@@ -98,7 +98,7 @@ class CasinoSlotMachine {
         // Integration with your existing OAuth system
         console.log('🎰 Checking login status...');
         try {
-            const token = localStorage.getItem('oauth_token');
+            const token = localStorage.getItem('oauth_simple_token');
             console.log('🎰 Token check:', token ? 'Token found' : 'No token');
             if (!token) {
                 console.log('🎰 No token found, returning false');
@@ -120,7 +120,7 @@ class CasinoSlotMachine {
             // Call your existing balance API
             const response = await fetch('/api/user/balance', {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('oauth_token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('oauth_simple_token')}`
                 }
             });
             const data = await response.json();
@@ -595,7 +595,7 @@ class CasinoSlotMachine {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('oauth_token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('oauth_simple_token')}`
                 },
                 body: JSON.stringify({
                     amount: amount,
@@ -625,7 +625,7 @@ class CasinoSlotMachine {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('oauth_token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('oauth_simple_token')}`
                 },
                 body: JSON.stringify({
                     amount: amount,
