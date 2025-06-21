@@ -245,29 +245,21 @@ class OAuthSimpleFaucet {
     }
     
     showLoginScreen() {
-        // Show login button in header
-        const headerLoginBtn = document.getElementById('header-login-btn');
-        const headerUserInfo = document.getElementById('header-user-info');
+        // Show login section, hide faucet section
+        const loginSection = document.getElementById('oauth-login-section');
+        const faucetSection = document.getElementById('oauth-faucet-section');
         
-        if (headerLoginBtn) headerLoginBtn.style.display = 'block';
-        if (headerUserInfo) headerUserInfo.style.display = 'none';
-        
-        // Hide the welcome section
-        const welcomeSection = document.getElementById('oauth-welcome-section');
-        if (welcomeSection) welcomeSection.style.display = 'none';
+        if (loginSection) loginSection.style.display = 'block';
+        if (faucetSection) faucetSection.style.display = 'none';
     }
     
     showFaucetScreen() {
-        // Show user info in header
-        const headerLoginBtn = document.getElementById('header-login-btn');
-        const headerUserInfo = document.getElementById('header-user-info');
+        // Hide login section, show faucet section
+        const loginSection = document.getElementById('oauth-login-section');
+        const faucetSection = document.getElementById('oauth-faucet-section');
         
-        if (headerLoginBtn) headerLoginBtn.style.display = 'none';
-        if (headerUserInfo) headerUserInfo.style.display = 'flex';
-        
-        // Show the welcome section
-        const welcomeSection = document.getElementById('oauth-welcome-section');
-        if (welcomeSection) welcomeSection.style.display = 'block';
+        if (loginSection) loginSection.style.display = 'none';
+        if (faucetSection) faucetSection.style.display = 'block';
         
         this.updateUI();
     }
