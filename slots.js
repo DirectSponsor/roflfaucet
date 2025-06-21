@@ -614,7 +614,8 @@ class CasinoSlotMachine {
     
     async addToRealBalance(amount, transactionType = 'gaming_win') {
         try {
-            const response = await fetch('/api/transaction.php', {
+            // Use the same external API as the faucet
+            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -625,6 +626,7 @@ class CasinoSlotMachine {
                     amount: amount,
                     source: transactionType,
                     description: `Slot machine win: ${amount} credits`,
+                    site_id: 'roflfaucet',
                     metadata: {
                         game: 'slots',
                         session_id: Date.now().toString()
@@ -634,10 +636,10 @@ class CasinoSlotMachine {
             
             if (response.ok) {
                 const data = await response.json();
-                this.credits = data.balance.current;
+                this.credits = data.balance ? data.balance.current : this.credits + amount;
                 console.log('✅ Gaming win credited:', amount, 'New balance:', this.credits);
             } else {
-                console.error('Failed to add to real balance');
+                console.error('Failed to add to real balance, using fallback');
                 // Fallback to local addition
                 this.credits += amount;
             }
@@ -650,7 +652,8 @@ class CasinoSlotMachine {
     
     async subtractFromRealBalance(amount, transactionType = 'slots_bet') {
         try {
-            const response = await fetch('/api/transaction.php', {
+            // Use the same external API as the faucet
+            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -661,6 +664,7 @@ class CasinoSlotMachine {
                     amount: amount,
                     source: transactionType,
                     description: `Slot machine bet: ${amount} credits`,
+                    site_id: 'roflfaucet',
                     metadata: {
                         game: 'slots',
                         session_id: Date.now().toString()
@@ -670,16 +674,20 @@ class CasinoSlotMachine {
             
             if (response.ok) {
                 const data = await response.json();
-                this.credits = data.balance.current;
+                this.credits = data.balance ? data.balance.current : this.credits - amount;
                 console.log('✅ Gaming bet processed:', amount, 'New balance:', this.credits);
             } else {
-                const errorData = await response.json();
+                const errorData = await response.json().catch(() => ({ error: 'Transaction failed' }));
                 console.error('Failed to subtract from real balance:', errorData.error);
-                throw new Error(errorData.error || 'Transaction failed');
+                // For bet failures, we fall back to local deduction but log the issue
+                console.warn('⚠️ API bet failed, using local deduction as fallback');
+                this.credits -= amount;
             }
         } catch (error) {
             console.error('Error subtracting from real balance:', error);
-            throw error; // Re-throw to handle in calling code
+            // For bet failures, we fall back to local deduction
+            console.warn('⚠️ Network error during bet, using local deduction as fallback');
+            this.credits -= amount;
         }
     }
     
