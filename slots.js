@@ -66,12 +66,10 @@ class CasinoSlotMachine {
         
         // Ensure bet is compatible with demo balance
         this.currentBet = 1; // Default bet for demo
-
-        this.initializeGame();
     }
     
-    initializeGame() {
-        this.loadUserData();
+    async initializeGame() {
+        await this.loadUserData();
         this.setupEventListeners();
         this.updateDisplay();
         this.populateReels();
@@ -79,28 +77,40 @@ class CasinoSlotMachine {
     }
     
     async loadUserData() {
+        console.log('🎰 Starting loadUserData()');
         // Check if user is logged in (using your OAuth system)
         this.isLoggedIn = await this.checkLoginStatus();
+        console.log('🎰 Login status checked, isLoggedIn:', this.isLoggedIn);
         
         if (this.isLoggedIn) {
             // Logged-in users: Load real balance from API
+            console.log('🎰 Loading real user data...');
             await this.loadRealUserData();
         } else {
             // Anonymous users: Use localStorage for demo play
+            console.log('🎰 Loading demo user data...');
             this.loadDemoUserData();
         }
+        console.log('🎰 loadUserData() completed, credits:', this.credits);
     }
     
     async checkLoginStatus() {
         // Integration with your existing OAuth system
+        console.log('🎰 Checking login status...');
         try {
             const token = localStorage.getItem('oauth_token');
-            if (!token) return false;
+            console.log('🎰 Token check:', token ? 'Token found' : 'No token');
+            if (!token) {
+                console.log('🎰 No token found, returning false');
+                return false;
+            }
             
             // You can expand this to validate token with your auth API
+            console.log('🎰 Token found, returning true');
             return true;
         } catch (error) {
-            console.log('Not logged in, using demo mode');
+            console.log('🎰 Error in checkLoginStatus:', error);
+            console.log('🎰 Not logged in, using demo mode');
             return false;
         }
     }
@@ -680,7 +690,8 @@ class CasinoSlotMachine {
 }
 
 // Initialize the slot machine when page loads
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     window.slotMachine = new CasinoSlotMachine();
+    await window.slotMachine.initializeGame();
 });
 
