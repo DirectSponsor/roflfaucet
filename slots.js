@@ -137,7 +137,7 @@ class CasinoSlotMachine {
         const saved = localStorage.getItem('slotMachineDemo');
         if (saved) {
             const data = JSON.parse(saved);
-            this.credits = data.credits || 0;
+            this.credits = Math.max(data.credits || 0, 50); // Ensure minimum 50 credits
             this.userLevel = data.userLevel || 1;
             this.totalSpins = data.totalSpins || 0;
             this.totalWagered = data.totalWagered || 0;
