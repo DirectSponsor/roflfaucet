@@ -127,16 +127,29 @@ class CasinoSlotMachine {
     
     async loadRealUserData() {
         try {
-            // Call your existing balance API
-            const response = await fetch('/api/user/balance', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('oauth_simple_token')}`
-                }
-            });
-            const data = await response.json();
+            // Call data.directsponsor.org balance API (matches OAuth system)
+            const url = `https://data.directsponsor.org/api/dashboard?site_id=roflfaucet&_t=${Date.now()}`;
+            console.log('🎰 Calling balance API:', url);
             
-            this.credits = data.spendableBalance || 100;
-            this.userLevel = data.level || 1;
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('oauth_simple_token')}`,
+                    'Content-Type': 'application/json'
+                },
+                cache: 'no-cache'
+            });
+            
+            console.log('🎰 Balance API response status:', response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('🎰 Balance API data:', data);
+                this.credits = parseFloat(data.dashboard.balance.useless_coins) || 0;
+                this.userLevel = 1; // Default level for slots
+            } else {
+                throw new Error(`API returned status ${response.status}`);
+            }
             
             // Load slot-specific stats from localStorage as backup
             const slotStats = localStorage.getItem('slotMachineStats');
