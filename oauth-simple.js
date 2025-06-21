@@ -25,28 +25,19 @@ class OAuthSimpleFaucet {
     }
     
     setupEventListeners() {
-        // Header login button
-        const headerLoginBtn = document.getElementById('header-login-btn');
-        if (headerLoginBtn) {
-            headerLoginBtn.addEventListener('click', () => this.startLogin());
+        // Main login button (matches HTML ID)
+        const loginBtn = document.getElementById('oauth-login-btn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => this.startLogin());
         }
         
-        // Header logout button
-        const headerLogoutBtn = document.getElementById('header-logout-btn');
-        if (headerLogoutBtn) {
-            headerLogoutBtn.addEventListener('click', () => this.handleLogout());
+        // Logout button (matches HTML ID)
+        const logoutBtn = document.getElementById('oauth-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.handleLogout());
         }
         
-        // Modal login button
-        const modalLoginBtn = document.getElementById('modal-login-btn');
-        if (modalLoginBtn) {
-            modalLoginBtn.addEventListener('click', () => {
-                this.hideLoginDialog();
-                this.startLogin();
-            });
-        }
-        
-        // Claim button (always visible, but shows dialog if not logged in)
+        // Claim button (matches HTML ID)
         const claimBtn = document.getElementById('oauth-claim-btn');
         if (claimBtn) {
             claimBtn.addEventListener('click', () => this.handleClaimClick());
