@@ -97,9 +97,19 @@ class CasinoSlotMachine {
     async checkLoginStatus() {
         // Integration with your existing OAuth system
         console.log('🎰 Checking login status...');
+        
+        // Check all possible token keys for debugging
+        const oauthSimpleToken = localStorage.getItem('oauth_simple_token');
+        const oauthToken = localStorage.getItem('oauth_token');
+        const allKeys = Object.keys(localStorage);
+        
+        console.log('🎰 All localStorage keys:', allKeys);
+        console.log('🎰 oauth_simple_token:', oauthSimpleToken ? 'Found' : 'Not found');
+        console.log('🎰 oauth_token:', oauthToken ? 'Found' : 'Not found');
+        
         try {
             const token = localStorage.getItem('oauth_simple_token');
-            console.log('🎰 Token check:', token ? 'Token found' : 'No token');
+            console.log('🎰 Using token:', token ? 'Token found' : 'No token');
             if (!token) {
                 console.log('🎰 No token found, returning false');
                 return false;
