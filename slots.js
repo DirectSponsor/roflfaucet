@@ -64,6 +64,9 @@ class CasinoSlotMachine {
             5: { cost: 500, multiplier: 2.0, maxBet: 5 }
         };
         
+        // Ensure bet is compatible with demo balance
+        this.currentBet = 1; // Default bet for demo
+
         this.initializeGame();
     }
     
@@ -135,6 +138,7 @@ class CasinoSlotMachine {
     loadDemoUserData() {
         // Anonymous users: Use localStorage for demo
         const saved = localStorage.getItem('slotMachineDemo');
+        console.log('🎰 Loading demo user data, saved data:', saved);
         if (saved) {
             const data = JSON.parse(saved);
             this.credits = Math.max(data.credits || 0, 50); // Ensure minimum 50 credits
@@ -143,9 +147,11 @@ class CasinoSlotMachine {
             this.totalWagered = data.totalWagered || 0;
             this.totalWon = data.totalWon || 0;
             this.bigWinPool = data.bigWinPool || 0;
+            console.log('🎰 Returning demo user loaded with credits:', this.credits);
         } else {
             // New demo user gets starting credits
             this.credits = 500; // More generous for demo to get them hooked!
+            console.log('🎰 New demo user created with credits:', this.credits);
         }
     }
     
