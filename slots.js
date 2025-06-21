@@ -151,7 +151,7 @@ class CasinoSlotMachine {
         console.log('🎰 Loading demo user data, saved data:', saved);
         if (saved) {
             const data = JSON.parse(saved);
-            this.credits = Math.max(data.credits || 0, 50); // Ensure minimum 50 credits
+            this.credits = data.credits || 0; // Load exact balance, no minimum
             this.userLevel = data.userLevel || 1;
             this.totalSpins = data.totalSpins || 0;
             this.totalWagered = data.totalWagered || 0;
@@ -159,8 +159,8 @@ class CasinoSlotMachine {
             this.bigWinPool = data.bigWinPool || 0;
             console.log('🎰 Returning demo user loaded with credits:', this.credits);
         } else {
-            // New demo user gets starting credits
-            this.credits = 500; // More generous for demo to get them hooked!
+            // New demo users start with 0 - must claim free credits
+            this.credits = 0; // Start at 0, encourage using free credits button
             console.log('🎰 New demo user created with credits:', this.credits);
         }
     }
@@ -666,23 +666,41 @@ class CasinoSlotMachine {
         document.getElementById('total-spins').textContent = this.totalSpins.toLocaleString();
         document.getElementById('total-wagered').textContent = this.totalWagered.toLocaleString();
         document.getElementById('total-won').textContent = this.totalWon.toLocaleString();
-        
+
         // Update control panel
         document.getElementById('last-win').textContent = this.lastWin;
         document.getElementById('current-balance').textContent = this.credits;
         document.getElementById('current-bet').textContent = this.currentBet;
-        
+
         // Show different text for demo vs real mode
         const balanceLabel = document.querySelector('.control-label[for="current-balance"]');
         if (balanceLabel) {
             balanceLabel.textContent = this.isLoggedIn ? 'CREDITS' : 'DEMO CREDITS';
         }
-        
+
         // Show login prompt for demo users with big wins
         if (!this.isLoggedIn && this.totalWon > 100 && this.totalSpins % 20 === 0) {
             this.showLoginPrompt();
         }
-        
+
+        // Toggle Free Credits or Faucet button based on user status
+        const freeCreditsBtn = document.getElementById('claim-btn');
+        if (this.isLoggedIn) {
+            freeCreditsBtn.textContent = 'Go to Faucet';
+            freeCreditsBtn.onclick = () => window.location.href = '/faucet';
+            freeCreditsBtn.disabled = false;
+        } else if (this.credits <= 1) {
+            freeCreditsBtn.textContent = 'Claim Free Credits';
+            freeCreditsBtn.onclick = () => {
+                this.credits += 50;
+                this.saveDemoUserData();
+                this.updateDisplay();
+            };
+            freeCreditsBtn.disabled = false;
+        } else {
+            freeCreditsBtn.disabled = true;
+        }
+
         // Update spin button state
         const spinBtn = document.getElementById('spin-btn');
         spinBtn.disabled = this.credits < this.currentBet || this.isSpinning;
