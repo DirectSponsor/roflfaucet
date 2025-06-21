@@ -612,24 +612,30 @@ class CasinoSlotMachine {
         // Anonymous users: Already deducted in spin() method
     }
     
-    async addToRealBalance(amount, transactionType = 'gaming_temp') {
+    async addToRealBalance(amount, transactionType = 'gaming_win') {
         try {
-            const response = await fetch('/api/user/balance/add', {
+            const response = await fetch('/api/transaction.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('oauth_simple_token')}`
                 },
                 body: JSON.stringify({
+                    type: 'gaming_win',
                     amount: amount,
                     source: transactionType,
-                    description: `Slot machine win: ${amount} credits`
+                    description: `Slot machine win: ${amount} credits`,
+                    metadata: {
+                        game: 'slots',
+                        session_id: Date.now().toString()
+                    }
                 })
             });
             
             if (response.ok) {
                 const data = await response.json();
-                this.credits = data.newBalance;
+                this.credits = data.balance.current;
+                console.log('✅ Gaming win credited:', amount, 'New balance:', this.credits);
             } else {
                 console.error('Failed to add to real balance');
                 // Fallback to local addition
@@ -642,29 +648,38 @@ class CasinoSlotMachine {
         }
     }
     
-    async subtractFromRealBalance(amount, transactionType = 'gaming_temp') {
+    async subtractFromRealBalance(amount, transactionType = 'slots_bet') {
         try {
-            const response = await fetch('/api/user/balance/subtract', {
+            const response = await fetch('/api/transaction.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('oauth_simple_token')}`
                 },
                 body: JSON.stringify({
+                    type: 'spend',
                     amount: amount,
                     source: transactionType,
-                    description: `Slot machine bet: ${amount} credits`
+                    description: `Slot machine bet: ${amount} credits`,
+                    metadata: {
+                        game: 'slots',
+                        session_id: Date.now().toString()
+                    }
                 })
             });
             
             if (response.ok) {
                 const data = await response.json();
-                this.credits = data.newBalance;
+                this.credits = data.balance.current;
+                console.log('✅ Gaming bet processed:', amount, 'New balance:', this.credits);
             } else {
-                console.error('Failed to subtract from real balance');
+                const errorData = await response.json();
+                console.error('Failed to subtract from real balance:', errorData.error);
+                throw new Error(errorData.error || 'Transaction failed');
             }
         } catch (error) {
             console.error('Error subtracting from real balance:', error);
+            throw error; // Re-throw to handle in calling code
         }
     }
     
