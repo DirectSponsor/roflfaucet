@@ -1,3 +1,99 @@
+/* Video Slot Machine Styles - High Specificity to Override Main Site CSS */
+
+.slot-machine-container .video-reels-container {
+    display: flex !important;
+    justify-content: center !important;
+    margin-bottom: 20px !important;
+    border: 3px solid #333 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    background: #000 !important;
+    width: 500px !important;
+    height: 180px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    flex-wrap: nowrap !important;
+}
+
+.slot-machine-container .video-reel {
+    width: 160px !important;
+    height: 180px !important;
+    overflow: hidden !important;
+    background: #000 !important;
+    flex: none !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+}
+
+.slot-machine-container .video-reel video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+.slot-machine-container .reel-separator {
+    width: 6px !important;
+    height: 180px !important;
+    background: #2d5a2d !important;
+    flex: none !important;
+    min-width: 6px !important;
+    max-width: 6px !important;
+}
+
+.control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #2c3e50;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.control-item {
+    text-align: center;
+}
+
+.spin-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.spin-button:hover {
+    background: #c0392b;
+}
+
+.stat-item {
+    flex: 1;
+    text-align: center;
+    color: white;
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ecf0f1;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #f1c40f;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
 /* =================================== */
 /* CASINO SLOT MACHINE STYLES         */
 /* =================================== */
@@ -53,6 +149,43 @@
     margin-bottom: 20px;
     border: 4px solid #34495e;
     box-shadow: inset 0 5px 15px rgba(0,0,0,0.2);
+    perspective: 1000px;
+    height: 240px;
+    overflow: hidden;
+}
+
+/* Machine flip mechanism */
+.machine-front,
+.machine-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    padding: 0;
+    backface-visibility: hidden;
+    transition: transform 0.6s ease-in-out;
+    border-radius: 6px;
+}
+
+.machine-front {
+    transform: rotateY(0deg);
+    z-index: 2;
+}
+
+.machine-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    z-index: 1;
+    padding: 20px;
+}
+
+.slot-machine.flipped .machine-front {
+    transform: rotateY(-180deg);
+}
+
+.slot-machine.flipped .machine-back {
+    transform: rotateY(0deg);
 }
 
 .reel-container {
@@ -62,6 +195,9 @@
     gap: 0;
 }
 
+/* Video Reels - Unified Window (duplicate removed) */
+
+/* Legacy reel styles - kept for compatibility */
 .reel {
     width: 120px;
     height: 180px;
@@ -71,19 +207,12 @@
     overflow: hidden;
     position: relative;
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
-.reel-separator {
-    width: 8px;
-    height: 180px;
-    background: linear-gradient(to bottom, #27ae60, #2ecc71, #27ae60);
-    border: 2px solid #1e8449;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+.symbols-container {
+    display: flex;
+    flex-direction: column;
+    transition: none;
 }
 
 .symbol {
@@ -102,38 +231,22 @@
 }
 
 /* Reel Animation States */
-.reel.spinning {
-    animation: reelSpin 2s linear infinite;
+.reel.spinning .symbols-container {
+    animation: infiniteScroll 0.3s linear infinite;
 }
 
-.reel.stopping {
-    animation: reelStop 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+.reel.stopping .symbols-container {
+    /* Transition applied via JavaScript for precise control */
 }
 
-.reel.bounce {
-    animation: reelBounce 0.6s ease-out forwards;
+.reel.bounce .symbols-container {
+    /* Bounce effect applied via JavaScript for precise control */
 }
 
-@keyframes reelSpin {
+/* Infinite scrolling animation for spinning reels */
+@keyframes infiniteScroll {
     0% { transform: translateY(0); }
-    100% { transform: translateY(-180px); }
-}
-
-@keyframes reelStop {
-    0% { transform: translateY(-180px); }
-    70% { transform: translateY(10px); }
-    85% { transform: translateY(-5px); }
-    95% { transform: translateY(2px); }
-    100% { transform: translateY(0); }
-}
-
-@keyframes reelBounce {
-    0% { transform: translateY(0) scale(1); }
-    20% { transform: translateY(-3px) scale(1.02); }
-    40% { transform: translateY(2px) scale(0.98); }
-    60% { transform: translateY(-1px) scale(1.01); }
-    80% { transform: translateY(1px) scale(0.99); }
-    100% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-360px); }
 }
 
 /* Win Overlay */
@@ -368,14 +481,81 @@
 }
 
 /* Special Effects */
-.symbol.winning {
-    animation: symbolWin 1s ease-in-out infinite;
-    background: linear-gradient(135deg, #f1c40f, #f39c12);
-    border-radius: 8px;
+
+/* Payout Table (Machine Back) */
+.payout-table {
+    color: white;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
 }
 
-@keyframes symbolWin {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(241, 196, 15, 0); }
-    50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(241, 196, 15, 0.8); }
+.payout-table h3 {
+    color: #f1c40f;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.payout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.payout-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    border-left: 4px solid #3498db;
+}
+
+.payout-row.jackpot {
+    border-left-color: #e74c3c;
+    background: rgba(231, 76, 60, 0.2);
+}
+
+.payout-row.high {
+    border-left-color: #f39c12;
+    background: rgba(243, 156, 18, 0.2);
+}
+
+.combo {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.credits {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #f1c40f;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.flip-button {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.flip-button:hover {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+    transform: translateY(-1px);
 }
 

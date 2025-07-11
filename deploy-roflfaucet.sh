@@ -84,6 +84,8 @@ timeout 120 rsync -avz --progress --delete --timeout=60 \
   --exclude 'templates/' \
   --exclude 'build.sh' \
   --exclude 'docs/' \
+  --include 'api/' \
+  --include 'api/**' \
   . $VPS_HOST:$APP_DIR/ || {
     echo "⚠️  Rsync timed out or failed, but may have partially completed"
     exit 1

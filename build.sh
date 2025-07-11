@@ -100,6 +100,12 @@ if [[ $processed_count -eq 0 ]]; then
 else
     echo ""
     echo "🎉 Build complete! Updated $processed_count HTML file(s)"
+    
+    # Fix permissions for web server access
+    echo "🔧 Setting web server permissions..."
+    chmod 644 *.html
+    echo "✅ Permissions set to 644 (web server readable)"
+    
     echo ""
     echo "📝 Include syntax:"
     echo "   \u003c!-- include start header.html --\u003e"

@@ -30,7 +30,9 @@ The ROFLFaucet slot machine is a fully-featured casino-style game that provides 
 - **Big Win Pool**: Accumulates 10% of all bets for exciting jackpots
 
 ### 🎨 Visual & Audio
-- **Realistic animations**: Acceleration, spinning, deceleration, bounce
+- **Physics-based animations**: Authentic reel deceleration with natural near-misses (upgraded July 5, 2025)
+- **Fixed reel strips**: Like real casinos - weighted symbol distribution with organic randomness
+- **Seamless symbol flow**: No gaps or artificial substitution - what spins is what lands
 - **Win highlighting**: Golden glow effects on winning symbols
 - **Responsive design**: Mobile-optimized layouts
 - **Flip mechanism**: Shows payout table on machine back

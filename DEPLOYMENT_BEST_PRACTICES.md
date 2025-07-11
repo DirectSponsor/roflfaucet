@@ -20,6 +20,8 @@ Our ecosystem uses a **distributed server architecture** to prevent conflicts an
 3. **❌ Local widget dependencies** (embedding widget files locally)
 4. **❌ Direct production edits** without git commits
 5. **❌ Skipping backups** before deployment
+6. **❌ Installing PHP/complex server dependencies** when external APIs exist
+7. **❌ Creating local API endpoints** when external solutions work
 
 ### **✅ ALWAYS DO:**
 1. **✅ Use deploy scripts** for all deployments
@@ -27,6 +29,8 @@ Our ecosystem uses a **distributed server architecture** to prevent conflicts an
 3. **✅ Create backups** before any changes
 4. **✅ Load widgets cross-server** via HTTP includes
 5. **✅ Test locally** before deployment
+6. **✅ Use external APIs** when they exist (data.directsponsor.org)
+7. **✅ Keep architecture simple** - avoid complexity when simple solutions work
 
 ---
 
@@ -59,6 +63,25 @@ git commit -m "Widget/API updates"
 - ✅ Commits changes to git
 - ✅ Deploys to UselessCoin server (89.116.106.121)
 - ✅ Makes widgets available globally
+
+---
+
+## 🏗️ **Architecture Philosophy**
+
+### **Simplicity Over Complexity:**
+- **External APIs First**: Use `data.directsponsor.org` instead of local PHP
+- **Minimal Server Dependencies**: Static files + external services
+- **Proven Solutions**: Don't reinvent what already works
+- **CSS Best Practice**: Use relative units (rem, %, vw) for responsive design; fixed pixels only for borders/shadows
+
+### **The PHP Avoidance Policy:**
+When tempted to install PHP/complex backend services:
+1. **First**: Check if external API already handles this
+2. **Second**: Consider if feature is actually needed
+3. **Third**: Look for client-side solutions
+4. **Last Resort**: Add server complexity
+
+**Real Example**: Slot machine transactions initially planned as local PHP API, but external `data.directsponsor.org/api/user/transaction` was simpler and more reliable.
 
 ---
 
