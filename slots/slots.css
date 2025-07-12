@@ -34,6 +34,35 @@
     background-position: 0 0;
 }
 
+/* Depth shading overlay - creates illusion of deep reel cylinder */
+.reel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+    
+    /* Gradient shadows to simulate depth - darker at edges, transparent in center */
+    background: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.3) 15%,
+        rgba(0, 0, 0, 0.08) 30%,
+        rgba(0, 0, 0, 0) 40%,
+        rgba(0, 0, 0, 0) 60%,
+        rgba(0, 0, 0, 0.08) 70%,
+        rgba(0, 0, 0, 0.3) 85%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    
+    /* Additional side shading for cylindrical depth */
+    box-shadow: 
+        inset 8px 0 12px -8px rgba(0, 0, 0, 0.4),
+        inset -8px 0 12px -8px rgba(0, 0, 0, 0.4);
+}
+
 /* Spinning animation - CSS animation for smooth looping */
 .reel.spinning {
     animation: spinReel 0.1s linear infinite;
@@ -73,27 +102,46 @@
     display: block;
 }
 
-/* Glass Overlay with Center Line */
+/* Glass Overlay with Realistic 3D Effect */
 .slot-glass-overlay {
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    height: 150px; /* One symbol height */
+    transform: translateY(-50%);
     pointer-events: none;
     z-index: 10;
+    
+    /* Glass effect with subtle 3D shading */
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.08) 20%,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(255, 255, 255, 0.08) 80%,
+        rgba(255, 255, 255, 0.15) 100%
+    );
+    
+    /* More visible glass borders */
+    border-top: 2px solid rgba(255, 255, 255, 0.6);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(255, 255, 255, 0.4),
+        0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
+/* More visible center reference line */
 .center-line {
     position: absolute;
     left: 0;
     right: 0;
     height: 2px;
-    background: rgba(255, 255, 0, 0.8);
+    background: rgba(255, 255, 255, 0.4);
     top: 50%;
     transform: translateY(-50%);
-    box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
-    z-index: 10;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+    z-index: 11;
     pointer-events: none;
 }
 
