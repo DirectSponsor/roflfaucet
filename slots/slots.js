@@ -644,5 +644,7 @@ function claimWinnings() {
 
 document.addEventListener('DOMContentLoaded', () => {
     slotMachine = new CasinoSlotMachine();
+    // Make slotMachine globally accessible for console debugging
+    window.slotMachine = slotMachine;
 });
 

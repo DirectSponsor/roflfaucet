@@ -5,7 +5,7 @@
     'use strict';
     
     // Configuration
-    const SCROLL_THRESHOLD = 100; // pixels to scroll before header collapses
+    const SCROLL_THRESHOLD = 60; // pixels to scroll before header collapses (aligns with beta triangle)
     const THROTTLE_DELAY = 16; // ~60fps throttling for smooth performance
     
     let ticking = false;

@@ -247,7 +247,7 @@ body {
 }
 
 .header.collapsed .container {
-    padding: 0.5rem 20px;
+    padding: 0.1rem 20px;
 }
 
 .header.collapsed .tagline {
@@ -257,14 +257,32 @@ body {
     overflow: hidden;
 }
 
+.header.collapsed .logo {
+    transform: translateY(calc(0.9rem - 5px)); /* Counteract padding reduction and move up 5px for centering */
+}
+
 .header.collapsed .logo h1 {
     margin-bottom: 0;
+    transform: translateY(0px); /* No movement for logo */
+}
+
+.header.collapsed .nav {
+    transform: translateY(-2px); /* Subtle upward movement for nav */
+}
+
+.header.collapsed .header-auth {
+    transform: translateY(-2px); /* Match nav movement for auth buttons */
+}
+
+.logo {
+    transition: transform 0.3s ease;
 }
 
 .logo h1 {
     font-size: 1.8rem;
     color: var(--primary-color);
     margin-bottom: 0.2rem;
+    transition: margin-bottom 0.3s ease, transform 0.3s ease;
 }
 
 .tagline {
@@ -280,6 +298,7 @@ body {
     display: flex;
     gap: 2rem;
     margin: 0 2rem;
+    transition: transform 0.3s ease;
 }
 
 .nav-link {
@@ -303,6 +322,7 @@ body {
     align-items: center;
     gap: 1rem;
     margin-left: auto;
+    transition: transform 0.3s ease;
 }
 
 .header-auth-btn {
