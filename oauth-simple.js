@@ -98,6 +98,7 @@ class OAuthSimpleFaucet {
                 body: new URLSearchParams({
                     grant_type: 'authorization_code',
                     client_id: this.clientId,
+                    site_id: this.clientId,
                     code: code,
                     redirect_uri: this.redirectUri
                 })
