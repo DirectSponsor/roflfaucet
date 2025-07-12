@@ -23,12 +23,16 @@ class CasinoSlotMachine {
         ];
         
         // Each reel has 10 symbols (150px each = 1500px total)
-        // Background position goes from 0 to -1500px
+        // But we use 20 positions (10 symbols + 10 in-between = 75px each)
         this.totalSymbolsPerReel = 10;
         this.symbolHeight = 150;
         this.totalSpriteHeight = this.totalSymbolsPerReel * this.symbolHeight; // 1500px
         
-        // Current background positions for each reel
+        // 20 positions: 10 symbols + 10 in-between (75px increments)
+        this.totalPositions = 20;
+        this.positionHeight = 75; // 150px / 2 = 75px per position
+        
+        // Current background positions for each reel (0-19)
         this.currentPositions = [0, 0, 0];
 
         // Define the actual symbol distribution in each reel (10 symbols total)
@@ -41,6 +45,42 @@ class CasinoSlotMachine {
             // Reel 3: cherries(3x), watermelon(2x), banana(2x), bigwin(1x), seven(1x), bar(1x)
             ['cherries', 'watermelon', 'banana', 'cherries', 'bigwin', 'watermelon', 'seven', 'banana', 'bar', 'cherries']
         ];
+        
+        // Virtual reel list for probability control (much larger than physical sprites)
+        // This gives us fine-grained control over outcomes while using 10-symbol sprites
+        this.virtualReelList = [
+            // High frequency (small wins keep players engaged) - 78% of outcomes
+            'blank1', 'blank2', 'blank3', 'blank4', 'blank5',           // 5 blanks (17%)
+            'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon',  // 8 melons (27%)
+            'banana', 'banana', 'banana', 'banana', 'banana', 'banana', 'banana',    // 7 bananas (23%)
+            'cherries', 'cherries', 'cherries', 'cherries', 'cherries', 'cherries',              // 6 cherries (20%)
+            
+            // Medium frequency (good wins) - 10% of outcomes
+            'combo1', 'combo2', 'combo3',                               // 3 combo pieces (10%)
+            
+            // Rare but not impossible (exciting wins) - 12% of outcomes
+            'seven',                                                    // 1 seven (3%)
+            'bar',                                                     // 1 bar (3%)
+            'bigwin', 'bigwin'                                         // 2 bigwin (6% - jackpot more likely)
+        ];
+        
+        // Map virtual symbols to physical sprite positions
+        this.virtualToPhysicalMap = {
+            'blank1': { symbol: 'watermelon', offset: 30 },   // In-between stop
+            'blank2': { symbol: 'banana', offset: 45 },       // In-between stop
+            'blank3': { symbol: 'cherries', offset: 60 },     // In-between stop
+            'blank4': { symbol: 'seven', offset: 90 },        // In-between stop
+            'blank5': { symbol: 'bar', offset: 120 },         // In-between stop
+            'watermelon': { symbol: 'watermelon', offset: 0 },
+            'banana': { symbol: 'banana', offset: 0 },
+            'cherries': { symbol: 'cherries', offset: 0 },
+            'seven': { symbol: 'seven', offset: 0 },
+            'bar': { symbol: 'bar', offset: 0 },
+            'bigwin': { symbol: 'bigwin', offset: 0 },
+            'combo1': { symbol: 'cherries', offset: 0 },      // Treat combos as cherries
+            'combo2': { symbol: 'banana', offset: 0 },
+            'combo3': { symbol: 'watermelon', offset: 0 }
+        };
 
         // Setup event listeners
         this.setupEventListeners();
@@ -97,13 +137,42 @@ class CasinoSlotMachine {
         console.log('Current positions before:', this.currentPositions);
         
         for (let i = 0; i < 3; i++) {
-            const randomSteps = Math.floor(Math.random() * this.totalSymbolsPerReel);
-            const oldPosition = this.currentPositions[i];
-            this.currentPositions[i] = (this.currentPositions[i] + randomSteps) % this.totalSymbolsPerReel;
-            const selectedSymbolName = this.reelSymbols[i][this.currentPositions[i]];
+            // Simple random selection from 20 positions (0-19)
+            const randomPosition = Math.floor(Math.random() * this.totalPositions);
             
-            console.log(`Reel ${i + 1}: random steps=${randomSteps}, old pos=${oldPosition}, new pos=${this.currentPositions[i]}, symbol=${selectedSymbolName}`);
-            outcomes.push(selectedSymbolName);
+            // Even positions (0, 2, 4, 6, 8, 10, 12, 14, 16, 18) = on symbols
+            // Odd positions (1, 3, 5, 7, 9, 11, 13, 15, 17, 19) = in-between
+            const isInBetween = randomPosition % 2 === 1;
+            
+            if (isInBetween) {
+                // In-between position: calculate which symbol to show + 75px offset
+                const symbolIndex = Math.floor(randomPosition / 2);
+                const symbolName = this.reelSymbols[i][symbolIndex];
+                
+                outcomes.push({
+                    position: randomPosition,
+                    symbolIndex: symbolIndex,
+                    symbolName: symbolName,
+                    isInBetween: true,
+                    offset: 75 // Half-way between symbols
+                });
+                
+                console.log(`Reel ${i + 1}: position ${randomPosition} (IN-BETWEEN), symbol ${symbolName} + 75px offset`);
+            } else {
+                // On symbol: calculate which symbol to show
+                const symbolIndex = randomPosition / 2;
+                const symbolName = this.reelSymbols[i][symbolIndex];
+                
+                outcomes.push({
+                    position: randomPosition,
+                    symbolIndex: symbolIndex,
+                    symbolName: symbolName,
+                    isInBetween: false,
+                    offset: 0
+                });
+                
+                console.log(`Reel ${i + 1}: position ${randomPosition} (ON SYMBOL), symbol ${symbolName}`);
+            }
         }
         
         // Stop each reel at different times
@@ -124,9 +193,10 @@ class CasinoSlotMachine {
         }
     }
     
-    stopSingleReel(reelIndex, selectedSymbol) {
+    stopSingleReel(reelIndex, outcome) {
         const reel = this.reels[reelIndex];
-        const symbolIndex = this.currentPositions[reelIndex];
+        const symbolIndex = outcome.symbolIndex;
+        const offset = outcome.offset;
         
         // Stop the spinning animation
         reel.classList.remove('spinning');
@@ -147,11 +217,20 @@ class CasinoSlotMachine {
         // Position the sprite so the previous symbol is at the top of the window
         // This means the current symbol will be in the center, and next symbol at bottom
         // Use exact pixels: each symbol is 150px tall
-        const backgroundPositionY = -(prevSymbolIndex * this.symbolHeight); // 0px, -150px, -300px, etc.
+        let backgroundPositionY = -(prevSymbolIndex * this.symbolHeight); // 0px, -150px, -300px, etc.
+        
+        // Apply offset for in-between stops
+        if (offset > 0) {
+            backgroundPositionY -= offset; // Move further down for in-between position
+            console.log(`🎯 IN-BETWEEN STOP: Reel ${reelIndex + 1} stopped between symbols with ${offset}px offset`);
+        }
+        
         reel.style.backgroundPosition = `0 ${backgroundPositionY}px`;
         
-        console.log(`Reel ${reelIndex + 1} stopped on ${selectedSymbol} at position ${symbolIndex}`);
-        console.log(`  Showing symbols: ${this.reelSymbols[reelIndex][prevSymbolIndex]} (top), ${selectedSymbol} (center), ${this.reelSymbols[reelIndex][nextSymbolIndex]} (bottom)`);
+        const isInBetween = offset > 0;
+        console.log(`Reel ${reelIndex + 1} stopped on position ${outcome.position} (${outcome.symbolName}) at symbol index ${symbolIndex}`);
+        console.log(`  In-between: ${isInBetween}, offset: ${offset}px`);
+        console.log(`  Showing symbols: ${this.reelSymbols[reelIndex][prevSymbolIndex]} (top), ${outcome.symbolName} (center), ${this.reelSymbols[reelIndex][nextSymbolIndex]} (bottom)`);
         console.log(`  Background position: 0 ${backgroundPositionY}px`);
     }
 
