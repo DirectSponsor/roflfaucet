@@ -77,6 +77,7 @@ class OAuthSimpleFaucet {
         const authUrl = new URL(`${this.authApiBase}/authorize.php`);
         authUrl.searchParams.append('response_type', 'code');
         authUrl.searchParams.append('client_id', this.clientId);
+        authUrl.searchParams.append('site_id', this.clientId); // Add site_id parameter
         authUrl.searchParams.append('redirect_uri', this.redirectUri);
         authUrl.searchParams.append('scope', 'read write');
         authUrl.searchParams.append('state', state);
