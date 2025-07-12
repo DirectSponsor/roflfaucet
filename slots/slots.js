@@ -415,16 +415,7 @@ class CasinoSlotMachine {
         this.updateDisplay();
         console.log(`🎁 Added ${amount} demo credits! New balance: ${this.credits}`);
         
-        // Show conversion prompt
-        setTimeout(() => {
-            const signUpText = `🎯 Having fun?\n\n` +
-                              `Sign up to keep your winnings and earn real UselessCoins!\n\n` +
-                              `Your balance will work across all DirectSponsor sites.`;
-            
-            if (confirm(signUpText)) {
-                window.location.href = '/';
-            }
-        }, 2000);
+        // No nagging - just let them play!
     }
     
     initializeReelPositions() {
