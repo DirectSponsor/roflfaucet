@@ -1,33 +1,52 @@
-/* CSS Styles for CSS Sprite Slot Machine */
+/* CSS Styles for Sliding Symbol Slot Machine */
 
-/* Sprite Reels Container */
+/* Reels Container */
 .sprite-reels-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    align-items: center;
+    gap: 20px; /* Fixed gap between reels */
     background: #1a1a1a;
     padding: 20px;
     border-radius: 10px;
-    border: 3px solid #333;
-}
-
-/* Individual Sprite Reel */
-.sprite-reel {
-    width: 150px;
-    height: 450px; /* Shows 3 symbols vertically (150px each) */
-    overflow: hidden;
-    background-image: url('sprite_reel_vertical.png');
-    background-repeat: repeat-y;
-    background-position: center 0; /* Center horizontally, start at top */
+    border: 2px solid #333;
+    width: fit-content; /* Size to content, not full width */
+    max-width: 100%; /* Don't exceed container */
+    margin: 20px auto;
+    box-sizing: border-box;
     position: relative;
-    border: 2px solid #555;
-    border-radius: 5px;
 }
 
-/* Vertical Spin Animation */
-@keyframes spinReelVertical {
-    from { background-position: center 0; }
-    to { background-position: center -1500px; /* Full sprite height - 10 symbols */ }
+/* Individual Reel - FIXED 150px width for perfect alignment */
+.reel {
+    width: 150px; /* FIXED WIDTH - never changes */
+    height: 450px; /* FIXED HEIGHT - 3 symbols × 150px = 450px */
+    overflow: hidden; /* CRITICAL: Hide symbols outside the window */
+    background: #333;
+    border-radius: 3px;
+    position: relative;
+    border: 2px solid #222;
+    
+    /* Sprite background setup - exact pixel matching */
+    background-image: url('sprite_reel_vertical.png');
+    background-size: 150px 1500px; /* Exact sprite size - 150px wide, 1500px tall */
+    background-repeat: repeat-y;
+    background-position: 0 0;
+}
+
+/* Spinning animation - CSS animation for smooth looping */
+.reel.spinning {
+    animation: spinReel 0.1s linear infinite;
+}
+
+@keyframes spinReel {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1500px; }
+}
+
+/* Non-spinning reels - smooth transition to final position */
+.reel:not(.spinning) {
+    transition: background-position 0.3s ease-out;
 }
 
 /* Video Reels Container - Natural Video Size */
@@ -74,6 +93,8 @@
     top: 50%;
     transform: translateY(-50%);
     box-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
+    z-index: 10;
+    pointer-events: none;
 }
 
 /* Separators Between Reels - Thin Green Lines */
@@ -86,14 +107,15 @@
 /* Control Panel */
 .control-panel {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     background: #2c3e50;
     color: white;
-    padding: 15px 20px;
+    padding: 20px;
     border-radius: 8px;
-    margin: 20px auto;
-    max-width: 500px;
+    margin: 20px 0;
+    width: 100%;
+    gap: 20px;
 }
 
 .control-item {
@@ -161,14 +183,16 @@
     background: #2980b9;
 }
 
-/* Slot Machine Container */
+/* Slot Machine Container - Full width with centered content */
 .slot-machine-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100%; /* Fill the full width of the center column */
     background: linear-gradient(135deg, #2c3e50, #34495e);
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the slot machine content within the full-width container */
+    padding: 20px; /* Add back some padding since we have full width now */
 }
 
 /* Stats Bar */
@@ -335,31 +359,34 @@
     color: #f1c40f;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .video-reels-container {
-        width: 90%;
-        max-width: 400px;
-        height: 310px;
-    }
-    
-    .video-reel {
-        width: 120px;
-        height: 310px;
-    }
-    
-    .reel-separator {
-        width: 4px;
-        height: 310px;
-    }
-    
+/* Responsive Media Queries for Control Panel */
+@media (max-width: 700px) {
     .control-panel {
         flex-direction: column;
         gap: 15px;
+        width: 100%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 600px) {
+    .sprite-reels-container {
+        gap: 15px;
+        padding: 15px;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 450px) {
+    .control-panel {
+        width: 100%;
+        padding: 10px 15px;
+        gap: 10px;
     }
     
-    .slot-machine-container {
-        margin: 10px;
-        padding: 15px;
+    .sprite-reels-container {
+        gap: 10px;
+        padding: 10px;
+        max-width: 400px;
     }
 }

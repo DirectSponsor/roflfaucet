@@ -350,7 +350,7 @@ body {
 
 .main-content {
     flex: 2;
-    min-width: 300px;
+    min-width: 570px; /* Ensure enough space for slot machine (450px + padding) */
     order: 2;
 }
 
@@ -1420,7 +1420,7 @@ section h2 {
     font-size: 0.9rem;
 }
 
-/* Responsive Design */
+/* Responsive Design - Slot machine friendly */
 @media (max-width: 768px) {
     .content-grid {
         flex-direction: column;
@@ -1446,6 +1446,20 @@ section h2 {
     
     .sidebar-right {
         order: 3; /* Right ads last */
+    }
+}
+
+/* Give main content more space when slot machine is present */
+@media (min-width: 769px) and (max-width: 1100px) {
+    .main-content {
+        flex: 3; /* More space for slot machine */
+        min-width: 570px; /* Accommodate 3×150px + gaps + padding */
+    }
+    
+    .sidebar-left,
+    .sidebar-right {
+        flex: 0.8; /* Slightly smaller sidebars */
+        min-width: 200px;
     }
 }
 
@@ -2016,6 +2030,8 @@ section h2 {
     border-radius: 10px;
     padding: 0;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    /* Ensure main content can grow to accommodate fixed-width slot machine */
+    min-width: 570px; /* Accommodate 450px + 2x60px padding */
 }
 
 /* Content header - gradient header for any main content */
@@ -2040,7 +2056,17 @@ section h2 {
 
 /* Main content container */
 .content-container {
-    padding: 30px;
+    padding: 0; /* Remove padding to allow slot machine to fill full width */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Allow child to fill full width */
+    /* Ensure the container doesn't constrain the slot machine */
+    min-width: 0; /* Allow flex shrinking */
+    /* Force absolute centering for slot machine page */
+    justify-content: flex-start;
+    width: 100%; /* Full width to enable proper centering */
+    /* Reset text alignment - don't inherit center from header */
+    text-align: initial;
 }
 
 /* Entry/article styles - reusable for any content entries */
