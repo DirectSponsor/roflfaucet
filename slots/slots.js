@@ -40,6 +40,31 @@ class CasinoSlotMachine {
         this.totalSpins = 0;
         this.totalWagered = 0;
         this.totalWon = 0;
+        
+        // Game Economy (local storage for testing)
+        this.loadGameState();
+        
+        // Payout table based on virtual reel list design
+        this.payoutTable = {
+            // Special combinations
+            'three_blanks': 2,        // All in-between stops
+            'any_fruit': 5,           // Any 3 matching fruits
+            'three_watermelon': 8,    // 3 watermelons
+            'three_banana': 10,       // 3 bananas  
+            'three_cherries': 12,     // 3 cherries
+            'three_combo': 15,        // 3 combo pieces
+            'three_seven': 35,        // 3 sevens
+            'three_bar': 75,          // 3 bars
+            'three_bigwin': 400,      // 3 bigwins (jackpot!)
+            
+            // Partial matches (2 of 3)
+            'two_watermelon': 2,
+            'two_banana': 3,
+            'two_cherries': 4,
+            'two_seven': 8,
+            'two_bar': 15,
+            'two_bigwin': 50
+        };
 
         // Initialize game components
         this.reels = [
@@ -61,73 +86,256 @@ class CasinoSlotMachine {
         // Current background positions for each reel (0-19)
         this.currentPositions = [0, 0, 0];
 
-        // Define the actual symbol distribution in each reel (10 symbols total)
-        // Each reel has different symbol order for variety
-        this.reelSymbols = [
-            // Reel 1: watermelon(3x), banana(2x), cherries(2x), seven(1x), bar(1x), bigwin(1x)
-            ['watermelon', 'banana', 'cherries', 'watermelon', 'seven', 'banana', 'bar', 'cherries', 'bigwin', 'watermelon'],
-            // Reel 2: banana(3x), cherries(2x), watermelon(2x), bar(1x), seven(1x), bigwin(1x)
-            ['banana', 'cherries', 'watermelon', 'bar', 'banana', 'seven', 'cherries', 'watermelon', 'bigwin', 'banana'],
-            // Reel 3: cherries(3x), watermelon(2x), banana(2x), bigwin(1x), seven(1x), bar(1x)
-            ['cherries', 'watermelon', 'banana', 'cherries', 'bigwin', 'watermelon', 'seven', 'banana', 'bar', 'cherries']
-        ];
+        // Simple unified position-based system
+        // All reels use the same sprite and same virtual list
+        // Positions 0,2,4,6,8,10,12,14,16,18 = on-symbol (even positions)
+        // Positions 1,3,5,7,9,11,13,15,17,19 = in-between (odd positions)
         
-        // Virtual reel list for probability control (much larger than physical sprites)
-        // This gives us fine-grained control over outcomes while using 10-symbol sprites
-        this.virtualReelList = [
-            // High frequency (small wins keep players engaged) - 78% of outcomes
-            'blank1', 'blank2', 'blank3', 'blank4', 'blank5',           // 5 blanks (17%)
-            'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon', 'watermelon',  // 8 melons (27%)
-            'banana', 'banana', 'banana', 'banana', 'banana', 'banana', 'banana',    // 7 bananas (23%)
-            'cherries', 'cherries', 'cherries', 'cherries', 'cherries', 'cherries',              // 6 cherries (20%)
-            
-            // Medium frequency (good wins) - 10% of outcomes
-            'combo1', 'combo2', 'combo3',                               // 3 combo pieces (10%)
-            
-            // Rare but not impossible (exciting wins) - 12% of outcomes
-            'seven',                                                    // 1 seven (3%)
-            'bar',                                                     // 1 bar (3%)
-            'bigwin', 'bigwin'                                         // 2 bigwin (6% - jackpot more likely)
-        ];
-        
-        // Map virtual symbols to physical sprite positions
-        this.virtualToPhysicalMap = {
-            'blank1': { symbol: 'watermelon', offset: 30 },   // In-between stop
-            'blank2': { symbol: 'banana', offset: 45 },       // In-between stop
-            'blank3': { symbol: 'cherries', offset: 60 },     // In-between stop
-            'blank4': { symbol: 'seven', offset: 90 },        // In-between stop
-            'blank5': { symbol: 'bar', offset: 120 },         // In-between stop
-            'watermelon': { symbol: 'watermelon', offset: 0 },
-            'banana': { symbol: 'banana', offset: 0 },
-            'cherries': { symbol: 'cherries', offset: 0 },
-            'seven': { symbol: 'seven', offset: 0 },
-            'bar': { symbol: 'bar', offset: 0 },
-            'bigwin': { symbol: 'bigwin', offset: 0 },
-            'combo1': { symbol: 'cherries', offset: 0 },      // Treat combos as cherries
-            'combo2': { symbol: 'banana', offset: 0 },
-            'combo3': { symbol: 'watermelon', offset: 0 }
+        // Position-based mapping - what's actually at each position in the sprite
+        this.positionMap = {
+            0: 'watermelon',    // Position 0 (what we see at top)
+            1: 'blank',         // Between watermelon and banana
+            2: 'banana',        // Position 2
+            3: 'blank',         // Between banana and cherries  
+            4: 'cherries',      // Position 4 (center in your screenshot)
+            5: 'blank',         // Between cherries and seven
+            6: 'seven',         // Position 6 (bottom visible)
+            7: 'blank',         // Between seven and bar
+            8: 'bar',           // Position 8
+            9: 'blank',         // Between bar and bigwin
+            10: 'bigwin',       // Position 10
+            11: 'blank',        // Between bigwin and next symbol
+            12: 'watermelon',   // Position 12 (second watermelon)
+            13: 'blank',        // Between symbols
+            14: 'banana',       // Position 14 (second banana)
+            15: 'blank',        // Between symbols
+            16: 'cherries',     // Position 16 (second cherries)
+            17: 'blank',        // Between symbols
+            18: 'seven',        // Position 18 (second seven)
+            19: 'blank'         // Between symbols
         };
+        
+        // Simple virtual reel list - just position numbers
+        this.virtualReelList = [
+            // High frequency positions (common symbols)
+            0, 0, 0, 0,        // Watermelon (position 0) - 4 entries
+            2, 2, 2, 2, 2,     // Banana (position 2) - 5 entries  
+            4, 4, 4, 4,        // Cherries (position 4) - 4 entries
+            12, 12, 12,        // Watermelon (position 12) - 3 entries
+            14, 14, 14,        // Banana (position 14) - 3 entries
+            16, 16,            // Cherries (position 16) - 2 entries
+            
+            // Medium frequency positions
+            6, 6,              // Seven (position 6) - 2 entries
+            18,                // Seven (position 18) - 1 entry
+            8,                 // Bar (position 8) - 1 entry
+            
+            // Low frequency positions  
+            10, 10,            // BigWin (position 10) - 2 entries
+            
+            // Blank positions (in-between stops)
+            1, 3, 5, 7, 9      // Various blank positions - 5 entries
+        ];
+        
 
         // Setup event listeners
         this.setupEventListeners();
         
         // Set initial positions for all reels to show 3 symbols
         this.initializeReelPositions();
+        
+        // Initialize display with loaded state
+        this.updateDisplay();
+        
+        // Initialize audio system
+        this.setupAudio();
 
         console.log('🎰 Casino Slot Machine with Sprite Background initialized!');
     }
     
-    initializeReelPositions() {
-        // Set initial positions for each reel to show the first 3 symbols
-        this.reels.forEach((reel, index) => {
-            // Show symbols 0, 1, 2 initially (symbol 1 in center)
-            this.currentPositions[index] = 1; // Start with symbol 1 in center
-            const prevSymbolIndex = 0; // Symbol 0 at top
-            // Use exact pixels: each symbol is 150px tall
-            const backgroundPositionY = -(prevSymbolIndex * this.symbolHeight); // 0px, -150px, -300px, etc.
-            reel.style.backgroundPosition = `0 ${backgroundPositionY}px`;
+    setupAudio() {
+        // Create audio context and sound system
+        this.audioContext = null;
+        this.sounds = {};
+        
+        // Initialize audio context on first user interaction
+        document.addEventListener('click', () => {
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.loadSounds();
+            }
+        }, { once: true });
+    }
+    
+    loadSounds() {
+        // Sound stubs - to be replaced with actual audio files
+        this.sounds = {
+            reelThump: this.createTone(120, 0.1, 'square'),
+            coinDrop: this.createTone(800, 0.05, 'sine'),
+            win: this.createTone(440, 0.2, 'sine'),
+            jackpot: this.createTone(660, 0.5, 'sine')
+        };
+    }
+    
+    createTone(frequency, duration, type = 'sine') {
+        // Create a simple synthetic sound
+        return () => {
+            if (!this.audioContext) return;
             
-            console.log(`Reel ${index + 1} initialized: showing symbols ${this.reelSymbols[index][0]} (top), ${this.reelSymbols[index][1]} (center), ${this.reelSymbols[index][2]} (bottom)`);
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+            
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + duration);
+        };
+    }
+    
+    playSound(soundName) {
+        if (this.sounds[soundName]) {
+            this.sounds[soundName]();
+        }
+    }
+    
+    animateWinPayout(totalPayout, winResult) {
+        // Play win sound
+        if (winResult.type === 'three_bigwin') {
+            this.playSound('jackpot');
+        } else {
+            this.playSound('win');
+        }
+        
+        // Animate the payout counter
+        const lastWinElement = document.getElementById('last-win');
+        if (lastWinElement) {
+            lastWinElement.classList.add('win-animation');
+            
+            // Animate the number from 0 to totalPayout
+            this.animateCounter(lastWinElement, 0, totalPayout, 1000);
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                lastWinElement.classList.remove('win-animation');
+            }, 1500);
+        }
+        
+        // Animate coin drops
+        this.animateCoins(totalPayout);
+        
+        // Update credits gradually
+        this.animateCreditsIncrease(totalPayout);
+        
+        // Update total won
+        this.totalWon += totalPayout;
+        
+        // Log the win
+        console.log(`🎉 WIN! ${winResult.type} - Payout: ${winResult.payout}x bet = ${totalPayout} credits`);
+        
+        // Special jackpot message
+        if (winResult.type === 'three_bigwin') {
+            console.log('🎰💰 JACKPOT! THREE BIG WINS! 💰🎰');
+        }
+    }
+    
+    animateCounter(element, start, end, duration) {
+        const startTime = performance.now();
+        const range = end - start;
+        
+        const updateCounter = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Use easing function for smooth animation
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            const currentValue = Math.floor(start + (range * easeOut));
+            
+            element.textContent = currentValue;
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            } else {
+                element.textContent = end; // Ensure final value is exact
+            }
+        };
+        
+        requestAnimationFrame(updateCounter);
+    }
+    
+    animateCoins(totalPayout) {
+        // Create coin drop animation
+        const coinDrops = Math.min(totalPayout, 20); // Max 20 coins for performance
+        
+        for (let i = 0; i < coinDrops; i++) {
+            setTimeout(() => {
+                this.playSound('coinDrop');
+                this.createCoinEffect();
+            }, i * 50); // Stagger coin drops
+        }
+    }
+    
+    createCoinEffect() {
+        const coin = document.createElement('div');
+        coin.className = 'coin-effect';
+        coin.innerHTML = '🪙';
+        
+        // Position randomly around the last win display
+        const lastWinElement = document.getElementById('last-win');
+        if (lastWinElement) {
+            const rect = lastWinElement.getBoundingClientRect();
+            coin.style.position = 'fixed';
+            coin.style.left = (rect.left + Math.random() * rect.width) + 'px';
+            coin.style.top = (rect.top - 20) + 'px';
+            coin.style.zIndex = '1000';
+            coin.style.fontSize = '20px';
+            coin.style.pointerEvents = 'none';
+            
+            document.body.appendChild(coin);
+            
+            // Animate coin falling
+            coin.animate([
+                { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
+                { transform: 'translateY(100px) rotate(360deg)', opacity: 0 }
+            ], {
+                duration: 1000,
+                easing: 'ease-in'
+            }).onfinish = () => {
+                coin.remove();
+            };
+        }
+    }
+    
+    animateCreditsIncrease(totalPayout) {
+        const currentBalanceElement = document.getElementById('current-balance');
+        const startCredits = this.credits;
+        const endCredits = this.credits + totalPayout;
+        
+        // Animate the credits counter
+        this.animateCounter(currentBalanceElement, startCredits, endCredits, 800);
+        
+        // Update the actual credits value
+        this.credits = endCredits;
+        
+        // Save state
+        this.saveGameState();
+    }
+    
+    initializeReelPositions() {
+        // Set initial positions for each reel
+        this.reels.forEach((reel, index) => {
+            // Start at position 0 (cherries)
+            this.currentPositions[index] = 0;
+            // Position sprite to show cherries in center
+            reel.style.backgroundPosition = `0 0px`;
+            
+            console.log(`Reel ${index + 1} initialized at position 0`);
         });
     }
 
@@ -141,8 +349,23 @@ class CasinoSlotMachine {
 
     spinReels() {
         if (this.isSpinning) return;
+        
+        // Check if player has enough credits
+        if (this.credits < this.currentBet) {
+            console.log('❌ Not enough credits to spin!');
+            return;
+        }
+        
+        // Deduct bet from credits
+        this.credits -= this.currentBet;
+        this.totalSpins++;
+        this.totalWagered += this.currentBet;
+        
         this.isSpinning = true;
-        console.log('Spinning...');
+        console.log(`🎰 Spinning with bet: ${this.currentBet} credits...`);
+        
+        // Update display immediately
+        this.updateDisplay();
         
         // Start all reels spinning with CSS animation
         this.reels.forEach((reel, index) => {
@@ -159,67 +382,30 @@ class CasinoSlotMachine {
         
         // Pre-calculate outcomes for all reels
         const outcomes = [];
-        console.log('Symbols available:', this.symbolNames);
+        console.log('Virtual reel list size:', this.virtualReelList.length);
         console.log('Current positions before:', this.currentPositions);
         
         for (let i = 0; i < 3; i++) {
-            // Pick from virtual reel list for probability control
+            // Pick from virtual reel list - now contains just position numbers
             const randomIndex = Math.floor(Math.random() * this.virtualReelList.length);
-            const virtualSymbol = this.virtualReelList[randomIndex];
+            const position = this.virtualReelList[randomIndex];
             
-            // Check if this is a blank (in-between) symbol
-            const isBlank = virtualSymbol.startsWith('blank');
+            // Look up what symbol is at this position
+            const symbol = this.positionMap[position];
             
-            if (isBlank) {
-                // In-between stop: pick a random symbol and add 75px offset
-                const randomSymbolIndex = Math.floor(Math.random() * this.totalSymbolsPerReel);
-                const symbolName = this.reelSymbols[i][randomSymbolIndex];
-                
-                // Calculate the 20-position equivalent (odd position for in-between)
-                const position = (randomSymbolIndex * 2) + 1; // Odd position = in-between
-                
-                outcomes.push({
-                    position: position,
-                    symbolIndex: randomSymbolIndex,
-                    symbolName: symbolName,
-                    virtualSymbol: virtualSymbol,
-                    isInBetween: true,
-                    offset: 75 // Perfect half-way between symbols
-                });
-                
-                console.log(`Reel ${i + 1}: virtual=${virtualSymbol} (IN-BETWEEN), position ${position}, symbol ${symbolName} + 75px offset`);
-            } else {
-                // Regular symbol stop: find this symbol in the reel
-                let symbolName = virtualSymbol;
-                
-                // Handle combo symbols (map to physical symbols)
-                if (virtualSymbol === 'combo1') symbolName = 'cherries';
-                if (virtualSymbol === 'combo2') symbolName = 'banana';
-                if (virtualSymbol === 'combo3') symbolName = 'watermelon';
-                
-                // Find position of this symbol in the reel
-                let symbolIndex = this.reelSymbols[i].indexOf(symbolName);
-                if (symbolIndex === -1) {
-                    // Fallback to first symbol if not found
-                    console.warn(`Symbol ${symbolName} not found in reel ${i + 1}, using first symbol`);
-                    symbolIndex = 0;
-                    symbolName = this.reelSymbols[i][0];
-                }
-                
-                // Calculate the 20-position equivalent (even position for on-symbol)
-                const position = symbolIndex * 2; // Even position = on symbol
-                
-                outcomes.push({
-                    position: position,
-                    symbolIndex: symbolIndex,
-                    symbolName: symbolName,
-                    virtualSymbol: virtualSymbol,
-                    isInBetween: false,
-                    offset: 0 // Perfect symbol centering
-                });
-                
-                console.log(`Reel ${i + 1}: virtual=${virtualSymbol} (ON SYMBOL), position ${position}, symbol ${symbolName}`);
-            }
+            // Calculate sprite positioning based on position
+            const isInBetween = position % 2 === 1; // Odd positions are in-between
+            const symbolIndex = Math.floor(position / 2); // Which symbol (0-9)
+            
+            outcomes.push({
+                position: position,
+                symbolIndex: symbolIndex,
+                symbolName: symbol,
+                virtualSymbol: symbol,
+                isInBetween: isInBetween
+            });
+            
+            console.log(`Reel ${i + 1}: position=${position}, symbol=${symbol}, symbolIndex=${symbolIndex}`);
         }
         
         // Stop each reel at different times
@@ -233,7 +419,9 @@ class CasinoSlotMachine {
                     setTimeout(() => {
                         this.isSpinning = false;
                         console.log(`Stopped on: ${selectedSymbols.join(', ')}`);
-                        this.updateDisplay();
+                        
+                        // Process the spin result
+                        this.processSpinResult(outcomes);
                     }, 600); // Wait for last reel animation
                 }
             }, delays[i]);
@@ -242,48 +430,167 @@ class CasinoSlotMachine {
     
     stopSingleReel(reelIndex, outcome) {
         const reel = this.reels[reelIndex];
-        const symbolIndex = outcome.symbolIndex;
-        const offset = outcome.offset;
+        const position = outcome.position;
         
         // Stop the spinning animation
         reel.classList.remove('spinning');
         
+        // Play reel stop sound
+        this.playSound('reelThump');
+        
         // Force a reflow
         reel.offsetHeight;
         
-        // Position the sprite to show 3 symbols in the window with the selected symbol in the center
-        // The sprite is 1500px tall (10 symbols × 150px each)
-        // The reel window is 450px tall (3 symbols × 150px each)
-        // We need to position the sprite so that 3 consecutive symbols are visible
-        // and the selected symbol is in the center position
+        // Position-based approach: use position directly
+        // Each position is 75px apart (position 0 = 0px, position 1 = -75px, etc.)
+        // We need to center the position in the middle of the 3-symbol window
+        // Window height is 450px (3 symbols × 150px), so center is at 225px
+        // Position the sprite so the selected position appears in the center
         
-        // Calculate which 3 symbols to show (previous, current, next)
-        const prevSymbolIndex = (symbolIndex - 1 + this.totalSymbolsPerReel) % this.totalSymbolsPerReel;
-        const nextSymbolIndex = (symbolIndex + 1) % this.totalSymbolsPerReel;
-        
-        // Position the sprite so the previous symbol is at the top of the window
-        // This means the current symbol will be in the center, and next symbol at bottom
-        // Use exact pixels: each symbol is 150px tall
-        let backgroundPositionY = -(prevSymbolIndex * this.symbolHeight); // 0px, -150px, -300px, etc.
-        
-        // Apply offset for in-between stops
-        if (offset > 0) {
-            backgroundPositionY -= offset; // Move further down for in-between position
-            console.log(`🎯 IN-BETWEEN STOP: Reel ${reelIndex + 1} stopped between symbols with ${offset}px offset`);
-        }
+        const backgroundPositionY = -(position * this.positionHeight) + 150; // Center the position in middle slot
         
         reel.style.backgroundPosition = `0 ${backgroundPositionY}px`;
         
-        const isInBetween = offset > 0;
-        console.log(`Reel ${reelIndex + 1} stopped on position ${outcome.position} (${outcome.symbolName}) at symbol index ${symbolIndex}`);
-        console.log(`  In-between: ${isInBetween}, offset: ${offset}px`);
-        console.log(`  Showing symbols: ${this.reelSymbols[reelIndex][prevSymbolIndex]} (top), ${outcome.symbolName} (center), ${this.reelSymbols[reelIndex][nextSymbolIndex]} (bottom)`);
+        // Update the stored position
+        this.currentPositions[reelIndex] = position;
+        
+        const isInBetween = position % 2 === 1;
+        console.log(`Reel ${reelIndex + 1} stopped on position ${position} (${outcome.symbolName})`);
+        console.log(`  In-between: ${isInBetween}`);
         console.log(`  Background position: 0 ${backgroundPositionY}px`);
     }
 
+    loadGameState() {
+        // Load from localStorage for testing (before OAuth integration)
+        const saved = localStorage.getItem('roflfaucet_slots_state');
+        if (saved) {
+            const state = JSON.parse(saved);
+            this.credits = state.credits || 100; // Start with 100 credits
+            this.totalSpins = state.totalSpins || 0;
+            this.totalWagered = state.totalWagered || 0;
+            this.totalWon = state.totalWon || 0;
+        } else {
+            // New player - give starting credits
+            this.credits = 100;
+        }
+    }
+    
+    saveGameState() {
+        const state = {
+            credits: this.credits,
+            totalSpins: this.totalSpins,
+            totalWagered: this.totalWagered,
+            totalWon: this.totalWon,
+            lastSaved: new Date().toISOString()
+        };
+        localStorage.setItem('roflfaucet_slots_state', JSON.stringify(state));
+    }
+    
+    checkWinConditions(outcomes) {
+        // Extract final symbols from outcomes
+        const symbols = outcomes.map(outcome => {
+            if (outcome.isInBetween) {
+                return 'blank'; // In-between = blank for win calculation
+            } else {
+                // Map combo symbols to their physical equivalents
+                if (outcome.virtualSymbol.startsWith('combo')) {
+                    return outcome.symbolName; // Use the mapped physical symbol
+                }
+                return outcome.virtualSymbol;
+            }
+        });
+        
+        console.log('🎲 Win check outcomes:', outcomes);
+        console.log('🎲 Win check symbols:', symbols);
+        console.log('🎲 Symbol comparison:', symbols[0], '===', symbols[1], '===', symbols[2]);
+        console.log('🎲 All equal?', symbols[0] === symbols[1] && symbols[1] === symbols[2]);
+        
+        // Check for exact matches first
+        if (symbols[0] === symbols[1] && symbols[1] === symbols[2]) {
+            // Three of a kind
+            const symbol = symbols[0];
+            if (symbol === 'blank') return { type: 'three_blanks', payout: this.payoutTable.three_blanks };
+            if (symbol === 'watermelon') return { type: 'three_watermelon', payout: this.payoutTable.three_watermelon };
+            if (symbol === 'banana') return { type: 'three_banana', payout: this.payoutTable.three_banana };
+            if (symbol === 'cherries') return { type: 'three_cherries', payout: this.payoutTable.three_cherries };
+            if (symbol === 'seven') return { type: 'three_seven', payout: this.payoutTable.three_seven };
+            if (symbol === 'bar') return { type: 'three_bar', payout: this.payoutTable.three_bar };
+            if (symbol === 'bigwin') return { type: 'three_bigwin', payout: this.payoutTable.three_bigwin };
+        }
+        
+        // Check for "any fruit" combination (any 3 fruits)
+        const fruits = ['watermelon', 'banana', 'cherries'];
+        const allFruits = symbols.every(symbol => fruits.includes(symbol));
+        if (allFruits && symbols.length === 3) {
+            return { type: 'any_fruit', payout: this.payoutTable.any_fruit };
+        }
+        
+        // Check for two of a kind
+        const counts = {};
+        symbols.forEach(symbol => {
+            counts[symbol] = (counts[symbol] || 0) + 1;
+        });
+        
+        for (const [symbol, count] of Object.entries(counts)) {
+            if (count === 2) {
+                const payoutKey = `two_${symbol}`;
+                if (this.payoutTable[payoutKey]) {
+                    return { type: payoutKey, payout: this.payoutTable[payoutKey] };
+                }
+            }
+        }
+        
+        // No win
+        return { type: 'no_win', payout: 0 };
+    }
+    
+    processWin(winResult, bet) {
+        const totalPayout = winResult.payout * bet;
+        
+        // If there's a win, animate the payout
+        if (totalPayout > 0) {
+            this.animateWinPayout(totalPayout, winResult);
+        } else {
+            // No win - just update normally
+            this.credits += totalPayout;
+            this.totalWon += totalPayout;
+            console.log('💸 No win this time');
+        }
+        
+        return totalPayout;
+    }
+    
+    processSpinResult(outcomes) {
+        // Check for wins
+        const winResult = this.checkWinConditions(outcomes);
+        
+        // Process any winnings
+        const totalPayout = this.processWin(winResult, this.currentBet);
+        
+        // Update display with final results
+        this.updateDisplay();
+        
+        console.log(`🎰 Spin complete! Result: ${winResult.type}, Payout: ${totalPayout}`);
+    }
+    
     updateDisplay() {
-        // Update credits, wins, etc.
-        console.log('Display Updated');
+        // Update all display elements
+        const currentBalanceElement = document.getElementById('current-balance');
+        const currentBetElement = document.getElementById('current-bet');
+        const totalSpinsElement = document.getElementById('total-spins');
+        const totalWageredElement = document.getElementById('total-wagered');
+        const totalWonElement = document.getElementById('total-won');
+        
+        if (currentBalanceElement) currentBalanceElement.textContent = this.credits;
+        if (currentBetElement) currentBetElement.textContent = this.currentBet;
+        if (totalSpinsElement) totalSpinsElement.textContent = this.totalSpins;
+        if (totalWageredElement) totalWageredElement.textContent = this.totalWagered;
+        if (totalWonElement) totalWonElement.textContent = this.totalWon;
+        
+        // Save state to localStorage
+        this.saveGameState();
+        
+        console.log(`💰 Balance: ${this.credits}, Bet: ${this.currentBet}, Spins: ${this.totalSpins}`);
     }
 }
 
@@ -307,16 +614,23 @@ function toggleMachineView() {
 }
 
 function decreaseBet() {
-    if (slotMachine) {
-        // Add bet decrease logic
-        console.log('Decrease bet');
+    if (slotMachine && !slotMachine.isSpinning) {
+        if (slotMachine.currentBet > 1) {
+            slotMachine.currentBet--;
+            slotMachine.updateDisplay();
+            console.log(`🎰 Bet decreased to ${slotMachine.currentBet}`);
+        }
     }
 }
 
 function increaseBet() {
-    if (slotMachine) {
-        // Add bet increase logic
-        console.log('Increase bet');
+    if (slotMachine && !slotMachine.isSpinning) {
+        const maxBet = Math.min(10, slotMachine.credits); // Max bet is 10 or current credits
+        if (slotMachine.currentBet < maxBet) {
+            slotMachine.currentBet++;
+            slotMachine.updateDisplay();
+            console.log(`🎰 Bet increased to ${slotMachine.currentBet}`);
+        }
     }
 }
 
