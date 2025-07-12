@@ -2,41 +2,38 @@
 
 ## Overview
 
-The ROFLFaucet slot machine is a fully-featured casino-style game that provides both demo play for anonymous users and real gameplay for authenticated users. It features authentic animations, player-favored economics, and seamless integration with the existing OAuth and balance systems.
+The ROFLFaucet slot machine offers a seamless gaming experience, using a simplified position-based system to perfectly sync visual and mathematical outcomes. This ensures consistent gameplay and accurate payouts.
+
+## Simplified Position-Based System
+
+- **Unified Position Mapping**: Uses a simple system with exact symbol positions (0-19)
+- **Virtual Reel List**: List-based probability distribution leveraging pure Math.random()
+- **Mapping**: Positions directly mapped to symbols
+- **Consistency**: Ensures match between displayed and internal symbols
+
+## Features
+
+### Core Mechanics
+- **3-Reel Slot Machine**: Classic design with precise synchronization
+- **Symbol Types**: Watermelon, Banana, Cherries, Seven, Bar, Bigwin
+- **Fairness**: Close-to-true randomness with adjustable symbol frequency
+- **Simple Control**: All reels utilize the same symbol list for uniform behavior
+
+### Visuals & Audio
+- **Visual Precision**: Implements CSS-based alignment for perfect symbol appearance
+- **Audio Feedback**: Engaging sounds for spins, wins, and jackpot moments
+- **Clean UI**: Responsive and adaptable to different device sizes
+
+### Technical Notes
+- **Background Position**: Adjustments made to ensure center line accuracy (150px offset)
+- **Sprite Consistency**: Matches internal state perfectly with no manual adjustments
 
 ## Architecture
 
-### Dual-Mode System
-
-**Demo Mode (Anonymous Users):**
-- localStorage-based balance and progression
-- 500 starting demo credits for engagement
-- Login prompts to encourage registration
-- No server communication required
-
-**Real Mode (Logged-In Users):**
-- API integration with existing balance system
-- Real-time transaction tracking
-- Cross-device synchronization
-- Gaming-specific transaction types for analytics
-
-## Game Features
-
-### 🎯 Core Mechanics
-- **3-reel classic slot machine** with authentic casino feel
-- **6 symbol types**: Cherry (🍒), Banana (🍌), Watermelon (🍉), Orange (🍊), Lucky 7 (🔴), BAR (📊)
-- **Player-favored economics**: 105% return rate over time
-- **Progressive betting**: 1-5 credits based on user level
-- **Big Win Pool**: Accumulates 10% of all bets for exciting jackpots
-
-### 🎨 Visual & Audio
-- **Physics-based animations**: Authentic reel deceleration with natural near-misses (upgraded July 5, 2025)
-- **Fixed reel strips**: Like real casinos - weighted symbol distribution with organic randomness
-- **Seamless symbol flow**: No gaps or artificial substitution - what spins is what lands
-- **Win highlighting**: Golden glow effects on winning symbols
-- **Responsive design**: Mobile-optimized layouts
-- **Flip mechanism**: Shows payout table on machine back
-
+### Components
+- **slots.html**: Main page
+- **slots.js**: Game logic
+- **sprites.css**: Styling
 ### 📊 Progression System
 - **5 levels** with increasing multipliers and bet limits
 - **Level costs**: 0, 50, 150, 300, 500 credits

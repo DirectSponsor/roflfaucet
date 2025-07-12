@@ -19,14 +19,12 @@
 - **Video is pure display** - shows predetermined outcomes
 - **JavaScript picks outcomes first** using weighted probability lists
 - **Frame seeking positions** video to show the chosen symbol
-- **Player-favorable odds** (101-105% RTP) for faucet-like behavior
+- **Player-favorable odds** (adjustable RTP) for faucet-like behavior
 
-### **2. Sprite-Based Reel System**
-**Location**: `/home/andy/Documents/websites/Warp/projects/rofl/roflfaucet/slots/sprite_reel_vertical.png`
-- **Uses proper 150x150 symbol images** from `./symbols_150px/`
-- **Vertical sprite sheet** (150x1650px) with 11 symbols
-- **Sequence**: watermelon(×3), banana(×3), cherries(×2), seven, bar, bigwin
-- **Perfect symbol alignment** with CSS background positioning
+- **Simplified Position-Based System**
+- **Symbol Mapping**: Direct mapping of positions to symbols (0-19)
+- **Simplified List**: Uniform probability list with direct CSS control
+- **New Alignment**: Perfect synchronization without offsets or manual fiddling
 
 ### **3. Complete CSS Sprite Implementation**
 **Location**: `/home/andy/Documents/websites/Warp/projects/rofl/roflfaucet/slots/slots.js`

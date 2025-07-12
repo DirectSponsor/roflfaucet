@@ -10,7 +10,7 @@ Successfully implemented a fully functional casino-style slot machine with real 
 ### **Core Functionality:**
 - ✅ **Authentic slot machine** with casino-style animations (acceleration, spin, deceleration, bounce)
 - ✅ **Dual-mode system**: Demo mode for anonymous users, real balance for logged-in users
-- ✅ **Player-favored economics**: 105% return rate over time (anti-casino model)
+- ✅ **Player-favorable returns**: Adjustable payout settings for balanced play
 - ✅ **Real balance integration**: Bets deduct and wins credit to actual user balance
 - ✅ **Transaction logging**: Complete audit trail for all gaming activity
 

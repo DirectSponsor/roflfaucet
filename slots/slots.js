@@ -435,9 +435,6 @@ class CasinoSlotMachine {
         // Stop the spinning animation
         reel.classList.remove('spinning');
         
-        // Play reel stop sound
-        this.playSound('reelThump');
-        
         // Force a reflow
         reel.offsetHeight;
         
@@ -453,6 +450,11 @@ class CasinoSlotMachine {
         
         // Update the stored position
         this.currentPositions[reelIndex] = position;
+        
+        // Play reel stop sound slightly after visual stop for better sync
+        setTimeout(() => {
+            this.playSound('reelThump');
+        }, 70); // 70ms delay for audio to come after visual
         
         const isInBetween = position % 2 === 1;
         console.log(`Reel ${reelIndex + 1} stopped on position ${position} (${outcome.symbolName})`);
@@ -577,15 +579,9 @@ class CasinoSlotMachine {
         // Update all display elements
         const currentBalanceElement = document.getElementById('current-balance');
         const currentBetElement = document.getElementById('current-bet');
-        const totalSpinsElement = document.getElementById('total-spins');
-        const totalWageredElement = document.getElementById('total-wagered');
-        const totalWonElement = document.getElementById('total-won');
         
         if (currentBalanceElement) currentBalanceElement.textContent = this.credits;
         if (currentBetElement) currentBetElement.textContent = this.currentBet;
-        if (totalSpinsElement) totalSpinsElement.textContent = this.totalSpins;
-        if (totalWageredElement) totalWageredElement.textContent = this.totalWagered;
-        if (totalWonElement) totalWonElement.textContent = this.totalWon;
         
         // Save state to localStorage
         this.saveGameState();

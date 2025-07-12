@@ -332,7 +332,7 @@ body {
 
 /* Main Content - Cache Refresh 2025-06-21 */
 .main {
-    padding: 2rem 0;
+    padding: 1rem 0;
 }
 
 .content-grid {
@@ -2038,13 +2038,13 @@ section h2 {
 .content-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 30px;
+    padding: 5px;
     border-radius: 10px 10px 0 0;
     text-align: center;
 }
 
 .content-header h1 {
-    margin: 0 0 10px 0;
+    margin: 0;
     font-size: 2.5em;
 }
 
