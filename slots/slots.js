@@ -604,9 +604,14 @@ function spinReels() {
     }
 }
 
-function toggleMachineView() {
-    // Add this function if needed for the flip button
-    console.log('Toggle machine view');
+function flipMachine() {
+    const slotMachineElement = document.getElementById('slot-machine');
+    if (slotMachineElement) {
+        slotMachineElement.classList.toggle('flipped');
+        console.log('🎰 Machine flipped!');
+    } else {
+        console.error('Slot machine element not found!');
+    }
 }
 
 function decreaseBet() {

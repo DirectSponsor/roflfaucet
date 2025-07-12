@@ -216,7 +216,7 @@ body {
     padding: 0 20px;
 }
 
-/* Header */
+/* Header - with collapsing animation support */
 .header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -225,10 +225,12 @@ body {
     top: 0;
     z-index: 100;
     box-shadow: var(--shadow);
+    transition: all 0.3s ease;
 }
 
 .header .container {
     padding: 1rem 20px;
+    transition: padding 0.3s ease;
 }
 
 .header-content {
@@ -237,6 +239,26 @@ body {
     align-items: center;
     gap: 2rem;
     width: 100%;
+}
+
+/* Collapsed header state */
+.header.collapsed {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header.collapsed .container {
+    padding: 0.5rem 20px;
+}
+
+.header.collapsed .tagline {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.header.collapsed .logo h1 {
+    margin-bottom: 0;
 }
 
 .logo h1 {
@@ -249,6 +271,9 @@ body {
     font-size: 0.9rem;
     color: var(--text-secondary);
     font-weight: 500;
+    transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease;
+    max-height: 1.5rem; /* Allow space for the tagline */
+    overflow: hidden;
 }
 
 .nav {
