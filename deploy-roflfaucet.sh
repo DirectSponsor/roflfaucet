@@ -103,8 +103,8 @@ timeout 30 ssh $VPS_HOST bash -c '
 echo "📁 Setting permissions..."
 cd /root/roflfaucet
 chown -R root:root /root/roflfaucet
-chmod -R 644 /root/roflfaucet/*
-chmod 755 /root/roflfaucet
+find /root/roflfaucet -type d -exec chmod 755 {} \;
+find /root/roflfaucet -type f -exec chmod 644 {} \;
 echo "🔐 Fixing auth directory permissions..."
 chmod 755 /root/roflfaucet/auth/
 chmod 644 /root/roflfaucet/auth/callback.html 2>/dev/null || echo "Auth callback permissions set"
