@@ -312,19 +312,119 @@ class CasinoSlotMachine {
         }
     }
     
-    animateCreditsIncrease(totalPayout) {
+    async animateCreditsIncrease(totalPayout) {
         const currentBalanceElement = document.getElementById('current-balance');
         const startCredits = this.credits;
         const endCredits = this.credits + totalPayout;
         
+        // For logged-in users, process win transaction via API
+        if (this.isLoggedIn && totalPayout > 0) {
+            await this.processWinTransaction(totalPayout);
+        } else {
+            // For demo users, just update local balance
+            this.credits = endCredits;
+        }
+        
         // Animate the credits counter
         this.animateCounter(currentBalanceElement, startCredits, endCredits, 800);
         
-        // Update the actual credits value
-        this.credits = endCredits;
-        
         // Save state
         this.saveGameState();
+    }
+    
+    async processBetTransaction(amount) {
+        try {
+            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: 'spend',
+                    amount: amount,
+                    source: 'slots_bet',
+                    site_id: 'roflfaucet',
+                    description: `Slot machine bet: ${amount} credits`
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.credits = data.balance.current;
+                console.log('✅ Bet transaction processed:', amount, 'New balance:', this.credits);
+                return true;
+            } else {
+                console.log('⚠️ Bet transaction failed, falling back to demo mode');
+                this.fallbackToDemoMode();
+                return false;
+            }
+        } catch (error) {
+            console.error('💥 Bet transaction error:', error);
+            this.fallbackToDemoMode();
+            return false;
+        }
+    }
+    
+    async processWinTransaction(amount) {
+        try {
+            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: 'gaming_win',
+                    amount: amount,
+                    source: 'slots_win',
+                    site_id: 'roflfaucet',
+                    description: `Slot machine win: ${amount} credits`
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.credits = data.balance.current;
+                console.log('✅ Win transaction processed:', amount, 'New balance:', this.credits);
+                return true;
+            } else {
+                console.log('⚠️ Win transaction failed, using local fallback');
+                this.credits += amount;
+                return false;
+            }
+        } catch (error) {
+            console.error('💥 Win transaction error:', error);
+            this.credits += amount;
+            return false;
+        }
+    }
+    
+    showDemoCreditsPrompt() {
+        const promptText = `🎰 Out of demo credits!\n\n` +
+                          `💡 Get 50 free demo credits to keep playing?\n\n` +
+                          `🔐 Sign up with OAuth to play with real UselessCoins that work across all sites!`;
+        
+        if (confirm(promptText)) {
+            this.addDemoCredits(50);
+        }
+    }
+    
+    addDemoCredits(amount) {
+        this.credits += amount;
+        this.updateDisplay();
+        console.log(`🎁 Added ${amount} demo credits! New balance: ${this.credits}`);
+        
+        // Show conversion prompt
+        setTimeout(() => {
+            const signUpText = `🎯 Having fun?\n\n` +
+                              `Sign up to keep your winnings and earn real UselessCoins!\n\n` +
+                              `Your balance will work across all DirectSponsor sites.`;
+            
+            if (confirm(signUpText)) {
+                window.location.href = '/';
+            }
+        }, 2000);
     }
     
     initializeReelPositions() {
@@ -347,17 +447,30 @@ class CasinoSlotMachine {
         }
     }
 
-    spinReels() {
+    async spinReels() {
         if (this.isSpinning) return;
         
         // Check if player has enough credits
         if (this.credits < this.currentBet) {
             console.log('❌ Not enough credits to spin!');
+            if (!this.isLoggedIn && this.credits === 0) {
+                this.showDemoCreditsPrompt();
+            }
             return;
         }
         
-        // Deduct bet from credits
-        this.credits -= this.currentBet;
+        // For logged-in users, process bet transaction via API
+        if (this.isLoggedIn) {
+            const betSuccess = await this.processBetTransaction(this.currentBet);
+            if (!betSuccess) {
+                console.log('❌ Bet transaction failed!');
+                return;
+            }
+        } else {
+            // For demo users, deduct from local balance
+            this.credits -= this.currentBet;
+        }
+        
         this.totalSpins++;
         this.totalWagered += this.currentBet;
         
@@ -463,29 +576,79 @@ class CasinoSlotMachine {
     }
 
     loadGameState() {
-        // Load from localStorage for testing (before OAuth integration)
-        const saved = localStorage.getItem('roflfaucet_slots_state');
+        // Check if user is logged in via OAuth
+        this.accessToken = localStorage.getItem('oauth_simple_token');
+        this.isLoggedIn = !!this.accessToken;
+        
+        if (this.isLoggedIn) {
+            console.log('🔐 User logged in - loading real balance from API');
+            this.loadRealBalance();
+        } else {
+            console.log('👤 Anonymous user - using demo credits');
+            this.loadDemoCredits();
+        }
+    }
+    
+    loadDemoCredits() {
+        // Load demo credits from localStorage for anonymous users
+        const saved = localStorage.getItem('roflfaucet_slots_demo_state');
         if (saved) {
             const state = JSON.parse(saved);
-            this.credits = state.credits || 100; // Start with 100 credits
+            this.credits = state.credits || 0;
             this.totalSpins = state.totalSpins || 0;
             this.totalWagered = state.totalWagered || 0;
             this.totalWon = state.totalWon || 0;
         } else {
-            // New player - give starting credits
-            this.credits = 100;
+            // New demo user starts with 0 credits
+            this.credits = 0;
         }
+        this.updateDisplay();
+    }
+    
+    async loadRealBalance() {
+        try {
+            const response = await fetch('https://data.directsponsor.org/api/dashboard?site_id=roflfaucet&_t=' + Date.now(), {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                cache: 'no-cache'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.credits = parseFloat(data.dashboard.balance.useless_coins);
+                console.log('✅ Real balance loaded:', this.credits);
+            } else {
+                console.log('⚠️ API unavailable, using demo mode');
+                this.fallbackToDemoMode();
+            }
+        } catch (error) {
+            console.error('💥 Balance loading error:', error);
+            this.fallbackToDemoMode();
+        }
+        this.updateDisplay();
+    }
+    
+    fallbackToDemoMode() {
+        this.isLoggedIn = false;
+        this.loadDemoCredits();
     }
     
     saveGameState() {
-        const state = {
-            credits: this.credits,
-            totalSpins: this.totalSpins,
-            totalWagered: this.totalWagered,
-            totalWon: this.totalWon,
-            lastSaved: new Date().toISOString()
-        };
-        localStorage.setItem('roflfaucet_slots_state', JSON.stringify(state));
+        if (!this.isLoggedIn) {
+            // Only save demo state to localStorage for anonymous users
+            const state = {
+                credits: this.credits,
+                totalSpins: this.totalSpins,
+                totalWagered: this.totalWagered,
+                totalWon: this.totalWon,
+                lastSaved: new Date().toISOString()
+            };
+            localStorage.setItem('roflfaucet_slots_demo_state', JSON.stringify(state));
+        }
+        // For logged-in users, balance is managed via API transactions
     }
     
     checkWinConditions(outcomes) {
