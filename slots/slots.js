@@ -1,6 +1,32 @@
 // =======================================
 // CASINO SLOT MACHINE SPRITE ENGINE
 // =======================================
+//
+// 🎯 PROVABLY FAIR READY ARCHITECTURE 🎯
+//
+// This system is designed with provably fair gaming in mind - a revolutionary
+// breakthrough that allows players to cryptographically verify that every 
+// game outcome is truly random and not manipulated by the house.
+//
+// CURRENT STATE: Pure probability-based system using Math.random()
+// - Virtual reel list controls probabilities transparently
+// - No outcome fixing or manipulation
+// - Deterministic position mapping
+// - Perfect foundation for provably fair implementation
+//
+// FUTURE ENHANCEMENT: Replace Math.random() with seeded randomness
+// - Client seed + Server seed + Nonce → Verifiable outcomes
+// - Players can verify every spin result independently
+// - Industry-standard cryptographic fairness
+// - Trust through mathematics, not reputation
+//
+// "Provably fair gaming represents the evolution from 'trust us' to 'verify yourself'"
+// - Every outcome becomes mathematically verifiable
+// - Eliminates house manipulation concerns entirely
+// - Promotes true fairness in online gaming
+//
+// TODO: Implement provably fair system (high priority future feature)
+// =======================================
 
 class CasinoSlotMachine {
     constructor() {
@@ -137,41 +163,62 @@ class CasinoSlotMachine {
         console.log('Current positions before:', this.currentPositions);
         
         for (let i = 0; i < 3; i++) {
-            // Simple random selection from 20 positions (0-19)
-            const randomPosition = Math.floor(Math.random() * this.totalPositions);
+            // Pick from virtual reel list for probability control
+            const randomIndex = Math.floor(Math.random() * this.virtualReelList.length);
+            const virtualSymbol = this.virtualReelList[randomIndex];
             
-            // Even positions (0, 2, 4, 6, 8, 10, 12, 14, 16, 18) = on symbols
-            // Odd positions (1, 3, 5, 7, 9, 11, 13, 15, 17, 19) = in-between
-            const isInBetween = randomPosition % 2 === 1;
+            // Check if this is a blank (in-between) symbol
+            const isBlank = virtualSymbol.startsWith('blank');
             
-            if (isInBetween) {
-                // In-between position: calculate which symbol to show + 75px offset
-                const symbolIndex = Math.floor(randomPosition / 2);
-                const symbolName = this.reelSymbols[i][symbolIndex];
+            if (isBlank) {
+                // In-between stop: pick a random symbol and add 75px offset
+                const randomSymbolIndex = Math.floor(Math.random() * this.totalSymbolsPerReel);
+                const symbolName = this.reelSymbols[i][randomSymbolIndex];
+                
+                // Calculate the 20-position equivalent (odd position for in-between)
+                const position = (randomSymbolIndex * 2) + 1; // Odd position = in-between
                 
                 outcomes.push({
-                    position: randomPosition,
-                    symbolIndex: symbolIndex,
+                    position: position,
+                    symbolIndex: randomSymbolIndex,
                     symbolName: symbolName,
+                    virtualSymbol: virtualSymbol,
                     isInBetween: true,
-                    offset: 75 // Half-way between symbols
+                    offset: 75 // Perfect half-way between symbols
                 });
                 
-                console.log(`Reel ${i + 1}: position ${randomPosition} (IN-BETWEEN), symbol ${symbolName} + 75px offset`);
+                console.log(`Reel ${i + 1}: virtual=${virtualSymbol} (IN-BETWEEN), position ${position}, symbol ${symbolName} + 75px offset`);
             } else {
-                // On symbol: calculate which symbol to show
-                const symbolIndex = randomPosition / 2;
-                const symbolName = this.reelSymbols[i][symbolIndex];
+                // Regular symbol stop: find this symbol in the reel
+                let symbolName = virtualSymbol;
+                
+                // Handle combo symbols (map to physical symbols)
+                if (virtualSymbol === 'combo1') symbolName = 'cherries';
+                if (virtualSymbol === 'combo2') symbolName = 'banana';
+                if (virtualSymbol === 'combo3') symbolName = 'watermelon';
+                
+                // Find position of this symbol in the reel
+                let symbolIndex = this.reelSymbols[i].indexOf(symbolName);
+                if (symbolIndex === -1) {
+                    // Fallback to first symbol if not found
+                    console.warn(`Symbol ${symbolName} not found in reel ${i + 1}, using first symbol`);
+                    symbolIndex = 0;
+                    symbolName = this.reelSymbols[i][0];
+                }
+                
+                // Calculate the 20-position equivalent (even position for on-symbol)
+                const position = symbolIndex * 2; // Even position = on symbol
                 
                 outcomes.push({
-                    position: randomPosition,
+                    position: position,
                     symbolIndex: symbolIndex,
                     symbolName: symbolName,
+                    virtualSymbol: virtualSymbol,
                     isInBetween: false,
-                    offset: 0
+                    offset: 0 // Perfect symbol centering
                 });
                 
-                console.log(`Reel ${i + 1}: position ${randomPosition} (ON SYMBOL), symbol ${symbolName}`);
+                console.log(`Reel ${i + 1}: virtual=${virtualSymbol} (ON SYMBOL), position ${position}, symbol ${symbolName}`);
             }
         }
         
