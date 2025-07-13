@@ -1,7 +1,7 @@
 // Simple JWT Implementation for ROFLFaucet
 console.log('🔐 JWT Simple Faucet loading...');
 
-class JWTSimpleFaucet {
+class SimpleFaucet {
     constructor() {
         // JWT settings
         this.authApiBase = 'auth'; // Use local auth directory
@@ -344,15 +344,19 @@ class JWTSimpleFaucet {
         }
     }
     
-    showLoginScreen() {
-        const loginSection = document.getElementById('oauth-login-section');
-        const faucetSection = document.getElementById('oauth-faucet-section');
-        
-        if (loginSection) loginSection.style.display = 'block';
-        if (faucetSection) faucetSection.style.display = 'none';
+initializeFaucet() {
+const faucetSection = document.getElementById('oauth-faucet-section');
+
+
+    if (faucetSection) {
+        faucetSection.style.display = 'block';
+        const loginNotice = document.getElementById('login-notice');
+        welcomeMessage.style.display = this.jwtToken ? 'block' : 'none';
+        loginNotice.style.display = this.jwtToken ? 'none' : 'block';
+    }
     }
     
-    showFaucetScreen() {
+// Old function showFaucetScreen removed
         const loginSection = document.getElementById('oauth-login-section');
         const faucetSection = document.getElementById('oauth-faucet-section');
         

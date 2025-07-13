@@ -19,12 +19,13 @@
     <link rel="stylesheet" href="styles.css">
     
     <!-- JWT Simple Faucet -->
-    <script src="jwt-simple.js"></script>
+    <script src="simple-faucet.js"></script>
     
     <!-- hCaptcha -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 </head>
 <body>
+
 <!-- include end doctype-head.html -->
 <!-- include start header.html -->
     <!-- Beta Indicator -->
@@ -58,6 +59,7 @@
     
     <!-- Header Collapse on Scroll Script -->
     <script src="header-collapse.js"></script>
+
 <!-- include end header.html -->
     <!-- Main Content -->
     <main class="main">
@@ -85,6 +87,7 @@
                             <img class="rotating-ad" data-ad-slot="1" src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250' viewBox='0 0 300 250'%3e%3crect width='300' height='250' fill='%23e8f4fd'/%3e%3ctext x='150' y='110' text-anchor='middle' font-family='Arial' font-size='16' fill='%23333'%3e🚀 Crypto Services%3c/text%3e%3ctext x='150' y='135' text-anchor='middle' font-family='Arial' font-size='14' fill='%23666'%3eYour Ad Here%3c/text%3e%3ctext x='150' y='160' text-anchor='middle' font-family='Arial' font-size='12' fill='%23999'%3e300x250 Banner%3c/text%3e%3c/svg%3e" alt="Advertisement">
                         </div>
                     </div>
+
                     <!-- Quick Stats -->
                     <div class="quick-stats">
                         <h3>📊 Live Stats</h3>
@@ -100,6 +103,7 @@
                         </div>
                     </div>
                 </aside>
+
 <!-- include end sidebar-left.html -->
                 <!-- Main Content -->
                 <section class="main-content">
@@ -114,10 +118,10 @@
                         <div id="oauth-message" class="message"></div>
                         
                         
-                        <!-- Faucet Section -->
-                        <div id="oauth-faucet-section" class="content-entry" style="display: none;">
+                        <!-- Faucet Section - Always Visible -->
+                        <div id="oauth-faucet-section" class="content-entry">
                             <div class="entry-content">
-                                <h2>🎉 Welcome, <span id="oauth-username">User</span>!</h2>
+                                <h2 id="faucet-title">🚰 UselessCoin Faucet</h2>
                                 
                                 <!-- Balance Display -->
                                 <div class="stats-display">
@@ -127,31 +131,30 @@
                                     </div>
                                 </div>
                                 
+                                <!-- Login Notice (shown when not logged in) -->
+                                <div id="login-notice" class="highlight-box info" style="margin: 20px 0;">
+                                    <strong>🔐 Login Required</strong><br>
+                                    You need to be logged in to claim coins. Please login using the button in the top right corner.
+                                </div>
+                                
+                                <!-- Welcome Message (shown when logged in) -->
+                                <div id="welcome-message" class="highlight-box" style="margin: 20px 0; display: none;">
+                                    <strong>🎉 Welcome, <span id="oauth-username">User</span>!</strong><br>
+                                    You can claim coins every 5 minutes.
+                                </div>
+                                
                                 <!-- Claim Button -->
                                 <div style="text-align: center; margin: 30px 0;">
                                     <button id="oauth-claim-btn" class="claim-button">🎲 Claim 5 UselessCoins</button>
                                 </div>
                                 
-                                <!-- Logout Button -->
-                                <div style="text-align: center;">
+                                <!-- Logout Button (shown when logged in) -->
+                                <div id="logout-section" style="text-align: center; display: none;">
                                     <button id="oauth-logout-btn" class="secondary-button">🚪 Logout</button>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Info Section -->
-                        <div class="content-entry">
-                            <div class="entry-content">
-                                <div class="highlight-box">
-                                    <strong>JWT Simple Faucet:</strong><br>
-                                    • Secure JWT authentication system<br>
-                                    • Local balance management<br>
-                                    • Claim API integration<br>
-                                    • No captcha (focused on core functionality)<br>
-                                    • Check browser console for detailed logs
-                                </div>
-                            </div>
-                        </div>
                     </div>
 <!-- END UNIQUE PAGE CONTENT -->
                 </section>
@@ -167,6 +170,7 @@
                             <img class="rotating-ad" data-ad-slot="2" src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250' viewBox='0 0 300 250'%3e%3crect width='300' height='250' fill='%23f0f8e8'/%3e%3ctext x='150' y='110' text-anchor='middle' font-family='Arial' font-size='16' fill='%23333'%3e💰 DeFi Platform%3c/text%3e%3ctext x='150' y='135' text-anchor='middle' font-family='Arial' font-size='14' fill='%23666'%3eYour Ad Here%3c/text%3e%3ctext x='150' y='160' text-anchor='middle' font-family='Arial' font-size='12' fill='%23999'%3e300x250 Banner%3c/text%3e%3c/svg%3e" alt="Advertisement">
                         </div>
                     </div>
+
                     <!-- Ecosystem Links -->
                     <div class="ecosystem-sidebar">
                         <h3>🌐 Ecosystem</h3>
@@ -185,6 +189,7 @@
                             </a>
                         </div>
                     </div>
+
                     <!-- Rotating Ad Space 3 -->
                     <div class="ad-space" id="ad-space-3">
                         <div class="ad-header">
@@ -195,6 +200,7 @@
                         </div>
                     </div>
                 </aside>
+
 <!-- include end sidebar-right.html -->
             </div>
         </div>
@@ -244,8 +250,11 @@
             </div>
         </div>
     </footer>
+
+
 </body>
 </html>
+
 <!-- include end footer.html -->
-<!-- Simple JWT Faucet JavaScript -->
-<script src="jwt-simple.js"></script>
+<!-- Simple Faucet JavaScript -->
+<script src="simple-faucet.js"></script>

@@ -118,10 +118,10 @@
                         <div id="oauth-message" class="message"></div>
                         
                         
-                        <!-- Faucet Section -->
-                        <div id="oauth-faucet-section" class="content-entry" style="display: none;">
+                        <!-- Faucet Section - Always Visible -->
+                        <div id="oauth-faucet-section" class="content-entry">
                             <div class="entry-content">
-                                <h2>🎉 Welcome, <span id="oauth-username">User</span>!</h2>
+                                <h2 id="faucet-title">🚰 UselessCoin Faucet</h2>
                                 
                                 <!-- Balance Display -->
                                 <div class="stats-display">
@@ -131,31 +131,30 @@
                                     </div>
                                 </div>
                                 
+                                <!-- Login Notice (shown when not logged in) -->
+                                <div id="login-notice" class="highlight-box info" style="margin: 20px 0;">
+                                    <strong>🔐 Login Required</strong><br>
+                                    You need to be logged in to claim coins. Please login using the button in the top right corner.
+                                </div>
+                                
+                                <!-- Welcome Message (shown when logged in) -->
+                                <div id="welcome-message" class="highlight-box" style="margin: 20px 0; display: none;">
+                                    <strong>🎉 Welcome, <span id="oauth-username">User</span>!</strong><br>
+                                    You can claim coins every 5 minutes.
+                                </div>
+                                
                                 <!-- Claim Button -->
                                 <div style="text-align: center; margin: 30px 0;">
                                     <button id="oauth-claim-btn" class="claim-button">🎲 Claim 5 UselessCoins</button>
                                 </div>
                                 
-                                <!-- Logout Button -->
-                                <div style="text-align: center;">
+                                <!-- Logout Button (shown when logged in) -->
+                                <div id="logout-section" style="text-align: center; display: none;">
                                     <button id="oauth-logout-btn" class="secondary-button">🚪 Logout</button>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Info Section -->
-                        <div class="content-entry">
-                            <div class="entry-content">
-                                <div class="highlight-box">
-                                    <strong>JWT Simple Faucet:</strong><br>
-                                    • Secure JWT authentication system<br>
-                                    • Local balance management<br>
-                                    • Claim API integration<br>
-                                    • No captcha (focused on core functionality)<br>
-                                    • Check browser console for detailed logs
-                                </div>
-                            </div>
-                        </div>
                     </div>
 <!-- END UNIQUE PAGE CONTENT -->
                 </section>
@@ -257,5 +256,5 @@
 </html>
 
 <!-- include end footer.html -->
-<!-- Simple JWT Faucet JavaScript -->
-<script src="jwt-simple.js"></script>
+<!-- Simple Faucet JavaScript -->
+<script src="simple-faucet.js"></script>
