@@ -122,6 +122,44 @@ class JWTSimpleFaucet {
         }
     }
     
+    async handleSignup(username, password, email) {
+        try {
+            console.log('🎉 Signing up with JWT...');
+            
+            const response = await fetch(`${this.authApiBase}/jwt-register.php`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    username: username,
+                    password: password,
+                    email: email
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.jwt) {
+                console.log('✅ Signup successful, JWT received');
+                localStorage.setItem('jwt_token', data.jwt);
+                this.jwtToken = data.jwt;
+                
+                this.hideLoginDialog();
+                this.showMessage('Welcome to ROFLFaucet! Account created successfully.', 'success');
+                await this.loadUserData();
+                
+            } else {
+                console.error('❌ Signup failed:', data.error);
+                this.showMessage(data.error || 'Signup failed', 'error');
+            }
+            
+        } catch (error) {
+            console.error('💥 Signup error:', error);
+            this.showMessage('Network error during signup. Please try again.', 'error');
+        }
+    }
+    
     async loadUserData() {
         try {
             console.log('👤 Loading user profile...');
@@ -405,7 +443,38 @@ window.hideLoginDialog = () => {
     if (dialog) dialog.style.display = 'none';
 };
 
+window.showTab = function (tabName) {
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const loginBtn = document.querySelector('.tab-button[onclick="showTab(\'login\')"]');
+    const signupBtn = document.querySelector('.tab-button[onclick="showTab(\'signup\')"]');
+
+    if (tabName === 'login') {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+        loginBtn.classList.add('active');
+        signupBtn.classList.remove('active');
+    } else {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+        loginBtn.classList.remove('active');
+        signupBtn.classList.add('active');
+    }
+};
+
 window.handleJWTLogin = handleJWTLogin;
+
+window.handleJWTSignup = function () {
+    const username = document.getElementById('signup-username').value;
+    const password = document.getElementById('signup-password').value;
+    const email = document.getElementById('signup-email').value;
+
+    if (username && password && email) {
+        window.jwtSimpleFaucet.handleSignup(username, password, email);
+    } else {
+        window.jwtSimpleFaucet.showMessage('Please fill in all fields', 'error');
+    }
+};
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
