@@ -19,8 +19,30 @@ class JWTSimpleFaucet {
     
     init() {
         this.setupEventListeners();
+        this.handleCallback(); // Handle JWT callback from auth server
         this.checkAuth();
         this.setupAutoRefresh();
+    }
+    
+    handleCallback() {
+        // Check if we're returning from auth server with JWT token
+        const urlParams = new URLSearchParams(window.location.search);
+        const jwt = urlParams.get('jwt');
+        
+        if (jwt) {
+            console.log('🔑 JWT received from auth server');
+            localStorage.setItem('jwt_token', jwt);
+            this.jwtToken = jwt;
+            
+            // Clean up URL by removing the JWT parameter
+            const cleanUrl = window.location.pathname;
+            history.replaceState({}, document.title, cleanUrl);
+            
+            // Load user data and show faucet
+            this.loadUserData();
+            return true;
+        }
+        return false;
     }
     
     setupEventListeners() {
@@ -355,6 +377,18 @@ class JWTSimpleFaucet {
             balanceEl.textContent = this.balance;
         }
         
+        // Update header login button
+        const loginBtn = document.getElementById('oauth-login-btn');
+        if (loginBtn) {
+            if (this.jwtToken && this.userProfile) {
+                loginBtn.textContent = `👤 ${this.userProfile.username}`;
+                loginBtn.className = 'header-auth-btn member';
+            } else {
+                loginBtn.textContent = 'Login';
+                loginBtn.className = 'header-auth-btn';
+            }
+        }
+        
         // Update claim button
         const claimBtn = document.getElementById('oauth-claim-btn');
         if (claimBtn) {
@@ -396,17 +430,18 @@ class JWTSimpleFaucet {
     }
     
     showLoginDialog() {
-        const dialog = document.getElementById('login-dialog');
-        if (dialog) {
-            dialog.style.display = 'flex';
+        // If already logged in, show member menu (logout)
+        if (this.jwtToken) {
+            if (confirm('Are you sure you want to logout?')) {
+                this.handleLogout();
+            }
+            return;
         }
-    }
-    
-    hideLoginDialog() {
-        const dialog = document.getElementById('login-dialog');
-        if (dialog) {
-            dialog.style.display = 'none';
-        }
+        
+        // Redirect to centralized auth server
+        const currentUrl = window.location.href;
+        const authUrl = `https://auth.directsponsor.org/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
+        window.location.href = authUrl;
     }
     
     showMessage(text, type = 'info') {
@@ -437,44 +472,7 @@ function handleJWTLogin() {
     }
 }
 
-// Global functions
-window.hideLoginDialog = () => {
-    const dialog = document.getElementById('login-dialog');
-    if (dialog) dialog.style.display = 'none';
-};
-
-window.showTab = function (tabName) {
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
-    const loginBtn = document.querySelector('.tab-button[onclick="showTab(\'login\')"]');
-    const signupBtn = document.querySelector('.tab-button[onclick="showTab(\'signup\')"]');
-
-    if (tabName === 'login') {
-        loginForm.style.display = 'block';
-        signupForm.style.display = 'none';
-        loginBtn.classList.add('active');
-        signupBtn.classList.remove('active');
-    } else {
-        loginForm.style.display = 'none';
-        signupForm.style.display = 'block';
-        loginBtn.classList.remove('active');
-        signupBtn.classList.add('active');
-    }
-};
-
-window.handleJWTLogin = handleJWTLogin;
-
-window.handleJWTSignup = function () {
-    const username = document.getElementById('signup-username').value;
-    const password = document.getElementById('signup-password').value;
-    const email = document.getElementById('signup-email').value;
-
-    if (username && password && email) {
-        window.jwtSimpleFaucet.handleSignup(username, password, email);
-    } else {
-        window.jwtSimpleFaucet.showMessage('Please fill in all fields', 'error');
-    }
-};
+// Clean up old code - no longer needed with redirect-based auth
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
