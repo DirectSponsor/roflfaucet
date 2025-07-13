@@ -74,6 +74,14 @@ git commit -m "Widget/API updates"
 - **Proven Solutions**: Don't reinvent what already works
 - **CSS Best Practice**: Use relative units (rem, %, vw) for responsive design; fixed pixels only for borders/shadows
 
+### **CSS Architecture Lessons (July 2025):**
+- **Start Minimal**: Begin with minimal CSS, add only what's specifically needed
+- **Avoid Universal Resets**: Don't use `* { margin: 0; padding: 0; }` - it removes useful browser defaults
+- **Preserve Browser Defaults**: Let paragraphs, headings, and lists keep their natural spacing
+- **Test As You Go**: Check spacing and layout incrementally rather than trying to fix complex files later
+- **Large CSS Files Are Technical Debt**: Files over 1000+ lines become very difficult to debug and maintain
+- **CSS Conflicts Are Exponential**: The more rules you have, the harder it becomes to predict cascading effects
+
 ### **The PHP Avoidance Policy:**
 When tempted to install PHP/complex backend services:
 1. **First**: Check if external API already handles this
