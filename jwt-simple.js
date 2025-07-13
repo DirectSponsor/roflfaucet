@@ -4,7 +4,7 @@ console.log('🔐 JWT Simple Faucet loading...');
 class JWTSimpleFaucet {
     constructor() {
         // JWT settings
-        this.authApiBase = 'https://auth.directsponsor.org';
+        this.authApiBase = 'auth'; // Use local auth directory
         this.userDataApiBase = 'https://data.directsponsor.org/api';
         
         // User state
