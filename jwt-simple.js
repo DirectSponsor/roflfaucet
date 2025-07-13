@@ -1,0 +1,415 @@
+// Simple JWT Implementation for ROFLFaucet
+console.log('🔐 JWT Simple Faucet loading...');
+
+class JWTSimpleFaucet {
+    constructor() {
+        // JWT settings
+        this.authApiBase = 'https://auth.directsponsor.org';
+        this.userDataApiBase = 'https://data.directsponsor.org/api';
+        
+        // User state
+        this.jwtToken = null;
+        this.userProfile = null;
+        this.balance = 0;
+        this.canClaim = false;
+        
+        console.log('🔧 JWT Simple Faucet initialized');
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.checkAuth();
+        this.setupAutoRefresh();
+    }
+    
+    setupEventListeners() {
+        // Main login button
+        const loginBtn = document.getElementById('oauth-login-btn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => this.showLoginDialog());
+        }
+        
+        // Logout button
+        const logoutBtn = document.getElementById('oauth-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.handleLogout());
+        }
+        
+        // Claim button
+        const claimBtn = document.getElementById('oauth-claim-btn');
+        if (claimBtn) {
+            claimBtn.addEventListener('click', () => this.handleClaimClick());
+        }
+    }
+    
+    checkAuth() {
+        console.log('🔍 Checking JWT authentication...');
+        
+        // Check for existing JWT token
+        this.jwtToken = localStorage.getItem('jwt_token');
+        if (this.jwtToken) {
+            console.log('🔑 Found existing JWT');
+            if (this.isTokenValid()) {
+                this.loadUserData();
+            } else {
+                console.log('⚠️ JWT expired, removing');
+                this.handleLogout();
+            }
+        } else {
+            console.log('❌ No JWT found, showing login');
+            this.showLoginScreen();
+        }
+    }
+    
+    isTokenValid() {
+        if (!this.jwtToken) return false;
+        
+        try {
+            // Decode JWT payload (base64)
+            const payload = JSON.parse(atob(this.jwtToken.split('.')[1]));
+            const now = Math.floor(Date.now() / 1000);
+            
+            // Check if token is expired
+            if (payload.exp < now) {
+                console.log('🕐 JWT expired');
+                return false;
+            }
+            
+            // Check IP binding (basic check - server will validate properly)
+            console.log('✅ JWT appears valid');
+            return true;
+            
+        } catch (error) {
+            console.error('💥 Error validating JWT:', error);
+            return false;
+        }
+    }
+    
+    async handleLogin(username, password) {
+        try {
+            console.log('🔐 Logging in with JWT...');
+            
+            const response = await fetch(`${this.authApiBase}/jwt-auth.php`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    username: username,
+                    password: password
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.jwt) {
+                console.log('✅ JWT received successfully');
+                localStorage.setItem('jwt_token', data.jwt);
+                this.jwtToken = data.jwt;
+                
+                this.hideLoginDialog();
+                await this.loadUserData();
+                
+            } else {
+                console.error('❌ Login failed:', data.error);
+                this.showMessage(data.error || 'Login failed', 'error');
+            }
+            
+        } catch (error) {
+            console.error('💥 Login error:', error);
+            this.showMessage('Network error during login. Please try again.', 'error');
+        }
+    }
+    
+    async loadUserData() {
+        try {
+            console.log('👤 Loading user profile...');
+            
+            // Get user info from JWT payload
+            const payload = JSON.parse(atob(this.jwtToken.split('.')[1]));
+            
+            // For now, use JWT user ID to get profile from user data API
+            const profileResponse = await fetch(`${this.userDataApiBase}/profile?user_id=${payload.sub}`, {
+                headers: {
+                    'Authorization': `Bearer ${this.jwtToken}`
+                }
+            });
+            
+            if (profileResponse.ok) {
+                this.userProfile = await profileResponse.json();
+                console.log('✅ Profile loaded:', this.userProfile.username);
+                
+                // Load balance
+                await this.loadBalance();
+                this.showFaucetScreen();
+                
+            } else {
+                // Fallback: use JWT data directly
+                this.userProfile = { username: `User ${payload.sub}` };
+                await this.loadBalance();
+                this.showFaucetScreen();
+            }
+            
+        } catch (error) {
+            console.error('💥 User data loading error:', error);
+            this.showMessage('Failed to load user data.', 'error');
+            this.handleLogout();
+        }
+    }
+    
+    async loadBalance() {
+        try {
+            console.log('💰 Loading user balance...');
+            
+            const url = `${this.userDataApiBase}/dashboard?site_id=roflfaucet&_t=${Date.now()}`;
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.jwtToken}`,
+                    'Content-Type': 'application/json'
+                },
+                cache: 'no-cache'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.balance = parseFloat(data.dashboard.balance.useless_coins);
+                this.canClaim = data.dashboard.claim_statuses.roflfaucet.can_claim;
+                
+                console.log('✅ Balance loaded:', this.balance, 'Can claim:', this.canClaim);
+                this.updateUI();
+                
+            } else {
+                console.log('⚠️ Using fallback balance (API unavailable)');
+                this.balance = 0;
+                this.canClaim = true;
+                this.updateUI();
+            }
+            
+        } catch (error) {
+            console.error('💥 Balance loading error:', error);
+            console.log('⚠️ Using fallback balance');
+            this.balance = 0;
+            this.canClaim = true;
+            this.updateUI();
+        }
+    }
+    
+    async handleClaim() {
+        if (!this.canClaim) {
+            this.showMessage('Please wait before claiming again.', 'warning');
+            return;
+        }
+        
+        try {
+            console.log('🎲 Processing claim...');
+            this.showMessage('Processing claim...', 'info');
+            
+            const response = await fetch(`${this.userDataApiBase}/balance/claim`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.jwtToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    site_id: 'roflfaucet'
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                const coinsEarned = result.rewards.useless_coins;
+                console.log('✅ Claim successful! Earned:', coinsEarned);
+                
+                this.showMessage(`🎉 Claimed ${coinsEarned} UselessCoins!`, 'success');
+                
+                // Reload balance
+                await this.loadBalance();
+                
+            } else {
+                console.error('❌ Claim failed:', result);
+                this.showMessage(result.error || 'Claim failed. Please try again.', 'error');
+            }
+            
+        } catch (error) {
+            console.error('💥 Claim error:', error);
+            this.showMessage('Network error during claim. Please try again.', 'error');
+        }
+    }
+    
+    setupAutoRefresh() {
+        // Check token expiration every minute
+        setInterval(() => {
+            if (this.jwtToken && this.isTokenValid()) {
+                const payload = JSON.parse(atob(this.jwtToken.split('.')[1]));
+                const now = Math.floor(Date.now() / 1000);
+                const timeUntilExpiry = payload.exp - now;
+                
+                // Refresh if less than 2 minutes remaining
+                if (timeUntilExpiry < 120) {
+                    console.log('🔄 Auto-refreshing JWT...');
+                    this.refreshToken();
+                }
+            }
+        }, 60000); // Check every minute
+    }
+    
+    async refreshToken() {
+        try {
+            const response = await fetch(`${this.authApiBase}/jwt-refresh.php`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.jwtToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.jwt) {
+                console.log('✅ JWT refreshed successfully');
+                localStorage.setItem('jwt_token', data.jwt);
+                this.jwtToken = data.jwt;
+            } else {
+                console.log('⚠️ Token refresh failed, logging out');
+                this.handleLogout();
+            }
+            
+        } catch (error) {
+            console.error('💥 Token refresh error:', error);
+            this.handleLogout();
+        }
+    }
+    
+    showLoginScreen() {
+        const loginSection = document.getElementById('oauth-login-section');
+        const faucetSection = document.getElementById('oauth-faucet-section');
+        
+        if (loginSection) loginSection.style.display = 'block';
+        if (faucetSection) faucetSection.style.display = 'none';
+    }
+    
+    showFaucetScreen() {
+        const loginSection = document.getElementById('oauth-login-section');
+        const faucetSection = document.getElementById('oauth-faucet-section');
+        
+        if (loginSection) loginSection.style.display = 'none';
+        if (faucetSection) faucetSection.style.display = 'block';
+        
+        this.updateUI();
+    }
+    
+    updateUI() {
+        // Update username
+        const usernameEls = document.querySelectorAll('#oauth-username, #header-username');
+        if (this.userProfile) {
+            usernameEls.forEach(el => {
+                if (el) el.textContent = this.userProfile.username;
+            });
+        }
+        
+        // Update balance
+        const balanceEl = document.getElementById('oauth-balance');
+        if (balanceEl) {
+            balanceEl.textContent = this.balance;
+        }
+        
+        // Update claim button
+        const claimBtn = document.getElementById('oauth-claim-btn');
+        if (claimBtn) {
+            claimBtn.disabled = this.jwtToken ? !this.canClaim : false;
+            
+            if (!this.jwtToken) {
+                claimBtn.textContent = '🎲 Claim 5 UselessCoins';
+                claimBtn.className = 'claim-button';
+            } else if (this.canClaim) {
+                claimBtn.textContent = '🎲 Claim 5 UselessCoins';
+                claimBtn.className = 'claim-button';
+            } else {
+                claimBtn.textContent = '⏱️ Cooldown Active';
+                claimBtn.className = 'claim-button disabled';
+            }
+        }
+    }
+    
+    handleLogout() {
+        console.log('🚪 Logging out...');
+        
+        localStorage.removeItem('jwt_token');
+        
+        this.jwtToken = null;
+        this.userProfile = null;
+        this.balance = 0;
+        this.canClaim = false;
+        
+        this.showLoginScreen();
+        this.showMessage('Logged out successfully', 'info');
+    }
+    
+    handleClaimClick() {
+        if (!this.jwtToken) {
+            this.showLoginDialog();
+        } else {
+            this.handleClaim();
+        }
+    }
+    
+    showLoginDialog() {
+        const dialog = document.getElementById('login-dialog');
+        if (dialog) {
+            dialog.style.display = 'flex';
+        }
+    }
+    
+    hideLoginDialog() {
+        const dialog = document.getElementById('login-dialog');
+        if (dialog) {
+            dialog.style.display = 'none';
+        }
+    }
+    
+    showMessage(text, type = 'info') {
+        console.log(`📢 ${type.toUpperCase()}: ${text}`);
+        
+        const messageEl = document.getElementById('oauth-message');
+        if (messageEl) {
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+    }
+}
+
+// Handle login form submission
+function handleJWTLogin() {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (username && password) {
+        window.jwtSimpleFaucet.handleLogin(username, password);
+    } else {
+        window.jwtSimpleFaucet.showMessage('Please enter username and password', 'error');
+    }
+}
+
+// Global functions
+window.hideLoginDialog = () => {
+    const dialog = document.getElementById('login-dialog');
+    if (dialog) dialog.style.display = 'none';
+};
+
+window.handleJWTLogin = handleJWTLogin;
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🎯 DOM loaded, initializing JWT Simple Faucet...');
+    window.jwtSimpleFaucet = new JWTSimpleFaucet();
+    console.log('✅ JWT Simple Faucet ready!');
+});

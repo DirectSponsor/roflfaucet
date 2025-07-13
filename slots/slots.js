@@ -403,7 +403,7 @@ class CasinoSlotMachine {
     showDemoCreditsPrompt() {
         const promptText = `🎰 Out of demo credits!\n\n` +
                           `💡 Get 50 free demo credits to keep playing?\n\n` +
-                          `🔐 Sign up with OAuth to play with real UselessCoins that work across all sites!`;
+                          `🔐 Sign up with JWT to play with real UselessCoins that work across all sites!`;
         
         if (confirm(promptText)) {
             this.addDemoCredits(50);
@@ -567,8 +567,8 @@ class CasinoSlotMachine {
     }
 
     loadGameState() {
-        // Check if user is logged in via OAuth
-        this.accessToken = localStorage.getItem('oauth_simple_token');
+        // Check if user is logged in via JWT
+        this.accessToken = localStorage.getItem('jwt_simple_token');
         this.isLoggedIn = !!this.accessToken;
         
         if (this.isLoggedIn) {
