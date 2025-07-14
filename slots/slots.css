@@ -64,11 +64,42 @@
 }
 
 /* Spinning animation - CSS animation for smooth looping */
+/* Different speeds for each reel to prevent synchronization */
 .reel.spinning {
     animation: spinReel 0.1s linear infinite;
 }
 
+/* Reel 1 - Fastest speed */
+#reel-1.spinning {
+    animation: spinReel1 0.105s linear infinite;
+}
+
+/* Reel 2 - Medium speed */
+#reel-2.spinning {
+    animation: spinReel2 0.110s linear infinite;
+}
+
+/* Reel 3 - Slowest speed */
+#reel-3.spinning {
+    animation: spinReel3 0.115s linear infinite;
+}
+
 @keyframes spinReel {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1500px; }
+}
+
+@keyframes spinReel1 {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1500px; }
+}
+
+@keyframes spinReel2 {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1500px; }
+}
+
+@keyframes spinReel3 {
     0% { background-position: 0 0; }
     100% { background-position: 0 -1500px; }
 }
