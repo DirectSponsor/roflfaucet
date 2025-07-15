@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="styles.css">
     
     <!-- JWT Simple Faucet -->
-    <script src="simple-faucet.js"></script>
+    <script src="jwt-simple.js"></script>
     
     <!-- hCaptcha -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
@@ -42,7 +42,13 @@
                     <span class="tagline">Free Crypto + Charity Impact</span>
                 </div>
                 
-                <nav class="nav">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <nav class="nav" id="nav">
                     <a href="index.html" class="nav-link">Faucet</a>
                     <a href="slots.html" class="nav-link">Slots</a>
                     <a href="illusions.html" class="nav-link">Illusions</a>
@@ -57,8 +63,18 @@
         </div>
     </header>
     
-    <!-- Header Collapse on Scroll Script -->
-    <script src="header-collapse.js"></script>
+    
+    <!-- Slots CSS and JS (loaded on all pages for simplicity) -->
+    <link rel="stylesheet" href="slots/slots.css">
+    <script src="slots/slots.js"></script>
+    
+    <!-- Desktop device detection for slots - redirect mobile users -->
+    <script>
+        // Redirect mobile users to mobile version on slots page
+        if (window.location.pathname.includes('slots.html') && window.innerWidth <= 768) {
+            window.location.href = 'slots-mobile.html';
+        }
+    </script>
 
 <!-- include end header.html -->
     <!-- Main Content -->
@@ -66,6 +82,10 @@
         <div class="container">
             <div class="content-grid">
 <!-- include start sidebar-left.html -->
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="content-grid">
                 <!-- Left Sidebar -->
                 <aside class="sidebar-left">
                     <!-- Giphy Content Slot - Top Position -->
@@ -108,33 +128,32 @@
                 <!-- Main Content -->
                 <section class="main-content">
 <!-- UNIQUE PAGE CONTENT GOES HERE -->
-                    <div class="content-header">
-                        <h1>🔐 JWT Simple Faucet</h1>
-                        <p>Earn UselessCoins every 5 minutes with our secure JWT authentication</p>
-                    </div>
-                    
+                    <!-- Multi-Step Faucet Process -->
                     <div class="content-container">
                         <!-- JWT Message -->
                         <div id="oauth-message" class="message"></div>
                         
-                        
-                        <!-- Faucet Section - Always Visible -->
-                        <div id="oauth-faucet-section" class="content-entry">
-                            <div class="entry-content">
-                                <h2 id="faucet-title">🚰 UselessCoin Faucet</h2>
-                                
-                                <!-- Balance Display -->
-                                <div class="stats-display">
-                                    <div class="stats-item">
-                                        <span class="stats-number" id="oauth-balance">0</span>
-                                        <span class="stats-label">UselessCoins</span>
-                                    </div>
+                        <!-- Step 1: Welcome Screen -->
+                        <div id="welcome-step" class="faucet-step">
+                            <div class="content-header">
+                                <h1 id="welcome-title">🚰 ROFLFaucet</h1>
+                                <p id="welcome-subtitle">Claim some useless coins</p>
+                            </div>
+                            
+                            <!-- Balance Display -->
+                            <div class="stats-display">
+                                <div class="stats-item">
+                                    <span class="stats-number" id="oauth-balance">0</span>
+                                    <span class="stats-label" id="balance-label">UselessCoins</span>
                                 </div>
-                                
+                            </div>
+                            
+                            <!-- User Info -->
+                            <div id="user-info">
                                 <!-- Login Notice (shown when not logged in) -->
                                 <div id="login-notice" class="highlight-box info" style="margin: 20px 0;">
-                                    <strong>🔐 Login Required</strong><br>
-                                    You need to be logged in to claim coins. Please login using the button in the top right corner.
+                                    <strong>🎮 Demo Mode</strong><br>
+                                    You can claim tokens without logging in to play games, but you need to log in to get real UselessCoins.
                                 </div>
                                 
                                 <!-- Welcome Message (shown when logged in) -->
@@ -142,38 +161,59 @@
                                     <strong>🎉 Welcome, <span id="oauth-username">User</span>!</strong><br>
                                     You can claim coins every 5 minutes.
                                 </div>
-                                
-                                <!-- YouTube Playlist -->
-                                <div style="text-align: center; margin: 20px 0;">
-                                    <h3>🎬 Watch & Earn</h3>
-                                    <iframe width="560" height="315" 
-                                            src="https://www.youtube.com/embed/videoseries?list=PL8uSxewu26A61cc9ZxSBM0Ty3sF4u6Hjt" 
-                                            title="YouTube video player" 
-                                            frameborder="0" 
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                            referrerpolicy="strict-origin-when-cross-origin" 
-                                            allowfullscreen
-                                            style="max-width: 100%; height: auto;">
-                                    </iframe>
-                                </div>
-                                
-                                <!-- hCaptcha -->
-                                <div style="text-align: center; margin: 20px 0;">
-                                    <div class="h-captcha" data-sitekey="a01ce33e-fce6-44ee-b2d4-2dee7014ed3c"></div>
-                                </div>
-                                
-                                <!-- Claim Button -->
-                                <div style="text-align: center; margin: 30px 0;">
-                                    <button id="oauth-claim-btn" class="claim-button">🎲 Claim 5 UselessCoins</button>
-                                </div>
-                                
-                                <!-- Logout Button (shown when logged in) -->
-                                <div id="logout-section" style="text-align: center; display: none;">
-                                    <button id="oauth-logout-btn" class="secondary-button">🚪 Logout</button>
-                                </div>
+                            </div>
+                            
+                            <!-- Claim Button -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <button id="start-claim-btn" class="claim-button">🎲 Start Claim Process</button>
                             </div>
                         </div>
                         
+                        <!-- Step 2: Faucet Claim -->
+                        <div id="faucet-step" class="faucet-step" style="display: none;">
+                            <div class="content-header">
+                                <h1>🎲 Claim Your Reward</h1>
+                                <p>Complete the captcha to claim your <span id="claim-amount">5</span> <span id="claim-type">UselessCoins</span></p>
+                            </div>
+                            
+                            <!-- hCaptcha -->
+                            <div style="text-align: center; margin: 20px 0;">
+                                <div class="h-captcha" data-sitekey="a01ce33e-fce6-44ee-b2d4-2dee7014ed3c"></div>
+                            </div>
+                            
+                            <!-- Claim Button -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <button id="final-claim-btn" class="claim-button">🎲 Claim <span id="claim-btn-amount">5</span> <span id="claim-btn-type">UselessCoins</span></button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Success Result -->
+                        <div id="result-step" class="faucet-step" style="display: none;">
+                            <div class="content-header">
+                                <h1>🎉 Congratulations!</h1>
+                                <p>You successfully claimed your reward!</p>
+                            </div>
+                            
+                            <!-- Result Display -->
+                            <div class="result-display" style="text-align: center; margin: 30px 0;">
+                                <div class="result-amount">
+                                    <span class="result-number" id="won-amount">5</span>
+                                    <span class="result-label" id="won-type">UselessCoins</span>
+                                </div>
+                                <p id="result-message">added to your balance!</p>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <button id="back-to-start" class="claim-button">🔄 Back to Faucet</button>
+                                <button id="play-slots" class="secondary-button" onclick="window.location.href='slots.html'">🎰 Play Slots</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Logout Button (shown when logged in) -->
+                        <div id="logout-section" style="text-align: center; margin: 20px 0; display: none;">
+                            <button id="oauth-logout-btn" class="secondary-button">🚪 Logout</button>
+                        </div>
                     </div>
 <!-- END UNIQUE PAGE CONTENT -->
                 </section>
@@ -225,6 +265,10 @@
         </div>
     </main>
 <!-- include start footer.html -->
+            </div>
+        </div>
+    </main>
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container">

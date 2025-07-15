@@ -1,3 +1,8 @@
+<!-- 🎰 ROFLFaucet Slot Machine Page -->
+<!-- #TITLE#="ROFLFaucet - Casino Slots" -->
+<!-- #DESC#="Play casino slots and win UselessCoins on ROFLFaucet" -->
+<!-- #KEYWORDS#="casino slots, slot machine, uselesscoins, crypto games, free coins" -->
+
 <!-- include start doctype-head.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -27,6 +32,7 @@
 <body>
 
 <!-- include end doctype-head.html -->
+
 <!-- include start header.html -->
     <!-- Beta Indicator -->
     <div class="beta-indicator">
@@ -42,7 +48,13 @@
                     <span class="tagline">Free Crypto + Charity Impact</span>
                 </div>
                 
-                <nav class="nav">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <nav class="nav" id="nav">
                     <a href="index.html" class="nav-link">Faucet</a>
                     <a href="slots.html" class="nav-link">Slots</a>
                     <a href="illusions.html" class="nav-link">Illusions</a>
@@ -57,15 +69,30 @@
         </div>
     </header>
     
-    <!-- Header Collapse on Scroll Script -->
-    <script src="header-collapse.js"></script>
+    
+    <!-- Slots CSS and JS (loaded on all pages for simplicity) -->
+    <link rel="stylesheet" href="slots/slots.css">
+    <script src="slots/slots.js"></script>
+    
+    <!-- Desktop device detection for slots - redirect mobile users -->
+    <script>
+        // Redirect mobile users to mobile version on slots page
+        if (window.location.pathname.includes('slots.html') && window.innerWidth <= 768) {
+            window.location.href = 'slots-mobile.html';
+        }
+    </script>
 
 <!-- include end header.html -->
+
     <!-- Main Content -->
     <main class="main">
         <div class="container">
             <div class="content-grid">
 <!-- include start sidebar-left.html -->
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="content-grid">
                 <!-- Left Sidebar -->
                 <aside class="sidebar-left">
                     <!-- Giphy Content Slot - Top Position -->
@@ -104,125 +131,162 @@
                     </div>
                 </aside>
 
+                <!-- Main Content -->
+                <section class="main-content">
+
 <!-- include end sidebar-left.html -->
+
                 <!-- Main Content -->
                 <section class="main-content">
 <!-- UNIQUE PAGE CONTENT GOES HERE -->
                     <div class="content-header">
-                        <h1>ℹ️ About ROFLFaucet</h1>
-                        <p>Learn about our mission, technology, and the ecosystem we're building</p>
+                        <h1>🎰 Casino Slots</h1>
                     </div>
                     
                     <div class="content-container">
-                        <!-- Mission Section -->
-                        <div class="content-entry">
-                            <div class="entry-content">
-                                <h2>🎯 Our Mission</h2>
-                                
-                                <p>ROFLFaucet is more than just a cryptocurrency faucet - we're building an ecosystem that combines free crypto earning with meaningful charitable impact.</p>
-                                
-                                <div class="highlight-box info">
-                                    <strong>Core Values:</strong><br>
-                                    • <strong>Free Access</strong> - Anyone can earn crypto without investment<br>
-                                    • <strong>Charitable Impact</strong> - Your earnings can support real causes<br>
-                                    • <strong>Community Driven</strong> - Users vote on charity recipients<br>
-                                    • <strong>Transparent Operations</strong> - Open development and clear processes
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- How It Works Section -->
-                        <div class="content-entry">
-                            <div class="entry-content">
-                                <h2>⚙️ How It Works</h2>
-                                
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
-                                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
-                                        <h3 style="margin-top: 0; color: #667eea;">1. 🎲 Earn Tokens</h3>
-                                        <p>Claim UselessCoins every 5 minutes through our secure faucet system.</p>
+                        <!-- Flip Container for Slot Machine -->
+                        <div class="slot-machine" id="slot-machine">
+                            
+                            <!-- Front Side - Game -->
+                            <div class="machine-front">
+                                <div class="slot-machine-container">
+                                    <!-- Sprite Background Slot Machine Reels -->
+                                    <div class="sprite-reels-container">
+                                        <!-- Glass overlay with center line -->
+                                        <div class="slot-glass-overlay">
+                                            <div class="center-line"></div>
+                                        </div>
+                                        <!-- Just empty reel windows - sprite moves behind them -->
+                                        <div class="reel" id="reel-1"></div>
+                                        <div class="reel" id="reel-2"></div>
+                                        <div class="reel" id="reel-3"></div>
+                                    </div>
+                                    <!-- Control Panel -->
+                                    <div class="control-panel">
+                                        <table class="control-table">
+                                            <tr class="control-row">
+                                                <td class="control-cell">
+                                                    <span class="control-label">WIN</span><br>
+                                                    <span class="control-value" id="last-win">0</span>
+                                                </td>
+                                                <td class="control-cell">
+                                                    <span class="control-label">COINS</span><br>
+                                                    <span class="control-value" id="current-balance">0</span>
+                                                </td>
+                                                <td class="control-cell bet-cell">
+                                                    <span class="control-label">BET</span><br>
+                                                    <span class="control-value" id="current-bet">1</span>
+                                                </td>
+                                                <td class="control-cell narrow-arrow-cell">
+                                                    <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
+                                                    <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
+                                                </td>
+                                                <td class="control-cell spin-cell">
+                                                    <button class="spin-button" onclick="spinReels()" id="spin-btn">
+                                                        SPIN
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
                                     
-                                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745;">
-                                        <h3 style="margin-top: 0; color: #28a745;">2. 🗳️ Vote for Charities</h3>
-                                        <p>Use your tokens to vote for which charities should receive donations.</p>
+                                    <!-- Action Buttons Row -->
+                                    <div class="action-buttons">
+                                        <button class="flip-button" onclick="flipMachine()" id="flip-btn">
+                                            📊 PAYOUTS
+                                        </button>
+                                        <button class="claim-button" onclick="claimWinnings()" id="claim-btn" disabled>
+                                            Claim Faucet
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Back Side - Prize Display -->
+                            <div class="machine-back">
+                                <div class="slot-machine-container">
+                                    
+                                    <!-- Prize Display Table -->
+                                    <div class="prize-display-container">
+                                        <table class="prize-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Combination</th>
+                                                    <th>Payout</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-symbol="cherry">
+                                                    <td class="prize-combo">🍒🍒🍒</td>
+                                                    <td class="prize-payout">50</td>
+                                                </tr>
+                                                <tr data-symbol="lemon">
+                                                    <td class="prize-combo">🍋🍋🍋</td>
+                                                    <td class="prize-payout">75</td>
+                                                </tr>
+                                                <tr data-symbol="bell">
+                                                    <td class="prize-combo">🔔🔔🔔</td>
+                                                    <td class="prize-payout">100</td>
+                                                </tr>
+                                                <tr data-symbol="bar">
+                                                    <td class="prize-combo">⬛⬛⬛</td>
+                                                    <td class="prize-payout">200</td>
+                                                </tr>
+                                                <tr data-symbol="seven">
+                                                    <td class="prize-combo">7️⃣7️⃣7️⃣</td>
+                                                    <td class="prize-payout">500</td>
+                                                </tr>
+                                                <tr data-symbol="diamond">
+                                                    <td class="prize-combo">💎💎💎</td>
+                                                    <td class="prize-payout">1000</td>
+                                                </tr>
+                                                <tr data-symbol="fruit_combo">
+                                                    <td class="prize-combo">🍉🍌🍒</td>
+                                                    <td class="prize-payout">400</td>
+                                                </tr>
+                                                <tr data-symbol="blanks">
+                                                    <td class="prize-combo">⬜⬜⬜</td>
+                                                    <td class="prize-payout">10</td>
+                                                </tr>
+                                                <tr data-symbol="two_diamonds">
+                                                    <td class="prize-combo">💎💎⬜</td>
+                                                    <td class="prize-payout">25</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                     
-                                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107;">
-                                        <h3 style="margin-top: 0; color: #e67e22;">3. 💝 Make Impact</h3>
-                                        <p>Watch as your votes direct real charitable donations to worthy causes.</p>
+                                    <!-- Back Control Panel -->
+                                    <div class="control-panel">
+                                        <div class="control-item">
+                                            <span class="control-label">TOTAL PRIZES</span>
+                                            <span class="control-value">6</span>
+                                        </div>
+                                        <div class="control-item">
+                                            <span class="control-label">MAX WIN</span>
+                                            <span class="control-value">1000</span>
+                                        </div>
+                                        <div class="control-item">
+                                            <span class="control-label">MIN BET</span>
+                                            <span class="control-value">1</span>
+                                        </div>
+                                        <div class="control-item">
+                                            <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
+                                                🎰 PRIZES
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Technology Section -->
-                        <div class="content-entry">
-                            <div class="entry-content">
-                                <h2>🔧 Technology Stack</h2>
-                                
-                                <p>ROFLFaucet is built with modern, secure technologies:</p>
-                                
-                                <ul>
-                                    <li><strong>OAuth 2.0 Authentication</strong> - Secure login via DirectSponsor Auth</li>
-                                    <li><strong>Cross-Site Integration</strong> - Unified balance across network sites</li>
-                                    <li><strong>Static Site Architecture</strong> - Fast, reliable, and secure</li>
-                                    <li><strong>Template-Based CMS</strong> - Easy content management and updates</li>
-                                    <li><strong>Responsive Design</strong> - Works perfectly on mobile and desktop</li>
-                                </ul>
-                                
-                                <div class="highlight-box success">
-                                    <strong>Security First:</strong><br>
-                                    • No passwords stored locally<br>
-                                    • Secure API token validation<br>
-                                    • Regular security audits<br>
-                                    • Open source transparency
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Network Section -->
-                        <div class="content-entry">
-                            <div class="entry-content">
-                                <h2>🌐 The SatoshiHost Network</h2>
-                                
-                                <p>ROFLFaucet is part of the larger SatoshiHost ecosystem:</p>
-                                
-                                <div style="background: #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                                    <h3 style="color: #667eea; margin-top: 0;">Network Sites</h3>
-                                    <ul style="margin-bottom: 0;">
-                                        <li><strong>ROFLFaucet</strong> - Free cryptocurrency faucet</li>
-                                        <li><strong>ClickForCharity</strong> - Social media engagement for charity</li>
-                                        <li><strong>DirectSponsor</strong> - Authentication and user management</li>
-                                        <li><strong>Documentation Hub</strong> - Technical guides and references</li>
-                                    </ul>
-                                </div>
-                                
-                                <p>All sites share the same user accounts and token balances, creating a seamless experience across the entire network.</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Contact Section -->
-                        <div class="content-entry">
-                            <div class="entry-content">
-                                <h2>📞 Get in Touch</h2>
-                                
-                                <p>We're always happy to hear from our community:</p>
-                                
-                                <div class="highlight-box">
-                                    <strong>Connect With Us:</strong><br>
-                                    • <strong>Development Updates</strong> - Check the Progress page<br>
-                                    • <strong>Technical Support</strong> - Use the OAuth login system<br>
-                                    • <strong>Feature Requests</strong> - Submit through our feedback system<br>
-                                    • <strong>Bug Reports</strong> - Help us improve the platform
-                                </div>
-                                
-                                <p><em>ROFLFaucet is currently in beta. We appreciate your patience as we continue to improve and expand the platform!</em></p>
-                            </div>
+                            
                         </div>
                     </div>
 <!-- END UNIQUE PAGE CONTENT -->
                 </section>
+
 <!-- include start sidebar-right.html -->
+                </section>
+                
                 <!-- Right Sidebar -->
                 <aside class="sidebar-right">
                     <!-- Rotating Ad Space 2 -->
@@ -266,10 +330,16 @@
                 </aside>
 
 <!-- include end sidebar-right.html -->
+
             </div>
         </div>
     </main>
+
 <!-- include start footer.html -->
+            </div>
+        </div>
+    </main>
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container">

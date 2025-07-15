@@ -12,7 +12,13 @@
                     <span class="tagline">Free Crypto + Charity Impact</span>
                 </div>
                 
-                <nav class="nav">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <nav class="nav" id="nav">
                     <a href="index.html" class="nav-link">Faucet</a>
                     <a href="slots.html" class="nav-link">Slots</a>
                     <a href="illusions.html" class="nav-link">Illusions</a>
@@ -27,6 +33,16 @@
         </div>
     </header>
     
-    <!-- Header Collapse on Scroll Script -->
-    <script src="header-collapse.js"></script>
+    
+    <!-- Slots CSS and JS (loaded on all pages for simplicity) -->
+    <link rel="stylesheet" href="slots/slots.css">
+    <script src="slots/slots.js"></script>
+    
+    <!-- Desktop device detection for slots - redirect mobile users -->
+    <script>
+        // Redirect mobile users to mobile version on slots page
+        if (window.location.pathname.includes('slots.html') && window.innerWidth <= 768) {
+            window.location.href = 'slots-mobile.html';
+        }
+    </script>
 

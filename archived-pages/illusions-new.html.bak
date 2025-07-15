@@ -1,0 +1,37 @@
+<!-- 👁️ ROFLFaucet Illusions Page -->
+<!-- #TITLE#="ROFLFaucet - Optical Illusions" -->
+<!-- #DESC#="Explore fascinating optical illusions and learn about visual perception and brain science" -->
+<!-- #KEYWORDS#="optical illusions, visual perception, brain science, illusions gallery" -->
+
+<!-- include start doctype-head.html -->
+<!-- include end doctype-head.html -->
+
+<!-- include start header.html -->
+<!-- include end header.html -->
+
+<!-- include start sidebar-left.html -->
+<!-- include end sidebar-left.html -->
+
+<!-- UNIQUE PAGE CONTENT GOES HERE -->
+                    <div class="content-header">
+                        <h1>👁️ Optical Illusions</h1>
+                        <p>Explore fascinating optical illusions and learn about visual perception and brain science</p>
+                    </div>
+                    
+                    <div class="content-container">
+                        <div class="content-entry">
+                            <h3 class="entry-title">Illusions Gallery</h3>
+                            <div class="entry-content">
+                                <p>This gallery will feature optical illusions from your ROFL folders with educational captions.</p>
+                                <p>Click any illusion to view it in a smart-sized overlay that looks perfect on any monitor - never too big on huge screens, never too small on mobile devices.</p>
+                                <p><em>Gallery functionality coming soon...</em></p>
+                            </div>
+                        </div>
+                    </div>
+<!-- END UNIQUE PAGE CONTENT -->
+
+<!-- include start sidebar-right.html -->
+<!-- include end sidebar-right.html -->
+
+<!-- include start footer.html -->
+<!-- include end footer.html -->

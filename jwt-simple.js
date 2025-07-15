@@ -345,18 +345,18 @@ class SimpleFaucet {
     }
     
 initializeFaucet() {
-const faucetSection = document.getElementById('oauth-faucet-section');
-
-
-    if (faucetSection) {
-        faucetSection.style.display = 'block';
-        const loginNotice = document.getElementById('login-notice');
-        welcomeMessage.style.display = this.jwtToken ? 'block' : 'none';
-        loginNotice.style.display = this.jwtToken ? 'none' : 'block';
-    }
+        const faucetSection = document.getElementById('oauth-faucet-section');
+        
+        if (faucetSection) {
+            faucetSection.style.display = 'block';
+            const loginNotice = document.getElementById('login-notice');
+            const welcomeMessage = document.getElementById('welcome-message');
+            if (welcomeMessage) welcomeMessage.style.display = this.jwtToken ? 'block' : 'none';
+            if (loginNotice) loginNotice.style.display = this.jwtToken ? 'none' : 'block';
+        }
     }
     
-// Old function showFaucetScreen removed
+    showFaucetScreen() {
         const loginSection = document.getElementById('oauth-login-section');
         const faucetSection = document.getElementById('oauth-faucet-section');
         
@@ -462,6 +462,16 @@ const faucetSection = document.getElementById('oauth-faucet-section');
             }, 3000);
         }
     }
+    
+    showLoginScreen() {
+        const loginSection = document.getElementById('oauth-login-section');
+        const faucetSection = document.getElementById('oauth-faucet-section');
+        
+        if (loginSection) loginSection.style.display = 'block';
+        if (faucetSection) faucetSection.style.display = 'none';
+        
+        this.updateUI();
+    }
 }
 
 // Handle login form submission
@@ -481,6 +491,6 @@ function handleJWTLogin() {
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🎯 DOM loaded, initializing JWT Simple Faucet...');
-    window.jwtSimpleFaucet = new JWTSimpleFaucet();
+    window.jwtSimpleFaucet = new SimpleFaucet();
     console.log('✅ JWT Simple Faucet ready!');
 });

@@ -550,7 +550,8 @@ class CasinoSlotMachine {
         
         const backgroundPositionY = -(position * this.positionHeight) + 150; // Center the position in middle slot
         
-        reel.style.backgroundPosition = `0 ${backgroundPositionY}px`;
+        // Add subtle bounce effect
+        this.addReelBounce(reel, backgroundPositionY);
         
         // Update the stored position
         this.currentPositions[reelIndex] = position;
@@ -564,6 +565,37 @@ class CasinoSlotMachine {
         console.log(`Reel ${reelIndex + 1} stopped on position ${position} (${outcome.symbolName})`);
         console.log(`  In-between: ${isInBetween}`);
         console.log(`  Background position: 0 ${backgroundPositionY}px`);
+    }
+    
+    addReelBounce(reel, finalPositionY) {
+        // Create a bounce effect when reel stops
+        // Use 10% of symbol height (150px) = 15px overshoot
+        const bounceHeight = this.symbolHeight * 0.1; // 15px (10% of 150px symbol)
+        const bounceSpeed = 250; // Medium bounce, 250ms
+        
+        // Overshoot past the final position (reel goes too far down, then bounces back up)
+        const overshootY = finalPositionY + bounceHeight;
+        
+        // Start at final position
+        reel.style.backgroundPosition = `0 ${finalPositionY}px`;
+        
+        // Animate overshoot, then bounce back
+        setTimeout(() => {
+            // First: overshoot past target
+            reel.style.transition = `background-position ${bounceSpeed * 0.6}ms ease-out`;
+            reel.style.backgroundPosition = `0 ${overshootY}px`;
+            
+            // Then: bounce back to final position
+            setTimeout(() => {
+                reel.style.transition = `background-position ${bounceSpeed * 0.4}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
+                reel.style.backgroundPosition = `0 ${finalPositionY}px`;
+                
+                // Reset transition after bounce completes
+                setTimeout(() => {
+                    reel.style.transition = '';
+                }, bounceSpeed * 0.4 + 50);
+            }, bounceSpeed * 0.6);
+        }, 10); // Small delay to ensure position is set before animation
     }
 
     loadGameState() {

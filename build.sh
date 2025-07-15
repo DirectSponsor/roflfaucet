@@ -64,20 +64,41 @@ process_includes() {
     echo "  ✅ Built: $output_file"
 }
 
-# Process all HTML files with include tags
+# Process HTML files with include tags
 processed_count=0
 
-# Find and process HTML files that contain include tags
-for htmlfile in *.html; do
+# Check if a specific file was provided as argument
+if [[ -n "$1" ]]; then
+    # Process single file
+    htmlfile="$1"
     if [[ -f "$htmlfile" ]] && grep -q "include start" "$htmlfile"; then
-        # Create backup
-        cp "$htmlfile" "${htmlfile}.bak"
+        # Create backup in backups folder
+        mkdir -p backups
+        cp "$htmlfile" "backups/${htmlfile}.bak"
         
         # Process includes in place  
         process_includes "$htmlfile" "$htmlfile"
         ((processed_count++))
+    elif [[ -f "$htmlfile" ]]; then
+        echo "📁 File '$htmlfile' found but contains no include tags"
+    else
+        echo "❌ File '$htmlfile' not found"
+        exit 1
     fi
-done
+else
+    # Process all HTML files that contain include tags
+    for htmlfile in *.html; do
+        if [[ -f "$htmlfile" ]] && grep -q "include start" "$htmlfile"; then
+            # Create backup in backups folder
+            mkdir -p backups
+            cp "$htmlfile" "backups/${htmlfile}.bak"
+            
+            # Process includes in place  
+            process_includes "$htmlfile" "$htmlfile"
+            ((processed_count++))
+        fi
+    done
+fi
 
 if [[ $processed_count -eq 0 ]]; then
     echo "📁 No HTML files with includes found"
@@ -99,7 +120,7 @@ else
     echo "📂 Directory structure:"
     echo "   includes/           - Shared HTML snippets (header, footer, sidebars)"
     echo "   *.html              - Your pages (edit these directly)"
-    echo "   *.html.bak          - Automatic backups created during build"
+    echo "   backups/*.html.bak  - Automatic backups created during build"
 fi
 
 # Ensure script exits with success

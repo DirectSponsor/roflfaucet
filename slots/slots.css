@@ -11,6 +11,7 @@
     border-radius: 10px;
     border: 2px solid #333;
     width: fit-content; /* Size to content, not full width */
+    min-width: 534px; /* Minimum width: 3×150px + 2×20px gaps + 2×20px padding + 2×2px border = 534px */
     max-width: 100%; /* Don't exceed container */
     margin: 2px auto;
     box-sizing: border-box;
@@ -66,22 +67,22 @@
 /* Spinning animation - CSS animation for smooth looping */
 /* Different speeds for each reel to prevent synchronization */
 .reel.spinning {
-    animation: spinReel 0.1s linear infinite;
+    animation: spinReel 0.5s linear infinite;
 }
 
 /* Reel 1 - Fastest speed */
 #reel-1.spinning {
-    animation: spinReel1 0.105s linear infinite;
+    animation: spinReel1 0.5s linear infinite;
 }
 
 /* Reel 2 - Medium speed */
 #reel-2.spinning {
-    animation: spinReel2 0.110s linear infinite;
+    animation: spinReel2 0.55s linear infinite;
 }
 
 /* Reel 3 - Slowest speed */
 #reel-3.spinning {
-    animation: spinReel3 0.115s linear infinite;
+    animation: spinReel3 0.6s linear infinite;
 }
 
 @keyframes spinReel {
@@ -733,3 +734,5 @@
         padding: 10px;
     }
 }
+
+/* Desktop and tablet optimized - no mobile scaling */

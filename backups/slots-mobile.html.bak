@@ -1,7 +1,7 @@
-<!-- 👁️ ROFLFaucet Illusions Page -->
-<!-- #TITLE#="ROFLFaucet - Optical Illusions" -->
-<!-- #DESC#="Explore fascinating optical illusions and learn about visual perception and brain science" -->
-<!-- #KEYWORDS#="optical illusions, visual perception, brain science, illusions gallery" -->
+<!-- 📱 ROFLFaucet Mobile Slots Page -->
+<!-- #TITLE#="ROFLFaucet - Mobile Slots" -->
+<!-- #DESC#="Play casino slots on mobile and win UselessCoins on ROFLFaucet" -->
+<!-- #KEYWORDS#="mobile slots, casino slots, mobile gambling, uselesscoins, crypto games" -->
 
 <!-- include start doctype-head.html -->
 <!DOCTYPE html>
@@ -134,17 +134,35 @@
 
 <!-- UNIQUE PAGE CONTENT GOES HERE -->
                     <div class="content-header">
-                        <h1>👁️ Optical Illusions</h1>
-                        <p>Explore fascinating optical illusions and learn about visual perception and brain science</p>
+                        <h1>📱 Mobile Slots</h1>
+                        <p>Optimized slot machine experience for mobile devices</p>
                     </div>
                     
                     <div class="content-container">
                         <div class="content-entry">
-                            <h3 class="entry-title">Illusions Gallery</h3>
                             <div class="entry-content">
-                                <p>This gallery will feature optical illusions from your ROFL folders with educational captions.</p>
-                                <p>Click any illusion to view it in a smart-sized overlay that looks perfect on any monitor - never too big on huge screens, never too small on mobile devices.</p>
-                                <p><em>Gallery functionality coming soon...</em></p>
+                                <div class="highlight-box info">
+                                    <strong>📱 Mobile Optimized:</strong> This page is specifically designed for mobile devices with touch-friendly controls and responsive design.
+                                </div>
+                                
+                                <p>The mobile slots experience includes:</p>
+                                <ul>
+                                    <li>Touch-optimized slot machine interface</li>
+                                    <li>Simplified controls for mobile screens</li>
+                                    <li>Responsive design that works on all screen sizes</li>
+                                    <li>Fast loading for mobile connections</li>
+                                </ul>
+                                
+                                <div class="highlight-box warning">
+                                    <strong>🚧 Coming Soon:</strong> Mobile-optimized slot machine is currently in development. Please check back soon!
+                                </div>
+                                
+                                <p>In the meantime, you can:</p>
+                                <ul>
+                                    <li>Visit the main faucet to earn UselessCoins</li>
+                                    <li>Try the desktop version of slots on larger screens</li>
+                                    <li>Explore other ROFLFaucet features</li>
+                                </ul>
                             </div>
                         </div>
                     </div>

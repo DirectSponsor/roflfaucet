@@ -1,6 +1,8 @@
 <!-- 🎰 ROFLFaucet Slot Machine Page -->
-<!-- Unique content can be edited directly -->
-<!-- Only run build.sh if includes/ files change -->
+<!-- #TITLE#="ROFLFaucet - Casino Slots" -->
+<!-- #DESC#="Play casino slots and win UselessCoins on ROFLFaucet" -->
+<!-- #KEYWORDS#="casino slots, slot machine, uselesscoins, crypto games, free coins" -->
+
 <!-- include start doctype-head.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -30,6 +32,7 @@
 <body>
 
 <!-- include end doctype-head.html -->
+
 <!-- include start header.html -->
     <!-- Beta Indicator -->
     <div class="beta-indicator">
@@ -45,7 +48,13 @@
                     <span class="tagline">Free Crypto + Charity Impact</span>
                 </div>
                 
-                <nav class="nav">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <nav class="nav" id="nav">
                     <a href="index.html" class="nav-link">Faucet</a>
                     <a href="slots.html" class="nav-link">Slots</a>
                     <a href="illusions.html" class="nav-link">Illusions</a>
@@ -60,15 +69,30 @@
         </div>
     </header>
     
-    <!-- Header Collapse on Scroll Script -->
-    <script src="header-collapse.js"></script>
+    
+    <!-- Slots CSS and JS (loaded on all pages for simplicity) -->
+    <link rel="stylesheet" href="slots/slots.css">
+    <script src="slots/slots.js"></script>
+    
+    <!-- Desktop device detection for slots - redirect mobile users -->
+    <script>
+        // Redirect mobile users to mobile version on slots page
+        if (window.location.pathname.includes('slots.html') && window.innerWidth <= 768) {
+            window.location.href = 'slots-mobile.html';
+        }
+    </script>
 
 <!-- include end header.html -->
+
     <!-- Main Content -->
     <main class="main">
         <div class="container">
             <div class="content-grid">
 <!-- include start sidebar-left.html -->
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="content-grid">
                 <!-- Left Sidebar -->
                 <aside class="sidebar-left">
                     <!-- Giphy Content Slot - Top Position -->
@@ -107,7 +131,11 @@
                     </div>
                 </aside>
 
+                <!-- Main Content -->
+                <section class="main-content">
+
 <!-- include end sidebar-left.html -->
+
                 <!-- Main Content -->
                 <section class="main-content">
 <!-- UNIQUE PAGE CONTENT GOES HERE -->
@@ -255,10 +283,10 @@
                     </div>
 <!-- END UNIQUE PAGE CONTENT -->
                 </section>
-<!-- Slot Machine Styles and Scripts -->
-<link rel="stylesheet" href="slots/slots.css">
-<script src="slots/slots.js"></script>
+
 <!-- include start sidebar-right.html -->
+                </section>
+                
                 <!-- Right Sidebar -->
                 <aside class="sidebar-right">
                     <!-- Rotating Ad Space 2 -->
@@ -302,10 +330,16 @@
                 </aside>
 
 <!-- include end sidebar-right.html -->
+
             </div>
         </div>
     </main>
+
 <!-- include start footer.html -->
+            </div>
+        </div>
+    </main>
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container">

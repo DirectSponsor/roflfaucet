@@ -1,13 +1,8 @@
-<!-- ⚠️  IMPORTANT: This file uses the include system! ⚠️ -->
-<!-- 📝 EDITING INSTRUCTIONS: -->
-<!-- -->
-<!-- ✅ SAFE TO EDIT: Content between these markers: -->
-<!--    <!-- UNIQUE PAGE CONTENT GOES HERE --> -->
-<!--    <!-- END UNIQUE PAGE CONTENT --> -->
-<!-- -->
-<!-- 🚨 DO NOT EDIT: Include sections (header, footer, sidebars) -->
-<!-- 🔧 After editing: Run ./build.sh to process includes -->
-<!-- ================================================================ -->
+<!-- 👁️ ROFLFaucet Illusions Page -->
+<!-- #TITLE#="ROFLFaucet - Optical Illusions" -->
+<!-- #DESC#="Explore fascinating optical illusions and learn about visual perception and brain science" -->
+<!-- #KEYWORDS#="optical illusions, visual perception, brain science, illusions gallery" -->
+
 <!-- include start doctype-head.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -37,6 +32,7 @@
 <body>
 
 <!-- include end doctype-head.html -->
+
 <!-- include start header.html -->
     <!-- Beta Indicator -->
     <div class="beta-indicator">
@@ -52,7 +48,13 @@
                     <span class="tagline">Free Crypto + Charity Impact</span>
                 </div>
                 
-                <nav class="nav">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <nav class="nav" id="nav">
                     <a href="index.html" class="nav-link">Faucet</a>
                     <a href="slots.html" class="nav-link">Slots</a>
                     <a href="illusions.html" class="nav-link">Illusions</a>
@@ -67,15 +69,26 @@
         </div>
     </header>
     
-    <!-- Header Collapse on Scroll Script -->
-    <script src="header-collapse.js"></script>
+    
+    <!-- Slots CSS and JS (loaded on all pages for simplicity) -->
+    <link rel="stylesheet" href="slots/slots.css">
+    <script src="slots/slots.js"></script>
+    
+    <!-- Desktop device detection for slots - redirect mobile users -->
+    <script>
+        // Redirect mobile users to mobile version on slots page
+        if (window.location.pathname.includes('slots.html') && window.innerWidth <= 768) {
+            window.location.href = 'slots-mobile.html';
+        }
+    </script>
 
 <!-- include end header.html -->
+
+<!-- include start sidebar-left.html -->
     <!-- Main Content -->
     <main class="main">
         <div class="container">
             <div class="content-grid">
-<!-- include start sidebar-left.html -->
                 <!-- Left Sidebar -->
                 <aside class="sidebar-left">
                     <!-- Giphy Content Slot - Top Position -->
@@ -114,114 +127,32 @@
                     </div>
                 </aside>
 
-<!-- include end sidebar-left.html -->
                 <!-- Main Content -->
                 <section class="main-content">
+
+<!-- include end sidebar-left.html -->
+
 <!-- UNIQUE PAGE CONTENT GOES HERE -->
                     <div class="content-header">
-                        <h1>📝 Development Diary</h1>
-                        <p>Behind-the-scenes progress updates and insights from the ROFLFaucet development team</p>
+                        <h1>👁️ Optical Illusions</h1>
+                        <p>Explore fascinating optical illusions and learn about visual perception and brain science</p>
                     </div>
                     
                     <div class="content-container">
-                        <!-- Summary Stats -->
-                        <div class="content-summary">
-                            <h3>🚀 Recent Development Activity</h3>
-                            <div class="stats-display">
-                                <div class="stats-item">
-                                    <span class="stats-number">8</span>
-                                    <span class="stats-label">Updates This Month</span>
-                                </div>
-                                <div class="stats-item">
-                                    <span class="stats-number">15</span>
-                                    <span class="stats-label">Features Added</span>
-                                </div>
-                                <div class="stats-item">
-                                    <span class="stats-number">3</span>
-                                    <span class="stats-label">Major Releases</span>
-                                </div>
-                                <div class="stats-item">
-                                    <span class="stats-number">42</span>
-                                    <span class="stats-label">Bug Fixes</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Content Entry -->
                         <div class="content-entry">
-                            <div class="entry-date">June 21, 2025</div>
-                            <div class="entry-version">v2.1.0</div>
-                            <h2 class="entry-title">🎉 Linear Include System Complete!</h2>
+                            <h3 class="entry-title">Illusions Gallery</h3>
                             <div class="entry-content">
-                                <div class="highlight-box success">
-                                    <strong>🚀 New Feature:</strong> Simplified linear include processing system is now live!
-                                </div>
-                                
-                                <h3>🔨 What Changed</h3>
-                                <ul>
-                                    <li>Linear single-pass processing - no more infinite loops</li>
-                                    <li>Clean include start/end tag syntax</li>
-                                    <li>Master template for consistent page structure</li>
-                                    <li>All HTML content moved to include files</li>
-                                </ul>
-                                
-                                <h3>🛠️ New Workflow</h3>
-                                <ul>
-                                    <li>Copy master.template.html for new pages</li>
-                                    <li>Replace content between <!-- UNIQUE PAGE CONTENT --> markers</li>
-                                    <li>Run ./build.sh to generate complete pages</li>
-                                    <li>All shared elements automatically included</li>
-                                </ul>
-                                
-                                <div class="highlight-box info">
-                                    <strong>💡 Developer Note:</strong> This system is perfect for future CMS integration. The unique content area can be easily managed through a web interface while keeping all shared elements consistent.
-                                </div>
-                            </div>
-                            <div class="entry-tags">
-                                <span class="entry-tag feature">Linear Processing</span>
-                                <span class="entry-tag improvement">Template System</span>
-                                <span class="entry-tag feature">CMS Ready</span>
-                            </div>
-                        </div>
-                        <!-- Previous Entry -->
-                        <div class="content-entry">
-                            <div class="entry-date">June 20, 2025</div>
-                            <div class="entry-version">v2.0.0</div>
-                            <h2 class="entry-title">🎉 BBEdit-Style Include System Implemented!</h2>
-                            <div class="entry-content">
-                                <div class="highlight-box success">
-                                    <strong>🚀 New Feature:</strong> Lightweight HTML include system is now working!
-                                </div>
-                                
-                                <h3>🔨 What This Means</h3>
-                                <ul>
-                                    <li>Easy maintenance of shared components (header, footer, sidebars)</li>
-                                    <li>Clear visibility of includes when editing template files</li>
-                                    <li>Lightweight build process with no complex dependencies</li>
-                                    <li>BBEdit-style include syntax</li>
-                                </ul>
-                                
-                                <h3>🛠️ How It Works</h3>
-                                <ul>
-                                    <li>Edit .template.html files in the templates/ directory</li>
-                                    <li>Shared components live in includes/ directory</li>
-                                    <li>Run ./build.sh to process includes and generate .html files</li>
-                                    <li>Deploy the generated .html files as usual</li>
-                                </ul>
-                                
-                                <div class="highlight-box info">
-                                    <strong>💡 Developer Note:</strong> This system brings back the simplicity of BBEdit's includes while keeping everything lightweight and maintainable. No complex frameworks needed!
-                                </div>
-                            </div>
-                            <div class="entry-tags">
-                                <span class="entry-tag feature">BBEdit Includes</span>
-                                <span class="entry-tag improvement">Maintainability</span>
-                                <span class="entry-tag feature">Build System</span>
+                                <p>This gallery will feature optical illusions from your ROFL folders with educational captions.</p>
+                                <p>Click any illusion to view it in a smart-sized overlay that looks perfect on any monitor - never too big on huge screens, never too small on mobile devices.</p>
+                                <p><em>Gallery functionality coming soon...</em></p>
                             </div>
                         </div>
                     </div>
 <!-- END UNIQUE PAGE CONTENT -->
-                </section>
+
 <!-- include start sidebar-right.html -->
+                </section>
+                
                 <!-- Right Sidebar -->
                 <aside class="sidebar-right">
                     <!-- Rotating Ad Space 2 -->
@@ -265,10 +196,12 @@
                 </aside>
 
 <!-- include end sidebar-right.html -->
+
+<!-- include start footer.html -->
             </div>
         </div>
     </main>
-<!-- include start footer.html -->
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
