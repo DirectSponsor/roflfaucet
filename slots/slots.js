@@ -431,24 +431,13 @@ class CasinoSlotMachine {
     }
 
     setupEventListeners() {
-        // Bind to the actual spin button in the HTML
-        const spinButton = document.getElementById('spin-btn');
-        if (spinButton) {
-            spinButton.addEventListener('click', () => this.spinReels());
-        }
+        // Spin button uses onclick="spinReels()" in HTML
+        // No additional event listeners needed
+        console.log('🎰 Event listeners setup complete');
     }
 
     async spinReels() {
         if (this.isSpinning) return;
-        
-        // Check if player has enough credits
-        if (this.credits < this.currentBet) {
-            console.log('❌ Not enough credits to spin!');
-            if (!this.isLoggedIn && this.credits === 0) {
-                this.showDemoCreditsPrompt();
-            }
-            return;
-        }
         
         // Use unified balance system to subtract bet amount
         const betResult = await subtractBalance(this.currentBet, 'slots_bet', `Slot machine bet: ${this.currentBet} credits`);

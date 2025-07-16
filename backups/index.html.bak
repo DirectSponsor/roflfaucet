@@ -36,6 +36,12 @@
     <!-- hCaptcha -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     
+    <!-- Unified Balance System (available on all pages) -->
+    <script src="unified-balance.js"></script>
+    
+    <!-- Site Utilities (available on all pages) -->
+    <script src="site-utils.js"></script>
+    
     <!-- Page-specific scripts -->
         <script src="faucet-bridge.js"></script>
     <script src="analytics.js"></script>
@@ -211,7 +217,15 @@
                             
                             <!-- Action Buttons -->
                             <div style="text-align: center; margin: 30px 0;">
-                                <button id="back-to-start" class="claim-button">🔄 Back to Faucet</button>
+                                <!-- include start faucet-countdown-button.html -->
+<!-- Faucet Countdown Button Include -->
+<!-- Usage: Just include this file where you want the faucet countdown button -->
+<!-- CSS and JavaScript are loaded globally via styles.css and site-utils.js -->
+
+<button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+    <span class="btn-text">Faucet: 300</span>
+</button>
+                                <!-- include end faucet-countdown-button.html -->
                                 <button id="play-slots" class="secondary-button" onclick="window.location.href='slots.html'">🎰 Play Slots</button>
                             </div>
                         </div>

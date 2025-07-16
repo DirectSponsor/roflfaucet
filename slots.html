@@ -38,6 +38,9 @@
     <!-- Unified Balance System (available on all pages) -->
     <script src="unified-balance.js"></script>
     
+    <!-- Site Utilities (available on all pages) -->
+    <script src="site-utils.js"></script>
+    
     <!-- Page-specific scripts -->
         <script src="slots/slots.js"></script>
     <script src="slots/device-detection.js"></script>
@@ -195,11 +198,17 @@
                                     <!-- Action Buttons Row -->
                                     <div class="action-buttons">
                                         <button class="flip-button" onclick="flipMachine()" id="flip-btn">
-                                            📊 PAYOUTS
+                                            Payouts
                                         </button>
-                                        <button class="claim-button" onclick="claimWinnings()" id="claim-btn" disabled>
-                                            Claim Faucet
-                                        </button>
+                                        <!-- include start faucet-countdown-button.html -->
+<!-- Faucet Countdown Button Include -->
+<!-- Usage: Just include this file where you want the faucet countdown button -->
+<!-- CSS and JavaScript are loaded globally via styles.css and site-utils.js -->
+
+<button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+    <span class="btn-text">Faucet: 300</span>
+</button>
+                                        <!-- include end faucet-countdown-button.html -->
                                     </div>
                                 </div>
                             </div>
@@ -258,25 +267,49 @@
                                         </table>
                                     </div>
                                     
-                                    <!-- Back Control Panel -->
+                                    <!-- Back Control Panel - Same as front but with disabled SPIN -->
                                     <div class="control-panel">
-                                        <div class="control-item">
-                                            <span class="control-label">TOTAL PRIZES</span>
-                                            <span class="control-value">6</span>
-                                        </div>
-                                        <div class="control-item">
-                                            <span class="control-label">MAX WIN</span>
-                                            <span class="control-value">1000</span>
-                                        </div>
-                                        <div class="control-item">
-                                            <span class="control-label">MIN BET</span>
-                                            <span class="control-value">1</span>
-                                        </div>
-                                        <div class="control-item">
-                                            <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
-                                                🎰 PRIZES
-                                            </button>
-                                        </div>
+                                        <table class="control-table">
+                                            <tr class="control-row">
+                                                <td class="control-cell">
+                                                    <span class="control-label">WIN</span><br>
+                                                    <span class="control-value" id="last-win-back">0</span>
+                                                </td>
+                                                <td class="control-cell">
+                                                    <span class="control-label">COINS</span><br>
+                                                    <span class="control-value" id="current-balance-back">0</span>
+                                                </td>
+                                                <td class="control-cell bet-cell">
+                                                    <span class="control-label">BET</span><br>
+                                                    <span class="control-value" id="current-bet-back">1</span>
+                                                </td>
+                                                <td class="control-cell narrow-arrow-cell">
+                                                    <button class="bet-btn-inline" onclick="increaseBet()" disabled>▲</button><br>
+                                                    <button class="bet-btn-inline" onclick="decreaseBet()" disabled>▼</button>
+                                                </td>
+                                                <td class="control-cell spin-cell">
+                                                    <button class="spin-button" disabled>
+                                                        SPIN
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Back Action Buttons Row -->
+                                    <div class="action-buttons">
+                                        <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
+                                            Slots
+                                        </button>
+                                        <!-- include start faucet-countdown-button.html -->
+<!-- Faucet Countdown Button Include -->
+<!-- Usage: Just include this file where you want the faucet countdown button -->
+<!-- CSS and JavaScript are loaded globally via styles.css and site-utils.js -->
+
+<button id="faucet-countdown-btn-back" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+    <span class="btn-text">Faucet: 300</span>
+</button>
+                                        <!-- include end faucet-countdown-button.html -->
                                     </div>
                                 </div>
                             </div>

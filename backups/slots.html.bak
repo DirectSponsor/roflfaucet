@@ -35,9 +35,14 @@
     <!-- hCaptcha -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     
+    <!-- Unified Balance System (available on all pages) -->
+    <script src="unified-balance.js"></script>
+    
+    <!-- Site Utilities (available on all pages) -->
+    <script src="site-utils.js"></script>
+    
     <!-- Page-specific scripts -->
-        <script src="faucet-bridge.js"></script>
-    <script src="slots/slots.js"></script>
+        <script src="slots/slots.js"></script>
     <script src="slots/device-detection.js"></script>
 
 </head>
@@ -195,9 +200,15 @@
                                         <button class="flip-button" onclick="flipMachine()" id="flip-btn">
                                             📊 PAYOUTS
                                         </button>
-                                        <button class="claim-button" onclick="claimWinnings()" id="claim-btn" disabled>
-                                            Claim Faucet
-                                        </button>
+                                        <!-- include start faucet-countdown-button.html -->
+<!-- Faucet Countdown Button Include -->
+<!-- Usage: Just include this file where you want the faucet countdown button -->
+<!-- CSS and JavaScript are loaded globally via styles.css and site-utils.js -->
+
+<button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+    <span class="btn-text">Faucet: 300</span>
+</button>
+                                        <!-- include end faucet-countdown-button.html -->
                                     </div>
                                 </div>
                             </div>

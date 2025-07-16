@@ -128,6 +128,11 @@ function updateLastClaimTime() {
     const now = Date.now();
     localStorage.setItem('last_claim_time', now.toString());
     console.log('⏱️ Updated last claim time:', new Date(now).toLocaleTimeString());
+    
+    // Restart countdown on all pages if function exists
+    if (typeof startFaucetCountdown === 'function') {
+        startFaucetCountdown();
+    }
 }
 
 async function loadAndDisplayBalance() {
