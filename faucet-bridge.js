@@ -7,18 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const isLoggedIn = localStorage.getItem('jwt_token') !== null;
     console.log('🔍 Faucet Bridge: Login status:', isLoggedIn ? 'logged in' : 'guest');
 
-    // Adjust terminology based on login status
-    const claimTypeElements = document.querySelectorAll('#claim-type, #claim-btn-type, #won-type');
-    console.log('🏷️ Faucet Bridge: Found', claimTypeElements.length, 'terminology elements');
-    claimTypeElements.forEach(el => {
-        el.textContent = isLoggedIn ? 'Coins' : 'Tokens';
-    });
-
-    // Update balance label terminology
-    const balanceLabel = document.getElementById('balance-label');
-    if (balanceLabel) {
-        balanceLabel.textContent = isLoggedIn ? 'UselessCoins' : 'Tokens';
-    }
+    // Currency terminology is now handled by the unified balance system
+    // via currency classes (.currency, .currency-upper, .currency-full)
 
     // Load and display current balance
     loadAndDisplayBalance();

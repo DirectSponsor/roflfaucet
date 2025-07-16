@@ -204,7 +204,7 @@ class UnifiedBalanceSystem {
     getTerminology() {
         return {
             currency: this.isLoggedIn ? 'Coins' : 'Tokens',
-            fullName: this.isLoggedIn ? 'UselessCoins' : 'Tokens',
+            fullName: this.isLoggedIn ? 'Useless Coins' : 'Pointless Tokens',
             action: this.isLoggedIn ? 'Claim Coins' : 'Claim Tokens'
         };
     }
@@ -220,9 +220,86 @@ class UnifiedBalanceSystem {
 window.unifiedBalance = new UnifiedBalanceSystem();
 
 // Global convenience functions
+// Global function to update all balance displays
+window.updateBalanceDisplays = async () => {
+    const balance = await window.unifiedBalance.getBalance();
+    const terminology = window.unifiedBalance.getTerminology();
+    
+    // Find all elements with 'balance' class and update them
+    const balanceElements = document.querySelectorAll('.balance');
+    balanceElements.forEach(element => {
+        // Format the balance number
+        const formattedBalance = balance.toFixed(2);
+        element.textContent = formattedBalance;
+        
+        // Update title attribute for hover tooltip
+        element.title = `${formattedBalance} ${terminology.fullName}`;
+    });
+    
+    // Also update any elements with specific IDs for backward compatibility
+    const legacyElements = [
+        'balance',
+        'current-balance',
+        'current-balance-back',
+        'user-balance',
+        'balance-display'
+    ];
+    
+    legacyElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = balance.toFixed(2);
+            element.title = `${balance.toFixed(2)} ${terminology.fullName}`;
+        }
+    });
+    
+    // Update currency terminology
+    updateCurrencyDisplays();
+    
+    console.log('💰 Balance displays updated:', balance.toFixed(2), terminology.currency);
+};
+
+// Global function to update currency terminology displays
+window.updateCurrencyDisplays = () => {
+    const terminology = window.unifiedBalance.getTerminology();
+    
+    // Find all elements with 'currency' class and update them
+    const currencyElements = document.querySelectorAll('.currency');
+    currencyElements.forEach(element => {
+        element.textContent = terminology.currency;
+        element.title = terminology.fullName;
+    });
+    
+    // Find all elements with 'currency-upper' class and update them (for UPPERCASE display)
+    const currencyUpperElements = document.querySelectorAll('.currency-upper');
+    currencyUpperElements.forEach(element => {
+        element.textContent = terminology.currency.toUpperCase();
+        element.title = terminology.fullName;
+    });
+    
+    // Find all elements with 'currency-full' class and update them (for full name)
+    const currencyFullElements = document.querySelectorAll('.currency-full');
+    currencyFullElements.forEach(element => {
+        element.textContent = terminology.fullName;
+        element.title = terminology.fullName;
+    });
+    
+    console.log('🏷️ Currency displays updated:', terminology.currency);
+};
+
+// Global convenience functions
 window.getBalance = () => window.unifiedBalance.getBalance();
 window.addBalance = (amount, source, description) => window.unifiedBalance.addBalance(amount, source, description);
 window.subtractBalance = (amount, source, description) => window.unifiedBalance.subtractBalance(amount, source, description);
 window.getTerminology = () => window.unifiedBalance.getTerminology();
+
+// Auto-update balance displays when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial update
+    setTimeout(updateBalanceDisplays, 100);
+    
+    // Update every 10 seconds in case of external changes
+    setInterval(updateBalanceDisplays, 10000);
+});
 
 console.log('🔧 Unified Balance System ready!');

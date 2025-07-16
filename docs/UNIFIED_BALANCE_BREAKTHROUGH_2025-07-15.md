@@ -67,8 +67,8 @@ POST /api/user/balance/add
 // Automatic terminology switching
 const isLoggedIn = localStorage.getItem('jwt_token') !== null;
 const terminology = isLoggedIn ? 
-  { single: 'Coin', plural: 'Coins', type: 'UselessCoins' } : 
-  { single: 'Token', plural: 'Tokens', type: 'Tokens' };
+  { single: 'Coin', plural: 'Coins', type: 'Useless Coins' } : 
+  { single: 'Token', plural: 'Tokens', type: 'Pointless Tokens' };
 ```
 
 ### Cross-Game Compatibility
@@ -201,7 +201,7 @@ await addBalance(winAmount, 'slots_win', `Won ${winAmount} on slots`);
 // Universal balance display
 const balance = await getBalance();
 const terms = getTerminology();
-document.getElementById('balance').textContent = `${balance} ${terms.plural}`;
+document.getElementById('balance').textContent = `${balance} ${terms.fullName}`;
 ```
 
 ## Testing Scenarios

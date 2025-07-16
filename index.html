@@ -2,8 +2,8 @@
 <!-- TITLE=_ROFLFaucet - Earn UselessCoins_ -->
 <!-- DESC=_Earn UselessCoins every 5 minutes with our secure faucet system_ -->
 <!-- KEYWORDS=_crypto faucet, free tokens, cryptocurrency, uselesscoins_ -->
-<!-- STYLES=_page-specific.css, custom-theme.css_ -->
-<!-- SCRIPTS=_faucet-bridge.js, analytics.js, faucet-ui.js_ -->
+<!-- STYLES=_none_ -->
+<!-- SCRIPTS=_faucet-bridge.js_ -->
 
 <!-- include start doctype-head.html -->
 <!DOCTYPE html>
@@ -26,8 +26,7 @@
     <link rel="stylesheet" href="styles.css">
     
     <!-- Page-specific styles -->
-        <link rel="stylesheet" href="page-specific.css">
-    <link rel="stylesheet" href="custom-theme.css">
+        <!-- No additional styles needed -->
 
     
     <!-- JWT Simple Faucet -->
@@ -44,8 +43,6 @@
     
     <!-- Page-specific scripts -->
         <script src="faucet-bridge.js"></script>
-    <script src="analytics.js"></script>
-    <script src="faucet-ui.js"></script>
 
 </head>
 <body>
@@ -147,26 +144,21 @@
                         
                         <!-- Step 1: Welcome Screen -->
                         <div id="welcome-step" class="faucet-step">
-                            <div class="content-header">
-                                <h1 id="welcome-title">🚰 ROFLFaucet</h1>
-                                <p id="welcome-subtitle">Claim some useless coins</p>
-                            </div>
+                            <p id="welcome-subtitle">Claim some <span class="currency-full">pointless tokens</span></p>
                             
                             <!-- Balance Display -->
-                            <div class="stats-display">
-                                <div class="stats-item">
-                                    <span class="stats-number" id="balance">0</span>
-                                    <span class="stats-label" id="balance-label">UselessCoins</span>
-                                </div>
-                            </div>
+                            <p class="stats-paragraph">
+                                <span class="stats-number balance" id="balance">0</span>
+                                <span class="stats-label currency-full">Pointless Tokens</span>
+                            </p>
                             
                             <!-- User Info -->
                             <div id="user-info">
                                 <!-- Login Notice (shown when not logged in) -->
-                                <div id="login-notice" class="highlight-box info" style="margin: 20px 0;">
+                                <p id="login-notice" class="info" style="margin: 20px 0;">
                                     <strong>🎮 Demo Mode</strong><br>
-                                    You can claim tokens without logging in to play games, but you need to log in to get real UselessCoins.
-                                </div>
+                                    You can claim Pointless Tokens and play games without logging in, but you need to log in for the <a href="about.html#guest-vs-member">full experience</a>!
+                                </p>
                                 
                                 <!-- Welcome Message (shown when logged in) -->
                                 <div id="welcome-message" class="highlight-box" style="margin: 20px 0; display: none;">
@@ -185,7 +177,7 @@
                         <div id="faucet-step" class="faucet-step" style="display: none;">
                             <div class="content-header">
                                 <h1>🎲 Claim Your Reward</h1>
-                                <p>Complete the captcha to claim your <span id="claim-amount">10</span> <span id="claim-type">UselessCoins</span></p>
+                                <p>Complete the captcha to claim your <span id="claim-amount">10</span> <span class="currency">UselessCoins</span></p>
                             </div>
                             
                             <!-- hCaptcha -->
@@ -195,7 +187,7 @@
                             
                             <!-- Claim Button -->
                             <div style="text-align: center; margin: 30px 0;">
-                                <button id="final-claim-btn" class="claim-button">🎲 Claim <span id="claim-btn-amount">10</span> <span id="claim-btn-type">UselessCoins</span></button>
+                                <button id="final-claim-btn" class="claim-button">🎲 Claim <span id="claim-btn-amount">10</span> <span class="currency">UselessCoins</span></button>
                             </div>
                         </div>
                         
@@ -210,7 +202,7 @@
                             <div class="result-display" style="text-align: center; margin: 30px 0;">
                                 <div class="result-amount">
                                     <span class="result-number" id="won-amount">10</span>
-                                    <span class="result-label" id="won-type">UselessCoins</span>
+                                    <span class="result-label currency">UselessCoins</span>
                                 </div>
                                 <p id="result-message">added to your balance!</p>
                             </div>
