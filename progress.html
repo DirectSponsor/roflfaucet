@@ -1,7 +1,9 @@
 <!-- 📝 ROFLFaucet Progress Page -->
-<!-- #TITLE#="ROFLFaucet - Development Progress" -->
-<!-- #DESC#="Behind-the-scenes progress updates and insights from the ROFLFaucet development team" -->
-<!-- #KEYWORDS#="development progress, updates, changelog, rofl faucet development" -->
+<!-- TITLE=_ROFLFaucet - Development Progress_ -->
+<!-- DESC=_Behind-the-scenes progress updates and insights from the ROFLFaucet development team_ -->
+<!-- KEYWORDS=_development progress, updates, changelog, rofl faucet development_ -->
+<!-- STYLES=__ -->
+<!-- SCRIPTS=__ -->
 
 <!-- include start doctype-head.html -->
 <!DOCTYPE html>
@@ -9,9 +11,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROFLFaucet - Earn UselessCoins</title>
-    <meta name="description" content="Earn UselessCoins every 5 minutes with our secure faucet system">
-    <meta name="keywords" content="crypto faucet, free tokens, cryptocurrency, uselesscoins">
+<title>ROFLFaucet - Development Progress</title>
+    <meta name="description" content="Behind-the-scenes progress updates and insights from the ROFLFaucet development team">
+    <meta name="keywords" content="development progress, updates, changelog, rofl faucet development">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
@@ -23,11 +25,20 @@
     <!-- Main Styles -->
     <link rel="stylesheet" href="styles.css">
     
+    <!-- Page-specific styles -->
+    
+    
     <!-- JWT Simple Faucet -->
     <script src="jwt-simple.js"></script>
     
     <!-- hCaptcha -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    
+    <!-- Unified Balance System (available on all pages) -->
+    <script src="unified-balance.js"></script>
+    
+    <!-- Page-specific scripts -->
+    
 </head>
 <body>
 
@@ -69,18 +80,6 @@
         </div>
     </header>
     
-    
-    <!-- Slots CSS and JS (loaded on all pages for simplicity) -->
-    <link rel="stylesheet" href="slots/slots.css">
-    <script src="slots/slots.js"></script>
-    
-    <!-- Desktop device detection for slots - redirect mobile users -->
-    <script>
-        // Redirect mobile users to mobile version on slots page
-        if (window.location.pathname.includes('slots.html') && window.innerWidth <= 768) {
-            window.location.href = 'slots-mobile.html';
-        }
-    </script>
 
 <!-- include end header.html -->
 

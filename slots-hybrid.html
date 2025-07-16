@@ -25,8 +25,67 @@
     <!-- Main Styles -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Page-specific styles -->
-        <link rel="stylesheet" href="slots/slots.css">
+    <!-- Page-specific styles - using hybrid approach -->
+        <link rel="stylesheet" href="slots-hybrid.css">
+        
+        <!-- Simple layout overrides -->
+        <style>
+            /* Override complex layout with simple approach - using !important for specificity */
+            .content-grid {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 1rem !important;
+                max-width: 1200px !important;
+                margin: 0 auto !important;
+                padding: 0 1rem !important;
+            }
+            
+            .sidebar-left {
+                flex: 1 !important;
+                min-width: 250px !important;
+                order: 1 !important;
+                display: block !important; /* Override any display:none */
+                flex-direction: column !important; /* Override row direction */
+            }
+            
+            .main-content {
+                flex: 2 !important;
+                min-width: 600px !important; /* Wider for slot machine */
+                order: 2 !important;
+            }
+            
+            .sidebar-right {
+                flex: 1 !important;
+                min-width: 250px !important;
+                order: 3 !important;
+                display: block !important; /* Override any display:none */
+            }
+            
+            /* Progressive sidebar collapse - more specific than main CSS */
+            @media (max-width: 1050px) {
+                .sidebar-right {
+                    display: none !important;
+                }
+            }
+            
+            @media (max-width: 900px) {
+                .content-grid {
+                    flex-direction: column !important;
+                    max-width: 700px !important;
+                }
+                
+                .sidebar-left {
+                    order: 2 !important;
+                    display: block !important; /* Ensure it shows */
+                    flex-direction: column !important; /* Override row direction */
+                }
+                
+                .main-content {
+                    order: 1 !important;
+                    min-width: 300px !important;
+                }
+            }
+        </style>
 
     
     <!-- JWT Simple Faucet -->

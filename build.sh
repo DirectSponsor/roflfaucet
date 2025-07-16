@@ -1,9 +1,92 @@
 #!/bin/bash
-# Linear Include Processor
+# Linear Include Processor with Placeholder Support
 # Processes <!-- include start xxx --> and <!-- include end xxx --> tags
+# Also processes #TITLE#, #DESC#, #KEYWORDS#, #STYLES#, #SCRIPTS# placeholders
 # Clean, fast template system for SatoshiHost network sites
 
-echo "🔨 Building HTML files with includes..."
+echo "🔨 Building HTML files with includes and placeholders..."
+
+# Function to process placeholders in a file
+process_placeholders() {
+    local input_file="$1"
+    local output_file="$2"
+    local temp_file=$(mktemp)
+    
+    echo "  🔄 Processing placeholders in: $input_file"
+    
+    # Copy input to temp file
+    cp "$input_file" "$temp_file"
+    
+    # Extract placeholder values from comment lines
+    while IFS= read -r line; do
+        # Check if line contains placeholder pattern
+        if [[ "$line" == *"TITLE=_"* ]]; then
+            local placeholder_name="TITLE"
+            local placeholder_value="${line#*TITLE=_}"
+            placeholder_value="${placeholder_value%_*}"
+        elif [[ "$line" == *"DESC=_"* ]]; then
+            local placeholder_name="DESC"
+            local placeholder_value="${line#*DESC=_}"
+            placeholder_value="${placeholder_value%_*}"
+        elif [[ "$line" == *"KEYWORDS=_"* ]]; then
+            local placeholder_name="KEYWORDS"
+            local placeholder_value="${line#*KEYWORDS=_}"
+            placeholder_value="${placeholder_value%_*}"
+        elif [[ "$line" == *"STYLES=_"* ]]; then
+            local placeholder_name="STYLES"
+            local placeholder_value="${line#*STYLES=_}"
+            placeholder_value="${placeholder_value%_*}"
+        elif [[ "$line" == *"SCRIPTS=_"* ]]; then
+            local placeholder_name="SCRIPTS"
+            local placeholder_value="${line#*SCRIPTS=_}"
+            placeholder_value="${placeholder_value%_*}"
+        else
+            continue
+        fi
+        
+        echo "    📝 $placeholder_name = '$placeholder_value'"
+        
+        # Handle special processing for STYLES and SCRIPTS
+        if [[ "$placeholder_name" == "STYLES" ]]; then
+            # Convert comma-separated styles to link tags
+            local styles_html=""
+            if [[ -n "$placeholder_value" ]]; then
+                IFS=',' read -ra STYLES <<< "$placeholder_value"
+                for style in "${STYLES[@]}"; do
+                    style=$(echo "$style" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')  # trim whitespace
+                    if [[ -n "$style" ]]; then
+                        styles_html="$styles_html    <link rel=\"stylesheet\" href=\"$style\">\n"
+                    fi
+                done
+            fi
+            # Replace #STYLES# with generated HTML
+            sed -i "s|#STYLES#|$styles_html|g" "$temp_file"
+            
+        elif [[ "$placeholder_name" == "SCRIPTS" ]]; then
+            # Convert comma-separated scripts to script tags
+            local scripts_html=""
+            if [[ -n "$placeholder_value" ]]; then
+                IFS=',' read -ra SCRIPTS <<< "$placeholder_value"
+                for script in "${SCRIPTS[@]}"; do
+                    script=$(echo "$script" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')  # trim whitespace
+                    if [[ -n "$script" ]]; then
+                        scripts_html="$scripts_html    <script src=\"$script\"></script>\n"
+                    fi
+                done
+            fi
+            # Replace #SCRIPTS# with generated HTML
+            sed -i "s|#SCRIPTS#|$scripts_html|g" "$temp_file"
+            
+        else
+            # Regular placeholder replacement
+            sed -i "s|#$placeholder_name#|$placeholder_value|g" "$temp_file"
+        fi
+    done < "$input_file"
+    
+    # Move processed file to output
+    mv "$temp_file" "$output_file"
+    echo "  ✅ Placeholders processed"
+}
 
 # Function to process includes in a file - linear single pass
 process_includes() {
@@ -78,6 +161,9 @@ if [[ -n "$1" ]]; then
         
         # Process includes in place  
         process_includes "$htmlfile" "$htmlfile"
+        
+        # Process placeholders after includes
+        process_placeholders "$htmlfile" "$htmlfile"
         ((processed_count++))
     elif [[ -f "$htmlfile" ]]; then
         echo "📁 File '$htmlfile' found but contains no include tags"
@@ -95,6 +181,9 @@ else
             
             # Process includes in place  
             process_includes "$htmlfile" "$htmlfile"
+            
+            # Process placeholders after includes
+            process_placeholders "$htmlfile" "$htmlfile"
             ((processed_count++))
         fi
     done

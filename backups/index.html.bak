@@ -1,7 +1,9 @@
 <!-- 🚰 ROFLFaucet Main Page -->
-<!-- #TITLE#="ROFLFaucet - Earn UselessCoins" -->
-<!-- #DESC#="Earn UselessCoins every 5 minutes with our secure faucet system" -->
-<!-- #KEYWORDS#="crypto faucet, free tokens, cryptocurrency, uselesscoins" -->
+<!-- TITLE=_ROFLFaucet - Earn UselessCoins_ -->
+<!-- DESC=_Earn UselessCoins every 5 minutes with our secure faucet system_ -->
+<!-- KEYWORDS=_crypto faucet, free tokens, cryptocurrency, uselesscoins_ -->
+<!-- STYLES=_page-specific.css, custom-theme.css_ -->
+<!-- SCRIPTS=_faucet-bridge.js, analytics.js, faucet-ui.js_ -->
 
 <!-- include start doctype-head.html -->
 <!DOCTYPE html>
@@ -9,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROFLFaucet - Earn UselessCoins</title>
+<title>ROFLFaucet - Earn UselessCoins</title>
     <meta name="description" content="Earn UselessCoins every 5 minutes with our secure faucet system">
     <meta name="keywords" content="crypto faucet, free tokens, cryptocurrency, uselesscoins">
     
@@ -23,11 +25,22 @@
     <!-- Main Styles -->
     <link rel="stylesheet" href="styles.css">
     
+    <!-- Page-specific styles -->
+        <link rel="stylesheet" href="page-specific.css">
+    <link rel="stylesheet" href="custom-theme.css">
+
+    
     <!-- JWT Simple Faucet -->
     <script src="jwt-simple.js"></script>
     
     <!-- hCaptcha -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    
+    <!-- Page-specific scripts -->
+        <script src="faucet-bridge.js"></script>
+    <script src="analytics.js"></script>
+    <script src="faucet-ui.js"></script>
+
 </head>
 <body>
 
@@ -69,18 +82,6 @@
         </div>
     </header>
     
-    
-    <!-- Slots CSS and JS (loaded on all pages for simplicity) -->
-    <link rel="stylesheet" href="slots/slots.css">
-    <script src="slots/slots.js"></script>
-    
-    <!-- Desktop device detection for slots - redirect mobile users -->
-    <script>
-        // Redirect mobile users to mobile version on slots page
-        if (window.location.pathname.includes('slots.html') && window.innerWidth <= 768) {
-            window.location.href = 'slots-mobile.html';
-        }
-    </script>
 
 <!-- include end header.html -->
 
@@ -136,7 +137,7 @@
                     <!-- Multi-Step Faucet Process -->
                     <div class="content-container">
                         <!-- JWT Message -->
-                        <div id="oauth-message" class="message"></div>
+                        <div id="message" class="message"></div>
                         
                         <!-- Step 1: Welcome Screen -->
                         <div id="welcome-step" class="faucet-step">
@@ -148,7 +149,7 @@
                             <!-- Balance Display -->
                             <div class="stats-display">
                                 <div class="stats-item">
-                                    <span class="stats-number" id="oauth-balance">0</span>
+                                    <span class="stats-number" id="balance">0</span>
                                     <span class="stats-label" id="balance-label">UselessCoins</span>
                                 </div>
                             </div>
@@ -163,7 +164,7 @@
                                 
                                 <!-- Welcome Message (shown when logged in) -->
                                 <div id="welcome-message" class="highlight-box" style="margin: 20px 0; display: none;">
-                                    <strong>🎉 Welcome, <span id="oauth-username">User</span>!</strong><br>
+                                    <strong>🎉 Welcome, <span id="username">User</span>!</strong><br>
                                     You can claim coins every 5 minutes.
                                 </div>
                             </div>
@@ -178,7 +179,7 @@
                         <div id="faucet-step" class="faucet-step" style="display: none;">
                             <div class="content-header">
                                 <h1>🎲 Claim Your Reward</h1>
-                                <p>Complete the captcha to claim your <span id="claim-amount">5</span> <span id="claim-type">UselessCoins</span></p>
+                                <p>Complete the captcha to claim your <span id="claim-amount">10</span> <span id="claim-type">UselessCoins</span></p>
                             </div>
                             
                             <!-- hCaptcha -->
@@ -188,7 +189,7 @@
                             
                             <!-- Claim Button -->
                             <div style="text-align: center; margin: 30px 0;">
-                                <button id="final-claim-btn" class="claim-button">🎲 Claim <span id="claim-btn-amount">5</span> <span id="claim-btn-type">UselessCoins</span></button>
+                                <button id="final-claim-btn" class="claim-button">🎲 Claim <span id="claim-btn-amount">10</span> <span id="claim-btn-type">UselessCoins</span></button>
                             </div>
                         </div>
                         
@@ -202,7 +203,7 @@
                             <!-- Result Display -->
                             <div class="result-display" style="text-align: center; margin: 30px 0;">
                                 <div class="result-amount">
-                                    <span class="result-number" id="won-amount">5</span>
+                                    <span class="result-number" id="won-amount">10</span>
                                     <span class="result-label" id="won-type">UselessCoins</span>
                                 </div>
                                 <p id="result-message">added to your balance!</p>
@@ -217,7 +218,7 @@
                         
                         <!-- Logout Button (shown when logged in) -->
                         <div id="logout-section" style="text-align: center; margin: 20px 0; display: none;">
-                            <button id="oauth-logout-btn" class="secondary-button">Logout</button>
+                            <button id="logout-btn" class="secondary-button">Logout</button>
                         </div>
                     </div>
 <!-- END UNIQUE PAGE CONTENT -->

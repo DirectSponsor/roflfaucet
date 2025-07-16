@@ -35,9 +35,13 @@ ROFLFaucet has been successfully cleaned up and converted to a **pure frontend s
 ```
 roflfaucet/
 ├── index.html                    # Main faucet page
-├── script-centralized-auth.js    # Pure frontend with OAuth
+├── jwt-simple.js                 # JWT authentication system
+├── faucet-bridge.js              # Unified token system integration
 ├── styles.css                    # Complete styling
-├── content-manager.html          # Content management interface
+├── slots/
+│   ├── slots.html                # Slot machine game
+│   ├── slots.js                  # Game logic with unified balance
+│   └── slots.css                 # Game styling
 ├── auth/
 │   └── callback.html             # OAuth callback page
 ├── images/                       # Static images
@@ -156,17 +160,19 @@ const claimResult = await fetch('https://auth.directsponsor.org/api/claim', {
 
 ## 🛠️ **Key Features**
 
-### **🔐 Authentication**
-- **Single Sign-On** across all ecosystem sites
-- **OAuth2 standard** with proper security
+### 🔐 Authentication
+- **JWT-based authentication** with DirectSponsor integration
+- **PHP native JWT** implementation for simplicity and security
 - **Token refresh** for long-term sessions
 - **State verification** prevents CSRF attacks
+- **Unified demo tokens** for guest users
 
-### **💰 Token System**
-- **UselessCoins** - Cross-site ecosystem currency
-- **Site Tokens** - Site-specific rewards (e.g., ROFLFaucet tokens)
-- **Unified Balance** - Works across all sites
+### 💰 Token System
+- **UselessCoins** - Cross-site ecosystem currency for logged-in users
+- **Demo Tokens** - Guest user tokens stored in `roflfaucet_demo_state`
+- **Unified Balance** - Works across all sites and games
 - **Activity Tracking** - All claims/actions recorded centrally
+- **Cross-Game Persistence** - Demo balance shared between faucet and games
 
 ### **🎭 Content Management**
 - **Slot-based system** - Content auto-routes by dimensions
@@ -178,11 +184,12 @@ const claimResult = await fetch('https://auth.directsponsor.org/api/claim', {
 
 ## 🚀 **Next Steps**
 
-### **Immediate (Auth Server Setup)**
-1. **Deploy the centralized database** on auth.directsponsor.org:3002
-2. **Set up OAuth endpoints** for token exchange
-3. **Configure CORS** to allow ROFLFaucet domain
-4. **Test the authentication flow** end-to-end
+### **Immediate (Current State)**
+1. ✅ **JWT authentication** implemented with DirectSponsor
+2. ✅ **Unified token system** for guest users
+3. ✅ **Cross-game balance** working between faucet and slots
+4. ✅ **Multi-step faucet** process implemented
+5. **Production deployment** with secure JWT keys needed
 
 ### **Content Management**
 1. **Use content-manager.html** to add real content

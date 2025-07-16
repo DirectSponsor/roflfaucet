@@ -39,13 +39,15 @@ Converted the single-page faucet to a traditional multi-step faucet process to i
 - **Actions**: 
   - "Back to Faucet" button
   - "Play Slots" button
+- **Token Integration**: Guest claims add 10 tokens to unified balance system
 
 ## Key Features
 
 ### Dynamic Content
-- **Logged-in users**: Get real UselessCoins
-- **Anonymous users**: Get Demo Coins with notice about logging in
+- **Logged-in users**: Get real UselessCoins ("Coins" terminology)
+- **Anonymous users**: Get Demo Tokens ("Tokens" terminology)
 - **All labels update** based on authentication status
+- **Unified Balance**: Guest tokens stored in `roflfaucet_demo_state` for cross-game use
 
 ### Cooldown System
 - **5-minute cooldown** enforced before allowing claim process
@@ -74,6 +76,8 @@ Converted the single-page faucet to a traditional multi-step faucet process to i
 ## Files Modified
 - `index.html` - Complete restructure of main content area
 - `simple-faucet.js` - Complete rewrite for multi-step flow
+- `faucet-bridge.js` - Unified token system integration
+- Connected to unified demo balance system (`roflfaucet_demo_state`)
 
 ## Benefits Achieved
 - ✅ **More page views** (3 steps instead of 1)
@@ -81,6 +85,8 @@ Converted the single-page faucet to a traditional multi-step faucet process to i
 - ✅ **Traditional faucet experience** users expect
 - ✅ **Compact design** maintained (no scrolling required)
 - ✅ **Authentication system** preserved and working
+- ✅ **Unified token system** for seamless cross-game experience
+- ✅ **Guest token persistence** across faucet and games
 
 ## Known Issues
 - Captcha validation currently bypassed (placeholder implementation)

@@ -33,6 +33,8 @@ Successfully migrated roflfaucet from OAuth authentication to JWT-based authenti
 ### Modified Files
 - `index.html` - Updated for JWT integration and lowercase branding
 - `slots/slots.js` - Updated localStorage token key from `oauth_simple_token` to `jwt_simple_token`
+- `faucet-bridge.js` - Unified token system integration
+- `slots/slots.js` - Unified demo balance using `roflfaucet_demo_state`
 
 ### Archived Files
 - `oauth-simple.js` → `archived-pages/oauth-simple.js.archive-2025-07-13`
@@ -52,11 +54,14 @@ Successfully migrated roflfaucet from OAuth authentication to JWT-based authenti
 - **Auto-refresh**: Handled by `jwt-simple.js` before token expiry
 
 ## Testing Checklist
-- [ ] Test login flow on index.html page
-- [ ] Verify token storage in localStorage as `jwt_simple_token`
-- [ ] Test slot machine dual balance system
-- [ ] Verify automatic token refresh functionality
-- [ ] Test logout functionality
+- [x] Test login flow on index.html page
+- [x] Verify token storage in localStorage as `jwt_simple_token`
+- [x] Test slot machine dual balance system
+- [x] Verify automatic token refresh functionality
+- [x] Test logout functionality
+- [x] Test unified demo token system across faucet and games
+- [x] Verify guest token claims add to unified balance
+- [x] Test cross-game token consistency
 
 ## Legacy Documentation
 All previous OAuth documentation preserved in:
@@ -64,12 +69,47 @@ All previous OAuth documentation preserved in:
 - `SUCCESS_DOCUMENTATION_2025-06-20.md` (OAuth implementation success)
 - `archived-pages/oauth-simple.js.archive-2025-07-13` (original OAuth script)
 
+## Unified Token System Implementation
+
+### Guest Token Management
+- **Unified localStorage Key**: `roflfaucet_demo_state` for all demo/guest tokens
+- **Cross-Game Balance**: Single token balance works across faucet and all games
+- **Faucet Integration**: Guest claims add 10 tokens to unified balance
+- **Game Integration**: Slots and future games read/write from unified balance
+
+### Token Flow
+1. **Guest Users**: Claim tokens from faucet → stored in `roflfaucet_demo_state`
+2. **Game Play**: All games access unified balance for demo users
+3. **Logged-in Users**: Real balance managed via JWT API calls
+4. **Seamless Experience**: Same UI/UX regardless of login status
+
+### localStorage Structure
+```javascript
+// roflfaucet_demo_state
+{
+  credits: 10,        // Current token balance
+  totalSpins: 0,      // Game statistics
+  totalWagered: 0,    // Lifetime wagered
+  totalWon: 0,        // Lifetime won
+  lastSaved: "2025-07-15T20:20:35Z"
+}
+```
+
+## JWT Implementation Decision
+
+### PHP Native JWT Approach
+- **Decision**: Use PHP's built-in JWT functionality instead of external libraries
+- **Rationale**: Simpler, more secure, and sufficient for our needs
+- **Security**: PHP JWT with proper key management is as secure as any library
+- **Maintenance**: Reduces external dependencies and complexity
+
 ## Next Steps for Production
-1. Replace demo JWT implementation with proper JWT library (e.g., Firebase/Auth0/custom)
-2. Set up secure JWT signing keys
-3. Implement proper user database integration
-4. Add comprehensive error handling and logging
-5. Update CSP headers for JWT endpoints
+1. ✅ **Unified token system** - Completed
+2. ✅ **PHP JWT implementation** - Decided to keep simple
+3. **Set up secure JWT signing keys** for production
+4. **Implement proper user database integration**
+5. **Add comprehensive error handling and logging**
+6. **Update CSP headers for JWT endpoints**
 
 ---
 *Migration completed successfully - ready for testing and production deployment*

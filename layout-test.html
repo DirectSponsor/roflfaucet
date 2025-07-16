@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple 3-Column Layout Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        
+        /* Hybrid approach: Current site pattern with controlled wrapping */
+        .layout-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .column {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .left-column {
+            flex: 1;
+            min-width: 250px;
+            order: 1;
+            background: #e8f4f8;
+        }
+        
+        .center-column {
+            flex: 2;
+            min-width: 300px;
+            order: 2;
+            background: #f8f8f8;
+        }
+        
+        .right-column {
+            flex: 1;
+            min-width: 250px;
+            order: 3;
+            background: #f0f8e8;
+        }
+        
+        /* Progressive sidebar collapse - like current site */
+        /* First: Hide right sidebar when space is tight */
+        @media (max-width: 950px) {
+            .right-column {
+                display: none;
+            }
+        }
+        
+        /* Second: Move left sidebar below main content */
+        @media (max-width: 800px) {
+            .layout-container {
+                flex-direction: column;
+                max-width: 600px;
+            }
+            
+            .left-column {
+                order: 2; /* Move below main content */
+            }
+            
+            .center-column {
+                order: 1; /* Main content stays on top */
+            }
+        }
+        
+        /* Demo content styling */
+        .demo-content {
+            padding: 20px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        
+        .slot-demo {
+            background: #2c3e50;
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .sidebar-item {
+            background: rgba(0,0,0,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        h1 { color: #333; }
+        h2 { color: #666; }
+        h3 { color: #888; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Simple 3-Column Layout Test</h1>
+    <p style="text-align: center;">Inspired by ClickForCharity approach - minimal containers, flexbox-based</p>
+    
+    <div class="layout-container">
+        <!-- Center Content -->
+        <div class="column center-column">
+            <h2>Main Content Area</h2>
+            
+            <div class="demo-content">
+                <h3>ROFLFaucet Demo</h3>
+                <p>This is where the main faucet interface would go. Notice how the center column is wider (600px) while the sidebars are narrower (250px each).</p>
+                
+                <div class="slot-demo">
+                    <h3>🎰 Slot Machine Area</h3>
+                    <p>This would be the slot machine interface</p>
+                    <p>The unified balance system works here</p>
+                </div>
+                
+                <div class="demo-content">
+                    <h3>Faucet Claims</h3>
+                    <p>Token claiming interface goes here</p>
+                    <button>Claim 10 Tokens</button>
+                </div>
+                
+                <div class="demo-content">
+                    <h3>Games Section</h3>
+                    <p>Links to other games would be here</p>
+                    <p>All using the unified balance system</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Sidebar -->
+        <div class="column right-column">
+            <h2>Right Sidebar</h2>
+            
+            <div class="sidebar-item">
+                <h3>Stats</h3>
+                <p>Total Claims: 45</p>
+                <p>Total Won: 1,250</p>
+                <p>Games Played: 23</p>
+            </div>
+            
+            <div class="sidebar-item">
+                <h3>Ecosystem</h3>
+                <p><a href="#">ClickForCharity</a></p>
+                <p><a href="#">DirectSponsor</a></p>
+                <p><a href="#">Other Projects</a></p>
+            </div>
+            
+            <div class="sidebar-item">
+                <h3>Quick Actions</h3>
+                <button>Play Slots</button><br><br>
+                <button>View Progress</button><br><br>
+                <button>Check Balance</button>
+            </div>
+        </div>
+        
+        <!-- Left Sidebar -->
+        <div class="column left-column">
+            <h2>Left Sidebar</h2>
+            
+            <div class="sidebar-item">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Slots</a></li>
+                    <li><a href="#">Progress</a></li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-item">
+                <h3>User Info</h3>
+                <p>Balance: 150 Tokens</p>
+                <p>Status: Guest</p>
+                <button>Login</button>
+            </div>
+            
+            <div class="sidebar-item">
+                <h3>Recent Activity</h3>
+                <p>• Claimed 10 tokens</p>
+                <p>• Played slots</p>
+                <p>• Won 25 tokens</p>
+            </div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px; padding: 20px; background: white; border-radius: 8px;">
+        <h3>Key Benefits of This Approach</h3>
+        <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+            <li><strong>Minimal containers</strong> - No complex nested layouts</li>
+            <li><strong>Fixed widths</strong> - No fighting with responsive calculations</li>
+            <li><strong>Flexbox simplicity</strong> - Automatic spacing and alignment</li>
+            <li><strong>Natural wrapping</strong> - Columns stack on mobile automatically</li>
+            <li><strong>Easy maintenance</strong> - Less CSS complexity</li>
+        </ul>
+    </div>
+</body>
+</html>

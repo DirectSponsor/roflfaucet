@@ -7,7 +7,7 @@ class SimpleFaucet {
         this.currentStep = 1;
         this.userProfile = null;
         this.balance = 0;
-        this.localBalance = parseInt(localStorage.getItem('local_balance') || '0');
+        this.localBalance = this.loadUnifiedBalance();
         this.lastClaimTime = parseInt(localStorage.getItem('last_claim_time') || '0');
         
         this.init();
@@ -104,9 +104,8 @@ class SimpleFaucet {
             document.getElementById('result-message').textContent = 'added to your balance!';
             this.showMessage('🎉 Claimed 5 UselessCoins!', 'success');
         } else {
-            // Not logged in - claim demo coins
-            this.localBalance += claimAmount;
-            localStorage.setItem('local_balance', this.localBalance.toString());
+            // Not logged in - claim demo coins using unified system
+            this.addTokensToUnifiedSystem(claimAmount);
             document.getElementById('won-amount').textContent = claimAmount;
             document.getElementById('won-type').textContent = 'Demo Coins';
             document.getElementById('result-message').textContent = 'added to your demo balance!';
@@ -190,6 +189,8 @@ class SimpleFaucet {
             if (this.jwtToken) {
                 balanceEl.textContent = this.balance;
             } else {
+                // Reload balance from unified system
+                this.localBalance = this.loadUnifiedBalance();
                 balanceEl.textContent = `${this.localBalance} (Demo)`;
             }
         }
@@ -270,6 +271,56 @@ class SimpleFaucet {
                 messageEl.style.display = 'none';
             }, 3000);
         }
+    }
+    
+    // Unified token system methods
+    loadUnifiedBalance() {
+        const saved = localStorage.getItem('roflfaucet_demo_state');
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                console.log('💰 Faucet: Loaded unified balance:', state.credits);
+                return state.credits || 0;
+            } catch (e) {
+                console.error('💥 Faucet: Error parsing unified state:', e);
+                return 0;
+            }
+        }
+        return 0;
+    }
+    
+    addTokensToUnifiedSystem(amount) {
+        console.log('🎁 Faucet: Adding tokens to unified system:', amount);
+        
+        const saved = localStorage.getItem('roflfaucet_demo_state');
+        let state;
+        
+        if (saved) {
+            try {
+                state = JSON.parse(saved);
+                console.log('📊 Faucet: Loaded existing state:', state);
+            } catch (e) {
+                console.warn('⚠️ Faucet: Error parsing saved state, creating new:', e);
+                state = { credits: 0, totalSpins: 0, totalWagered: 0, totalWon: 0 };
+            }
+        } else {
+            console.log('🆕 Faucet: No saved state found, creating new');
+            state = { credits: 0, totalSpins: 0, totalWagered: 0, totalWon: 0 };
+        }
+        
+        const oldCredits = state.credits || 0;
+        state.credits = oldCredits + amount;
+        state.lastSaved = new Date().toISOString();
+        
+        localStorage.setItem('roflfaucet_demo_state', JSON.stringify(state));
+        
+        this.localBalance = state.credits;
+        
+        console.log(`💰 Faucet: Added ${amount} tokens! ${oldCredits} → ${state.credits}`);
+        
+        // Verify save
+        const verification = localStorage.getItem('roflfaucet_demo_state');
+        console.log('✅ Faucet: Verification - saved state:', verification);
     }
 }
 

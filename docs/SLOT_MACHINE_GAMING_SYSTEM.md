@@ -48,7 +48,14 @@ The ROFLFaucet slot machine offers a seamless gaming experience, using a simplif
 /slots.css          # Complete styling and animations
 /slots.js           # Game engine and dual-mode logic
 /images/bigwin*.png # Win celebration graphics
+/faucet-bridge.js   # Unified token system integration
 ```
+
+### Token System Integration
+- **Unified Balance**: Uses `roflfaucet_demo_state` for guest users
+- **Cross-Game Tokens**: Balance persists across faucet and all games
+- **Seamless Flow**: Users claim from faucet, play in games
+- **Login Integration**: JWT tokens for real balance API calls
 
 ### API Integration
 
@@ -96,9 +103,16 @@ Body: {
 
 ### Anonymous Users
 1. **Discover**: Land on slots page, see exciting demo gameplay
-2. **Engage**: Play with 500 demo credits, experience wins
-3. **Convert**: See login prompts after big wins
-4. **Sign Up**: Create account to keep winnings
+2. **Engage**: Play with demo credits from unified balance system
+3. **Claim More**: Directed to faucet when balance runs low
+4. **Convert**: See login prompts after big wins
+5. **Sign Up**: Create account to keep winnings
+
+**Demo Token System:**
+- Uses unified `roflfaucet_demo_state` localStorage key
+- Starts with 0 credits, user claims from faucet
+- Cross-game balance shared with faucet and future games
+- 10 tokens per faucet claim for engaging gameplay
 
 ### Logged-In Users  
 1. **Play**: Use real UselessCoins for gameplay
@@ -173,8 +187,9 @@ this.levels = {
 
 ### Anti-Cheat Measures
 - Real balance managed server-side
-- Demo mode isolated from real balance
+- Demo mode uses client-side localStorage (acceptable for demo)
 - API authentication required for real transactions
+- Unified demo balance prevents token duplication across games
 
 ### Rate Limiting
 - Consider implementing spin rate limits

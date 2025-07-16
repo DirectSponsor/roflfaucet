@@ -46,26 +46,80 @@ Copy `build.sh` from the ROFLFaucet implementation:
 
 ```bash
 #!/bin/bash
-# Lightweight HTML Include Processor
-# Similar to BBEdit's include system
+# Linear Include Processor with Placeholder Support
+# Processes && #include && #end && #start tags and converts customized placeholders
 
-set -e
+echo "🔨 Building HTML files with includes and placeholders..."
 
-echo "🔨 Building HTML files with includes..."
-
-# Function to process includes in a file
-process_includes() {
+# Function to process placeholders in a file
+process_placeholders() {
     local input_file="$1"
     local output_file="$2"
     local temp_file=$(mktemp)
     
-    echo "📄 Processing: $input_file → $output_file"
+    echo "🔄 Processing placeholders in: $input_file"
     
-    # Copy input to temp file
     cp "$input_file" "$temp_file"
+
+    while IFS= read -r line; do
+        if [[ "$line" == *"TITLE=_"* ]]; then
+            local placeholder_name="TITLE"
+            local placeholder_value=${line#*TITLE=_}
+            placeholder_value=${placeholder_value%_*}
+        elif [[ "$line" == *"DESC=_"* ]]; then
+            local placeholder_name="DESC"
+            local placeholder_value=${line#*DESC=_}
+            placeholder_value=${placeholder_value%_*}
+        elif [[ "$line" == *"KEYWORDS=_"* ]]; then
+            local placeholder_name="KEYWORDS"
+            local placeholder_value=${line#*KEYWORDS=_}
+            placeholder_value=${placeholder_value%_*}
+        elif [[ "$line" == *"STYLES=_"* ]]; then
+            local placeholder_name="STYLES"
+            local placeholder_value=${line#*STYLES=_}
+            placeholder_value=${placeholder_value%_*}
+        elif [[ "$line" == *"SCRIPTS=_"* ]]; then
+            local placeholder_name="SCRIPTS"
+            local placeholder_value=${line#*SCRIPTS=_}
+            placeholder_value=${placeholder_value%_*}
+        else
+            continue
+        fi
+        
+        echo "    📝 $placeholder_name = '$placeholder_value'"
+        
+        if [[ "$placeholder_name" == "STYLES" ]]; then
+            local styles_html=""
+            if [[ -n "$placeholder_value" ]]; then
+                IFS=',' read -ra STYLES <<< "${placeholder_value}"
+                for style in "${STYLES[@]}"; do
+                    style=$(echo "$style" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                    if [[ -n "$style" ]]; then
+                        styles_html="$styles_html<link rel='stylesheet' href='$style'>"
+                    fi
+                done
+            fi
+            sed -i "s|#STYLES#|$styles_html|g" "$temp_file"
+        elif [[ "$placeholder_name" == "SCRIPTS" ]]; then
+            local scripts_html=""
+            if [[ -n "$placeholder_value" ]]; then
+                IFS=',' read -ra SCRIPTS <<< "${placeholder_value}"
+                for script in "${SCRIPTS[@]}"; do
+                    script=$(echo "$script" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                    if [[ -n "$script" ]]; then
+                        scripts_html="$scripts_html<script src='$script'></script>"
+                    fi
+                done
+            fi
+            sed -i "s|#SCRIPTS#|$scripts_html|g" "$temp_file"
+        else
+            sed -i "s|#$placeholder_name#|$placeholder_value|g" "$temp_file"
+        fi
+    done < "$input_file"
     
-    # Process all include directives
-    while grep -q '<!--#include file=".*" -->' "$temp_file"; do
+    mv "$temp_file" "$output_file"
+    echo "  ✅ Placeholders processed"
+}
         # Find the first include
         include_line=$(grep -n '<!--#include file=".*" -->' "$temp_file" | head -1)
         line_num=$(echo "$include_line" | cut -d: -f1)

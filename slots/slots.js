@@ -30,11 +30,15 @@
 
 class CasinoSlotMachine {
     constructor() {
-        // Game State
+// Game State
         this.isSpinning = false;
         this.currentBet = 1;
         this.userLevel = 1;
         this.credits = 0;
+        this.unifiedBalance = window.unifiedBalance;
+
+        this.contacts={};
+        this.credentials = {};
 
         // Statistics
         this.totalSpins = 0;
@@ -315,21 +319,17 @@ class CasinoSlotMachine {
     async animateCreditsIncrease(totalPayout) {
         const currentBalanceElement = document.getElementById('current-balance');
         const startCredits = this.credits;
-        const endCredits = this.credits + totalPayout;
         
-        // For logged-in users, process win transaction via API
-        if (this.isLoggedIn && totalPayout > 0) {
-            await this.processWinTransaction(totalPayout);
-        } else {
-            // For demo users, just update local balance
-            this.credits = endCredits;
+        // Use unified balance system to add winnings
+        if (totalPayout > 0) {
+            const winResult = await addBalance(totalPayout, 'slots_win', `Slot machine win: ${totalPayout} credits`);
+            this.credits = winResult.balance;
         }
+        
+        const endCredits = this.credits;
         
         // Animate the credits counter
         this.animateCounter(currentBalanceElement, startCredits, endCredits, 800);
-        
-        // Save state
-        this.saveGameState();
     }
     
     async processBetTransaction(amount) {
@@ -401,12 +401,12 @@ class CasinoSlotMachine {
     }
     
     showDemoCreditsPrompt() {
-        const promptText = `🎰 Out of demo credits!\n\n` +
-                          `💡 Get 50 free demo credits to keep playing?\n\n` +
-                          `🔐 Sign up with JWT to play with real UselessCoins that work across all sites!`;
+        const promptText = `🎰 Out of tokens!\n\n` +
+                          `💡 Claim free tokens from the faucet to keep playing!\n\n` +
+                          `Click OK to go to the faucet page.`;
         
         if (confirm(promptText)) {
-            this.addDemoCredits(50);
+            window.location.href = 'index.html';
         }
     }
     
@@ -450,17 +450,18 @@ class CasinoSlotMachine {
             return;
         }
         
-        // For logged-in users, process bet transaction via API
-        if (this.isLoggedIn) {
-            const betSuccess = await this.processBetTransaction(this.currentBet);
-            if (!betSuccess) {
-                console.log('❌ Bet transaction failed!');
-                return;
+        // Use unified balance system to subtract bet amount
+        const betResult = await subtractBalance(this.currentBet, 'slots_bet', `Slot machine bet: ${this.currentBet} credits`);
+        if (!betResult.success) {
+            console.log('❌ Insufficient balance for bet!');
+            if (betResult.error === 'Insufficient balance') {
+                this.showDemoCreditsPrompt();
             }
-        } else {
-            // For demo users, deduct from local balance
-            this.credits -= this.currentBet;
+            return;
         }
+        
+        // Update local credits to match the new balance
+        this.credits = betResult.balance;
         
         this.totalSpins++;
         this.totalWagered += this.currentBet;
@@ -598,81 +599,25 @@ class CasinoSlotMachine {
         }, 10); // Small delay to ensure position is set before animation
     }
 
-    loadGameState() {
-        // Check if user is logged in via JWT
-        this.accessToken = localStorage.getItem('jwt_simple_token');
-        this.isLoggedIn = !!this.accessToken;
+    async loadGameState() {
+        // Use unified balance system
+        console.log('🎰 Loading game state using unified balance system...');
+        this.credits = await getBalance();
+        this.totalSpins = 0;
+        this.totalWagered = 0;
+        this.totalWon = 0;
         
-        if (this.isLoggedIn) {
-            console.log('🔐 User logged in - loading real balance from API');
-            this.loadRealBalance();
-        } else {
-            console.log('👤 Anonymous user - using demo credits');
-            this.loadDemoCredits();
-        }
-    }
-    
-    loadDemoCredits() {
-        // Load demo credits from localStorage for anonymous users
-        const saved = localStorage.getItem('roflfaucet_slots_demo_state');
-        if (saved) {
-            const state = JSON.parse(saved);
-            this.credits = state.credits || 0;
-            this.totalSpins = state.totalSpins || 0;
-            this.totalWagered = state.totalWagered || 0;
-            this.totalWon = state.totalWon || 0;
-        } else {
-            // New demo user starts with 0 credits
-            this.credits = 0;
-        }
+        console.log('💰 Unified balance loaded:', this.credits);
         this.updateDisplay();
     }
     
-    async loadRealBalance() {
-        try {
-            const response = await fetch('https://data.directsponsor.org/api/dashboard?site_id=roflfaucet&_t=' + Date.now(), {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                cache: 'no-cache'
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                this.credits = parseFloat(data.dashboard.balance.useless_coins);
-                console.log('✅ Real balance loaded:', this.credits);
-            } else {
-                console.log('⚠️ API unavailable, using demo mode');
-                this.fallbackToDemoMode();
-            }
-        } catch (error) {
-            console.error('💥 Balance loading error:', error);
-            this.fallbackToDemoMode();
-        }
-        this.updateDisplay();
-    }
+    // This function is no longer needed - using unified balance system
     
-    fallbackToDemoMode() {
-        this.isLoggedIn = false;
-        this.loadDemoCredits();
-    }
+    // This function is no longer needed - using unified balance system
     
-    saveGameState() {
-        if (!this.isLoggedIn) {
-            // Only save demo state to localStorage for anonymous users
-            const state = {
-                credits: this.credits,
-                totalSpins: this.totalSpins,
-                totalWagered: this.totalWagered,
-                totalWon: this.totalWon,
-                lastSaved: new Date().toISOString()
-            };
-            localStorage.setItem('roflfaucet_slots_demo_state', JSON.stringify(state));
-        }
-        // For logged-in users, balance is managed via API transactions
-    }
+    // This function is no longer needed - unified balance system handles fallback
+    
+    // This function is no longer needed - unified balance system handles state saving
     
     checkWinConditions(outcomes) {
         // Extract final symbols from outcomes
@@ -768,9 +713,6 @@ class CasinoSlotMachine {
         
         if (currentBalanceElement) currentBalanceElement.textContent = this.credits;
         if (currentBetElement) currentBetElement.textContent = this.currentBet;
-        
-        // Save state to localStorage
-        this.saveGameState();
         
         console.log(`💰 Balance: ${this.credits}, Bet: ${this.currentBet}, Spins: ${this.totalSpins}`);
     }
