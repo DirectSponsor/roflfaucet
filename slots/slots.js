@@ -77,15 +77,8 @@ class CasinoSlotMachine {
             document.getElementById('reel-3'),
         ];
         
-        // Each reel has 10 symbols (150px each = 1500px total)
-        // But we use 20 positions (10 symbols + 10 in-between = 75px each)
-        this.totalSymbolsPerReel = 10;
-        this.symbolHeight = 150;
-        this.totalSpriteHeight = this.totalSymbolsPerReel * this.symbolHeight; // 1500px
-        
-        // 20 positions: 10 symbols + 10 in-between (75px increments)
-        this.totalPositions = 20;
-        this.positionHeight = 75; // 150px / 2 = 75px per position
+        // Responsive dimensions - calculated dynamically
+        this.calculateResponsiveDimensions();
         
         // Current background positions for each reel (0-19)
         this.currentPositions = [0, 0, 0];
@@ -153,8 +146,71 @@ class CasinoSlotMachine {
         
         // Initialize audio system
         this.setupAudio();
+        
+        // Listen for window resize to recalculate dimensions
+        window.addEventListener('resize', () => this.calculateResponsiveDimensions());
 
         console.log('🎰 Casino Slot Machine with Sprite Background initialized!');
+    }
+    
+    calculateResponsiveDimensions() {
+        // Get the container element
+        const container = document.querySelector('.sprite-reels-container');
+        if (!container) return;
+        
+        // Get the actual container width
+        const containerWidth = container.offsetWidth;
+        
+        // Calculate responsive gaps and padding for smaller screens first
+        let gap = 20;
+        let padding = 20;
+        
+        if (containerWidth < 400) {
+            gap = 10;
+            padding = 10;
+        } else if (containerWidth < 500) {
+            gap = 15;
+            padding = 15;
+        }
+        
+        // Calculate responsive dimensions using actual gap and padding values
+        // Account for gaps (2 × gap) and padding (2 × padding) and borders (2 × 2px)
+        const usedSpace = (2 * gap) + (2 * padding) + (2 * 2); // gaps + padding + borders
+        const availableWidth = containerWidth - usedSpace;
+        
+        // Calculate reel width (3 reels fit in available space)
+        const reelWidth = Math.floor(availableWidth / 3);
+        
+        // Maintain 3:1 aspect ratio (3 symbols high)
+        const reelHeight = reelWidth * 3;
+        
+        // Calculate sprite height (10 symbols × symbol height)
+        const spriteHeight = reelWidth * 10;
+        
+        // Calculate position height (sprite height / 20 positions)
+        const positionHeight = spriteHeight / 20;
+        
+        // Update CSS custom properties
+        const root = document.documentElement;
+        root.style.setProperty('--reel-width', `${reelWidth}px`);
+        root.style.setProperty('--reel-height', `${reelHeight}px`);
+        root.style.setProperty('--sprite-height', `${spriteHeight}px`);
+        root.style.setProperty('--reel-gap', `${gap}px`);
+        root.style.setProperty('--container-padding', `${padding}px`);
+        
+        // Update instance variables for positioning calculations
+        this.reelWidth = reelWidth;
+        this.symbolHeight = reelWidth; // Each symbol is square
+        this.reelHeight = reelHeight;
+        this.totalSpriteHeight = spriteHeight;
+        this.totalPositions = 20;
+        this.positionHeight = positionHeight;
+        
+        console.log(`🎰 Responsive dimensions calculated:`);
+        console.log(`  Container width: ${containerWidth}px`);
+        console.log(`  Reel width: ${reelWidth}px`);
+        console.log(`  Reel height: ${reelHeight}px`);
+        console.log(`  Position height: ${positionHeight}px`);
     }
     
     setupAudio() {
@@ -533,12 +589,12 @@ class CasinoSlotMachine {
         reel.offsetHeight;
         
         // Position-based approach: use position directly
-        // Each position is 75px apart (position 0 = 0px, position 1 = -75px, etc.)
+        // Each position is this.positionHeight apart (calculated dynamically)
         // We need to center the position in the middle of the 3-symbol window
-        // Window height is 450px (3 symbols × 150px), so center is at 225px
-        // Position the sprite so the selected position appears in the center
+        // The middle slot is at 1 symbol height from the top (showing 3 symbols total)
+        // Position the sprite so the selected position appears in the center slot
         
-        const backgroundPositionY = -(position * this.positionHeight) + 150; // Center the position in middle slot
+        const backgroundPositionY = -(position * this.positionHeight) + this.symbolHeight; // Center the position in middle slot
         
         // Add subtle bounce effect
         this.addReelBounce(reel, backgroundPositionY);

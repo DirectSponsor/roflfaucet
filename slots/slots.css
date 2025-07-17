@@ -1,36 +1,36 @@
 /* CSS Styles for Sliding Symbol Slot Machine */
 
-/* Reels Container */
+/* Reels Container - Responsive */
 .sprite-reels-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px; /* Fixed gap between reels */
+    gap: var(--reel-gap, 20px); /* Responsive gap */
     background: #1a1a1a;
-    padding: 20px;
+    padding: var(--container-padding, 20px);
     border-radius: 10px;
     border: 2px solid #333;
-    width: fit-content; /* Size to content, not full width */
-    min-width: 534px; /* Minimum width: 3×150px + 2×20px gaps + 2×20px padding + 2×2px border = 534px */
-    max-width: 100%; /* Don't exceed container */
+    width: 100%; /* Full width, responsive */
+    min-width: 300px; /* Much smaller minimum - mobile friendly */
+    max-width: 534px; /* Maximum size for large screens */
     margin: 2px auto;
     box-sizing: border-box;
     position: relative;
 }
 
-/* Individual Reel - FIXED 150px width for perfect alignment */
+/* Individual Reel - Responsive width with perfect alignment */
 .reel {
-    width: 150px; /* FIXED WIDTH - never changes */
-    height: 450px; /* FIXED HEIGHT - 3 symbols × 150px = 450px */
+    width: var(--reel-width, 150px); /* Responsive width */
+    height: var(--reel-height, 450px); /* Responsive height - 3 symbols */
     overflow: hidden; /* CRITICAL: Hide symbols outside the window */
     background: #333;
     border-radius: 3px;
     position: relative;
     border: 2px solid #222;
     
-    /* Sprite background setup - exact pixel matching */
+    /* Sprite background setup - responsive sizing */
     background-image: url('sprite_reel_vertical.png');
-    background-size: 150px 1500px; /* Exact sprite size - 150px wide, 1500px tall */
+    background-size: var(--reel-width, 150px) var(--sprite-height, 1500px);
     background-repeat: repeat-y;
     background-position: 0 0;
 }
@@ -184,17 +184,18 @@
     background: #2d5a2d;
 }
 
-/* Control Panel - HTML Table Layout */
+/* Control Panel - HTML Table Layout - Responsive */
 .control-panel {
     background: #2c3e50;
     color: white;
     border-radius: 8px;
     margin: 0 auto; /* Center like the reels container */
-    width: fit-content; /* Match reels container width behavior */
+    width: 100%; /* Full width, responsive */
     height: 80px; /* Fixed height for the control panel */
-    min-width: 534px; /* Match reels container width (450px + 2×20px padding + 2×2px border) */
+    min-width: 300px; /* Match reels container minimum width */
+    max-width: 534px; /* Match reels container maximum width */
     box-sizing: border-box;
-    padding: 10px;
+    padding: var(--container-padding, 20px);
 }
 
 .control-table {
@@ -225,12 +226,12 @@
     border-right: none;
 }
 
-/* Column widths - optimized for dynamic content */
-.control-table td:nth-child(1) { width: auto; min-width: 60px; } /* WIN - can expand for big wins */
-.control-table td:nth-child(2) { width: auto; min-width: 80px; } /* COINS - can expand for high balances */
-.control-table td:nth-child(3) { width: auto; min-width: 50px; } /* BET - minimal space */
-.control-table td:nth-child(4) { width: 60px; max-width: 60px; } /* NARROW ARROWS - fixed small */
-.control-table td:nth-child(5) { width: auto; max-width: 150px; } /* SPIN - can shrink to make room */
+/* Column widths - optimized for dynamic content with better flexibility */
+.control-table td:nth-child(1) { width: auto; min-width: 50px; max-width: 80px; } /* WIN - flexible width */
+.control-table td:nth-child(2) { width: auto; min-width: 65px; max-width: 100px; } /* COINS - flexible width */
+.control-table td:nth-child(3) { width: auto; min-width: 40px; max-width: 60px; } /* BET - flexible width */
+.control-table td:nth-child(4) { width: auto; min-width: 50px; max-width: 60px; } /* NARROW ARROWS - slightly flexible */
+.control-table td:nth-child(5) { width: auto; min-width: 80px; max-width: 150px; } /* SPIN - more flexible range */
 
 .spin-cell {
     vertical-align: middle;
@@ -238,8 +239,9 @@
 
 .spin-cell .spin-button {
     height: 56px;
-    min-width: 140px; /* Twice as wide as before, but can shrink if needed */
-    width: auto; /* Allow natural sizing */
+    min-width: 80px; /* Much smaller minimum width for better flexibility */
+    width: 100%; /* Fill available cell width */
+    max-width: 140px; /* But don't get too wide */
     margin: 0 auto;
 }
 
@@ -720,31 +722,107 @@
 }
 
 /* Responsive Media Queries for Control Panel */
-/* Since slot machine minimum width is 450px, optimize around that constraint */
+/* Responsive scaling for smaller screens */
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
     .control-panel {
-        /* Stay horizontal but reduce gaps for better space usage */
-        gap: 10px;
+        height: 70px; /* Slightly smaller height */
+        padding: 8px;
     }
     
-    .sprite-reels-container {
-        gap: 15px;
-        padding: 15px;
+    .control-table td {
+        padding: 2px 4px; /* Tighter padding */
+    }
+    
+    .control-label {
+        font-size: 0.7rem; /* Smaller labels */
+    }
+    
+    .control-value {
+        font-size: 1.2rem; /* Smaller values */
+        min-height: 48px; /* Smaller min height */
+    }
+    
+    .spin-button {
+        height: 48px; /* Smaller button */
+        font-size: 1rem;
+        min-width: 100px; /* Smaller minimum width */
+        padding: 0 15px;
+    }
+    
+    .bet-btn-inline {
+        width: 28px;
+        height: 22px;
+        font-size: 0.55rem;
     }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 400px) {
     .control-panel {
-        /* Only go vertical when really necessary, well above 450px limit */
-        flex-direction: column;
-        gap: 12px;
-        min-width: 450px; /* Enforce minimum to match slot machine */
+        height: 65px; /* Even smaller height */
+        padding: 6px;
     }
     
-    .sprite-reels-container {
-        gap: 10px;
-        padding: 10px;
+    .control-table td {
+        padding: 1px 2px; /* Very tight padding */
+    }
+    
+    .control-label {
+        font-size: 0.65rem; /* Even smaller labels */
+    }
+    
+    .control-value {
+        font-size: 1.1rem; /* Even smaller values */
+        min-height: 42px;
+    }
+    
+    .spin-button {
+        height: 42px; /* Even smaller button */
+        font-size: 0.9rem;
+        min-width: 80px;
+        padding: 0 10px;
+    }
+    
+    .bet-btn-inline {
+        width: 24px;
+        height: 18px;
+        font-size: 0.5rem;
+    }
+    
+    /* Adjust column widths for very small screens */
+    .control-table td:nth-child(1) { min-width: 45px; }
+    .control-table td:nth-child(2) { min-width: 60px; }
+    .control-table td:nth-child(3) { min-width: 35px; }
+    .control-table td:nth-child(4) { width: 50px; max-width: 50px; }
+    .control-table td:nth-child(5) { max-width: 100px; }
+}
+
+@media (max-width: 320px) {
+    .control-panel {
+        height: 60px; /* Minimal height for very small screens */
+        padding: 4px;
+    }
+    
+    .control-label {
+        font-size: 0.6rem;
+    }
+    
+    .control-value {
+        font-size: 1rem;
+        min-height: 38px;
+    }
+    
+    .spin-button {
+        height: 38px;
+        font-size: 0.8rem;
+        min-width: 60px;
+        padding: 0 8px;
+    }
+    
+    .bet-btn-inline {
+        width: 20px;
+        height: 16px;
+        font-size: 0.45rem;
     }
 }
 
