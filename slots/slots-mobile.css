@@ -1,26 +1,27 @@
 /* CSS Styles for Mobile Slot Machine */
 /* Optimized for screens 768px and below */
+/* Uses standard class names to work with existing HTML */
 
 /* Mobile Reels Container - Smaller dimensions */
-.sprite-reels-container-mobile {
+.sprite-reels-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px; /* Reduced gap for mobile */
+    gap: 5px; /* Further reduced gap for mobile */
     background: #1a1a1a;
-    padding: 10px; /* Reduced padding */
+    padding: 5px; /* Further reduced padding */
     border-radius: 8px;
     border: 2px solid #333;
     width: fit-content;
-    min-width: 344px; /* Minimum width: 3×100px + 2×10px gaps + 2×10px padding + 2×2px border = 344px */
+    min-width: 320px; /* Reduced from 344px - allows more compression */
     max-width: 100%;
-    margin: 2px auto;
+    margin: 0 auto; /* Removed extra margin */
     box-sizing: border-box;
     position: relative;
 }
 
 /* Mobile Individual Reel - Smaller 100px width */
-.reel-mobile {
+.reel {
     width: 100px; /* Smaller than desktop 150px */
     height: 300px; /* Smaller than desktop 450px - 3 symbols × 100px = 300px */
     overflow: hidden;
@@ -37,7 +38,7 @@
 }
 
 /* Mobile depth shading overlay */
-.reel-mobile::after {
+.reel::after {
     content: '';
     position: absolute;
     top: 0;
@@ -66,7 +67,7 @@
 }
 
 /* Mobile spinning animations */
-.reel-mobile.spinning {
+.reel.spinning {
     animation: spinReelMobile 0.1s linear infinite;
 }
 
@@ -103,12 +104,12 @@
 }
 
 /* Non-spinning mobile reels */
-.reel-mobile:not(.spinning) {
+.reel:not(.spinning) {
     transition: background-position 0.3s ease-out;
 }
 
 /* Mobile Glass Overlay */
-.slot-glass-overlay-mobile {
+.slot-glass-overlay {
     position: absolute;
     top: 50%;
     left: 0;
@@ -137,7 +138,7 @@
 }
 
 /* Mobile center reference line */
-.center-line-mobile {
+.center-line {
     position: absolute;
     left: 0;
     right: 0;
@@ -151,27 +152,145 @@
 }
 
 /* Mobile Slot Machine Container */
-.slot-machine-container-mobile {
+.slot-machine-container {
     width: 100%;
     background: linear-gradient(135deg, #2c3e50, #34495e);
     box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px;
+    padding: 5px; /* Further reduced padding */
     border-radius: 8px;
 }
 
 /* Mobile Control Panel - Compact Layout */
-.control-panel-mobile {
+.control-panel {
     background: #2c3e50;
     color: white;
     border-radius: 6px;
-    margin: 10px auto;
+    margin: 5px auto; /* Reduced vertical margin */
     width: 100%;
-    max-width: 340px; /* Match mobile reels container width */
-    padding: 8px;
+    max-width: 320px; /* Reduced to match reels container */
+    padding: 5px; /* Reduced padding */
     box-sizing: border-box;
+}
+
+/* Mobile Control Table */
+.control-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.control-row {
+    width: 100%;
+}
+
+.control-cell {
+    padding: 4px 2px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.control-label {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #ecf0f1;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.control-value {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #f1c40f;
+    display: block;
+}
+
+/* Mobile Bet Controls */
+.bet-btn-inline {
+    background: #3498db;
+    color: white;
+    border: none;
+    width: 24px;
+    height: 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin: 1px;
+}
+
+.bet-btn-inline:hover {
+    background: #2980b9;
+}
+
+/* Mobile Spin Button */
+.spin-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    min-width: 60px;
+}
+
+.spin-button:hover {
+    background: #c0392b;
+}
+
+.spin-button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* Mobile Action Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 8px 0;
+    width: 100%;
+}
+
+.flip-button,
+.claim-button {
+    flex: 1;
+    max-width: 120px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.flip-button {
+    background: #f39c12;
+    color: white;
+}
+
+.flip-button:hover {
+    background: #e67e22;
+}
+
+.claim-button {
+    background: #27ae60;
+    color: white;
+}
+
+.claim-button:hover:not(:disabled) {
+    background: #229954;
+}
+
+.claim-button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
 }
 
 /* Mobile Control Rows */
@@ -399,7 +518,36 @@
     height: 100%;
 }
 
-/* Mobile-specific layout */
+/* Mobile-specific layout - override main layout padding and ensure centering */
+.content-container {
+    padding: 2px !important;
+    margin: 2px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.main-content {
+    padding: 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.container {
+    padding: 2px !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.content-grid {
+    gap: 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
 .mobile-full-width {
     width: 100%;
     max-width: none;

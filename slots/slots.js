@@ -700,7 +700,7 @@ class CasinoSlotMachine {
         const currentBalanceElement = document.getElementById('current-balance');
         const currentBetElement = document.getElementById('current-bet');
         
-        if (currentBalanceElement) currentBalanceElement.textContent = this.credits;
+        if (currentBalanceElement) currentBalanceElement.textContent = Math.floor(this.credits);
         if (currentBetElement) currentBetElement.textContent = this.currentBet;
         
         console.log(`💰 Balance: ${this.credits}, Bet: ${this.currentBet}, Spins: ${this.totalSpins}`);

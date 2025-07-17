@@ -2,7 +2,7 @@
 <!-- TITLE=_ROFLFaucet - Mobile Slots_ -->
 <!-- DESC=_Play casino slots on mobile and win UselessCoins on ROFLFaucet_ -->
 <!-- KEYWORDS=_mobile slots, casino slots, mobile gambling, uselesscoins, crypto games_ -->
-<!-- STYLES=_slots/slots.css, slots/slots-mobile.css_ -->
+<!-- STYLES=_slots/slots-mobile.css_ -->
 <!-- SCRIPTS=_slots/slots.js_ -->
 
 <!-- include start doctype-head.html -->
@@ -23,24 +23,23 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
     
     <!-- Main Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Page-specific styles -->
-        <link rel="stylesheet" href="slots/slots.css">
-    <link rel="stylesheet" href="slots/slots-mobile.css">
+        <link rel="stylesheet" href="slots/slots-mobile.css">
 
     
     <!-- JWT Simple Faucet -->
-    <script src="jwt-simple.js"></script>
+    <script src="scripts/core/jwt-simple.js"></script>
     
     <!-- hCaptcha -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     
     <!-- Unified Balance System (available on all pages) -->
-    <script src="unified-balance.js"></script>
+    <script src="scripts/core/unified-balance.js"></script>
     
     <!-- Site Utilities (available on all pages) -->
-    <script src="site-utils.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
     
     <!-- Page-specific scripts -->
         <script src="slots/slots.js"></script>
@@ -344,40 +343,12 @@
                 <div class="footer-section">
                     <h4>🚰 ROFLFaucet</h4>
                     <p>The crypto faucet that makes charity fun and impactful.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Twitter</a>
-                        <a href="#" class="social-link">Discord</a>
-                        <a href="#" class="social-link">Telegram</a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>🤝 Ecosystem</h4>
-                    <ul class="footer-links">
-                        <li><a href="https://clickforcharity.net" target="_blank">ClickForCharity</a></li>
-                        <li><a href="https://satoshihost.com?ref=roflfaucet" target="_blank">SatoshiHost</a></li>
-                        <li><a href="https://auth.directsponsor.org" target="_blank">DirectSponsor</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>📚 Resources</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">Faucet</a></li>
-                        <li><a href="progress.html">Progress Updates</a></li>
-                        <li><a href="illusions.html">Illusions</a></li>
-                        <li><a href="#about">About</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>💝 Support</h4>
-                    <p>Help us improve by providing feedback and spreading the word about ROFLFaucet!</p>
+                    <p>A project of <a href="https://directsponsor.org" target="_blank">DirectSponsor</a></p>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 ROFLFaucet. Part of the SatoshiHost ecosystem. All advertising revenue supports charity projects through ClickForCharity.</p>
+                <p>&copy; 2025 ROFLFaucet. Part of the DirectSponsor ecosystem. All advertising revenue supports charity projects through ClickForCharity.</p>
             </div>
         </div>
     </footer>

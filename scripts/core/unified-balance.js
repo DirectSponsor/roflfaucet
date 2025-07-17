@@ -46,7 +46,7 @@ class UnifiedBalanceSystem {
             
             if (response.ok) {
                 const data = await response.json();
-                this.balance = parseFloat(data.dashboard.balance.useless_coins) || 0;
+                this.balance = Math.floor(parseFloat(data.dashboard.balance.useless_coins) || 0);
                 console.log('✅ Real balance loaded:', this.balance);
                 return this.balance;
             } else {
@@ -119,7 +119,7 @@ class UnifiedBalanceSystem {
             
             if (response.ok) {
                 const data = await response.json();
-                this.balance = data.balance.current;
+                this.balance = Math.floor(data.balance.current);
                 console.log('✅ Real balance added:', amount, 'New balance:', this.balance);
                 return { success: true, balance: this.balance };
             } else {
@@ -167,7 +167,7 @@ class UnifiedBalanceSystem {
             
             if (response.ok) {
                 const data = await response.json();
-                this.balance = data.balance.current;
+                this.balance = Math.floor(data.balance.current);
                 console.log('✅ Real balance subtracted:', amount, 'New balance:', this.balance);
                 return { success: true, balance: this.balance };
             } else {
@@ -228,8 +228,8 @@ window.updateBalanceDisplays = async () => {
     // Find all elements with 'balance' class and update them
     const balanceElements = document.querySelectorAll('.balance');
     balanceElements.forEach(element => {
-        // Format the balance number
-        const formattedBalance = balance.toFixed(2);
+        // Format the balance number as whole number
+        const formattedBalance = Math.floor(balance);
         element.textContent = formattedBalance;
         
         // Update title attribute for hover tooltip
@@ -248,15 +248,15 @@ window.updateBalanceDisplays = async () => {
     legacyElements.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.textContent = balance.toFixed(2);
-            element.title = `${balance.toFixed(2)} ${terminology.fullName}`;
+            element.textContent = Math.floor(balance);
+            element.title = `${Math.floor(balance)} ${terminology.fullName}`;
         }
     });
     
     // Update currency terminology
     updateCurrencyDisplays();
     
-    console.log('💰 Balance displays updated:', balance.toFixed(2), terminology.currency);
+    console.log('💰 Balance displays updated:', Math.floor(balance), terminology.currency);
 };
 
 // Global function to update currency terminology displays

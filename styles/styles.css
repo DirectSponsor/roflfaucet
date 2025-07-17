@@ -541,11 +541,15 @@ p.normal {
     padding-right: 1em;
 }
 
+/* Center h1 and h2 headings (main titles and major sections) */
+.main-content h1,
+.main-content h2 {
+    text-align: center;
+}
+
 /* Reusable paragraph classes for info boxes */
 p.info {
-    background: #cce7ff;
     border: 1px solid #b3d7ff;
-    border-radius: 5px;
     padding: 15px;
     margin: 15px 0;
     border-left: 4px solid #4A90E2;
@@ -751,11 +755,14 @@ p.error {
 
 /* Footer */
 .footer {
-    background: var(--bg-dark);
-    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    color: var(--text-primary);
     padding: 2rem 0;
     margin-top: 2rem;
     text-align: center;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -4px 20px rgba(74, 144, 226, 0.1);
 }
 
 .footer .container {
