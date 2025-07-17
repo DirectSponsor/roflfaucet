@@ -253,24 +253,6 @@
                         </div>
                     </div>
 
-                    <!-- Ecosystem Links -->
-                    <div class="ecosystem-sidebar">
-                        <h3>🌐 Ecosystem</h3>
-                        <div class="ecosystem-links">
-                            <a href="https://clickforcharity.net" target="_blank" class="ecosystem-link">
-                                <span class="link-icon">🤝</span>
-                                <span class="link-text">ClickForCharity</span>
-                            </a>
-                            <a href="https://satoshihost.com?ref=roflfaucet" target="_blank" class="ecosystem-link">
-                                <span class="link-icon">🌐</span>
-                                <span class="link-text">SatoshiHost</span>
-                            </a>
-                            <a href="https://auth.directsponsor.org" target="_blank" class="ecosystem-link">
-                                <span class="link-icon">🔐</span>
-                                <span class="link-text">DirectSponsor Auth</span>
-                            </a>
-                        </div>
-                    </div>
 
                     <!-- Rotating Ad Space 3 -->
                     <div class="ad-space" id="ad-space-3">

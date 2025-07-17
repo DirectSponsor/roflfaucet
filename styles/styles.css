@@ -494,7 +494,7 @@ body {
 
 /* Main Layout - Minimal approach */
 .main {
-    padding: 1rem 0;
+    padding: 0.5rem 0;
 }
 
 .content-grid {
@@ -510,12 +510,14 @@ body {
     flex: 1;
     min-width: 250px;
     order: 1;
+    background: var(--bg-secondary);
 }
 
 .sidebar-right {
     flex: 1;
     min-width: 250px;
     order: 3;
+    background: var(--bg-secondary);
 }
 
 .main-content {
