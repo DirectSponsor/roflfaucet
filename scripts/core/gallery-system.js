@@ -201,6 +201,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('🖼️ Loading initial sidebar GIPHY image...');
             loadSidebarGiphyImage();
         }
+        
+        // Auto-load faucet result gallery image if container exists
+        const galleryImageContainer = document.getElementById('gallery-image');
+        if (galleryImageContainer) {
+            console.log('🖼️ Loading faucet result gallery image...');
+            window.gallerySystem.currentGallery = 'postimg'; // Use PostImg for faucet results
+            window.gallerySystem.displayRandomImageIn('gallery-image', {
+                maxWidth: '300px',
+                showCaption: false,
+                linkToOriginal: true
+            });
+        }
     }, 500); // Small delay to ensure DOM is fully ready
 });
 
