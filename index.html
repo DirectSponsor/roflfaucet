@@ -66,23 +66,27 @@
 
         <main class="main-content">
             <!-- Faucet Page Content -->
-            <h1>🚰 ROFLFaucet</h1>
-            <p class="padded">Claim some free cryptocurrency every 5 minutes!</p>
-            
-            <div class="padded">
-                <h2>💰 Your Balance</h2>
-                <p><span class="stats-number balance" id="balance">0</span> <span class="currency-full">tokens</span></p>
-                
-                <h2>🔄 Faucet</h2>
-                <div style="text-align: center; margin: 20px 0;">
-                    <!-- Simple faucet button -->
-                    <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
-                        <span class="btn-text">Faucet: 300</span>
-                    </button>
+            <div class="content-container">
+                <div class="content-header">
+                    <h1>🚰 ROFLFaucet</h1>
+                    <p>Claim some free cryptocurrency every 5 minutes!</p>
                 </div>
                 
-                <h2>🎮 Demo Mode</h2>
-                <p>You can claim Pointless Tokens and play games without logging in, but you need to log in for the <a href="about.html#guest-vs-member">full experience</a>!</p>
+                <div class="padded">
+                    <h2>💰 Your Balance</h2>
+                    <p><span class="stats-number balance" id="balance">0</span> <span class="currency-full">tokens</span></p>
+                    
+                    <h2>🔄 Faucet</h2>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <!-- Simple faucet button -->
+                        <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                            <span class="btn-text">Faucet: 300</span>
+                        </button>
+                    </div>
+                    
+                    <h2>🎮 Demo Mode</h2>
+                    <p>You can claim Pointless Tokens and play games without logging in, but you need to log in for the <a href="about.html#guest-vs-member">full experience</a>!</p>
+                </div>
             </div>
             <!-- END Faucet Page Content -->
         </main>
