@@ -5,7 +5,7 @@
 // FAUCET COUNTDOWN BUTTON SYSTEM
 // ====================================
 
-// Use existing cooldown functions from faucet-bridge.js
+// Cooldown functions - single source of truth for all buttons
 function getRemainingCooldownTime() {
     const lastClaim = localStorage.getItem('last_claim_time');
     if (!lastClaim) return 0;
@@ -28,6 +28,7 @@ function updateFaucetCountdownButton() {
     const totalCooldown = 5 * 60 * 1000; // 5 minutes in milliseconds
     const remaining = getRemainingCooldownTime();
     
+    // Update faucet countdown buttons (with .btn-text spans)
     buttons.forEach(buttonId => {
         const btn = document.getElementById(buttonId);
         if (!btn) return;
@@ -63,6 +64,33 @@ function updateFaucetCountdownButton() {
             btn.style.background = `linear-gradient(to right, #27ae60 ${progressPercent}%, #95a5a6 ${progressPercent}%)`;
         }
     });
+    
+    // Update start claim button (direct text content, no .btn-text span)
+    const startClaimBtn = document.getElementById('start-claim-btn');
+    if (startClaimBtn) {
+        if (remaining <= 0) {
+            // Ready to claim
+            startClaimBtn.disabled = false;
+            startClaimBtn.classList.add('ready');
+            startClaimBtn.textContent = '🎲 Start Claim Process';
+            startClaimBtn.style.background = '';
+            startClaimBtn.classList.remove('countdown');
+        } else {
+            // Still in cooldown
+            startClaimBtn.disabled = true;
+            startClaimBtn.classList.remove('ready');
+            startClaimBtn.classList.add('countdown');
+            const seconds = Math.ceil(remaining / 1000);
+            startClaimBtn.textContent = `⏱️ ${seconds}s`;
+            
+            // Calculate progress percentage (how much time has passed)
+            const elapsed = totalCooldown - remaining;
+            const progressPercent = (elapsed / totalCooldown) * 100;
+            
+            // Update progress bar (green fill from left to right)
+            startClaimBtn.style.background = `linear-gradient(to right, #27ae60 ${progressPercent}%, #95a5a6 ${progressPercent}%)`;
+        }
+    }
 }
 
 function startFaucetCountdown() {
@@ -84,14 +112,26 @@ function handleFaucetClaim() {
         return;
     }
     
-    // Redirect to faucet page
-    window.location.href = 'index.html';
+    // Determine where to redirect based on current page
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    
+    if (currentPage === 'index.html' || currentPage === '') {
+        // From main faucet page, go to claim page
+        window.location.href = 'faucet-claim.html';
+    } else if (currentPage === 'faucet-result.html') {
+        // From result page, go back to main faucet page
+        window.location.href = 'index.html';
+    } else {
+        // Default fallback to main page
+        window.location.href = 'index.html';
+    }
 }
 
 // Initialize countdown when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    const btn = document.getElementById('faucet-countdown-btn');
-    if (btn) {
+    const faucetBtn = document.getElementById('faucet-countdown-btn');
+    const startClaimBtn = document.getElementById('start-claim-btn');
+    if (faucetBtn || startClaimBtn) {
         startFaucetCountdown();
     }
 });

@@ -6,6 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const isLoggedIn = localStorage.getItem('jwt_token') !== null;
     console.log('🔍 Faucet Bridge: Login status:', isLoggedIn ? 'logged in' : 'guest');
+    
+    // Initialize member/guest behavior (no visual theming, just currency and prompts)
+    if (isLoggedIn) {
+        console.log('📑 Member mode: Full features available');
+    } else {
+        console.log('📑 Guest mode: Limited features, prompts for member-only actions');
+        initGuestPrompts();
+    }
 
     // Currency terminology is now handled by the unified balance system
     // via currency classes (.currency, .currency-upper, .currency-full)
@@ -18,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const faucetStep = document.getElementById('faucet-step');
     const resultStep = document.getElementById('result-step');
 
-    // Initial visibility
-    showStep(welcomeStep);
+    // Initial visibility - disabled for multi-page system
+    // showStep(welcomeStep);
 
     // Event listeners for navigation
     const startClaimBtn = document.getElementById('start-claim-btn');
@@ -52,13 +60,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            showStep(resultStep);
+            // Redirect to result page instead of showing step
+            window.location.href = 'faucet-result.html';
             
     // Add tokens using unified balance system
             if (!isLoggedIn) {
                 console.log('🎁 Faucet Bridge: Adding tokens for guest user...');
                 addBalance(10, 'faucet_claim', 'Faucet claim reward');
                 updateLastClaimTime();
+                // Update all balance displays after adding tokens
+                setTimeout(updateBalanceDisplays, 100);
             } else {
                 console.log('💰 Faucet Bridge: Logged in user, skipping token addition');
             }
@@ -83,36 +94,7 @@ function showStep(stepElement) {
     }
 }
 
-// Cooldown and balance management functions
-function canClaim() {
-    const lastClaim = localStorage.getItem('last_claim_time');
-    if (!lastClaim) return true;
-    
-    const now = Date.now();
-    const cooldownTime = 5 * 60 * 1000; // 5 minutes
-    const timeSinceLastClaim = now - parseInt(lastClaim);
-    
-    console.log('⏱️ Cooldown check:', {
-        lastClaim: new Date(parseInt(lastClaim)).toLocaleTimeString(),
-        now: new Date(now).toLocaleTimeString(),
-        timeSinceLastClaim: Math.floor(timeSinceLastClaim / 1000) + ' seconds',
-        cooldownTime: cooldownTime / 1000 + ' seconds',
-        canClaim: timeSinceLastClaim >= cooldownTime
-    });
-    
-    return timeSinceLastClaim >= cooldownTime;
-}
-
-function getRemainingCooldownTime() {
-    const lastClaim = localStorage.getItem('last_claim_time');
-    if (!lastClaim) return 0;
-    
-    const now = Date.now();
-    const cooldownTime = 5 * 60 * 1000; // 5 minutes
-    const timeSinceLastClaim = now - parseInt(lastClaim);
-    
-    return Math.max(0, cooldownTime - timeSinceLastClaim);
-}
+// Cooldown functions are now in site-utils.js (global functions)
 
 function updateLastClaimTime() {
     const now = Date.now();
@@ -140,5 +122,63 @@ function updateBalanceDisplay(balance) {
     } else {
         console.warn('⚠️ Balance element not found');
     }
+}
+
+// Guest member-only feature prompts
+function initGuestPrompts() {
+    // Find all elements marked as member-only and add click handlers
+    const memberOnlyElements = document.querySelectorAll('.member-only');
+    memberOnlyElements.forEach(element => {
+        const featureName = element.getAttribute('data-feature-name') || 'This feature';
+        element.addEventListener('click', function(e) {
+            e.preventDefault();
+            showMemberPrompt(featureName);
+        });
+    });
+    
+    console.log('🔒 Guest prompts initialized for', memberOnlyElements.length, 'member-only elements');
+}
+
+function showMemberPrompt(featureName) {
+    const prompt = document.createElement('div');
+    prompt.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    `;
+    
+    prompt.innerHTML = `
+        <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
+            <h3 style="margin-top: 0; color: #4A90E2;">🎯 Member Feature</h3>
+            <p style="margin: 1rem 0; color: #2C3E50;">${featureName} requires a member account.</p>
+            <p style="margin: 1rem 0; color: #7F8C8D; font-size: 0.9rem;">Members get real Useless Coins, progress tracking, and exclusive features!</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                <button onclick="redirectToLogin()" style="background: #4A90E2; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Sign Up / Login</button>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: transparent; color: #7F8C8D; border: 1px solid #E1E8ED; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer;">Continue as Guest</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(prompt);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        if (prompt.parentElement) {
+            prompt.remove();
+        }
+    }, 10000);
+}
+
+function redirectToLogin() {
+    // You can customize this URL to your OAuth login
+    const loginUrl = 'https://auth.directsponsor.org/oauth/authorize?client_id=roflfaucet&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/callback');
+    window.location.href = loginUrl;
 }
 

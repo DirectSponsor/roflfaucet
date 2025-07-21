@@ -1,6 +1,9 @@
 # Image Auto-Discovery System
 
-## 🎯 **IMPLEMENTATION COMPLETE**
+> **📋 NOTE: This documentation describes the previous implementation.**  
+> **🔄 CURRENT SYSTEM: See [LINE_BASED_GALLERY_SYSTEM.md](LINE_BASED_GALLERY_SYSTEM.md) for the active simplified approach**
+
+## 🎯 **IMPLEMENTATION COMPLETE** *(Previous Version)*
 
 The ROFLFaucet now features a fully automated image discovery and management system that keeps your visual content fresh and entertaining!
 

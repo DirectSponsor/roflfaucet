@@ -149,6 +149,27 @@ class CasinoSlotMachine {
         
         // Listen for window resize to recalculate dimensions
         window.addEventListener('resize', () => this.calculateResponsiveDimensions());
+        
+        // Also listen for media query changes that might not trigger resize
+        // This covers sidebar collapse at 950px and 800px breakpoints
+        const mediaQuery1 = window.matchMedia('(max-width: 950px)');
+        const mediaQuery2 = window.matchMedia('(max-width: 800px)');
+        
+        mediaQuery1.addEventListener('change', () => {
+            // Add small delay to ensure CSS transitions complete
+            setTimeout(() => this.calculateResponsiveDimensions(), 100);
+        });
+        
+        mediaQuery2.addEventListener('change', () => {
+            // Add small delay to ensure CSS transitions complete
+            setTimeout(() => this.calculateResponsiveDimensions(), 100);
+        });
+        
+        // Also recalculate on orientation change (mobile)
+        window.addEventListener('orientationchange', () => {
+            // Longer delay for orientation change
+            setTimeout(() => this.calculateResponsiveDimensions(), 300);
+        });
 
         console.log('🎰 Casino Slot Machine with Sprite Background initialized!');
     }
@@ -158,19 +179,21 @@ class CasinoSlotMachine {
         const container = document.querySelector('.sprite-reels-container');
         if (!container) return;
         
-        // Get the actual container width
+        // Get the actual viewport width for better responsive calculation
+        const viewportWidth = window.innerWidth;
         const containerWidth = container.offsetWidth;
         
-        // Calculate responsive gaps and padding for smaller screens first
-        let gap = 20;
-        let padding = 20;
+        // Use viewport width to determine responsive breakpoints (not container width)
+        // This prevents issues when sidebars collapse and container width jumps
+        let gap = 15;  // Smaller default gap
+        let padding = 15;  // Smaller default padding
         
-        if (containerWidth < 400) {
+        if (viewportWidth < 400) {
             gap = 10;
             padding = 10;
-        } else if (containerWidth < 500) {
-            gap = 15;
-            padding = 15;
+        } else if (viewportWidth < 500) {
+            gap = 12;
+            padding = 12;
         }
         
         // Calculate responsive dimensions using actual gap and padding values
@@ -179,7 +202,19 @@ class CasinoSlotMachine {
         const availableWidth = containerWidth - usedSpace;
         
         // Calculate reel width (3 reels fit in available space)
-        const reelWidth = Math.floor(availableWidth / 3);
+        // Use smaller default sizing - aim for ~110px instead of 150px for better desktop experience
+        const idealReelWidth = 110;  // Better desktop default size (per reel)
+        const calculatedReelWidth = Math.floor(availableWidth / 3);
+        
+        // Responsive sizing: desktop vs mobile behavior
+        let reelWidth;
+        if (viewportWidth > 600) {
+            // Desktop: prefer ideal size but don't exceed available space
+            reelWidth = Math.max(80, Math.min(idealReelWidth, calculatedReelWidth));
+        } else {
+            // Mobile: allow shrinking below ideal size, minimum 60px for usability
+            reelWidth = Math.max(60, calculatedReelWidth);
+        }
         
         // Maintain 3:1 aspect ratio (3 symbols high)
         const reelHeight = reelWidth * 3;
@@ -207,8 +242,12 @@ class CasinoSlotMachine {
         this.positionHeight = positionHeight;
         
         console.log(`🎰 Responsive dimensions calculated:`);
+        console.log(`  Viewport width: ${viewportWidth}px`);
         console.log(`  Container width: ${containerWidth}px`);
-        console.log(`  Reel width: ${reelWidth}px`);
+        console.log(`  Available width: ${availableWidth}px`);
+        console.log(`  Ideal reel width: ${idealReelWidth}px`);
+        console.log(`  Calculated reel width: ${calculatedReelWidth}px`);
+        console.log(`  Final reel width: ${reelWidth}px`);
         console.log(`  Reel height: ${reelHeight}px`);
         console.log(`  Position height: ${positionHeight}px`);
     }
@@ -768,12 +807,19 @@ let slotMachine;
 
 // Global functions for inline onclick handlers
 function spinReels() {
-    console.log('Global spinReels() function called!');
+    console.log('🎰 Global spinReels() function called!');
+    console.log('🎰 Current slotMachine instance:', slotMachine);
+    console.log('🎰 Is slotMachine truthy?', !!slotMachine);
+    
     if (slotMachine) {
-        console.log('Calling slotMachine.spinReels()');
+        console.log('🎰 Calling slotMachine.spinReels()...');
+        console.log('🎰 isSpinning?', slotMachine.isSpinning);
+        console.log('🎰 currentBet:', slotMachine.currentBet);
+        console.log('🎰 credits:', slotMachine.credits);
         slotMachine.spinReels();
     } else {
-        console.error('slotMachine instance not found!');
+        console.error('🎰 ERROR: slotMachine instance not found!');
+        console.error('🎰 Available in window.slotMachine?', !!window.slotMachine);
     }
 }
 
@@ -816,8 +862,49 @@ function claimWinnings() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    slotMachine = new CasinoSlotMachine();
-    // Make slotMachine globally accessible for console debugging
-    window.slotMachine = slotMachine;
+    console.log('🎰 DOM loaded, initializing slot machine...');
+    console.log('🎰 Checking global functions availability...');
+    console.log('  - getBalance:', typeof getBalance);
+    console.log('  - addBalance:', typeof addBalance);
+    console.log('  - subtractBalance:', typeof subtractBalance);
+    
+    try {
+        slotMachine = new CasinoSlotMachine();
+        console.log('🎰 Slot machine instance created successfully!');
+        
+        // Make slotMachine globally accessible for console debugging
+        window.slotMachine = slotMachine;
+        console.log('🎰 Global functions should now work!');
+    } catch (error) {
+        console.error('🎰 Failed to create slot machine:', error);
+        console.error('🎰 Error stack:', error.stack);
+    }
+    
+    // Setup mobile hamburger menu
+    const hamburgerBtn = document.getElementById('mobile-menu-btn');
+    const mobileNav = document.getElementById('mobile-nav');
+    
+    if (hamburgerBtn && mobileNav) {
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('open');
+            mobileNav.classList.toggle('active');
+        });
+        
+        // Close mobile nav when clicking on a link
+        mobileNav.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                hamburgerBtn.classList.remove('open');
+                mobileNav.classList.remove('active');
+            }
+        });
+        
+        // Close mobile nav when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburgerBtn.contains(e.target) && !mobileNav.contains(e.target)) {
+                hamburgerBtn.classList.remove('open');
+                mobileNav.classList.remove('active');
+            }
+        });
+    }
 });
 

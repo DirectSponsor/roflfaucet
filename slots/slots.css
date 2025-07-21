@@ -5,14 +5,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--reel-gap, 20px); /* Responsive gap */
+    gap: var(--reel-gap, 15px); /* Responsive gap - smaller default */
     background: #1a1a1a;
-    padding: var(--container-padding, 20px);
+    padding: var(--container-padding, 15px);
     border-radius: 10px;
     border: 2px solid #333;
-    width: 100%; /* Full width, responsive */
-    min-width: 300px; /* Much smaller minimum - mobile friendly */
-    max-width: 534px; /* Maximum size for large screens */
+    width: fit-content; /* Dynamically fit content */
+    max-width: 100%;
     margin: 2px auto;
     box-sizing: border-box;
     position: relative;
@@ -28,7 +27,7 @@
     position: relative;
     border: 2px solid #222;
     
-    /* Sprite background setup - responsive sizing */
+/* Sprite background setup - responsive sizing */
     background-image: url('sprite_reel_vertical.png');
     background-size: var(--reel-width, 150px) var(--sprite-height, 1500px);
     background-repeat: repeat-y;
@@ -190,12 +189,11 @@
     color: white;
     border-radius: 8px;
     margin: 0 auto; /* Center like the reels container */
-    width: 100%; /* Full width, responsive */
+    width: fit-content; /* Dynamically fit content like reels */
+    max-width: 100%;
     height: 80px; /* Fixed height for the control panel */
-    min-width: 300px; /* Match reels container minimum width */
-    max-width: 534px; /* Match reels container maximum width */
     box-sizing: border-box;
-    padding: var(--container-padding, 20px);
+    padding: var(--container-padding, 10px); /* Use same responsive padding as reels */
 }
 
 .control-table {
@@ -215,9 +213,9 @@
     display: table-cell;
     text-align: center;
     vertical-align: middle;
-    padding: 4px 8px;
+    padding: 4px 6px; /* Reduced horizontal padding from 8px to 6px */
     border: none;
-    border-right: 4px solid #304357; /* Even wider vertical separator with background color */
+    border-right: 2px solid #304357; /* Reduced separator from 4px to 2px */
     background: #1a1a1a; /* Match reels container background */
 }
 
@@ -227,11 +225,11 @@
 }
 
 /* Column widths - optimized for dynamic content with better flexibility */
-.control-table td:nth-child(1) { width: auto; min-width: 50px; max-width: 80px; } /* WIN - flexible width */
-.control-table td:nth-child(2) { width: auto; min-width: 65px; max-width: 100px; } /* COINS - flexible width */
-.control-table td:nth-child(3) { width: auto; min-width: 40px; max-width: 60px; } /* BET - flexible width */
-.control-table td:nth-child(4) { width: auto; min-width: 50px; max-width: 60px; } /* NARROW ARROWS - slightly flexible */
-.control-table td:nth-child(5) { width: auto; min-width: 80px; max-width: 150px; } /* SPIN - more flexible range */
+.control-table td:nth-child(1) { width: auto; min-width: 45px; max-width: 70px; } /* WIN - more compact */
+.control-table td:nth-child(2) { width: auto; min-width: 55px; max-width: 85px; } /* COINS - more compact */
+.control-table td:nth-child(3) { width: auto; min-width: 35px; max-width: 50px; } /* BET - more compact */
+.control-table td:nth-child(4) { width: auto; min-width: 40px; max-width: 50px; } /* NARROW ARROWS - more compact */
+.control-table td:nth-child(5) { width: auto; min-width: 60px; max-width: 120px; } /* SPIN - more compact range */
 
 .spin-cell {
     vertical-align: middle;
@@ -620,9 +618,8 @@
     padding: 20px; /* Same padding */
     border-radius: 10px; /* Same border radius */
     border: 2px solid #333; /* Same border */
-    width: fit-content; /* Same width behavior */
-    min-width: 534px; /* Same minimum width */
-    max-width: 100%; /* Same max width */
+    width: 100%; /* Same width behavior - now fully responsive */
+    max-width: 534px; /* Same max width */
     margin: 2px auto; /* Same margin */
     box-sizing: border-box; /* Same box sizing */
     position: relative; /* Same position */
@@ -795,6 +792,39 @@
     .control-table td:nth-child(3) { min-width: 35px; }
     .control-table td:nth-child(4) { width: 50px; max-width: 50px; }
     .control-table td:nth-child(5) { max-width: 100px; }
+}
+
+@media (max-width: 360px) {
+    .control-panel {
+        height: 62px;
+        padding: 5px;
+    }
+    
+    .control-table td {
+        padding: 1px 3px;
+    }
+    
+    .control-label {
+        font-size: 0.62rem;
+    }
+    
+    .control-value {
+        font-size: 1.05rem;
+        min-height: 40px;
+    }
+    
+    .spin-button {
+        height: 40px;
+        font-size: 0.85rem;
+        min-width: 65px;
+        padding: 0 6px;
+    }
+    
+    .bet-btn-inline {
+        width: 22px;
+        height: 17px;
+        font-size: 0.48rem;
+    }
 }
 
 @media (max-width: 320px) {

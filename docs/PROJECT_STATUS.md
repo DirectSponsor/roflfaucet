@@ -1,127 +1,151 @@
-# ROFLFaucet Project Status
+# ROFLFaucet Project Status - July 20, 2025
 
-## Current State (July 15, 2025)
+## Project Overview
 
-### Template System ✅ COMPLETE
-- **Linear include system working perfectly**
-- Build script `build.sh` processes all HTML files with include tags
-- Template structure: `templates/basic-page.tmpl` updated with correct format
-- All main pages now have proper meta placeholders restored
+### 🚀 Ad Rotation System Plan
 
-### File Structure ✅ REORGANIZED
+Below is a plan for integrating an ad rotation system using your simplified line-based approach:
+
+- **Ad Text Files**: Organize ads by importance for the page layout.
+  - `high_importance_ads.txt` - Important slots (e.g., header)
+  - `medium_importance_ads.txt` - Medium slots (e.g., sidebar)
+  - `low_importance_ads.txt` - Less important slots (e.g., footer)
+
+- **Ranking System**:
+  - **Importance:** Determines ad slot placement (1-100)
+  - **Frequency:** How often ads rotate in the slot (1-100)
+
+- **Example Entry**:
 ```
-/includes/           - Shared HTML components
-  ├── doctype-head.html
-  ├── header.html
-  ├── sidebar-left.html
-  ├── sidebar-right.html
-  └── footer.html
-
-/templates/          - Page templates
-  └── basic-page.tmpl - Master template for new pages
-
-/docs/               - All project documentation (moved from root)
-/archived-pages/     - Old versions and unused files
-/backups/            - Build script backups (*.html.bak)
-
-/*.html              - Main pages (built from includes)
-/*.js, *.css, *.php  - Active project files only
+<a href="https://advertiser.com"><img src="https://banner.jpg" alt="Ad"></a>
 ```
 
-### Pages Status
-- `index.html` ✅ - Main faucet page with proper meta placeholders
-- `about.html` ✅ - About page with proper meta placeholders  
-- `illusions.html` ✅ - Illusions gallery page with proper meta placeholders
-- `progress.html` ✅ - Development progress page with proper meta placeholders
-- `slots.html` ✅ - Desktop slots page with proper meta placeholders
-- `slots-mobile.html` ✅ - Mobile slots page with proper meta placeholders
+- **JavaScript Configuration**:
 
-### Build System ✅ UPDATED
-- `./build.sh` - Builds all HTML files with includes
-- `./build.sh filename.html` - Builds specific file only
-- Creates automatic backups in `/backups/` folder
-- Sets proper web server permissions (644)
-- **NEW**: Backup files now organized in dedicated folder
-
-### Meta Placeholder System ✅ WORKING
-All pages now have proper SEO meta placeholders:
-```html
-<!-- #TITLE#="Page Title" -->
-<!-- #DESC#="Page Description" -->
-<!-- #KEYWORDS#="keywords, separated, by, commas" -->
+```javascript
+this.adSlots = {
+  header: {
+      file: 'high_importance_ads.txt',
+      importance: 80-100,
+      frequency: 'every 30 seconds'
+  },
+  sidebar: {
+      file: 'medium_importance_ads.txt', 
+      importance: 40-79,
+      frequency: 'every 60 seconds'
+  },
+  footer: {
+      file: 'low_importance_ads.txt',
+      importance: 1-39, 
+      frequency: 'every 120 seconds'
+  }
+};
 ```
 
-## Current Development Focus
+- **Benefits**:
+  - Flexible and easy management
+  - Gradually scale up by adding more text files
+  - Update ads by editing text files like images
 
-### 🎉 MAJOR BREAKTHROUGH: Unified Balance System (COMPLETE)
-- **Achievement**: Created single balance system working for both guests and members
-- **Impact**: Eliminated complex dual balance architecture
-- **Implementation**: `unified-balance.js` with same functions for all user types
-- **Status**: ✅ Complete and deployed to all pages
-- **Documentation**: `docs/UNIFIED_BALANCE_BREAKTHROUGH_2025-07-15.md`
-- **Next**: Migrate existing games to use unified system
+This plan ensures straightforward ad management and gradual scalability without complexity.
+A responsive web-based slot machine game ("ROFLFaucet") with integrated advertising system and cryptocurrency faucet functionality.
 
-### 🎯 Member/Guest Experience Implementation (IN PROGRESS)
-- **Goal**: Separate experiences for logged-in members vs guests
-- **Approach**: Use existing placeholder system for dynamic CSS/JS inclusion
-- **Status**: Plan documented in `docs/MEMBER_GUEST_EXPERIENCE_PLAN.md`
-- **Priority**: Medium - UI differentiation (core balance system now unified)
+## Current State Summary
+- **Platform**: Linux Mint development environment
+- **Location**: `/home/andy/Documents/websites/Warp/projects/rofl/roflfaucet/`
+- **Deployment**: DDNS at `satoshihost.ddns.net`
+- **Local Storage**: Browser persistence working for user balances
 
-### 📱 Mobile/Desktop Optimization (PLANNED)
-- **Goal**: Responsive design with device-specific enhancements
-- **Approach**: CSS media queries + mobile-specific JavaScript
-- **Status**: Architecture planned, ready for implementation
-- **Priority**: Medium - user experience improvement
+## Recent Development Progress
 
-### 🐛 Footer Positioning Bug
-- **Issue**: Footer appearing at top of page on mobile version
-- **Status**: Still occurring on mobile slots page
-- **Priority**: High - affects user experience
+### 1. Responsive Design Improvements ✅
+- **Reel Sizing**: Adjusted from 150px → 110px (desktop) → 60px min (mobile)
+- **Container Optimization**: Used `width: fit-content` to eliminate wasted background space
+- **Mobile Navigation**: Added hamburger menu with overlay for screens <768px
+- **Viewport Optimization**: Multiple breakpoints (320px-1200px+) for various devices
 
-### 🎯 Header Accessibility Improvements (In Progress)
-- **Issue**: Header collapse functionality not needed
-- **Goal**: Remove header collapse, make header narrower
-- **Priority**: Medium - accessibility improvement
-- **Status**: Being addressed tonight
+### 2. Header & UI Compactness ✅
+- **Mobile Space Saving**:
+  - Hidden emojis (🎰, 🤣) on mobile screens
+  - Removed "Play slots and win coins" description
+  - Converted "ROFLFaucet" to lowercase for width reduction
+- **Navigation**: Hamburger menu implementation with proper show/hide logic
 
-## Recent Achievements
-1. ✅ Fixed template system with proper include structure
-2. ✅ Restored meta placeholders to all pages
-3. ✅ Created working master template
-4. ✅ Built argument support for build script
-5. ✅ Organized project with backup files
-6. ✅ **July 15, 2025: Complete directory reorganization**
-   - Moved all documentation from root to `/docs/` folder
-   - Archived old/unused files to `/archived-pages/` folder
-   - Created dedicated `/backups/` folder for build script backups
-   - Updated build script to use new backup location
-   - Root directory now contains only active project files
-7. ✅ **🎉 MAJOR BREAKTHROUGH: Unified Balance System (July 15, 2025)**
-   - Created single balance system (`unified-balance.js`) for both guests and members
-   - Same interface: `addBalance()`, `subtractBalance()`, `getBalance()` for all users
-   - Automatic terminology switching (Tokens/Coins based on login status)
-   - Transaction-based design with localStorage for guests, API for members
-   - Available on all pages through header include
-   - Eliminates complex dual balance architecture
-   - Ready for 6+ games integration with same functions
+### 3. Sidebar & Layout Balance ✅
+- **Sidebar Width**: Increased from 22% to 25% (matches 300px ad standard)
+- **Measurement Tools**: Installed `gruler` pixel ruler for precise layout work
+- **Responsive Testing**: Verified on iPhone SE (320px) and other common viewports
 
-## Next Steps
-1. 🔧 Fix footer positioning bug on mobile
-2. 🔧 Complete header accessibility improvements
-3. 🎨 Review overall mobile responsiveness
-4. 📱 Test all pages on mobile devices
-5. 🚀 Ready for SEO optimization
+### 4. Control Panel Optimization ✅
+- **Compact Design**: Reduced padding, borders, and column widths for mobile
+- **Progressive Scaling**: Multiple responsive breakpoints for graceful degradation
 
-## Technical Notes
-- Template system uses linear single-pass processing
-- Include syntax: `<!-- include start filename.html -->` / `<!-- include end filename.html -->`
-- Unique content goes between `<!-- UNIQUE PAGE CONTENT GOES HERE -->` markers
-- Build system automatically processes all .html files with include tags
-- All shared layout handled by includes, pages contain only unique content
+## Current Technical Issues
 
-## Development Philosophy
-- **Accessibility First**: Minimal scrolling, maximum usability
-- **Clean Structure**: Separation of content and layout
-- **Maintainable**: Easy to update shared components
-- **Fast Loading**: Lightweight, static architecture
-- **SEO Ready**: Proper meta tags and structure
+### 1. Image Loading Problem 🔴
+- **Issue**: Test image loads locally but not on DDNS deployment
+- **URL**: `http://satoshihost.ddns.net/home/andy/Documents/websites/-%20archived_sites/directsponsor/directsponsor.net/bloukrans.directsponsor.net/static/wp-content/uploads/2016/04/IMG_1293-300x224.jpg`
+- **Suspected Cause**: Path outside domain scope or server configuration
+- **Next Steps**: Need proper image hosting solution
+
+### 2. Advertising System Setup 🔶
+- **Status**: Ready to implement with proper image sources
+- **Plan**: Create free image site playlists for ad content
+- **Integration**: Sidebar ad system (300px width standard)
+
+## Immediate Next Steps
+
+### A. Image & Ad System (Priority 1)
+1. **Set up proper image hosting** for ad content
+2. **Create image playlists** from free sources
+3. **Test ad loading** in sidebar system
+4. **Implement rotating/dynamic ads**
+
+### B. Animation Integration (Priority 2)
+1. **Laughing animations**: Integrate animal/cartoon character animations
+2. **Dynamic embedding**: Different animation each time
+3. **Performance optimization**: Ensure smooth playback
+
+### C. Deployment & Testing (Priority 3)
+1. **Resolve DDNS image paths**
+2. **Cross-browser testing**
+3. **Performance optimization**
+4. **Mobile device testing**
+
+## Key Files & Structure
+```
+roflfaucet/
+├── index.html          # Main slot machine page
+├── slots/
+│   ├── slots.js        # Game logic & responsive calculations
+│   ├── slots.css       # Responsive styles & layout
+│   └── [other assets]
+├── login/              # Authentication system
+├── register/           # User registration
+└── [other directories]
+```
+
+## Development Environment
+- **OS**: Linux Mint
+- **Tools**: gruler (pixel ruler), Firefox Responsive Mode
+- **Testing**: iPhone SE (320px), various viewport sizes
+- **Storage**: localStorage for user balance persistence
+
+## Technical Achievements
+- ✅ Fully responsive design (320px → 1920px+)
+- ✅ Mobile-first navigation with hamburger menu
+- ✅ Optimal sidebar proportions (25% width)
+- ✅ Compact control panel for narrow screens
+- ✅ Cross-device compatibility testing
+- ✅ Pixel-perfect layout measurements
+
+## Known Working Features
+- Slot machine gameplay mechanics
+- User balance persistence (localStorage)
+- Responsive reel sizing
+- Mobile navigation overlay
+- Sidebar layout system
+- Multi-breakpoint CSS responsiveness
+
+---
+*Last Updated: July 20, 2025 - Ready to resume with image hosting and ad system implementation*

@@ -1,5 +1,5 @@
-<!-- Shared Slot Machine Component -->
 <div class="slot-machine" id="slot-machine">
+
     <!-- Front Side - Game -->
     <div class="machine-front">
         <div class="slot-machine-container">
@@ -23,8 +23,8 @@
                             <span class="control-value" id="last-win">0</span>
                         </td>
                         <td class="control-cell">
-                            <span class="control-label">COINS</span><br>
-                            <span class="control-value" id="current-balance">0</span>
+                            <span class="control-label currency-upper">COINS</span><br>
+                            <span class="control-value balance" id="current-balance">100</span>
                         </td>
                         <td class="control-cell bet-cell">
                             <span class="control-label">BET</span><br>
@@ -46,10 +46,10 @@
             <!-- Action Buttons Row -->
             <div class="action-buttons">
                 <button class="flip-button" onclick="flipMachine()" id="flip-btn">
-                    📊 PAYOUTS
+                    Payouts
                 </button>
-                <button class="claim-button" onclick="claimWinnings()" id="claim-btn" disabled>
-                    Claim Faucet
+                <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                    <span class="btn-text">Faucet: 300</span>
                 </button>
             </div>
         </div>
@@ -93,14 +93,6 @@
                             <td class="prize-combo">💎💎💎</td>
                             <td class="prize-payout">1000</td>
                         </tr>
-                        <tr data-symbol="fruit_combo">
-                            <td class="prize-combo">🍉🍌🍒</td>
-                            <td class="prize-payout">400</td>
-                        </tr>
-                        <tr data-symbol="blanks">
-                            <td class="prize-combo">⬜⬜⬜</td>
-                            <td class="prize-payout">10</td>
-                        </tr>
                         <tr data-symbol="two_diamonds">
                             <td class="prize-combo">💎💎⬜</td>
                             <td class="prize-payout">25</td>
@@ -109,27 +101,46 @@
                 </table>
             </div>
             
-            <!-- Back Control Panel -->
+            <!-- Back Control Panel - Same as front but with disabled SPIN -->
             <div class="control-panel">
-                <div class="control-item">
-                    <span class="control-label">TOTAL PRIZES</span>
-                    <span class="control-value">6</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-label">MAX WIN</span>
-                    <span class="control-value">1000</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-label">MIN BET</span>
-                    <span class="control-value">1</span>
-                </div>
-                <div class="control-item">
-                    <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
-                        🎰 PRIZES
-                    </button>
-                </div>
+                <table class="control-table">
+                    <tr class="control-row">
+                        <td class="control-cell">
+                            <span class="control-label">WIN</span><br>
+                            <span class="control-value" id="last-win-back">0</span>
+                        </td>
+                        <td class="control-cell">
+                            <span class="control-label currency-upper">COINS</span><br>
+                            <span class="control-value balance" id="current-balance-back">100</span>
+                        </td>
+                        <td class="control-cell bet-cell">
+                            <span class="control-label">BET</span><br>
+                            <span class="control-value" id="current-bet-back">1</span>
+                        </td>
+                        <td class="control-cell narrow-arrow-cell">
+                            <button class="bet-btn-inline" onclick="increaseBet()" disabled>▲</button><br>
+                            <button class="bet-btn-inline" onclick="decreaseBet()" disabled>▼</button>
+                        </td>
+                        <td class="control-cell spin-cell">
+                            <button class="spin-button" disabled>
+                                SPIN
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Back Action Buttons Row -->
+            <div class="action-buttons">
+                <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
+                    Slots
+                </button>
+                <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                    <span class="btn-text">Faucet: 300</span>
+                </button>
             </div>
         </div>
     </div>
     
 </div>
+

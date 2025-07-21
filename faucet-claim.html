@@ -1,9 +1,9 @@
-<!-- ℹ️ About ROFLFaucet Page -->
-<!-- TITLE=_About ROFLFaucet_ -->
-<!-- DESC=_Learn about our mission, technology, and the ecosystem we're building_ -->
-<!-- KEYWORDS=_about, mission, crypto, charity, ecosystem_ -->
-<!-- STYLES=_ _ -->
-<!-- SCRIPTS=_ _ -->
+<!-- 🚰 ROFLFaucet Claim Page (Step 2) -->
+<!-- TITLE=_ROFLFaucet - Claim Your Coins_ -->
+<!-- DESC=_Complete the captcha to claim your free UselessCoins_ -->
+<!-- KEYWORDS=_crypto faucet, free tokens, cryptocurrency, uselesscoins, claim_ -->
+<!-- STYLES=_guest-base.css, member-base.css_ -->
+<!-- SCRIPTS=_scripts/core/faucet-bridge.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -11,15 +11,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About ROFLFaucet</title>
+    <title>ROFLFaucet - Claim Your Coins</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="Learn about our mission, technology, and the ecosystem we're building">
+    <meta name="description" content="Complete the captcha to claim your free UselessCoins">
     
     <!-- Base Layout CSS -->
     <link rel="stylesheet" href="styles.css">
     
     <!-- Additional page-specific styles -->
-    
+        <link rel="stylesheet" href="guest-base.css">
+    <link rel="stylesheet" href="member-base.css">
+
     
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
@@ -63,28 +65,25 @@
 <!-- include end left-sidebar.html -->
 
         <main class="main-content">
-<!-- About Page Content -->
-                <h1>ℹ️ About ROFLFaucet</h1>
-                <p class="padded">Learn about our mission, technology, and the ecosystem we're building</p>
-                
-                <div class="padded">
-                    <h2>🎯 Our Mission</h2>
-                    <p>ROFLFaucet is more than just a cryptocurrency faucet - we're building an ecosystem that combines free crypto earning with meaningful charitable impact.</p>
-                    
-                    <h2 id="guest-vs-member">🔑 Guest vs. Member</h2>
-                    <p>ROFLFaucet offers two experiences:</p>
-                    <ul>
-                        <li><strong>🎮 Guest Access</strong> - Claim Pointless Tokens, play games, no registration required</li>
-                        <li><strong>👑 Member Benefits</strong> - Win real UselessCoins, level-ups, leaderboard, VIP memberships</li>
-                    </ul>
-                    
-                    <h2>🌐 The DirectSponsor Network</h2>
-                    <p>ROFLFaucet is part of the larger DirectSponsor ecosystem including ClickForCharity.net and DirectSponsor.net</p>
-                    
-                    <h2>📞 Contact & Support</h2>
-                    <p>Email us at: <a href="mailto:support@roflfaucet.com">support@roflfaucet.com</a></p>
+<!-- Unique content for Step 2: Faucet Claim -->
+            <div class="content-container">
+                <div id="faucet-step" class="faucet-step">
+                    <div class="content-header">
+                        <h1>🎲 Claim Your Reward</h1>
+                        <p>Complete the captcha to claim your <span id="claim-amount">10</span> <span class="currency"></span></p>
+                    </div>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div class="h-captcha" data-sitekey="a01ce33e-fce6-44ee-b2d4-2dee7014ed3c"></div>
+                    </div>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <button id="final-claim-btn" class="claim-button" style="display: inline-block;">🎲 Claim <span id="claim-btn-amount">10</span> <span class="currency"></span></button>
+                    </div>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="index.html" class="nav-button">← Back to Start</a>
+                    </div>
                 </div>
-<!-- END About Page Content -->
+            </div>
+            <!-- End unique content for Step 2 -->
         </main>
 
 <!-- include start right-sidebar.html -->
@@ -100,7 +99,8 @@
     </div>
     
     <!-- Additional page-specific scripts -->
-    
+        <script src="scripts/core/faucet-bridge.js"></script>
+
 </body>
 </html>
 <!-- include end footer.html -->
