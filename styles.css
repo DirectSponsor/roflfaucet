@@ -49,7 +49,7 @@ body {
     z-index: 100;
     box-shadow: 0 4px 20px rgba(74, 144, 226, 0.1);
     transition: all 0.3s ease;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5em;
 }
 
 .header-content {
@@ -186,7 +186,8 @@ body {
 /* Main container - horizontal flexbox */
 .container {
     display: flex;
-    height: 100vh;
+    min-height: calc(100vh - 60px); /* Account for header height */
+    align-items: flex-start;
 }
 
 .left-sidebar, 
@@ -217,7 +218,7 @@ body {
     /* This fixes flexbox issue where child element margins get absorbed */
     margin-left: 0.5em;
     margin-right: 0.5em;
-    padding: 0.5em; /* Add padding to match sidebars */
+    padding: 0; /* Remove padding for perfect image alignment */
     box-sizing: border-box;
 }
 
@@ -477,8 +478,8 @@ body {
 .content-container {
     background: var(--bg-primary);
     border-radius: var(--border-radius);
-    padding: 2rem;
-    margin: 1rem;
+    padding: 0; /* No padding for perfect image alignment */
+    margin: 0.5rem;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
 }
@@ -507,4 +508,52 @@ body {
     font-weight: bold;
     color: var(--secondary-color);
     font-family: var(--font-mono);
+}
+
+/* =========================
+   GALLERY IMAGE SIZING
+   ========================= */
+
+/* Base gallery image styling */
+.gallery-postimg,
+.gallery-vgy,
+.gallery-giphy {
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* PostImg gallery - used in main content areas (faucet result page) */
+.gallery-postimg {
+    max-width: 450px;
+    width: 100%;
+}
+
+/* VGY gallery - used in main content areas (index page) */
+.gallery-vgy {
+    max-width: 450px;
+    width: 100%;
+}
+
+/* GIPHY gallery - used in sidebars (smaller for space constraints) */
+.gallery-giphy {
+    max-width: 100%;
+    width: auto;
+}
+
+/* Responsive: Scale down main gallery images on smaller screens */
+@media (max-width: 768px) {
+    .gallery-postimg,
+    .gallery-vgy {
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-postimg,
+    .gallery-vgy {
+        max-width: 250px;
+    }
 }

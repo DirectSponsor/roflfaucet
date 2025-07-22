@@ -26,6 +26,7 @@
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
 </head>
 <body>
     <!-- Header Navigation -->

@@ -26,7 +26,7 @@
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
-    <script src="scripts/core/gallery-system.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -65,55 +65,25 @@
 <!-- include end left-sidebar.html -->
 
         <main class="main-content">
-            <!-- JWT Message -->
-            <div id="message" class="message"></div>
-            
-            <!-- Streamlined Faucet Content -->
-            <div id="welcome-step" class="faucet-step">
-                <p id="welcome-subtitle" style="margin: 10px 0;">Claim some <span class="currency-full"></span></p>
+            <!-- Faucet Page Content -->
+            <div class="content-container">
+                <!-- Gallery Image Container (auto-populated by gallery script) -->
+                <div id="gallery-image" class="gallery-display" data-gallery="vgy" style="text-align: center; margin-bottom: 20px;"></div>
                 
-                <!-- Balance Display -->
-                <p class="stats-paragraph" style="margin: 15px 0;">
-                    <span class="stats-number balance" id="balance">0</span>
-                    <span class="stats-label currency-full"></span>
-                </p>
-                
-                <!-- User Info -->
-                <div id="user-info">
-                    <!-- Login Notice (shown when not logged in) -->
-                    <p id="login-notice" class="info" style="margin: 15px 0;">
-                        <strong>🎮 Demo Mode</strong><br>
-                        You can claim Pointless Tokens and play games without logging in, but you need to log in for the <a href="about.html#guest-vs-member">full experience</a>!
-                    </p>
+                <div style="text-align: center;">
+                    <h3>💰 Balance: <span class="stats-number balance" id="balance">0</span> <span class="currency-full">tokens</span></h3>
                     
-                    <!-- Welcome Message (shown when logged in) -->
-                    <div id="welcome-message" class="highlight-box" style="margin: 15px 0; display: none;">
-                        <strong>🎉 Welcome, <span id="username">User</span>!</strong><br>
-                        You can claim coins every 5 minutes.
+                    <div style="margin: 20px 0;">
+                        <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                            <span class="btn-text">Faucet: 300</span>
+                        </button>
                     </div>
-                </div>
-                
-                <!-- Static Landscape Banner -->
-                <div style="text-align: center; margin: 20px 0;">
-                    <img src="https://via.placeholder.com/600x200/4A90E2/FFFFFF?text=ROFLFaucet+Banner" 
-                         alt="ROFLFaucet Banner" 
-                         style="max-width: 100%; width: auto; height: auto; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                </div>
-                
-                <!-- Faucet Countdown Button -->
-                <div style="text-align: center; margin: 20px 0;">
-                        <!-- include start faucet-countdown-button.html -->
-<!-- Faucet Countdown Button Include -->
-<!-- Usage: Just include this file where you want the faucet countdown button -->
-<!-- CSS and JavaScript are loaded globally via styles.css and scripts/core/site-utils.js -->
-
-<button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
-    <span class="btn-text">Faucet: 300</span>
-</button>
-                        <!-- include end faucet-countdown-button.html -->
-                    </div>
+                    
+                    <p style="margin: 10px 0; font-size: 0.9em;">Demo Mode: <a href="about.html#guest-vs-member">Login for full experience</a></p>
                 </div>
             </div>
+            
+            <!-- END Faucet Page Content -->
         </main>
 
 <!-- include start right-sidebar.html -->

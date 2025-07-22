@@ -3,7 +3,7 @@
 <!-- DESC=_Congratulations! You claimed UselessCoins successfully._ -->
 <!-- KEYWORDS=_crypto faucet, claim successful, cryptocurrency, uselesscoins, reward_ -->
 <!-- STYLES=_guest-base.css, member-base.css_ -->
-<!-- SCRIPTS=_scripts/core/faucet-bridge.js, scripts/gallery-postimg-RJrzGL1.js_ -->
+<!-- SCRIPTS=_scripts/core/faucet-bridge.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -26,6 +26,7 @@
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -64,31 +65,26 @@
 <!-- include end left-sidebar.html -->
 
         <main class="main-content">
-<!-- Unique content for Step 3: Claim Success -->
-            <div class="content-container">
-                <div id="result-step" class="faucet-step">
-                    <div class="content-header">
-                        <h1>🎉 Congratulations!</h1>
+            <!-- Streamlined Claim Success -->
+            <div id="result-step" class="faucet-step">
+                <h1 style="margin: 10px 0; text-align: center;">🎉 Congratulations!</h1>
+                
+                <!-- Result Display with Bigger Image -->
+                <div class="result-display" style="text-align: center; margin: 15px 0; padding: 15px; border-radius: 12px; background: #f9f9f9; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    
+                    <!-- Gallery Image Container (auto-populated by gallery script) -->
+                    <div id="gallery-image" class="gallery-display" data-gallery="postimg" style="margin-bottom: 15px;"></div>
+                    
+                    <!-- Win Amount Text -->
+                    <div class="result-text" style="margin-top: 10px;">
+                        <p style="font-size: 1.2em; font-weight: bold; color: #333; margin: 0;">You have won <span class="result-number" id="won-amount" style="color: #4CAF50; font-size: 1.4em;">10</span> <span class="result-label currency-full" style="color: #4CAF50;"></span>!</p>
                     </div>
                     
-                    <!-- Combined Result Display with Image -->
-                    <div class="result-display" style="text-align: center; margin: 30px 0; padding: 20px; border-radius: 12px; background: #f9f9f9; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                        
-                        <!-- Gallery Image -->
-                        <div class="gallery-display" style="margin-bottom: 20px;">
-                            <img src="#" id="gallery-image" style="max-width: 100%; max-height: 300px; display: block; margin: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                        </div>
-                        
-                        <!-- Win Amount Text -->
-                        <div class="result-text" style="margin-top: 15px;">
-                            <p style="font-size: 1.2em; font-weight: bold; color: #333; margin: 0;">You have won <span class="result-number" id="won-amount" style="color: #4CAF50; font-size: 1.4em;">10</span> <span class="result-label currency-full" style="color: #4CAF50;"></span>!</p>
-                        </div>
-                        
-                    </div>
+                </div>
 
-                    <!-- Next Claim Countdown -->
-                    <div style="text-align: center; margin: 20px 0;">
-                        <p style="margin-bottom: 15px; color: #666;">Next claim available in:</p>
+                <!-- Next Claim Countdown -->
+                <div style="text-align: center; margin: 15px 0;">
+                    <p style="margin-bottom: 10px; color: #666;">Next claim available in:</p>
                         <!-- include start faucet-countdown-button.html -->
 <!-- Faucet Countdown Button Include -->
 <!-- Usage: Just include this file where you want the faucet countdown button -->
@@ -101,14 +97,12 @@
                     </div>
                     
                     <!-- Action Buttons -->
-                    <div style="text-align: center; margin: 30px 0;">
+                    <div style="text-align: center; margin: 20px 0;">
                         <a href="index.html" class="nav-button">← Back to Faucet</a>
                         <a href="slots.html" class="nav-button">🎰 Try Slots</a>
                         <a href="illusions.html" class="nav-button">🌀 View Illusions</a>
                     </div>
                 </div>
-            </div>
-            <!-- End unique content for Step 3 -->
         </main>
 
 <!-- include start right-sidebar.html -->
@@ -125,7 +119,6 @@
     
     <!-- Additional page-specific scripts -->
         <script src="scripts/core/faucet-bridge.js"></script>
-    <script src="scripts/gallery-postimg-RJrzGL1.js"></script>
 
 </body>
 </html>

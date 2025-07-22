@@ -3,7 +3,7 @@
 <!-- DESC=_Congratulations! You claimed UselessCoins successfully._ -->
 <!-- KEYWORDS=_crypto faucet, claim successful, cryptocurrency, uselesscoins, reward_ -->
 <!-- STYLES=_guest-base.css, member-base.css_ -->
-<!-- SCRIPTS=_scripts/core/faucet-bridge.js, scripts/gallery-postimg-RJrzGL1.js_ -->
+<!-- SCRIPTS=_scripts/core/faucet-bridge.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -26,7 +26,7 @@
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
-    <script src="scripts/core/gallery-system.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -72,10 +72,8 @@
                 <!-- Result Display with Bigger Image -->
                 <div class="result-display" style="text-align: center; margin: 15px 0; padding: 15px; border-radius: 12px; background: #f9f9f9; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     
-                    <!-- Bigger Gallery Image -->
-                    <div class="gallery-display" style="margin-bottom: 15px;">
-                        <img src="#" id="gallery-image" style="max-width: 300px; width: 100%; height: auto; display: block; margin: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                    </div>
+                    <!-- Gallery Image Container (auto-populated by gallery script) -->
+                    <div id="gallery-image" class="gallery-display" data-gallery="postimg" style="margin-bottom: 15px;"></div>
                     
                     <!-- Win Amount Text -->
                     <div class="result-text" style="margin-top: 10px;">
@@ -110,7 +108,7 @@
 <!-- include start right-sidebar.html -->
         <aside class="right-sidebar">
             <!-- Random Giphy Image Container -->
-            <div id="sidebar-giphy-gallery" class="full-width" style="text-align: center; margin: 0; padding: 0;">
+            <div id="sidebar-giphy-gallery" class="full-width" data-gallery="giphy" style="text-align: center; margin: 0; padding: 0;">
                 <p style="color: #666; font-size: 14px; margin: 10px;">Loading funny GIF...</p>
             </div>
         </aside>

@@ -83,8 +83,7 @@ class GallerySystem {
         console.log('🖼️ Selected random image:', selectedUrl);
         return {
             url: selectedUrl,
-            alt: `Image from ${this.galleries[galleryName]?.name || galleryName}`,
-            id: selectedUrl.split('/').pop()?.split('.')[0] || 'unknown'
+            alt: `Image from ${this.galleries[galleryName]?.name || galleryName}`
         };
     }
     
@@ -103,20 +102,8 @@ class GallerySystem {
         
         let html = '';
         if (linkToOriginal) {
-            // Determine the correct page URL based on image source
-            let pageUrl;
-            if (image.pageUrl) {
-                // Use provided pageUrl (for GIPHY)
-                pageUrl = image.pageUrl;
-            } else if (image.url.includes('postimg.cc')) {
-                // PostImg page URL
-                pageUrl = `https://postimg.cc/${image.id}`;
-            } else {
-                // Fallback to image URL
-                pageUrl = image.url;
-            }
-            
-            html = `<a href="${pageUrl}" target="_blank" style="display: inline-block; text-decoration: none;">${imageElement}</a>`;
+            // Just link to the image URL directly
+            html = `<a href="${image.url}" target="_blank" style="display: inline-block; text-decoration: none;">${imageElement}</a>`;
         } else {
             html = imageElement;
         }
