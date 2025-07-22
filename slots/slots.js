@@ -175,13 +175,19 @@ class CasinoSlotMachine {
     }
     
     calculateResponsiveDimensions() {
-        // Get the container element
-        const container = document.querySelector('.sprite-reels-container');
-        if (!container) return;
-        
-        // Get the actual viewport width for better responsive calculation
+        // Use viewport width directly to avoid circular reference
+        // Any container measurement creates feedback loop since containers expand based on our CSS variables
         const viewportWidth = window.innerWidth;
-        const containerWidth = container.offsetWidth;
+        
+        // Calculate available width based on viewport and layout breakpoints
+        let containerWidth;
+        if (viewportWidth > 950) {
+            // Desktop with sidebars: account for left sidebar (~180px) + right sidebar (~180px) + margins
+            containerWidth = viewportWidth - 360 - 40; // sidebars + margins
+        } else {
+            // Mobile/tablet: sidebars are hidden, use most of viewport
+            containerWidth = viewportWidth - 40; // just margins
+        }
         
         // Use viewport width to determine responsive breakpoints (not container width)
         // This prevents issues when sidebars collapse and container width jumps
@@ -197,8 +203,8 @@ class CasinoSlotMachine {
         }
         
         // Calculate responsive dimensions using actual gap and padding values
-        // Account for gaps (2 × gap) and padding (2 × padding) and borders (2 × 2px)
-        const usedSpace = (2 * gap) + (2 * padding) + (2 * 2); // gaps + padding + borders
+        // Account for gaps (2 × gap) and borders (2 × 2px) // Removed padding consideration
+        const usedSpace = (2 * gap) + (2 * 2); // gaps + borders (no padding considered)
         const availableWidth = containerWidth - usedSpace;
         
         // Calculate reel width (3 reels fit in available space)
