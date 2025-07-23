@@ -57,8 +57,8 @@ class CasinoSlotMachine {
             'three_bar': 75,          // 3 bars
             'three_watermelon': 8,    // 3 watermelons
             'three_seven': 35,        // 3 sevens
-            'any_fruit': 5,           // Any 3 different fruits (mixed)
-            'melon_banana_combo': 15, // Special positional combination
+            'any_fruit': 4,           // Any 3 different fruits (mixed) - good profit
+            'bar_bigwin_combo': 15,   // Bar or Bigwin in first 2 reels, any in third
             
             // Hidden bonus (not shown in visual table)
             'three_blanks': 2         // All in-between stops (bonus)
@@ -106,10 +106,16 @@ class CasinoSlotMachine {
             19: 'blank'         // Between symbols
         };
         
-        // Simple virtual reel list - just position numbers
-        this.virtualReelList = [
+        // =======================================
+        // SEPARATE VIRTUAL REEL LISTS (43 entries each)
+        // =======================================
+        // Each reel has its own distribution for fine-tuned odds control
+        // This allows asymmetric adjustments without adding more symbols
+        //
+        // REEL 1: Reduced watermelon, added seven (better seven starts)
+        this.virtualReelList1 = [
             // High frequency positions (common symbols)
-            0, 0, 0, 0,        // Watermelon (position 0) - 4 entries
+            0, 0, 0,           // Watermelon (position 0) - 3 entries (was 4)
             2, 2, 2, 2, 2,     // Banana (position 2) - 5 entries  
             4, 4, 4, 4,        // Cherries (position 4) - 4 entries
             12, 12, 12,        // Watermelon (position 12) - 3 entries
@@ -117,7 +123,7 @@ class CasinoSlotMachine {
             16, 16,            // Cherries (position 16) - 2 entries
             
             // Medium frequency positions
-            6, 6,              // Seven (position 6) - 2 entries
+            6, 6, 6,           // Seven (position 6) - 3 entries (was 2, +1)
             18,                // Seven (position 18) - 1 entry
             8,                 // Bar (position 8) - 1 entry
             
@@ -127,6 +133,53 @@ class CasinoSlotMachine {
             // Blank positions (in-between stops)
             1, 3, 5, 7, 9, 11  // Various blank positions - 6 entries
         ];
+        
+        // REEL 2: Reduced banana, added bar (better bar in middle)
+        this.virtualReelList2 = [
+            // High frequency positions (common symbols)
+            0, 0, 0, 0,        // Watermelon (position 0) - 4 entries
+            2, 2, 2, 2,        // Banana (position 2) - 4 entries (was 5, -1)
+            4, 4, 4, 4,        // Cherries (position 4) - 4 entries
+            12, 12, 12,        // Watermelon (position 12) - 3 entries
+            14, 14, 14,        // Banana (position 14) - 3 entries
+            16, 16,            // Cherries (position 16) - 2 entries
+            
+            // Medium frequency positions
+            6, 6,              // Seven (position 6) - 2 entries
+            18,                // Seven (position 18) - 1 entry
+            8, 8,              // Bar (position 8) - 2 entries (was 1, +1)
+            
+            // Low frequency positions  
+            10, 10,            // BigWin (position 10) - 2 entries
+            
+            // Blank positions (in-between stops)
+            1, 3, 5, 7, 9, 11  // Various blank positions - 6 entries
+        ];
+        
+        // REEL 3: Reduced cherries, added seven (better seven finishes)
+        this.virtualReelList3 = [
+            // High frequency positions (common symbols)
+            0, 0, 0, 0,        // Watermelon (position 0) - 4 entries
+            2, 2, 2, 2, 2,     // Banana (position 2) - 5 entries  
+            4, 4, 4,           // Cherries (position 4) - 3 entries (was 4, -1)
+            12, 12, 12,        // Watermelon (position 12) - 3 entries
+            14, 14, 14,        // Banana (position 14) - 3 entries
+            16, 16,            // Cherries (position 16) - 2 entries
+            
+            // Medium frequency positions
+            6, 6,              // Seven (position 6) - 2 entries
+            18, 18,            // Seven (position 18) - 2 entries (was 1, +1)
+            8,                 // Bar (position 8) - 1 entry
+            
+            // Low frequency positions  
+            10, 10,            // BigWin (position 10) - 2 entries
+            
+            // Blank positions (in-between stops)
+            1, 3, 5, 7, 9, 11  // Various blank positions - 6 entries
+        ];
+        
+        // Combined lists for easy reference
+        this.virtualReelLists = [this.virtualReelList1, this.virtualReelList2, this.virtualReelList3];
         
 
         // Setup event listeners
@@ -571,13 +624,14 @@ class CasinoSlotMachine {
         
         // Pre-calculate outcomes for all reels
         const outcomes = [];
-        console.log('Virtual reel list size:', this.virtualReelList.length);
+        console.log('Virtual reel list sizes:', this.virtualReelLists.map(list => list.length));
         console.log('Current positions before:', this.currentPositions);
         
         for (let i = 0; i < 3; i++) {
-            // Pick from virtual reel list - now contains just position numbers
-            const randomIndex = Math.floor(Math.random() * this.virtualReelList.length);
-            const position = this.virtualReelList[randomIndex];
+            // Pick from the appropriate virtual reel list for this reel
+            const currentList = this.virtualReelLists[i];
+            const randomIndex = Math.floor(Math.random() * currentList.length);
+            const position = currentList[randomIndex];
             
             // Look up what symbol is at this position
             const symbol = this.positionMap[position];
@@ -736,13 +790,13 @@ class CasinoSlotMachine {
         }
         
         // Check for specific combo patterns (positional requirements)
-        // Melon-Banana combo: (melon OR banana) in reel 1, (cherries OR seven) in reel 2, (bar OR bigwin) in reel 3
-        const reel1MelonBanana = (symbols[0] === 'watermelon' || symbols[0] === 'banana');
-        const reel2CherriesSeven = (symbols[1] === 'cherries' || symbols[1] === 'seven');
-        const reel3BarBigwin = (symbols[2] === 'bar' || symbols[2] === 'bigwin');
+        // Bar-Bigwin combo: (bar OR bigwin) in reel 1, (bar OR bigwin) in reel 2, any symbol in reel 3
+        const reel1BarBigwin = (symbols[0] === 'bar' || symbols[0] === 'bigwin');
+        const reel2BarBigwin = (symbols[1] === 'bar' || symbols[1] === 'bigwin');
+        // Reel 3 can be any symbol (wildcard)
         
-        if (reel1MelonBanana && reel2CherriesSeven && reel3BarBigwin) {
-            return { type: 'melon_banana_combo', payout: this.payoutTable.melon_banana_combo };
+        if (reel1BarBigwin && reel2BarBigwin) {
+            return { type: 'bar_bigwin_combo', payout: this.payoutTable.bar_bigwin_combo };
         }
         
         // Check for "any fruit" combination (any 3 different fruits mixed)
