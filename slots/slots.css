@@ -665,9 +665,34 @@
 }
 
 .prize-table td {
-    padding: 10px 8px;
     text-align: center;
     border: none;
+}
+
+/* Prize Cell - Each winning combination cell */
+.prize-table .prize-cell {
+    padding: 10px;
+    vertical-align: middle;
+    width: 50%; /* Equal width columns */
+}
+
+/* Prize Images Container */
+.prize-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 5px;
+}
+
+/* Prize Symbol Images - All symbols use same styling */
+.prize-symbol {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px;
 }
 
 .prize-image {

@@ -514,33 +514,34 @@ body {
    GALLERY IMAGE SIZING
    ========================= */
 
-/* Base gallery image styling */
-.gallery-postimg,
-.gallery-vgy,
-.gallery-giphy {
-    height: auto;
-    display: block;
-    margin: 0 auto;
+/* =========================
+   GALLERY IMAGE SIZING - By Gallery Type
+   ========================= */
+
+/* VGY Gallery (landscape images) - used on index page */
+[data-gallery="vgy"] img {
+    max-height: 350px;
+    max-width: 100%;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* PostImg gallery - used in main content areas (faucet result page) */
-.gallery-postimg {
-    max-width: 450px;
-    width: 100%;
+/* PostImg Gallery (animated GIFs) - used on faucet-result page */
+[data-gallery="postimg"] img {
+    height: 200px;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* VGY gallery - used in main content areas (index page) */
-.gallery-vgy {
-    max-width: 450px;
-    width: 100%;
-}
-
-/* GIPHY gallery - used in sidebars (smaller for space constraints) */
-.gallery-giphy {
+/* Giphy Gallery (sidebar GIFs) - used in sidebars */
+[data-gallery="giphy"] img {
     max-width: 100%;
     width: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 /* Responsive: Scale down main gallery images on smaller screens */

@@ -48,26 +48,20 @@ class CasinoSlotMachine {
         // Game Economy (local storage for testing)
         this.loadGameState();
         
-        // Payout table based on virtual reel list design
+        // Payout table based on visual payout display
         this.payoutTable = {
-            // Special combinations
-            'three_blanks': 2,        // All in-between stops
-            'any_fruit': 5,           // Any 3 matching fruits
-            'three_watermelon': 8,    // 3 watermelons
-            'three_banana': 10,       // 3 bananas  
+            // Main winning combinations (matching visual table)
             'three_cherries': 12,     // 3 cherries
-            'three_combo': 15,        // 3 combo pieces
-            'three_seven': 35,        // 3 sevens
-            'three_bar': 75,          // 3 bars
             'three_bigwin': 400,      // 3 bigwins (jackpot!)
+            'three_banana': 10,       // 3 bananas  
+            'three_bar': 75,          // 3 bars
+            'three_watermelon': 8,    // 3 watermelons
+            'three_seven': 35,        // 3 sevens
+            'any_fruit': 5,           // Any 3 different fruits (mixed)
+            'melon_banana_combo': 15, // Special positional combination
             
-            // Partial matches (2 of 3)
-            'two_watermelon': 2,
-            'two_banana': 3,
-            'two_cherries': 4,
-            'two_seven': 8,
-            'two_bar': 15,
-            'two_bigwin': 50
+            // Hidden bonus (not shown in visual table)
+            'three_blanks': 2         // All in-between stops (bonus)
         };
 
         // Initialize game components
@@ -131,7 +125,7 @@ class CasinoSlotMachine {
             10, 10,            // BigWin (position 10) - 2 entries
             
             // Blank positions (in-between stops)
-            1, 3, 5, 7, 9      // Various blank positions - 5 entries
+            1, 3, 5, 7, 9, 11  // Various blank positions - 6 entries
         ];
         
 
@@ -741,25 +735,24 @@ class CasinoSlotMachine {
             if (symbol === 'bigwin') return { type: 'three_bigwin', payout: this.payoutTable.three_bigwin };
         }
         
-        // Check for "any fruit" combination (any 3 fruits)
+        // Check for specific combo patterns (positional requirements)
+        // Melon-Banana combo: (melon OR banana) in reel 1, (cherries OR seven) in reel 2, (bar OR bigwin) in reel 3
+        const reel1MelonBanana = (symbols[0] === 'watermelon' || symbols[0] === 'banana');
+        const reel2CherriesSeven = (symbols[1] === 'cherries' || symbols[1] === 'seven');
+        const reel3BarBigwin = (symbols[2] === 'bar' || symbols[2] === 'bigwin');
+        
+        if (reel1MelonBanana && reel2CherriesSeven && reel3BarBigwin) {
+            return { type: 'melon_banana_combo', payout: this.payoutTable.melon_banana_combo };
+        }
+        
+        // Check for "any fruit" combination (any 3 different fruits mixed)
         const fruits = ['watermelon', 'banana', 'cherries'];
         const allFruits = symbols.every(symbol => fruits.includes(symbol));
         if (allFruits && symbols.length === 3) {
-            return { type: 'any_fruit', payout: this.payoutTable.any_fruit };
-        }
-        
-        // Check for two of a kind
-        const counts = {};
-        symbols.forEach(symbol => {
-            counts[symbol] = (counts[symbol] || 0) + 1;
-        });
-        
-        for (const [symbol, count] of Object.entries(counts)) {
-            if (count === 2) {
-                const payoutKey = `two_${symbol}`;
-                if (this.payoutTable[payoutKey]) {
-                    return { type: payoutKey, payout: this.payoutTable[payoutKey] };
-                }
+            // Only trigger "any fruit" if it's not already covered by three-of-a-kind above
+            const allSame = symbols[0] === symbols[1] && symbols[1] === symbols[2];
+            if (!allSame) {
+                return { type: 'any_fruit', payout: this.payoutTable.any_fruit };
             }
         }
         
@@ -800,9 +793,11 @@ class CasinoSlotMachine {
         // Update all display elements
         const currentBalanceElement = document.getElementById('current-balance');
         const currentBetElement = document.getElementById('current-bet');
+        const spinCounterElement = document.getElementById('spin-counter');
         
         if (currentBalanceElement) currentBalanceElement.textContent = Math.floor(this.credits);
         if (currentBetElement) currentBetElement.textContent = this.currentBet;
+        if (spinCounterElement) spinCounterElement.textContent = this.totalSpins;
         
         console.log(`💰 Balance: ${this.credits}, Bet: ${this.currentBet}, Spins: ${this.totalSpins}`);
     }

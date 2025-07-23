@@ -31,6 +31,13 @@ Starting point for rebuilding the faucet with a clean layout approach.
 - No unnecessary containers or nesting
 - Clean, readable code for maintenance
 
+## Recent Updates
+
+- Improved gallery image sizing for PostImg GIFs on the faucet-result page.
+- Discovered postimage.cc serves low-quality previews for GIFs despite using direct URLs.
+- Applied CSS to force image height to 200px to improve visibility temporarily.
+- Consider replacing PostImg with a more reliable image hosting service.
+
 ## Next Steps
 
 1. Add real content to the faucet page

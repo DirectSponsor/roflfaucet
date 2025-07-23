@@ -67,15 +67,8 @@ class SimpleGallery {
             return false;
         }
         
-        // Add gallery-specific CSS class to img tag (let CSS handle all sizing)
-        let styledLine = randomLine;
-        if (randomLine.includes('<img')) {
-            const galleryClass = `gallery-${this.currentGallery}`;
-            styledLine = randomLine.replace(
-                /<img([^>]*)>/,
-                `<img$1 class="${galleryClass}"`
-            );
-        }
+        // Directly insert the line as received
+        const styledLine = randomLine;
         
         element.innerHTML = styledLine;
         console.log('🖼️ Line inserted into:', elementId);
