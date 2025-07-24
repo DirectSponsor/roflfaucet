@@ -28,6 +28,10 @@ function updateFaucetCountdownButton() {
     const totalCooldown = 5 * 60 * 1000; // 5 minutes in milliseconds
     const remaining = getRemainingCooldownTime();
     
+    // Calculate progress percentage (how much time has passed)
+    const elapsed = totalCooldown - remaining;
+    const progressPercent = Math.max(0, Math.min(100, (elapsed / totalCooldown) * 100));
+    
     // Update faucet countdown buttons (with .btn-text spans)
     buttons.forEach(buttonId => {
         const btn = document.getElementById(buttonId);
@@ -55,10 +59,6 @@ function updateFaucetCountdownButton() {
             const seconds = Math.ceil(remaining / 1000);
             btnText.textContent = `Faucet: ${seconds}s`;
             
-            // Calculate progress percentage (how much time has passed)
-            const elapsed = totalCooldown - remaining;
-            const progressPercent = (elapsed / totalCooldown) * 100;
-            
             // Update progress bar (green fill from left to right)
             btn.style.setProperty('--progress', `${progressPercent}%`);
             btn.style.background = `linear-gradient(to right, #27ae60 ${progressPercent}%, #95a5a6 ${progressPercent}%)`;
@@ -83,14 +83,31 @@ function updateFaucetCountdownButton() {
             const seconds = Math.ceil(remaining / 1000);
             startClaimBtn.textContent = `⏱️ ${seconds}s`;
             
-            // Calculate progress percentage (how much time has passed)
-            const elapsed = totalCooldown - remaining;
-            const progressPercent = (elapsed / totalCooldown) * 100;
-            
             // Update progress bar (green fill from left to right)
             startClaimBtn.style.background = `linear-gradient(to right, #27ae60 ${progressPercent}%, #95a5a6 ${progressPercent}%)`;
         }
     }
+    
+    // Update faucet progress indicators (slim bars between reels and control panel)
+    const progressIndicators = ['faucet-progress-indicator', 'faucet-progress-indicator-back'];
+    const progressFills = ['faucet-progress-fill', 'faucet-progress-fill-back'];
+    
+    progressIndicators.forEach((indicatorId, index) => {
+        const indicator = document.getElementById(indicatorId);
+        const fill = document.getElementById(progressFills[index]);
+        
+        if (!indicator || !fill) return;
+        
+        if (remaining <= 0) {
+            // Ready to claim - full green with glow animation
+            fill.style.width = '100%';
+            indicator.classList.add('ready');
+        } else {
+            // In cooldown - show progress
+            fill.style.width = `${progressPercent}%`;
+            indicator.classList.remove('ready');
+        }
+    });
 }
 
 function startFaucetCountdown() {

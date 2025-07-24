@@ -35,15 +35,15 @@ class CasinoSlotMachine {
         this.currentBet = 1;
         this.userLevel = 1;
         this.credits = 0;
-        this.unifiedBalance = window.unifiedBalance;
 
-        this.contacts={};
-        this.credentials = {};
-
-        // Statistics
+        // Statistics - enhanced tracking
         this.totalSpins = 0;
         this.totalWagered = 0;
         this.totalWon = 0;
+        this.winCount = 0; // Track number of winning spins
+        
+        // Load existing stats from localStorage
+        this.loadStatsFromStorage();
         
         // Game Economy (local storage for testing)
         this.loadGameState();
@@ -71,8 +71,8 @@ class CasinoSlotMachine {
             document.getElementById('reel-3'),
         ];
         
-        // Responsive dimensions - calculated dynamically
-        this.calculateResponsiveDimensions();
+        // Simple dimensions - read actual CSS-rendered sizes
+        this.updateSpriteDimensions();
         
         // Current background positions for each reel (0-19)
         this.currentPositions = [0, 0, 0];
@@ -194,32 +194,45 @@ class CasinoSlotMachine {
         // Initialize audio system
         this.setupAudio();
         
-        // Listen for window resize to recalculate dimensions
-        window.addEventListener('resize', () => this.calculateResponsiveDimensions());
+        // Listen for window resize to update sprite dimensions
+        window.addEventListener('resize', () => this.updateSpriteDimensions());
         
-        // Listen for media query changes at exact breakpoints used in calculations
-        const mediaQuery900 = window.matchMedia('(max-width: 900px)'); // Right sidebar collapse
-        const mediaQuery650 = window.matchMedia('(max-width: 650px)'); // Left sidebar collapse/stack
-        
-        mediaQuery900.addEventListener('change', () => {
-            console.log('🎰 Right sidebar breakpoint (900px) triggered');
-            // Add small delay to ensure CSS transitions complete
-            setTimeout(() => this.calculateResponsiveDimensions(), 100);
-        });
-        
-        mediaQuery650.addEventListener('change', () => {
-            console.log('🎰 Left sidebar breakpoint (650px) triggered');
-            // Add small delay to ensure CSS transitions complete
-            setTimeout(() => this.calculateResponsiveDimensions(), 100);
-        });
-        
-        // Also recalculate on orientation change (mobile)
+        // Also update on orientation change (mobile)
         window.addEventListener('orientationchange', () => {
-            // Longer delay for orientation change
-            setTimeout(() => this.calculateResponsiveDimensions(), 300);
+            // Short delay for orientation change
+            setTimeout(() => this.updateSpriteDimensions(), 100);
         });
 
+        // Ensure dimensions are updated on initialization
+        this.updateSpriteDimensions();
+        
         console.log('🎰 Casino Slot Machine with Sprite Background initialized!');
+    }
+    
+    updateSpriteDimensions() {
+        // Calculate responsive dimensions first
+        this.calculateResponsiveDimensions();
+        
+        // Apply the calculated dimensions to the reels
+        this.reels.forEach(reel => {
+            reel.style.width = `${this.reelWidth}px`;
+            reel.style.height = `${this.reelHeight}px`;
+            reel.style.backgroundSize = `${this.reelWidth}px ${this.totalSpriteHeight}px`;
+        });
+        
+        // Update CSS custom property for reels container width (for progress indicator)
+        const gap = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--reel-gap')) || 15;
+        const padding = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--container-padding')) || 15;
+        const reelsContainerWidth = (3 * this.reelWidth) + (2 * gap) + (2 * 2) + (2 * padding); // 3 reels + gaps + borders + padding
+        document.documentElement.style.setProperty('--reels-container-width', `${reelsContainerWidth}px`);
+        
+        console.log(`🎰 Sprite dimensions updated:`);
+        console.log(`  Rendered reel width: ${this.reelWidth}px`);
+        console.log(`  Rendered reel height: ${this.reelHeight}px`);
+        console.log(`  Symbol height: ${this.symbolHeight}px`);
+        console.log(`  Total sprite height: ${this.totalSpriteHeight}px`);
+        console.log(`  Position height: ${this.positionHeight}px`);
+        console.log(`  Reels container width: ${reelsContainerWidth}px`);
     }
     
     calculateResponsiveDimensions() {
@@ -486,74 +499,6 @@ class CasinoSlotMachine {
         this.animateCounter(currentBalanceElement, startCredits, endCredits, 800);
     }
     
-    async processBetTransaction(amount) {
-        try {
-            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    type: 'spend',
-                    amount: amount,
-                    source: 'slots_bet',
-                    site_id: 'roflfaucet',
-                    description: `Slot machine bet: ${amount} credits`
-                })
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                this.credits = data.balance.current;
-                console.log('✅ Bet transaction processed:', amount, 'New balance:', this.credits);
-                return true;
-            } else {
-                console.log('⚠️ Bet transaction failed, falling back to demo mode');
-                this.fallbackToDemoMode();
-                return false;
-            }
-        } catch (error) {
-            console.error('💥 Bet transaction error:', error);
-            this.fallbackToDemoMode();
-            return false;
-        }
-    }
-    
-    async processWinTransaction(amount) {
-        try {
-            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    type: 'gaming_win',
-                    amount: amount,
-                    source: 'slots_win',
-                    site_id: 'roflfaucet',
-                    description: `Slot machine win: ${amount} credits`
-                })
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                this.credits = data.balance.current;
-                console.log('✅ Win transaction processed:', amount, 'New balance:', this.credits);
-                return true;
-            } else {
-                console.log('⚠️ Win transaction failed, using local fallback');
-                this.credits += amount;
-                return false;
-            }
-        } catch (error) {
-            console.error('💥 Win transaction error:', error);
-            this.credits += amount;
-            return false;
-        }
-    }
-    
     showDemoCreditsPrompt() {
         const promptText = `🎰 Out of tokens!\n\n` +
                           `💡 Claim free tokens from the faucet to keep playing!\n\n` +
@@ -562,14 +507,6 @@ class CasinoSlotMachine {
         if (confirm(promptText)) {
             window.location.href = 'index.html';
         }
-    }
-    
-    addDemoCredits(amount) {
-        this.credits += amount;
-        this.updateDisplay();
-        console.log(`🎁 Added ${amount} demo credits! New balance: ${this.credits}`);
-        
-        // No nagging - just let them play!
     }
     
     initializeReelPositions() {
@@ -755,14 +692,6 @@ class CasinoSlotMachine {
         this.updateDisplay();
     }
     
-    // This function is no longer needed - using unified balance system
-    
-    // This function is no longer needed - using unified balance system
-    
-    // This function is no longer needed - unified balance system handles fallback
-    
-    // This function is no longer needed - unified balance system handles state saving
-    
     checkWinConditions(outcomes) {
         // Extract final symbols from outcomes
         const symbols = outcomes.map(outcome => {
@@ -843,21 +772,112 @@ class CasinoSlotMachine {
         // Process any winnings
         const totalPayout = this.processWin(winResult, this.currentBet);
         
+        // Track statistics
+        this.trackSpinStats(winResult, totalPayout);
+        
         // Update display with final results
         this.updateDisplay();
         
         console.log(`🎰 Spin complete! Result: ${winResult.type}, Payout: ${totalPayout}`);
     }
     
+    // Statistics tracking methods
+    loadStatsFromStorage() {
+        const slotsStats = JSON.parse(localStorage.getItem('slotsStats') || '{}');
+        this.totalSpins = slotsStats.totalSpins || 0;
+        this.totalWagered = slotsStats.totalWagered || 0;
+        this.totalWon = slotsStats.totalWon || 0;
+        this.winCount = slotsStats.winCount || 0;
+    }
+    
+    saveStatsToStorage() {
+        const slotsStats = {
+            totalSpins: this.totalSpins,
+            totalWagered: this.totalWagered,
+            totalWon: this.totalWon,
+            winCount: this.winCount
+        };
+        localStorage.setItem('slotsStats', JSON.stringify(slotsStats));
+    }
+    
+    trackSpinStats(winResult, totalPayout) {
+        // Track win count
+        if (totalPayout > 0) {
+            this.winCount++;
+        }
+        
+        // INDEPENDENT STATS SYSTEM: Track balance changes separately from unified balance
+        // This creates a complete historical record of slot machine gameplay
+        const balanceHistory = JSON.parse(localStorage.getItem('balanceHistory') || '[]');
+        
+        // Record the current balance AFTER this spin (post bet + post win)
+        // This gives us the actual balance progression through gameplay
+        balanceHistory.push({
+            balance: this.credits,
+            spinNumber: this.totalSpins,
+            bet: this.currentBet,
+            won: totalPayout,
+            netChange: totalPayout - this.currentBet,
+            timestamp: new Date().toISOString(),
+            winType: winResult.type
+        });
+        
+        // Keep extensive history for detailed analysis (no artificial limits)
+        // Storage is cheap, insights are valuable
+        if (balanceHistory.length > 5000) {
+            balanceHistory.splice(0, 1000); // Remove oldest 1000 when we hit 5000
+        }
+        localStorage.setItem('balanceHistory', JSON.stringify(balanceHistory));
+        
+        // Save recent activity
+        const activity = JSON.parse(localStorage.getItem('slotsActivity') || '[]');
+        
+        // Add bet activity
+        activity.push({
+            type: 'bet',
+            amount: this.currentBet,
+            description: `Bet ${this.currentBet} credits`,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Add win activity if applicable
+        if (totalPayout > 0) {
+            activity.push({
+                type: 'win',
+                amount: totalPayout,
+                description: `Won ${totalPayout} credits (${winResult.type})`,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        // Keep only last 50 activities
+        if (activity.length > 50) {
+            activity.splice(0, activity.length - 50);
+        }
+        localStorage.setItem('slotsActivity', JSON.stringify(activity));
+        
+        // Track win breakdown
+        if (totalPayout > 0) {
+            const winBreakdown = JSON.parse(localStorage.getItem('winBreakdown') || '{}');
+            if (!winBreakdown[winResult.type]) {
+                winBreakdown[winResult.type] = { count: 0, totalWon: 0 };
+            }
+            winBreakdown[winResult.type].count++;
+            winBreakdown[winResult.type].totalWon += totalPayout;
+            localStorage.setItem('winBreakdown', JSON.stringify(winBreakdown));
+        }
+        
+        // Save updated stats
+        this.saveStatsToStorage();
+    }
+
     updateDisplay() {
         // Update all display elements
         const currentBalanceElement = document.getElementById('current-balance');
         const currentBetElement = document.getElementById('current-bet');
-        const spinCounterElement = document.getElementById('spin-counter');
         
         if (currentBalanceElement) currentBalanceElement.textContent = Math.floor(this.credits);
         if (currentBetElement) currentBetElement.textContent = this.currentBet;
-        if (spinCounterElement) spinCounterElement.textContent = this.totalSpins;
         
         console.log(`💰 Balance: ${this.credits}, Bet: ${this.currentBet}, Spins: ${this.totalSpins}`);
     }

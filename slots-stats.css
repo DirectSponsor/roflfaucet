@@ -1,0 +1,326 @@
+/* Additional styles for slots statistics page */
+
+/* Stats Grid Layout */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1em;
+    margin-bottom: 2em;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5em;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    font-size: 2em;
+    opacity: 0.8;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: #333;
+    line-height: 1;
+    margin-bottom: 0.2em;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Chart Section */
+.chart-section {
+    margin: 2em 0;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5em;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1em 0;
+    overflow-x: auto;
+}
+
+.chart-controls {
+    margin-top: 1em;
+    padding-top: 1em;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Activity Section */
+.activity-section {
+    margin: 2em 0;
+}
+
+.activity-list {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5em;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8em 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-description {
+    flex: 1;
+}
+
+.activity-amount {
+    font-weight: bold;
+    margin-left: 1em;
+}
+
+.activity-amount.positive {
+    color: #28a745;
+}
+
+.activity-amount.negative {
+    color: #dc3545;
+}
+
+.activity-time {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 1em;
+}
+
+/* Win Statistics */
+.win-stats-section {
+    margin: 2em 0;
+}
+
+.win-breakdown {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5em;
+}
+
+.win-type {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8em 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.win-type:last-child {
+    border-bottom: none;
+}
+
+.win-type-name {
+    flex: 1;
+}
+
+.win-type-count {
+    margin-right: 2em;
+    font-weight: bold;
+    color: #666;
+}
+
+.win-type-total {
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.8em;
+    }
+    
+    .stat-card {
+        padding: 1em;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5em;
+    }
+    
+    .stat-icon {
+        font-size: 1.5em;
+    }
+    
+    .stat-value {
+        font-size: 1.5em;
+    }
+    
+    .chart-container {
+        padding: 0.5em;
+    }
+    
+    .chart-controls {
+        flex-direction: column;
+        gap: 1em;
+        align-items: flex-start;
+    }
+}
+
+/* Risk Analysis Section */
+.risk-analysis-section {
+    margin: 2em 0;
+}
+
+.risk-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1em;
+    margin-bottom: 2em;
+}
+
+.risk-card {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1.5em;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.risk-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.risk-card .risk-icon {
+    font-size: 2em;
+    opacity: 0.8;
+}
+
+.risk-card .risk-content {
+    flex: 1;
+}
+
+.risk-card .risk-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #856404;
+    line-height: 1;
+    margin-bottom: 0.2em;
+}
+
+.risk-card .risk-label {
+    font-size: 0.9em;
+    color: #856404;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.2em;
+}
+
+.risk-card .risk-description {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+
+.streak-breakdown {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5em;
+}
+
+.streak-breakdown h3 {
+    margin-top: 0;
+    color: #495057;
+}
+
+.streak-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5em 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.streak-item:last-child {
+    border-bottom: none;
+}
+
+.streak-length {
+    font-weight: bold;
+    color: #495057;
+}
+
+.streak-count {
+    color: #6c757d;
+}
+
+.streak-percentage {
+    font-weight: bold;
+    color: #dc3545;
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .stat-card {
+        padding: 0.8em;
+    }
+    
+    .stat-value {
+        font-size: 1.2em;
+    }
+    
+    .stat-label {
+        font-size: 0.8em;
+    }
+    
+    .risk-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .risk-card {
+        padding: 1em;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5em;
+    }
+    
+    .risk-card .risk-value {
+        font-size: 1.5em;
+    }
+}

@@ -17,19 +17,19 @@
     position: relative;
 }
 
-/* Individual Reel - Responsive width with perfect alignment */
+/* Individual Reel - Fixed 120px dimensions */
 .reel {
-    width: var(--reel-width, 150px); /* Responsive width */
-    height: var(--reel-height, 450px); /* Responsive height - 3 symbols */
+    width: 120px; /* Fixed width - 120px */
+    height: 360px; /* Fixed height (3 symbols × 120px) */
     overflow: hidden; /* CRITICAL: Hide symbols outside the window */
     background: #333;
     border-radius: 3px;
     position: relative;
     border: 2px solid #222;
     
-/* Sprite background setup - responsive sizing */
-    background-image: url('sprite_reel_vertical.png');
-    background-size: var(--reel-width, 150px) var(--sprite-height, 1500px);
+/* Sprite background setup - 120px sprite with fixed sizing */
+    background-image: url('sprite_reel_vertical_120px.png');
+    background-size: 120px 1200px;
     background-repeat: repeat-y;
     background-position: 0 0;
 }
@@ -86,22 +86,22 @@
 
 @keyframes spinReel {
     0% { background-position: 0 0; }
-    100% { background-position: 0 -1500px; }
+    100% { background-position: 0 -1200px; }
 }
 
 @keyframes spinReel1 {
     0% { background-position: 0 0; }
-    100% { background-position: 0 -1500px; }
+    100% { background-position: 0 -1200px; }
 }
 
 @keyframes spinReel2 {
     0% { background-position: 0 0; }
-    100% { background-position: 0 -1500px; }
+    100% { background-position: 0 -1200px; }
 }
 
 @keyframes spinReel3 {
     0% { background-position: 0 0; }
-    100% { background-position: 0 -1500px; }
+    100% { background-position: 0 -1200px; }
 }
 
 /* Non-spinning reels - smooth transition to final position */
@@ -139,7 +139,7 @@
     top: 50%;
     left: 0;
     right: 0;
-    height: 150px; /* One symbol height */
+    height: 120px; /* One symbol height */
     transform: translateY(-50%);
     pointer-events: none;
     z-index: 10;
@@ -181,6 +181,60 @@
     width: 2px;
     height: 388px;
     background: #2d5a2d;
+}
+
+/* Faucet Progress Indicator - Fills the gap between reels and control panel */
+.faucet-progress-indicator {
+    width: var(--reels-container-width, 394px); /* Match reels container width */
+    height: 6px;
+    background: #8B0000; /* Dark red background */
+    border-radius: 3px;
+    margin: 0 auto; /* Zero margin for seamless integration */
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        inset 0 1px 2px rgba(0, 0, 0, 0.3),
+        0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid #5a0000;
+    display: block;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, 
+        #00ff00 0%,
+        #32cd32 50%,
+        #00ff00 100%
+    );
+    border-radius: 2px;
+    transition: width 1s ease-out;
+    position: relative;
+    box-shadow: 
+        0 0 4px rgba(0, 255, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Ready state - glowing animation */
+.faucet-progress-indicator.ready .progress-fill {
+    width: 100% !important;
+    animation: faucetGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes faucetGlow {
+    0% {
+        box-shadow: 
+            0 0 4px rgba(0, 255, 0, 0.4),
+            0 0 8px rgba(0, 255, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    100% {
+        box-shadow: 
+            0 0 8px rgba(0, 255, 0, 0.8),
+            0 0 16px rgba(0, 255, 0, 0.4),
+            0 0 24px rgba(0, 255, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
 }
 
 /* Control Panel - HTML Table Layout - Responsive */
@@ -898,3 +952,5 @@
 }
 
 /* Desktop and tablet optimized - no mobile scaling */
+
+/* Let JavaScript handle all responsive reel sizing to avoid conflicts */

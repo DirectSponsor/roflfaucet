@@ -64,9 +64,8 @@
 <!-- include end left-sidebar.html -->
 
         <main class="main-content">
-            <h1 style="margin: 0 0 0.5em 0; font-size: 1.5rem;">
+            <h1 style="margin: 0 0 0.25em 0; font-size: 1.3em; text-align: center;">
                 <span class="emoji-desktop">🎰 </span>Casino Slots
-                <span style="font-size: 0.8em; color: #666; margin-left: 1em;">Spins: <span id="spin-counter">0</span></span>
             </h1>
             
             <!-- Flip Container for Slot Machine -->
@@ -92,6 +91,12 @@
                                 <div class="reel-mask-bottom"></div>
                             </div>
                         </div>
+                        
+                        <!-- Faucet Progress Indicator -->
+                        <div class="faucet-progress-indicator" id="faucet-progress-indicator">
+                            <div class="progress-fill" id="faucet-progress-fill"></div>
+                        </div>
+                        
                         <!-- Control Panel -->
                         <div class="control-panel">
                             <table class="control-table">
@@ -225,6 +230,11 @@
                             </table>
                         </div>
                         
+                        <!-- Faucet Progress Indicator (Back) -->
+                        <div class="faucet-progress-indicator" id="faucet-progress-indicator-back">
+                            <div class="progress-fill" id="faucet-progress-fill-back"></div>
+                        </div>
+                        
                         <!-- Back Control Panel - Same as front but with disabled SPIN -->
                         <div class="control-panel">
                             <table class="control-table">
@@ -264,7 +274,7 @@
 <!-- Usage: Just include this file where you want the faucet countdown button -->
 <!-- CSS and JavaScript are loaded globally via styles.css and scripts/core/site-utils.js -->
 
-<button id="faucet-countdown-btn-back" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+<button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
     <span class="btn-text">Faucet: 300</span>
 </button>
                             <!-- include end faucet-countdown-button.html -->

@@ -1,0 +1,106 @@
+<!-- Slots Statistics Page -->
+<!-- TITLE=_ROFLFaucet - Slots Statistics_ -->
+<!-- DESC=_View detailed statistics about your slot machine gameplay_ -->
+<!-- KEYWORDS=_slots, statistics, analytics, payout, gambling, game_ -->
+<!-- STYLES=_slots-stats.css_ -->
+<!-- SCRIPTS=_slots-stats.js_ -->
+
+<!-- include start header.html -->
+<!-- include end header.html -->
+
+<!-- include start left-sidebar.html -->
+<!-- include end left-sidebar.html -->
+
+        <main class="main-content">
+<!-- UNIQUE PAGE CONTENT GOES HERE -->
+            <h1 style="margin: 0 0 1em 0; font-size: 1.5em;">
+                <span class="emoji-desktop">📊 </span>Slots Statistics
+                <button id="refresh-stats-btn" style="margin-left: 1em; padding: 0.3em 0.8em; font-size: 0.7em; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Refresh</button>
+            </h1>
+            
+            <!-- Quick Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎰</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="total-spins">0</div>
+                        <div class="stat-label">Total Spins</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="total-wagered">0</div>
+                        <div class="stat-label">Total Wagered</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🎉</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="total-won">0</div>
+                        <div class="stat-label">Total Won</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="net-profit">+0</div>
+                        <div class="stat-label">Net Profit</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="win-rate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💵</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="current-balance">0</div>
+                        <div class="stat-label">Current Balance</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Balance Chart -->
+            <div class="chart-section">
+                <h2>Balance Over Time</h2>
+                <div class="chart-container">
+                    <canvas id="balance-chart" width="800" height="300"></canvas>
+                </div>
+                <div class="chart-controls">
+                    <button id="clear-chart-btn" style="padding: 0.5em 1em; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 1em;">Clear Chart Data</button>
+                    <span style="color: #666; font-size: 0.9em;">Chart shows last 50 balance changes</span>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <h2>Recent Activity</h2>
+                <div id="recent-activity" class="activity-list">
+                    <p style="color: #666; font-style: italic;">No recent activity</p>
+                </div>
+            </div>
+            
+            <!-- Win Statistics -->
+            <div class="win-stats-section">
+                <h2>Win Statistics</h2>
+                <div id="win-breakdown" class="win-breakdown">
+                    <p style="color: #666; font-style: italic;">No wins recorded yet</p>
+                </div>
+            </div>                 
+<!-- END UNIQUE PAGE CONTENT -->
+        </main>
+
+<!-- include start right-sidebar.html -->
+<!-- include end right-sidebar.html -->
+
+<!-- include start footer.html -->
+<!-- include end footer.html -->

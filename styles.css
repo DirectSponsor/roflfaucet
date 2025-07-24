@@ -218,7 +218,7 @@ body {
     /* This fixes flexbox issue where child element margins get absorbed */
     margin-left: 0.5em;
     margin-right: 0.5em;
-    padding: 0; /* Remove padding for perfect image alignment */
+    padding: 0.5em; /* Restore padding for text and other elements */
     box-sizing: border-box;
 }
 

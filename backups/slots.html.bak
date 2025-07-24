@@ -64,8 +64,9 @@
 <!-- include end left-sidebar.html -->
 
         <main class="main-content">
-            <h1 style="margin: 0 0 0.5em 0; font-size: 1.5rem;">
+            <h1 style="margin: 0 0 0.25em 0; font-size: 1.3em;">
                 <span class="emoji-desktop">🎰 </span>Casino Slots
+                <span style="font-size: 0.8em; color: #666; margin-left: 1em;">Spins: <span id="spin-counter">0</span></span>
             </h1>
             
             <!-- Flip Container for Slot Machine -->
@@ -142,43 +143,83 @@
                 <div class="machine-back">
                     <div class="slot-machine-container">
                         
-                        <!-- Prize Display Table -->
+                        <!-- Prize Display Table - 2 Columns -->
                         <div class="prize-display-container">
                             <table class="prize-table">
-                                <thead>
-                                    <tr>
-                                        <th>Combination</th>
-                                        <th>Payout</th>
-                                    </tr>
-                                </thead>
                                 <tbody>
-                                    <tr data-symbol="cherry">
-                                        <td class="prize-combo">🍒🍒🍒</td>
-                                        <td class="prize-payout">50</td>
+                                    <tr>
+                                        <!-- Left Column -->
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/cherries_40px.png" alt="Cherry" class="prize-symbol">
+                                                <img src="slots/images/cherries_40px.png" alt="Cherry" class="prize-symbol">
+                                                <img src="slots/images/cherries_40px.png" alt="Cherry" class="prize-symbol">
+                                            </div>
+                                            <div class="prize-payout">12x</div>
+                                        </td>
+                                        <!-- Right Column -->
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                                <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                                <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                            </div>
+                                            <div class="prize-payout">400x</div>
+                                        </td>
                                     </tr>
-                                    <tr data-symbol="lemon">
-                                        <td class="prize-combo">🍋🍋🍋</td>
-                                        <td class="prize-payout">75</td>
+                                    <tr>
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/banana_40px.png" alt="Banana" class="prize-symbol">
+                                                <img src="slots/images/banana_40px.png" alt="Banana" class="prize-symbol">
+                                                <img src="slots/images/banana_40px.png" alt="Banana" class="prize-symbol">
+                                            </div>
+                                            <div class="prize-payout">10x</div>
+                                        </td>
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                                <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                                <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                            </div>
+                                            <div class="prize-payout">75x</div>
+                                        </td>
                                     </tr>
-                                    <tr data-symbol="bell">
-                                        <td class="prize-combo">🔔🔔🔔</td>
-                                        <td class="prize-payout">100</td>
+                                    <tr>
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/watermelon_40px.png" alt="Watermelon" class="prize-symbol">
+                                                <img src="slots/images/watermelon_40px.png" alt="Watermelon" class="prize-symbol">
+                                                <img src="slots/images/watermelon_40px.png" alt="Watermelon" class="prize-symbol">
+                                            </div>
+                                            <div class="prize-payout">8x</div>
+                                        </td>
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/seven_40px.png" alt="Seven" class="prize-symbol">
+                                                <img src="slots/images/seven_40px.png" alt="Seven" class="prize-symbol">
+                                                <img src="slots/images/seven_40px.png" alt="Seven" class="prize-symbol">
+                                            </div>
+                                            <div class="prize-payout">35x</div>
+                                        </td>
                                     </tr>
-                                    <tr data-symbol="bar">
-                                        <td class="prize-combo">⬛⬛⬛</td>
-                                        <td class="prize-payout">200</td>
-                                    </tr>
-                                    <tr data-symbol="seven">
-                                        <td class="prize-combo">7️⃣7️⃣7️⃣</td>
-                                        <td class="prize-payout">500</td>
-                                    </tr>
-                                    <tr data-symbol="diamond">
-                                        <td class="prize-combo">💎💎💎</td>
-                                        <td class="prize-payout">1000</td>
-                                    </tr>
-                                    <tr data-symbol="two_diamonds">
-                                        <td class="prize-combo">💎💎⬜</td>
-                                        <td class="prize-payout">25</td>
+                                    <tr>
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/3fruits_40px.png" alt="Any 3 Fruits" class="prize-symbol">
+                                                <img src="slots/images/3fruits_40px.png" alt="Any 3 Fruits" class="prize-symbol">
+                                                <img src="slots/images/3fruits_40px.png" alt="Any 3 Fruits" class="prize-symbol">
+                                            </div>
+                                            <div class="prize-payout">5x</div>
+                                        </td>
+                                        <td class="prize-cell">
+                                            <div class="prize-images">
+                                                <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                                <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                                <span class="empty-symbol">?</span>
+                                            </div>
+                                            <div class="prize-payout">15x</div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -223,7 +264,7 @@
 <!-- Usage: Just include this file where you want the faucet countdown button -->
 <!-- CSS and JavaScript are loaded globally via styles.css and scripts/core/site-utils.js -->
 
-<button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+<button id="faucet-countdown-btn-back" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
     <span class="btn-text">Faucet: 300</span>
 </button>
                             <!-- include end faucet-countdown-button.html -->
@@ -237,7 +278,7 @@
 <!-- include start right-sidebar.html -->
         <aside class="right-sidebar">
             <!-- Random Giphy Image Container -->
-            <div id="sidebar-giphy-gallery" class="full-width" style="text-align: center; margin: 0; padding: 0;">
+            <div id="sidebar-giphy-gallery" class="full-width" data-gallery="giphy" style="text-align: center; margin: 0; padding: 0;">
                 <p style="color: #666; font-size: 14px; margin: 10px;">Loading funny GIF...</p>
             </div>
         </aside>
