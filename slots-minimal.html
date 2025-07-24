@@ -158,15 +158,15 @@
             transition: width 1s ease-out;
         }
 
-        /* Control panel */
+        /* Control panel - scaled */
         .control-panel {
             background: #2c3e50;
             color: white;
             border-radius: 8px;
             margin: 0 auto;
             width: fit-content;
-            height: 80px;
-            padding: 10px;
+            height: var(--control-height, 80px);
+            padding: calc(10px * var(--scale-factor, 1));
             margin-top: 2px;
         }
 
@@ -180,7 +180,7 @@
         .control-table td {
             text-align: center;
             vertical-align: middle;
-            padding: 4px 6px;
+            padding: calc(4px * var(--scale-factor, 1)) calc(6px * var(--scale-factor, 1));
             border-right: 2px solid #304357;
             background: #1a1a1a;
         }
@@ -190,7 +190,7 @@
         }
 
         .control-label {
-            font-size: 0.8rem;
+            font-size: var(--control-label-size, 0.8rem);
             font-weight: bold;
             color: #ecf0f1;
             line-height: 1;
@@ -200,20 +200,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: var(--control-font-size, 1.4rem);
             font-weight: bold;
             color: #f1c40f;
             transition: all 0.3s ease;
-            min-height: 56px;
+            min-height: var(--button-height, 56px);
         }
 
         .spin-button {
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 0 25px;
-            height: 56px;
-            font-size: 1.1rem;
+            padding: 0 calc(25px * var(--scale-factor, 1));
+            height: var(--button-height, 56px);
+            font-size: calc(1.1rem * var(--scale-factor, 1));
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -221,7 +221,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 80px;
+            min-width: var(--button-width, 80px);
         }
 
         .spin-button:hover {
@@ -237,11 +237,11 @@
             background: #3498db;
             color: white;
             border: none;
-            width: 32px;
-            height: 26px;
+            width: calc(32px * var(--scale-factor, 1));
+            height: calc(26px * var(--scale-factor, 1));
             border-radius: 2px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: calc(0.9rem * var(--scale-factor, 1));
             transition: background 0.2s ease;
             display: flex;
             align-items: center;
@@ -253,22 +253,22 @@
             background: #2980b9;
         }
 
-        /* Action buttons */
+        /* Action buttons - scaled */
         .action-buttons {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
+            gap: calc(20px * var(--scale-factor, 1));
+            margin: calc(20px * var(--scale-factor, 1)) 0;
         }
 
         .flip-button, .faucet-btn {
             background: #f39c12;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: calc(10px * var(--scale-factor, 1)) calc(20px * var(--scale-factor, 1));
             border-radius: 4px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: calc(1rem * var(--scale-factor, 1));
             font-weight: bold;
             transition: background 0.3s ease;
         }
@@ -283,6 +283,21 @@
 
         .faucet-btn:hover {
             background: #229954;
+        }
+
+        /* Debug indicator */
+        .debug-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 1000;
+            max-width: 200px;
         }
 
     </style>
@@ -340,15 +355,62 @@
         </div>
     </div>
 
+    <!-- Debug indicator -->
+    <div class="debug-indicator" id="debug-info">
+        Window: Loading...<br>
+        Reel: Loading...<br>
+        Events: 0
+    </div>
+
+    <script>
+        // Add stub balance functions for standalone operation
+        let standaloneBalance = 100; // Starting balance
+        
+        async function getBalance() {
+            return standaloneBalance;
+        }
+        
+        async function addBalance(amount, type, description) {
+            standaloneBalance += amount;
+            console.log(`💰 Added ${amount} to balance. New balance: ${standaloneBalance}`);
+            return { success: true, balance: standaloneBalance };
+        }
+        
+        async function subtractBalance(amount, type, description) {
+            if (standaloneBalance >= amount) {
+                standaloneBalance -= amount;
+                console.log(`💸 Subtracted ${amount} from balance. New balance: ${standaloneBalance}`);
+                return { success: true, balance: standaloneBalance };
+            } else {
+                console.log(`❌ Insufficient balance. Need ${amount}, have ${standaloneBalance}`);
+                return { success: false, error: 'Insufficient balance', balance: standaloneBalance };
+            }
+        }
+    </script>
     <script src="slots/slots.js"></script>
     <script>
+        // Visual debug tracking
+        let resizeEventCount = 0;
+        function updateDebugInfo(reelWidth = 'Loading...') {
+            const debugElement = document.getElementById('debug-info');
+            if (debugElement) {
+                debugElement.innerHTML = `Window: ${window.innerWidth}x${window.innerHeight}<br>Reel: ${reelWidth}px<br>Events: ${resizeEventCount}`;
+            }
+        }
+        
         // Override the calculateResponsiveDimensions function for standalone version
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎰 DOM loaded, attempting to override...');
+            updateDebugInfo();
+            
             // Wait for slot machine to be created
             setTimeout(() => {
+                console.log('🎰 Checking for slotMachine instance:', !!window.slotMachine);
                 if (window.slotMachine) {
+                    console.log('🎰 Overriding calculateResponsiveDimensions function!');
                     // Replace the complex responsive logic with simple standalone logic
                     window.slotMachine.calculateResponsiveDimensions = function() {
+                        console.log('🎰 NEW CALCULATION RUNNING!');
                         const viewportWidth = window.innerWidth;
                         const viewportHeight = window.innerHeight;
                         
@@ -361,8 +423,8 @@
                             containerWidth = maxWidth;
                         }
                         
-                        // Set minimum width
-                        containerWidth = Math.max(280, containerWidth);
+                        // DON'T set minimum container width - let it shrink naturally
+                        // containerWidth = Math.max(280, containerWidth);
                         
                         // Simple fixed gaps and padding
                         const gap = 15;
@@ -375,8 +437,11 @@
                         // Calculate reel width - simple division
                         let reelWidth = Math.floor(availableWidth / 3);
                         
-                        // Ensure sensible limits
-                        reelWidth = Math.max(60, Math.min(120, reelWidth));
+                        // Only prevent it from going negative, no minimum constraint
+                        reelWidth = Math.max(20, reelWidth);
+                        
+                        // Cap maximum at 120px
+                        reelWidth = Math.min(120, reelWidth);
                         
                         // Maintain 3:1 aspect ratio (3 symbols high)
                         const reelHeight = reelWidth * 3;
@@ -387,6 +452,16 @@
                         // Calculate position height (sprite height / 20 positions)
                         const positionHeight = spriteHeight / 20;
                         
+                        // Calculate scale factor for other elements (based on reel width)
+                        const scaleFactor = reelWidth / 120; // 120px is full size
+                        
+                        // Scale control panel elements
+                        const controlFontSize = Math.max(0.6, 1.4 * scaleFactor); // Min 0.6rem
+                        const controlLabelSize = Math.max(0.5, 0.8 * scaleFactor); // Min 0.5rem
+                        const controlHeight = Math.max(50, 80 * scaleFactor); // Min 50px
+                        const buttonHeight = Math.max(40, 56 * scaleFactor); // Min 40px
+                        const buttonWidth = Math.max(60, 80 * scaleFactor); // Min 60px
+                        
                         // Update CSS custom properties
                         const root = document.documentElement;
                         root.style.setProperty('--reel-width', `${reelWidth}px`);
@@ -394,6 +469,14 @@
                         root.style.setProperty('--sprite-height', `${spriteHeight}px`);
                         root.style.setProperty('--reel-gap', `${gap}px`);
                         root.style.setProperty('--container-padding', `${padding}px`);
+                        
+                        // Add scaling properties for other elements
+                        root.style.setProperty('--control-font-size', `${controlFontSize}rem`);
+                        root.style.setProperty('--control-label-size', `${controlLabelSize}rem`);
+                        root.style.setProperty('--control-height', `${controlHeight}px`);
+                        root.style.setProperty('--button-height', `${buttonHeight}px`);
+                        root.style.setProperty('--button-width', `${buttonWidth}px`);
+                        root.style.setProperty('--scale-factor', scaleFactor);
                         
                         // Update instance variables for positioning calculations
                         this.reelWidth = reelWidth;
@@ -408,10 +491,30 @@
                         console.log(`  Container width: ${containerWidth}px`);
                         console.log(`  Reel width: ${reelWidth}px`);
                         console.log(`  Reel height: ${reelHeight}px`);
+                        
+                        // Update visual debug info
+                        updateDebugInfo(reelWidth);
                     };
                     
                     // Trigger initial calculation
                     window.slotMachine.updateSpriteDimensions();
+                    
+                    // Add debugging for resize events
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        resizeEventCount++;
+                        console.log('🎰 RESIZE EVENT FIRED! Window size:', window.innerWidth, 'x', window.innerHeight);
+                        updateDebugInfo(window.slotMachine ? window.slotMachine.reelWidth : 'Loading...');
+                        
+                        // Debounce resize events
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            console.log('🎰 Triggering recalculation after resize...');
+                            window.slotMachine.updateSpriteDimensions();
+                        }, 100);
+                    });
+                    
+                    console.log('🎰 Setup complete. Current window size:', window.innerWidth, 'x', window.innerHeight);
                 }
             }, 100);
         });
