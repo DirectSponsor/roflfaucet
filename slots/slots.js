@@ -197,17 +197,18 @@ class CasinoSlotMachine {
         // Listen for window resize to recalculate dimensions
         window.addEventListener('resize', () => this.calculateResponsiveDimensions());
         
-        // Also listen for media query changes that might not trigger resize
-        // This covers sidebar collapse at 950px and 800px breakpoints
-        const mediaQuery1 = window.matchMedia('(max-width: 950px)');
-        const mediaQuery2 = window.matchMedia('(max-width: 800px)');
+        // Listen for media query changes at exact breakpoints used in calculations
+        const mediaQuery900 = window.matchMedia('(max-width: 900px)'); // Right sidebar collapse
+        const mediaQuery650 = window.matchMedia('(max-width: 650px)'); // Left sidebar collapse/stack
         
-        mediaQuery1.addEventListener('change', () => {
+        mediaQuery900.addEventListener('change', () => {
+            console.log('🎰 Right sidebar breakpoint (900px) triggered');
             // Add small delay to ensure CSS transitions complete
             setTimeout(() => this.calculateResponsiveDimensions(), 100);
         });
         
-        mediaQuery2.addEventListener('change', () => {
+        mediaQuery650.addEventListener('change', () => {
+            console.log('🎰 Left sidebar breakpoint (650px) triggered');
             // Add small delay to ensure CSS transitions complete
             setTimeout(() => this.calculateResponsiveDimensions(), 100);
         });
@@ -223,49 +224,55 @@ class CasinoSlotMachine {
     
     calculateResponsiveDimensions() {
         // Use viewport width directly to avoid circular reference
-        // Any container measurement creates feedback loop since containers expand based on our CSS variables
         const viewportWidth = window.innerWidth;
         
-        // Calculate available width based on viewport and layout breakpoints
+        // More granular responsive breakpoints for smooth scaling
         let containerWidth;
-        if (viewportWidth > 950) {
-            // Desktop with sidebars: account for left sidebar (~180px) + right sidebar (~180px) + margins
-            containerWidth = viewportWidth - 360 - 40; // sidebars + margins
-        } else {
-            // Mobile/tablet: sidebars are hidden, use most of viewport
-            containerWidth = viewportWidth - 40; // just margins
-        }
+        let gap, padding;
         
-        // Use viewport width to determine responsive breakpoints (not container width)
-        // This prevents issues when sidebars collapse and container width jumps
-        let gap = 15;  // Smaller default gap
-        let padding = 15;  // Smaller default padding
-        
-        if (viewportWidth < 400) {
-            gap = 10;
-            padding = 10;
-        } else if (viewportWidth < 500) {
+        if (viewportWidth > 900) {
+            // Large desktop: both sidebars visible
+            // Account for left sidebar (~25% of viewport) + right sidebar (~25%) + margins
+            const sidebarWidth = Math.max(180, viewportWidth * 0.25); // At least 180px per sidebar
+            containerWidth = viewportWidth - (2 * sidebarWidth) - 40;
+            gap = 15;
+            padding = 15;
+        } else if (viewportWidth > 650) {
+            // Medium desktop: only left sidebar visible (right collapsed)
+            const leftSidebarWidth = Math.max(160, viewportWidth * 0.22);
+            containerWidth = viewportWidth - leftSidebarWidth - 40;
             gap = 12;
             padding = 12;
+        } else {
+            // Mobile/tablet: both sidebars collapsed
+            containerWidth = viewportWidth - 40; // just margins
+            gap = 10;
+            padding = 10;
         }
         
-        // Calculate responsive dimensions using actual gap and padding values
-        // Account for gaps (2 × gap) and borders (2 × 2px) // Removed padding consideration
-        const usedSpace = (2 * gap) + (2 * 2); // gaps + borders (no padding considered)
-        const availableWidth = containerWidth - usedSpace;
+        // Ensure minimum container width
+        containerWidth = Math.max(300, containerWidth);
         
-        // Calculate reel width (3 reels fit in available space)
-        // Use smaller default sizing - aim for ~110px instead of 150px for better desktop experience
-        const idealReelWidth = 110;  // Better desktop default size (per reel)
+        // Calculate available width for reels
+        const usedSpace = (2 * gap) + (3 * 4); // gaps + borders (2px each reel)
+        const availableWidth = containerWidth - usedSpace - (2 * padding);
+        
+        // Calculate reel width with smooth scaling
         const calculatedReelWidth = Math.floor(availableWidth / 3);
         
-        // Responsive sizing: desktop vs mobile behavior
+        // Responsive sizing with smooth transitions
         let reelWidth;
-        if (viewportWidth > 600) {
-            // Desktop: prefer ideal size but don't exceed available space
-            reelWidth = Math.max(80, Math.min(idealReelWidth, calculatedReelWidth));
+        if (viewportWidth > 1200) {
+            // Very large screens: cap at reasonable size
+            reelWidth = Math.min(130, calculatedReelWidth);
+        } else if (viewportWidth > 800) {
+            // Desktop: aim for good balance
+            reelWidth = Math.max(90, Math.min(120, calculatedReelWidth));
+        } else if (viewportWidth > 600) {
+            // Tablet: allow more shrinking
+            reelWidth = Math.max(70, Math.min(100, calculatedReelWidth));
         } else {
-            // Mobile: allow shrinking below ideal size, minimum 60px for usability
+            // Mobile: prioritize fitting
             reelWidth = Math.max(60, calculatedReelWidth);
         }
         
@@ -298,7 +305,6 @@ class CasinoSlotMachine {
         console.log(`  Viewport width: ${viewportWidth}px`);
         console.log(`  Container width: ${containerWidth}px`);
         console.log(`  Available width: ${availableWidth}px`);
-        console.log(`  Ideal reel width: ${idealReelWidth}px`);
         console.log(`  Calculated reel width: ${calculatedReelWidth}px`);
         console.log(`  Final reel width: ${reelWidth}px`);
         console.log(`  Reel height: ${reelHeight}px`);

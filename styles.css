@@ -228,15 +228,15 @@ body {
     padding: 0;
 }
 
-/* Responsive: Right sidebar collapses first - delayed for more sidebar space */
-@media (max-width: 56.25rem) { /* ~900px - right sidebar collapses first (was 1024px) */
+/* Responsive: Right sidebar collapses first */
+@media (max-width: 900px) { /* Right sidebar collapses at 900px */
     .right-sidebar {
         display: none;
     }
 }
 
-/* Left sidebar and stack vertically on smaller screens - delayed collapse */
-@media (max-width: 40.625rem) { /* ~650px - left sidebar collapses (was 768px) */
+/* Left sidebar stacks vertically on smaller screens */
+@media (max-width: 650px) { /* Left sidebar stacks at 650px */
     .container {
         flex-direction: column;
     }
