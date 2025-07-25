@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Casino Slots</title>
+    
+    <!-- Essential scripts for functionality -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    
     <style>
         /* Absolute minimal reset */
         * {
@@ -285,6 +290,118 @@
             background: #229954;
         }
 
+        /* Faucet countdown button styles */
+        .faucet-countdown-btn {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: calc(10px * var(--scale-factor, 1)) calc(20px * var(--scale-factor, 1));
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: calc(1rem * var(--scale-factor, 1));
+            font-weight: bold;
+            transition: background 0.3s ease;
+            border: 1px solid #5a0000;
+        }
+        
+        .faucet-countdown-btn:not(:disabled) {
+            background: linear-gradient(90deg, #00ff00 0%, #32cd32 50%, #00ff00 100%);
+            border: 1px solid #00cc00;
+            color: #000;
+        }
+        
+        .faucet-countdown-btn:not(:disabled):hover {
+            background: linear-gradient(90deg, #00dd00 0%, #28a428 50%, #00dd00 100%);
+        }
+        
+        .faucet-countdown-btn:disabled {
+            cursor: not-allowed;
+        }
+        
+        .faucet-countdown-btn .btn-text {
+            font-weight: bold;
+        }
+
+        /* Flip Machine Styles */
+        .slot-machine {
+            perspective: 1200px;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .slot-machine.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .machine-front, .machine-back {
+            position: relative;
+            backface-visibility: hidden;
+            transition: all 0.8s;
+        }
+
+        .machine-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transform: rotateY(180deg);
+        }
+
+        /* Prize Display Styles */
+        .prize-display-container {
+            background: #2c3e50;
+            border-radius: 8px;
+            padding: calc(10px * var(--scale-factor, 1));
+            margin: calc(5px * var(--scale-factor, 1)) auto;
+            max-width: 100%;
+        }
+
+        .prize-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: calc(0.9rem * var(--scale-factor, 1));
+        }
+
+        .prize-cell {
+            padding: calc(8px * var(--scale-factor, 1));
+            text-align: center;
+            border: 1px solid #34495e;
+            background: #1a1a1a;
+            vertical-align: middle;
+        }
+
+        .prize-images {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: calc(4px * var(--scale-factor, 1));
+            margin-bottom: calc(5px * var(--scale-factor, 1));
+        }
+
+        .prize-symbol {
+            width: calc(24px * var(--scale-factor, 1));
+            height: calc(24px * var(--scale-factor, 1));
+            object-fit: contain;
+        }
+
+        .prize-payout {
+            font-weight: bold;
+            color: #f1c40f;
+            font-size: calc(1.1rem * var(--scale-factor, 1));
+        }
+
+        .empty-symbol {
+            display: inline-block;
+            width: calc(24px * var(--scale-factor, 1));
+            height: calc(24px * var(--scale-factor, 1));
+            line-height: calc(24px * var(--scale-factor, 1));
+            text-align: center;
+            font-weight: bold;
+            color: #95a5a6;
+            font-size: calc(1rem * var(--scale-factor, 1));
+        }
+
         /* Debug indicator */
         .debug-indicator {
             position: fixed;
@@ -304,54 +421,194 @@
 </head>
 <body>
     <div class="slot-container">
-        <!-- Slot Machine Reels -->
-        <div class="reels-container">
-            <!-- Glass overlay with center line -->
-            <div class="glass-overlay">
-                <div class="center-line"></div>
+        <!-- Flip Container for Slot Machine -->
+        <div class="slot-machine" id="slot-machine">
+            
+            <!-- Front Side - Game -->
+            <div class="machine-front">
+                <div class="slot-machine-container">
+                    <!-- Slot Machine Reels -->
+                    <div class="reels-container">
+                        <!-- Glass overlay with center line -->
+                        <div class="glass-overlay">
+                            <div class="center-line"></div>
+                        </div>
+                        <!-- Reels -->
+                        <div class="reel" id="reel-1"></div>
+                        <div class="reel" id="reel-2"></div>
+                        <div class="reel" id="reel-3"></div>
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div class="progress-indicator" id="progress-indicator">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+
+                    <!-- Control Panel -->
+                    <div class="control-panel">
+                        <table class="control-table">
+                            <tr>
+                                <td>
+                                    <span class="control-label">WIN</span><br>
+                                    <span class="control-value" id="last-win">0</span>
+                                </td>
+                                <td>
+                                    <span class="control-label">COINS</span><br>
+                                    <span class="control-value" id="current-balance">100</span>
+                                </td>
+                                <td>
+                                    <span class="control-label">BET</span><br>
+                                    <span class="control-value" id="current-bet">1</span>
+                                </td>
+                                <td>
+                                    <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
+                                    <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
+                                </td>
+                                <td>
+                                    <button class="spin-button" onclick="spinReels()" id="spin-btn">SPIN</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="flip-button" onclick="flipMachine()" id="flip-btn">Payouts</button>
+                        <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                            <span class="btn-text">Faucet: 300</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <!-- Reels -->
-            <div class="reel" id="reel-1"></div>
-            <div class="reel" id="reel-2"></div>
-            <div class="reel" id="reel-3"></div>
-        </div>
-
-        <!-- Progress Indicator -->
-        <div class="progress-indicator" id="progress-indicator">
-            <div class="progress-fill" id="progress-fill"></div>
-        </div>
-
-        <!-- Control Panel -->
-        <div class="control-panel">
-            <table class="control-table">
-                <tr>
-                    <td>
-                        <span class="control-label">WIN</span><br>
-                        <span class="control-value" id="last-win">0</span>
-                    </td>
-                    <td>
-                        <span class="control-label">COINS</span><br>
-                        <span class="control-value" id="current-balance">100</span>
-                    </td>
-                    <td>
-                        <span class="control-label">BET</span><br>
-                        <span class="control-value" id="current-bet">1</span>
-                    </td>
-                    <td>
-                        <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
-                        <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
-                    </td>
-                    <td>
-                        <button class="spin-button" onclick="spinReels()" id="spin-btn">SPIN</button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="flip-button" onclick="showPayouts()">Payouts</button>
-            <button class="faucet-btn" onclick="goToFaucet()">Faucet</button>
+            
+            <!-- Back Side - Prize Display -->
+            <div class="machine-back">
+                <div class="slot-machine-container">
+                    
+                    <!-- Prize Display Table - 2 Columns -->
+                    <div class="prize-display-container">
+                        <table class="prize-table">
+                            <tbody>
+                                <tr>
+                                    <!-- Left Column -->
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/cherries_40px.png" alt="Cherry" class="prize-symbol">
+                                            <img src="slots/images/cherries_40px.png" alt="Cherry" class="prize-symbol">
+                                            <img src="slots/images/cherries_40px.png" alt="Cherry" class="prize-symbol">
+                                        </div>
+                                        <div class="prize-payout">12x</div>
+                                    </td>
+                                    <!-- Right Column -->
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                            <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                            <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                        </div>
+                                        <div class="prize-payout">400x</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/banana_40px.png" alt="Banana" class="prize-symbol">
+                                            <img src="slots/images/banana_40px.png" alt="Banana" class="prize-symbol">
+                                            <img src="slots/images/banana_40px.png" alt="Banana" class="prize-symbol">
+                                        </div>
+                                        <div class="prize-payout">10x</div>
+                                    </td>
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                            <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                            <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                        </div>
+                                        <div class="prize-payout">75x</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/watermelon_40px.png" alt="Watermelon" class="prize-symbol">
+                                            <img src="slots/images/watermelon_40px.png" alt="Watermelon" class="prize-symbol">
+                                            <img src="slots/images/watermelon_40px.png" alt="Watermelon" class="prize-symbol">
+                                        </div>
+                                        <div class="prize-payout">8x</div>
+                                    </td>
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/seven_40px.png" alt="Seven" class="prize-symbol">
+                                            <img src="slots/images/seven_40px.png" alt="Seven" class="prize-symbol">
+                                            <img src="slots/images/seven_40px.png" alt="Seven" class="prize-symbol">
+                                        </div>
+                                        <div class="prize-payout">35x</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/3fruits_40px.png" alt="Any 3 Fruits" class="prize-symbol">
+                                            <img src="slots/images/3fruits_40px.png" alt="Any 3 Fruits" class="prize-symbol">
+                                            <img src="slots/images/3fruits_40px.png" alt="Any 3 Fruits" class="prize-symbol">
+                                        </div>
+                                        <div class="prize-payout">5x</div>
+                                    </td>
+                                    <td class="prize-cell">
+                                        <div class="prize-images">
+                                            <img src="slots/images/bar_40px.png" alt="Bar" class="prize-symbol">
+                                            <img src="slots/images/bigwin_40px.png" alt="Big Win" class="prize-symbol">
+                                            <span class="empty-symbol">?</span>
+                                        </div>
+                                        <div class="prize-payout">15x</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Progress Indicator (Back) -->
+                    <div class="progress-indicator" id="progress-indicator-back">
+                        <div class="progress-fill" id="progress-fill-back"></div>
+                    </div>
+                    
+                    <!-- Back Control Panel - Same as front but with disabled SPIN -->
+                    <div class="control-panel">
+                        <table class="control-table">
+                            <tr>
+                                <td>
+                                    <span class="control-label">WIN</span><br>
+                                    <span class="control-value" id="last-win-back">0</span>
+                                </td>
+                                <td>
+                                    <span class="control-label">COINS</span><br>
+                                    <span class="control-value" id="current-balance-back">100</span>
+                                </td>
+                                <td>
+                                    <span class="control-label">BET</span><br>
+                                    <span class="control-value" id="current-bet-back">1</span>
+                                </td>
+                                <td>
+                                    <button class="bet-btn-inline" onclick="increaseBet()" disabled>▲</button><br>
+                                    <button class="bet-btn-inline" onclick="decreaseBet()" disabled>▼</button>
+                                </td>
+                                <td>
+                                    <button class="spin-button" disabled>SPIN</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Back Action Buttons Row -->
+                    <div class="action-buttons">
+                        <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">Slots</button>
+                        <button id="faucet-countdown-btn-back" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                            <span class="btn-text">Faucet: 300</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 
@@ -530,6 +787,51 @@
                 window.parent.postMessage({type: 'navigate', url: 'index.html'}, '*');
             } else {
                 window.location.href = 'index.html';
+            }
+        }
+        
+        // Flip machine function
+        function flipMachine() {
+            const machine = document.getElementById('slot-machine');
+            machine.classList.toggle('flipped');
+            
+            // Sync the back panel with front panel values
+            setTimeout(() => {
+                syncBackPanelValues();
+            }, 400); // Half way through the flip animation
+        }
+        
+        // Sync back panel values with front panel
+        function syncBackPanelValues() {
+            const frontWin = document.getElementById('last-win');
+            const frontBalance = document.getElementById('current-balance');
+            const frontBet = document.getElementById('current-bet');
+            
+            const backWin = document.getElementById('last-win-back');
+            const backBalance = document.getElementById('current-balance-back');
+            const backBet = document.getElementById('current-bet-back');
+            
+            if (frontWin && backWin) backWin.textContent = frontWin.textContent;
+            if (frontBalance && backBalance) backBalance.textContent = frontBalance.textContent;
+            if (frontBet && backBet) backBet.textContent = frontBet.textContent;
+            
+            // Sync progress bars
+            const frontProgress = document.getElementById('progress-fill');
+            const backProgress = document.getElementById('progress-fill-back');
+            if (frontProgress && backProgress) {
+                backProgress.style.width = frontProgress.style.width;
+            }
+            
+            // Sync faucet buttons
+            const frontFaucet = document.getElementById('faucet-countdown-btn');
+            const backFaucet = document.getElementById('faucet-countdown-btn-back');
+            if (frontFaucet && backFaucet) {
+                backFaucet.disabled = frontFaucet.disabled;
+                const frontText = frontFaucet.querySelector('.btn-text');
+                const backText = backFaucet.querySelector('.btn-text');
+                if (frontText && backText) {
+                    backText.textContent = frontText.textContent;
+                }
             }
         }
     </script>
