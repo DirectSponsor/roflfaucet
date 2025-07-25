@@ -8,6 +8,8 @@
 
 The ROFLFaucet button system provides a consistent, semantic, and maintainable approach to styling buttons across the entire site. This system replaces the previous ad-hoc button styling with a standardized set of classes that ensure visual consistency and easy maintenance.
 
+> **🔗 Related Documentation:** For dynamic button behavior, countdown functionality, and centralized color management, see [Site Utilities Documentation](SITE_UTILS_DOCUMENTATION.md). The Site Utilities system handles JavaScript-powered button states, while this document covers CSS styling classes.
+
 ## 🎨 Design Philosophy
 
 ### **Consistent Dimensions**
@@ -191,6 +193,27 @@ document.getElementById('my-btn').disabled = true;
 <!-- Bet controls -->
 <button class="bet-btn-inline">▲</button>
 <button class="bet-btn-inline">▼</button>
+```
+
+### **Dynamic Faucet Buttons**
+
+> **🔗 Important:** Faucet countdown buttons (`faucet-countdown-btn`, `start-claim-btn`) are managed by the [Site Utilities System](SITE_UTILS_DOCUMENTATION.md). Their colors, states, and behavior are controlled by JavaScript, not CSS classes.
+
+**Key Differences:**
+- **Static buttons** (this doc): Use CSS classes for appearance
+- **Dynamic faucet buttons** (Site Utilities): Use JavaScript for colors, countdown, and state changes
+
+**For faucet buttons:**
+- ✅ **Colors**: Managed by `FAUCET_COLORS` in site-utils.js
+- ✅ **States**: Automatically updated based on cooldown timer
+- ✅ **Progress effects**: Built-in gradient animations
+
+Example dynamic faucet button:
+```html
+<!-- Managed by Site Utilities -->
+<button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()">
+    <span class="btn-text">Faucet: 300</span>
+</button>
 ```
 
 ## 🔄 Migration Guide

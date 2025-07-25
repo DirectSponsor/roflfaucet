@@ -144,13 +144,13 @@
 
         /* Progress indicator - width controlled by JS */
         .progress-indicator {
-            height: 6px;
-            background: #8B0000;
-            border-radius: 3px;
+            height: 8px;
+            background: #4a5568; /* Lighter grey background */
+            border-radius: 4px;
             margin: 0 auto;
             position: relative;
             overflow: hidden;
-            border: 1px solid #5a0000;
+            border: 1px solid #2d3748; /* Darker grey border */
             /* Width set by JS */
             width: var(--reels-container-width, 394px);
         }
@@ -158,9 +158,9 @@
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #00ff00 0%, #32cd32 50%, #00ff00 100%);
-            border-radius: 2px;
-            transition: width 1s ease-out;
+            background: linear-gradient(90deg, #3CE74C 0%, #2DD93C 50%, #3CE74C 100%); /* Custom green gradient */
+            border-radius: 3px;
+            transition: width 0.3s ease-out;
         }
 
         /* Control panel - scaled */
@@ -290,32 +290,36 @@
             background: #229954;
         }
 
-        /* Faucet countdown button styles */
+        /* Faucet countdown button styles - matches progress bar theme */
         .faucet-countdown-btn {
-            background: #8B0000;
-            color: white;
+            background: #4a5568; /* Match progress bar background */
+            color: #e2e8f0; /* Light grey text for good contrast */
             border: none;
             padding: calc(10px * var(--scale-factor, 1)) calc(20px * var(--scale-factor, 1));
             border-radius: 4px;
             cursor: pointer;
             font-size: calc(1rem * var(--scale-factor, 1));
             font-weight: bold;
-            transition: background 0.3s ease;
-            border: 1px solid #5a0000;
+            transition: all 0.3s ease;
+            border: 1px solid #2d3748; /* Match progress bar border */
         }
         
         .faucet-countdown-btn:not(:disabled) {
-            background: linear-gradient(90deg, #00ff00 0%, #32cd32 50%, #00ff00 100%);
-            border: 1px solid #00cc00;
-            color: #000;
+            background: linear-gradient(90deg, #3CE74C 0%, #2DD93C 50%, #3CE74C 100%); /* Match progress fill */
+            border: 1px solid #2ABB38;
+            color: #1a202c; /* Dark text on green for good contrast */
         }
         
         .faucet-countdown-btn:not(:disabled):hover {
-            background: linear-gradient(90deg, #00dd00 0%, #28a428 50%, #00dd00 100%);
+            background: linear-gradient(90deg, #4FED5C 0%, #3FE64F 50%, #4FED5C 100%); /* Lighter green on hover */
         }
         
         .faucet-countdown-btn:disabled {
             cursor: not-allowed;
+        }
+        
+        .faucet-countdown-btn:disabled:hover {
+            background: #718096; /* Slightly lighter on hover even when disabled */
         }
         
         .faucet-countdown-btn .btn-text {
@@ -675,6 +679,8 @@
             if (!balanceSystem) return { success: false, error: 'System not ready' };
             return await balanceSystem.subtractBalance(amount, source, description);
         }
+        
+        // Progress bar is now handled by site-utils.js centrally!
     </script>
     <script src="slots/slots.js"></script>
     <script>

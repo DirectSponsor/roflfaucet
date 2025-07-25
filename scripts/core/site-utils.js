@@ -5,6 +5,15 @@
 // FAUCET COUNTDOWN BUTTON SYSTEM
 // ====================================
 
+// Central color configuration - change once, affects everything!
+const FAUCET_COLORS = {
+    primary: '#3CE74C',
+    secondary: '#2DD93C',
+    ready: 'linear-gradient(90deg, #3CE74C 0%, #2DD93C 50%, #3CE74C 100%)',
+    progress: '#3CE74C',
+    disabled: '#95a5a6'
+};
+
 // Cooldown functions - single source of truth for all buttons
 function getRemainingCooldownTime() {
     const lastClaim = localStorage.getItem('last_claim_time');
@@ -45,7 +54,7 @@ function updateFaucetCountdownButton() {
             btn.disabled = false;
             btn.classList.add('ready');
             btnText.textContent = 'Faucet: Ready';
-            btn.style.background = '#27ae60';
+            btn.style.background = FAUCET_COLORS.ready;
             
             // Clear interval if running
             if (faucetCountdownInterval) {
@@ -61,7 +70,7 @@ function updateFaucetCountdownButton() {
             
             // Update progress bar (green fill from left to right)
             btn.style.setProperty('--progress', `${progressPercent}%`);
-            btn.style.background = `linear-gradient(to right, #27ae60 ${progressPercent}%, #95a5a6 ${progressPercent}%)`;
+            btn.style.background = `linear-gradient(to right, ${FAUCET_COLORS.progress} ${progressPercent}%, ${FAUCET_COLORS.disabled} ${progressPercent}%)`;
         }
     });
     
@@ -84,7 +93,7 @@ function updateFaucetCountdownButton() {
             startClaimBtn.textContent = `⏱️ ${seconds}s`;
             
             // Update progress bar (green fill from left to right)
-            startClaimBtn.style.background = `linear-gradient(to right, #27ae60 ${progressPercent}%, #95a5a6 ${progressPercent}%)`;
+            startClaimBtn.style.background = `linear-gradient(to right, ${FAUCET_COLORS.progress} ${progressPercent}%, ${FAUCET_COLORS.disabled} ${progressPercent}%)`;
         }
     }
     
@@ -106,6 +115,24 @@ function updateFaucetCountdownButton() {
             // In cooldown - show progress
             fill.style.width = `${progressPercent}%`;
             indicator.classList.remove('ready');
+        }
+    });
+    
+    // Update slot machine progress bars (progress-fill elements)
+    const slotProgressBars = ['progress-fill', 'progress-fill-back'];
+    slotProgressBars.forEach(progressId => {
+        const progressBar = document.getElementById(progressId);
+        if (!progressBar) return;
+        
+        // Set dynamic colors using central configuration
+        progressBar.style.background = FAUCET_COLORS.ready;
+        
+        if (remaining <= 0) {
+            // Ready to claim - show full progress
+            progressBar.style.width = '100%';
+        } else {
+            // In cooldown - show progress percentage
+            progressBar.style.width = `${progressPercent}%`;
         }
     });
 }
