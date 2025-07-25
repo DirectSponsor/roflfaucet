@@ -620,28 +620,60 @@
     </div>
 
     <script>
-        // Add stub balance functions for standalone operation
-        let standaloneBalance = 100; // Starting balance
+        // Initialize unified balance system
+        let balanceSystem;
         
-        async function getBalance() {
-            return standaloneBalance;
-        }
-        
-        async function addBalance(amount, type, description) {
-            standaloneBalance += amount;
-            console.log(`💰 Added ${amount} to balance. New balance: ${standaloneBalance}`);
-            return { success: true, balance: standaloneBalance };
-        }
-        
-        async function subtractBalance(amount, type, description) {
-            if (standaloneBalance >= amount) {
-                standaloneBalance -= amount;
-                console.log(`💸 Subtracted ${amount} from balance. New balance: ${standaloneBalance}`);
-                return { success: true, balance: standaloneBalance };
-            } else {
-                console.log(`❌ Insufficient balance. Need ${amount}, have ${standaloneBalance}`);
-                return { success: false, error: 'Insufficient balance', balance: standaloneBalance };
+        // Initialize balance system when DOM loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Initialize the unified balance system
+                balanceSystem = new UnifiedBalanceSystem();
+                
+                // Load initial balance and update display
+                const initialBalance = await balanceSystem.getBalance();
+                console.log('🎰 Initial balance loaded:', initialBalance);
+                
+                // Update balance display
+                const balanceEl = document.getElementById('current-balance');
+                const balanceBackEl = document.getElementById('current-balance-back');
+                if (balanceEl) balanceEl.textContent = initialBalance;
+                if (balanceBackEl) balanceBackEl.textContent = initialBalance;
+                
+            } catch (error) {
+                console.error('💥 Failed to initialize balance system:', error);
+                // Fallback to simple guest mode if unified system fails
+                balanceSystem = {
+                    balance: 100,
+                    async getBalance() { return this.balance; },
+                    async addBalance(amount, source, description) {
+                        this.balance += amount;
+                        return { success: true, balance: this.balance };
+                    },
+                    async subtractBalance(amount, source, description) {
+                        if (this.balance >= amount) {
+                            this.balance -= amount;
+                            return { success: true, balance: this.balance };
+                        }
+                        return { success: false, error: 'Insufficient balance', balance: this.balance };
+                    }
+                };
             }
+        });
+        
+        // Global functions that the slots system expects
+        async function getBalance() {
+            if (!balanceSystem) return 100; // Default fallback
+            return await balanceSystem.getBalance();
+        }
+        
+        async function addBalance(amount, source, description) {
+            if (!balanceSystem) return { success: true, balance: 100 };
+            return await balanceSystem.addBalance(amount, source, description);
+        }
+        
+        async function subtractBalance(amount, source, description) {
+            if (!balanceSystem) return { success: false, error: 'System not ready' };
+            return await balanceSystem.subtractBalance(amount, source, description);
         }
     </script>
     <script src="slots/slots.js"></script>
