@@ -39,7 +39,7 @@ body {
     padding: 0;
 }
 
-/* Header - Glass-morphism effect like old system */
+/* Header - Glass-morphism effect with responsive scaling */
 .header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -56,10 +56,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0.5rem 1rem;
-    gap: 2rem;
+    padding: 0.5rem 5%;
 }
 
 .logo h1 {
@@ -236,12 +235,31 @@ body {
 .slots-iframe-container iframe {
     width: 100%;
     /* aspect-ratio: 4 / 5; -- Temporarily removed to test responsiveness */
-    height: 600px; /* Increased height to eliminate scrollbars */
+    height: 600px; /* Full height for desktop */
     border: none;
     border-radius: 8px;
     display: block;
     background: transparent;
     overflow: hidden;
+}
+
+/* Responsive height scaling for mobile */
+@media (max-width: 650px) {
+    .slots-iframe-container iframe {
+        height: 450px; /* Reduced height when sidebar stacks */
+    }
+}
+
+@media (max-width: 480px) {
+    .slots-iframe-container iframe {
+        height: 400px; /* Even smaller for phones */
+    }
+}
+
+@media (max-width: 360px) {
+    .slots-iframe-container iframe {
+        height: 350px; /* Minimal height for very small phones */
+    }
 }
 
 .collapsed .left-sidebar, 
@@ -254,6 +272,40 @@ body {
 @media (max-width: 900px) { /* Right sidebar collapses at 900px */
     .right-sidebar {
         display: none;
+    }
+}
+
+/* Tablet adjustments */
+@media (max-width: 900px) {
+    .nav {
+        gap: 1.5rem;
+        margin: 0 1.5rem;
+    }
+}
+
+/* Mobile header adjustments - tablets and smaller */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 0.4rem 3%;
+    }
+    
+    .logo h1 {
+        font-size: 1.3rem;
+    }
+    
+    .nav {
+        gap: 1rem;
+        margin: 0 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+    }
+    
+    .header-auth-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
     }
 }
 
@@ -270,6 +322,7 @@ body {
     
     .main-content {
         order: 1; /* Main content goes first */
+        margin: 0;
     }
     
     /* Hide desktop navigation and show hamburger menu */
@@ -284,6 +337,20 @@ body {
     /* Mobile navigation overlay - keep hidden by default */
     .mobile-nav {
         display: none;
+    }
+    
+    /* Even smaller header for mobile phones - overrides tablet styles */
+    .header-content {
+        padding: 0.4rem 4%;
+    }
+    
+    .logo h1 {
+        font-size: 1.2rem;
+    }
+    
+    .header-auth-btn {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
     }
 }
 

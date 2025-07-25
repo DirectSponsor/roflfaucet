@@ -21,7 +21,6 @@
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
-            min-height: 100vh;
             display: flex;
             align-items: flex-start;
             justify-content: center;
@@ -406,20 +405,6 @@
             font-size: calc(1rem * var(--scale-factor, 1));
         }
 
-        /* Debug indicator */
-        .debug-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-family: monospace;
-            z-index: 1000;
-            max-width: 200px;
-        }
 
     </style>
 </head>
@@ -616,12 +601,6 @@
         </div>
     </div>
 
-    <!-- Debug indicator -->
-    <div class="debug-indicator" id="debug-info">
-        Window: Loading...<br>
-        Reel: Loading...<br>
-        Events: 0
-    </div>
 
     <script>
         // Initialize unified balance system
@@ -684,19 +663,9 @@
     </script>
     <script src="slots/slots.js"></script>
     <script>
-        // Visual debug tracking
-        let resizeEventCount = 0;
-        function updateDebugInfo(reelWidth = 'Loading...') {
-            const debugElement = document.getElementById('debug-info');
-            if (debugElement) {
-                debugElement.innerHTML = `Window: ${window.innerWidth}x${window.innerHeight}<br>Reel: ${reelWidth}px<br>Events: ${resizeEventCount}`;
-            }
-        }
-        
         // Override the calculateResponsiveDimensions function for standalone version
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎰 DOM loaded, attempting to override...');
-            updateDebugInfo();
             
             // Wait for slot machine to be created
             setTimeout(() => {
@@ -786,20 +755,15 @@
                         console.log(`  Container width: ${containerWidth}px`);
                         console.log(`  Reel width: ${reelWidth}px`);
                         console.log(`  Reel height: ${reelHeight}px`);
-                        
-                        // Update visual debug info
-                        updateDebugInfo(reelWidth);
                     };
                     
                     // Trigger initial calculation
                     window.slotMachine.updateSpriteDimensions();
                     
-                    // Add debugging for resize events
+                    // Add resize event handling
                     let resizeTimeout;
                     window.addEventListener('resize', () => {
-                        resizeEventCount++;
                         console.log('🎰 RESIZE EVENT FIRED! Window size:', window.innerWidth, 'x', window.innerHeight);
-                        updateDebugInfo(window.slotMachine ? window.slotMachine.reelWidth : 'Loading...');
                         
                         // Debounce resize events
                         clearTimeout(resizeTimeout);
@@ -872,6 +836,7 @@
                 }
             }
         }
+        
     </script>
 </body>
 </html>
