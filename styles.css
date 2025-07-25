@@ -236,7 +236,7 @@ body {
 .slots-iframe-container iframe {
     width: 100%;
     /* aspect-ratio: 4 / 5; -- Temporarily removed to test responsiveness */
-    height: 500px; /* Temporary fixed height for testing */
+    height: 600px; /* Increased height to eliminate scrollbars */
     border: none;
     border-radius: 8px;
     display: block;

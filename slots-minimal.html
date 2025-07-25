@@ -25,14 +25,14 @@
             display: flex;
             align-items: flex-start;
             justify-content: center;
-            padding-top: 20px;
+            padding-top: 0.1em;
         }
 
         /* Minimal container - let JS control everything else */
         .slot-container {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 15px;
-            padding: 20px;
+            padding: 0.1em;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
@@ -172,8 +172,7 @@
             margin: 0 auto;
             width: fit-content;
             height: var(--control-height, 80px);
-            padding: calc(10px * var(--scale-factor, 1));
-            margin-top: 2px;
+            padding: 0 calc(10px * var(--scale-factor, 1)) calc(10px * var(--scale-factor, 1));
         }
 
         .control-table {
