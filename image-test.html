@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Test for iframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .image-container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .test-image {
+            width: 100%;
+            height: auto;
+            max-width: 500px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        p {
+            color: #666;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        /* Test different viewport sizes */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .image-container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.3em;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            body {
+                padding: 5px;
+            }
+            
+            .image-container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <h1>🖼️ Image Responsiveness Test</h1>
+        
+        <!-- Using a placeholder image service for testing -->
+        <img 
+            src="https://picsum.photos/500/300?random=1" 
+            alt="Test image for iframe responsiveness"
+            class="test-image"
+            onerror="this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"500\" height=\"300\" viewBox=\"0 0 500 300\"><rect width=\"500\" height=\"300\" fill=\"%23e0e0e0\"/><text x=\"250\" y=\"150\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"20\" fill=\"%23666\">Test Image<tspan x=\"250\" dy=\"25\">500x300px</tspan></text></svg>'"
+        >
+        
+        <p>This image should scale responsively within the iframe container.</p>
+        <p>Window size: <span id="size-info"></span></p>
+    </div>
+    
+    <script>
+        // Show current window dimensions for debugging
+        function updateSizeInfo() {
+            document.getElementById('size-info').textContent = 
+                `${window.innerWidth}x${window.innerHeight}`;
+        }
+        
+        updateSizeInfo();
+        window.addEventListener('resize', updateSizeInfo);
+        
+        // Log iframe info to console for debugging
+        console.log('Image test page loaded');
+        console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
+        console.log('Is in iframe:', window !== window.parent);
+    </script>
+</body>
+</html>

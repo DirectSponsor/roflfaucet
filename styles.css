@@ -222,6 +222,28 @@ body {
     box-sizing: border-box;
 }
 
+/* Slots iframe container styles */
+.slots-iframe-container {
+    width: 100%;
+    max-width: 600px; /* Max width for the slot machine */
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.slots-iframe-container iframe {
+    width: 100%;
+    /* aspect-ratio: 4 / 5; -- Temporarily removed to test responsiveness */
+    height: 500px; /* Temporary fixed height for testing */
+    border: none;
+    border-radius: 8px;
+    display: block;
+    background: transparent;
+    overflow: hidden;
+}
+
 .collapsed .left-sidebar, 
 .collapsed .right-sidebar {
     width: 0;
