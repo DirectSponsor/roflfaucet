@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }),
                 datasets: [{
                     label: 'Balance',
-                    data: displayData,
+                    data: displayData.map(item => item.balance),
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
                     fill: true,

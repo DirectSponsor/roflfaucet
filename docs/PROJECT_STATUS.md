@@ -88,7 +88,32 @@ A responsive web-based slot machine game ("ROFLFaucet") with integrated advertis
 
 ## Current Technical Issues
 
-### 1. Image Loading Problem 🔴
+### 1. Mobile Center Column Centering Issue 🔴 **URGENT - July 26, 2025**
+- **Issue**: When left sidebar collapses at 650px, the iframe shifts to the left instead of centering
+- **Problem**: Main content area has margins/padding that prevent proper centering when sidebar stacks
+- **Current State**: Iframe appears left-aligned with wasted space on the right
+- **Root Cause**: Flexbox layout with margin/padding interactions not accounting for sidebar collapse
+- **Impact**: Poor visual appearance on mobile/tablet when transitioning from desktop layout
+- **Attempted Fixes (July 26)**:
+  - ✗ Modified `.main-content` margins from `margin: 0` to `margin-left: 0; margin-right: 0` 
+  - ✗ Removed left/right padding: `padding-left: 0; padding-right: 0`
+  - ✗ Added visual debugging outlines (red for main-content, blue for iframe container)
+  - **Result**: No change in behavior - iframe still appears left-aligned on mobile
+  - **Observation**: The red/blue outlines were visible, confirming CSS was loading, but layout unchanged
+
+### 2. Mobile Header Spacing Issue 🔴 **Secondary Priority - July 25, 2025**
+- **Issue**: Header has excessive spacing between elements on mobile devices (iPhone SE 375px width)
+- **Problem**: `justify-content: space-between` creates huge gaps when navigation is hidden on mobile
+- **Current State**: Logo on left, huge gap, then hamburger+login on right
+- **Root Cause**: Header layout not optimized for mobile - need proper element grouping
+- **Impact**: Causes horizontal scrolling and poor user experience on mobile
+- **Next Steps**: 
+  - Need to group hamburger menu and login button together on right side
+  - Reduce overall header padding on mobile
+  - Test that slots machine doesn't resize/reload after changes
+- **Note**: Previous attempts today caused slots to load large then resize - need careful approach
+
+### 2. Image Loading Problem 🔴
 - **Issue**: Test image loads locally but not on DDNS deployment
 - **URL**: `http://satoshihost.ddns.net/home/andy/Documents/websites/-%20archived_sites/directsponsor/directsponsor.net/bloukrans.directsponsor.net/static/wp-content/uploads/2016/04/IMG_1293-300x224.jpg`
 - **Suspected Cause**: Path outside domain scope or server configuration

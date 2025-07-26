@@ -961,31 +961,5 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('🎰 Error stack:', error.stack);
     }
     
-    // Setup mobile hamburger menu
-    const hamburgerBtn = document.getElementById('mobile-menu-btn');
-    const mobileNav = document.getElementById('mobile-nav');
-    
-    if (hamburgerBtn && mobileNav) {
-        hamburgerBtn.addEventListener('click', () => {
-            hamburgerBtn.classList.toggle('open');
-            mobileNav.classList.toggle('active');
-        });
-        
-        // Close mobile nav when clicking on a link
-        mobileNav.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
-                hamburgerBtn.classList.remove('open');
-                mobileNav.classList.remove('active');
-            }
-        });
-        
-        // Close mobile nav when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!hamburgerBtn.contains(e.target) && !mobileNav.contains(e.target)) {
-                hamburgerBtn.classList.remove('open');
-                mobileNav.classList.remove('active');
-            }
-        });
-    }
 });
 

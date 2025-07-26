@@ -5,9 +5,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--reel-gap, 15px); /* Responsive gap - smaller default */
+    gap: 20px; /* Increased gap between reels */
     background: #1a1a1a;
-    padding: var(--container-padding, 15px);
+    padding: 20px; /* Increased padding */
     border-radius: 10px;
     border: 2px solid #333;
     width: fit-content; /* Dynamically fit content */
@@ -26,10 +26,11 @@
     border-radius: 3px;
     position: relative;
     border: 2px solid #222;
+    flex-shrink: 0; /* Prevent flex container from shrinking reels */
     
 /* Sprite background setup - 120px sprite with fixed sizing */
-    background-image: url('sprite_reel_vertical_120px.png');
-    background-size: 120px 1200px;
+    background-image: url('slots/sprite_reel_vertical_120px.png');
+    background-size: 120px 1200px; /* Keep exact sprite dimensions for positioning */
     background-repeat: repeat-y;
     background-position: 0 0;
 }
@@ -813,6 +814,256 @@
     transform: scale(0.98);
 }
 
+/* Responsive Media Queries for Control Panel */
+/* Responsive scaling for smaller screens */
+
+@media (max-width: 480px) {
+    .control-panel {
+        height: 70px; /* Slightly smaller height */
+        padding: 8px;
+    }
+    
+    .control-table td {
+        padding: 2px 4px; /* Tighter padding */
+    }
+    
+    .control-label {
+        font-size: 0.7rem; /* Smaller labels */
+    }
+    
+    .control-value {
+        font-size: 1.2rem; /* Smaller values */
+        min-height: 48px; /* Smaller min height */
+    }
+    
+    .spin-button {
+        height: 48px; /* Smaller button */
+        font-size: 1rem;
+        min-width: 100px; /* Smaller minimum width */
+        padding: 0 15px;
+    }
+    
+    .bet-btn-inline {
+        width: 28px;
+        height: 22px;
+        font-size: 0.55rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .control-panel {
+        height: 65px; /* Even smaller height */
+        padding: 6px;
+    }
+    
+    .control-table td {
+        padding: 1px 2px; /* Very tight padding */
+    }
+    
+    .control-label {
+        font-size: 0.65rem; /* Even smaller labels */
+    }
+    
+    .control-value {
+        font-size: 1.1rem; /* Even smaller values */
+        min-height: 42px;
+    }
+    
+    .spin-button {
+        height: 42px; /* Even smaller button */
+        font-size: 0.9rem;
+        min-width: 80px;
+        padding: 0 10px;
+    }
+    
+    .bet-btn-inline {
+        width: 24px;
+        height: 18px;
+        font-size: 0.5rem;
+    }
+    
+    /* Adjust column widths for very small screens */
+    .control-table td:nth-child(1) { min-width: 45px; }
+    .control-table td:nth-child(2) { min-width: 60px; }
+    .control-table td:nth-child(3) { min-width: 35px; }
+    .control-table td:nth-child(4) { width: 50px; max-width: 50px; }
+    .control-table td:nth-child(5) { max-width: 100px; }
+}
+
+@media (max-width: 360px) {
+    .control-panel {
+        height: 62px;
+        padding: 5px;
+    }
+    
+    .control-table td {
+        padding: 1px 3px;
+    }
+    
+    .control-label {
+        font-size: 0.62rem;
+    }
+    
+    .control-value {
+        font-size: 1.05rem;
+        min-height: 40px;
+    }
+    
+    .spin-button {
+        height: 40px;
+        font-size: 0.85rem;
+        min-width: 65px;
+        padding: 0 6px;
+    }
+    
+    .bet-btn-inline {
+        width: 22px;
+        height: 17px;
+        font-size: 0.48rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .control-panel {
+        height: 60px; /* Minimal height for very small screens */
+        padding: 4px;
+    }
+    
+    .control-label {
+        font-size: 0.6rem;
+    }
+    
+    .control-value {
+        font-size: 1rem;
+        min-height: 38px;
+    }
+    
+    .spin-button {
+        height: 38px;
+        font-size: 0.8rem;
+        min-width: 60px;
+        padding: 0 8px;
+    }
+    
+    .bet-btn-inline {
+        width: 20px;
+        height: 16px;
+        font-size: 0.45rem;
+    }
+}
+
 /* Desktop and tablet optimized - no mobile scaling */
 
 /* Let JavaScript handle all responsive reel sizing to avoid conflicts */
+
+/* ===== MOBILE LAYOUT ADDITIONS ===== */
+/* Mobile-first single column layout */
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* Layout ordering for mobile */
+.main-content {
+    order: 1;
+    width: 100%;
+    margin: 0 0 20px 0;
+}
+
+.left-sidebar {
+    order: 2;
+    width: 100%;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.right-sidebar {
+    order: 3;
+    width: 100%;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+/* Game container adjustments */
+.slots-iframe-container,
+.slots-game-container {
+    width: 100%;
+    max-width: 450px; /* Increased to accommodate proper reel spacing */
+    margin: 0 auto;
+}
+
+.slots-iframe-container iframe {
+    width: 100%;
+    height: 300px;
+}
+
+/* Sidebar content adjustments */
+.left-sidebar > div,
+.right-sidebar > div {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Header adjustments for mobile */
+.header {
+    padding: 10px;
+    position: relative;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.nav {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+}
+
+.nav-link {
+    padding: 8px;
+    margin: 2px 0;
+    background: #f1f1f1;
+    text-align: left;
+    width: 100%;
+}
+
+.hamburger {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 22px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.hamburger div {
+    background-color: #333;
+    height: 4px;
+    margin: 5px 0;
+    transition: 0.4s;
+}
+
+nav.open {
+    display: flex;
+}
+
+/* Typography adjustments */
+h1 {
+    font-size: 1.2em;
+    margin: 0 0 15px 0;
+}
+
+/* Ensure no horizontal scrolling */
+body {
+    overflow-x: hidden;
+}
