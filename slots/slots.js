@@ -505,7 +505,12 @@ class CasinoSlotMachine {
                           `Click OK to go to the faucet page.`;
         
         if (confirm(promptText)) {
-            window.location.href = 'index.html';
+            // Navigate parent window if in iframe, otherwise navigate normally
+            if (window.parent !== window) {
+                window.parent.postMessage({type: 'navigate', url: 'index.html'}, '*');
+            } else {
+                window.location.href = 'index.html';
+            }
         }
     }
     

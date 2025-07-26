@@ -792,6 +792,22 @@
             }
         }
         
+        // Override handleFaucetClaim to work properly in iframe context
+        function handleFaucetClaim() {
+            // Check if faucet is ready using site-utils function if available
+            if (typeof canClaim === 'function' && !canClaim()) {
+                alert('Faucet is not ready yet!');
+                return;
+            }
+            
+            // Navigate to faucet claim page via parent window
+            if (window.parent !== window) {
+                window.parent.postMessage({type: 'navigate', url: 'faucet-claim.html'}, '*');
+            } else {
+                window.location.href = 'faucet-claim.html';
+            }
+        }
+        
         // Flip machine function
         function flipMachine() {
             const machine = document.getElementById('slot-machine');
