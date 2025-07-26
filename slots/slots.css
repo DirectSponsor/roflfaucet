@@ -28,7 +28,7 @@
     border: 2px solid #222;
     
 /* Sprite background setup - 120px sprite with fixed sizing */
-    background-image: url('sprite_reel_vertical_120px.png');
+    background-image: url('images/sprite_reel_vertical_120px.png');
     background-size: 120px 1200px;
     background-repeat: repeat-y;
     background-position: 0 0;

@@ -5,9 +5,9 @@ console.log('🖼️ Simple Gallery System loading...');
 class SimpleGallery {
     constructor() {
         this.galleries = {
-            postimg: 'postimg_gallery.txt',
-            giphy: 'giphy_gallery.txt', 
-            vgy: 'vgy_gallery.txt'
+            postimg: 'data/postimg_gallery.txt',
+            giphy: 'data/giphy_gallery.txt', 
+            vgy: 'data/vgy_gallery.txt'
         };
         this.currentGallery = 'giphy';
     }

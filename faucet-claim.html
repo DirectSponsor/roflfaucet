@@ -2,7 +2,7 @@
 <!-- TITLE=_ROFLFaucet - Claim Your Coins_ -->
 <!-- DESC=_Complete the captcha to claim your free UselessCoins_ -->
 <!-- KEYWORDS=_crypto faucet, free tokens, cryptocurrency, uselesscoins, claim_ -->
-<!-- STYLES=_guest-base.css, member-base.css_ -->
+<!-- STYLES=_styles/guest-base.css, styles/member-base.css_ -->
 <!-- SCRIPTS=_scripts/core/faucet-bridge.js_ -->
 
 <!-- include start header.html -->
@@ -16,11 +16,11 @@
     <meta name="description" content="Complete the captcha to claim your free UselessCoins">
     
     <!-- Base Layout CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="guest-base.css">
-    <link rel="stylesheet" href="member-base.css">
+        <link rel="stylesheet" href="styles/guest-base.css">
+    <link rel="stylesheet" href="styles/member-base.css">
 
     
     <!-- Site-wide scripts -->
@@ -41,6 +41,13 @@
                 <a href="slots.html" class="nav-link">Slots</a>
                 <a href="about.html" class="nav-link">About</a>
             </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             
             <div class="header-auth">
                 <button id="oauth-login-btn" class="header-auth-btn">Login</button>

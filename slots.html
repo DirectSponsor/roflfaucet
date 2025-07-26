@@ -16,7 +16,7 @@
     <meta name="description" content="Play casino slots and win UselessCoins on ROFLFaucet">
     
     <!-- Base Layout CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
         <link rel="stylesheet" href="slots/slots.css">
@@ -41,6 +41,13 @@
                 <a href="about.html" class="nav-link">About</a>
             </nav>
             
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
             <div class="header-auth">
                 <button id="oauth-login-btn" class="header-auth-btn">Login</button>
             </div>
@@ -52,12 +59,12 @@
 
 <!-- include start left-sidebar.html -->
         <aside class="left-sidebar">
-            <!-- A-Ads placeholder - maintains 300x250 aspect ratio -->
-            <div style="width: 100%; aspect-ratio: 6 / 5; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 300px; box-sizing: border-box;">
+            <!-- A-Ads placeholder - no min-width constraint for testing -->
+            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
                 <div>
                     A-Ads Placeholder<br>
                     300x250px<br>
-                    (maintains aspect ratio)
+                    (scales to fit)
                 </div>
             </div>
         </aside>
@@ -91,9 +98,6 @@
 
 <!-- include start footer.html -->
     </div>
-    
-    <!-- Mobile detection and redirect -->
-    <script src="archive/device-detection.js"></script>
     
     <!-- Additional page-specific scripts -->
         <script src="slots/slots.js"></script>

@@ -29,7 +29,7 @@
     flex-shrink: 0; /* Prevent flex container from shrinking reels */
     
 /* Sprite background setup - 120px sprite with fixed sizing */
-    background-image: url('slots/sprite_reel_vertical_120px.png');
+    background-image: url('slots/images/sprite_reel_vertical_120px.png');
     background-size: 120px 1200px; /* Keep exact sprite dimensions for positioning */
     background-repeat: repeat-y;
     background-position: 0 0;

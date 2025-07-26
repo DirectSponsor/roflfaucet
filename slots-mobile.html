@@ -11,15 +11,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROFLFaucet - Casino Slots</title>
+    <title>ROFLFaucet - Casino Slots (Mobile)</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="Play casino slots and win UselessCoins on ROFLFaucet">
+    <meta name="description" content="Play casino slots and win UselessCoins on ROFLFaucet - Mobile optimized">
     
     <!-- Base Layout CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
     
-    <!-- Mobile games layout with full slot machine functionality -->
-    <link rel="stylesheet" href="mobile-games-base.css">
+    <!-- Additional page-specific styles -->
+        <link rel="stylesheet" href="slots/slots.css">
+    <link rel="stylesheet" href="mobile-layout.css">
+
     
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
@@ -34,31 +36,26 @@
                 <h1>🤣 roflfaucet</h1>
             </div>
             
-            <!-- Hamburger menu -->
-            <div class="hamburger" onclick="toggleMenu()">
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
-            
-            <nav class="nav" id="nav">
+            <nav class="nav">
                 <a href="index.html" class="nav-link">Faucet</a>
                 <a href="slots.html" class="nav-link">Slots</a>
                 <a href="about.html" class="nav-link">About</a>
-                <button id="oauth-login-btn" class="nav-link">Login</button>
             </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="header-auth">
+                <button id="oauth-login-btn" class="header-auth-btn">Login</button>
+            </div>
         </div>
     </header>
     
     <div class="container">
-        <!-- Main content comes first on mobile -->
-        <main class="main-content">
-            <h1 style="margin: 0 0 0.25em 0; font-size: 1.3em; text-align: center;">
-                <span class="emoji-desktop">🎰 </span>Casino Slots
-            </h1>
-            
-            <!-- Direct slot machine embed instead of iframe for better mobile performance -->
-            <div class="slots-game-container">
 <!-- include start components/slot-machine.html -->
 <div class="slot-machine" id="slot-machine">
 
@@ -212,12 +209,12 @@
 
 <!-- include start left-sidebar.html -->
         <aside class="left-sidebar">
-            <!-- A-Ads placeholder - maintains 300x250 aspect ratio -->
-            <div style="width: 100%; aspect-ratio: 6 / 5; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 300px; box-sizing: border-box;">
+            <!-- A-Ads placeholder - no min-width constraint for testing -->
+            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
                 <div>
                     A-Ads Placeholder<br>
                     300x250px<br>
-                    (maintains aspect ratio)
+                    (scales to fit)
                 </div>
             </div>
         </aside>
@@ -237,14 +234,6 @@
     
     <!-- Additional page-specific scripts -->
         <script src="slots/slots.js"></script>
-    
-    <!-- Hamburger menu script -->
-    <script>
-        function toggleMenu() {
-            const nav = document.getElementById('nav');
-            nav.classList.toggle('open');
-        }
-    </script>
 
 </body>
 </html>
