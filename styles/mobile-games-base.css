@@ -216,27 +216,6 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Ready state - glowing animation */
-.faucet-progress-indicator.ready .progress-fill {
-    width: 100% !important;
-    animation: faucetGlow 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes faucetGlow {
-    0% {
-        box-shadow: 
-            0 0 4px rgba(0, 255, 0, 0.4),
-            0 0 8px rgba(0, 255, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-    100% {
-        box-shadow: 
-            0 0 8px rgba(0, 255, 0, 0.8),
-            0 0 16px rgba(0, 255, 0, 0.4),
-            0 0 24px rgba(0, 255, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-}
 
 /* Control Panel - HTML Table Layout - Responsive */
 .control-panel {
