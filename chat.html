@@ -1,0 +1,149 @@
+<!-- 💬 ROFLFaucet Chat Page -->
+<!-- TITLE=_ROFLChat - Community Chat_ -->
+<!-- DESC=_Join the ROFLFaucet community chat, tip coins, and participate in rain events_ -->
+<!-- KEYWORDS=_chat, community, crypto chat, tip coins, faucet community_ -->
+<!-- STYLES=_chat/styles/chat-widget.css_ -->
+<!-- SCRIPTS=_chat/scripts/chat-widget.js, chat/scripts/chat-integration.js_ -->
+
+<!-- include start header.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROFLChat - Community Chat</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
+    <meta name="description" content="Join the ROFLFaucet community chat, tip coins, and participate in rain events">
+    
+    <!-- Base Layout CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <!-- Additional page-specific styles -->
+        <link rel="stylesheet" href="chat/styles/chat-widget.css">
+
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🤣 roflfaucet</h1>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Faucet</a>
+                <a href="slots.html" class="nav-link">Slots</a>
+                <a href="chat.html" class="nav-link active">Chat</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="header-auth">
+                <button id="oauth-login-btn" class="header-auth-btn">Login</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+<!-- include end header.html -->
+
+<!-- include start left-sidebar.html -->
+        <aside class="left-sidebar">
+            <!-- A-Ads placeholder - no min-width constraint for testing -->
+            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
+                <div>
+                    A-Ads Placeholder<br>
+                    300x250px<br>
+                    (scales to fit)
+                </div>
+            </div>
+        </aside>
+<!-- include end left-sidebar.html -->
+
+        <!-- Standalone Chat Page - Full Width Layout -->
+        <div style="grid-column: 1 / -1; padding: 20px; display: flex; flex-direction: column; align-items: center;">
+            <!-- Page Header -->
+            <div style="text-align: center; margin-bottom: 30px; max-width: 600px;">
+                <h1 style="margin: 0 0 10px 0; font-size: 2.5em; color: #3498db;">💬 ROFLChat</h1>
+                <p style="color: #666; font-size: 1.1em; margin: 0 0 15px 0;">Connect with the community, share tips, and join rain events!</p>
+                
+                <!-- Balance display -->
+                <div style="margin: 15px 0; padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px; border-left: 4px solid #3498db;">
+                    <span style="font-size: 18px; font-weight: bold;">💰 Balance: </span>
+                    <span class="stats-number balance" id="balance" style="font-size: 20px; color: #2ecc71;">0</span> 
+                    <span class="currency-full" style="font-size: 18px;">tokens</span>
+                </div>
+            </div>
+            
+            <!-- Chat Widget Container -->
+            <div class="standalone-chat-container" style="width: 100%; max-width: 900px; margin-bottom: 30px;">
+                <div id="chat-widget-container" style="width: 100%; height: 650px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);">
+                    <!-- Chat widget will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Connection Status -->
+            <div id="chat-status" style="text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px; border-left: 4px solid #e74c3c; max-width: 600px; width: 100%;">
+                <strong style="color: #e74c3c;">Chat Status:</strong> 
+                <span id="connection-status">Connecting to chat server...</span>
+            </div>
+            
+            <!-- Chat Features Info -->
+            <div style="max-width: 900px; width: 100%; padding: 25px; background: rgba(52, 152, 219, 0.1); border-radius: 12px; border-left: 4px solid #3498db;">
+                <h4 style="margin-top: 0; color: #3498db; text-align: center; font-size: 1.4em;">🎮 Chat Features</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 20px;">
+                    <div style="text-align: center; padding: 20px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">💸</div>
+                        <strong style="display: block; margin-bottom: 8px; color: #2c3e50;">Tip System</strong>
+                        <span style="color: #666; line-height: 1.4;">Send coins to other users with <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px;">/tip username amount</code></span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🌧️</div>
+                        <strong style="display: block; margin-bottom: 8px; color: #2c3e50;">Rain Events</strong>
+                        <span style="color: #666; line-height: 1.4;">VIP users can create rain events to reward active chatters</span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">👑</div>
+                        <strong style="display: block; margin-bottom: 8px; color: #2c3e50;">VIP Room</strong>
+                        <span style="color: #666; line-height: 1.4;">Exclusive room for users with 1000+ coins or special status</span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">❓</div>
+                        <strong style="display: block; margin-bottom: 8px; color: #2c3e50;">Help & Commands</strong>
+                        <span style="color: #666; line-height: 1.4;">Commands, rules, and guidelines for community chat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- include start right-sidebar.html -->
+        <aside class="right-sidebar">
+            <!-- Random Giphy Image Container -->
+            <div id="sidebar-giphy-gallery" class="full-width" data-gallery="giphy" style="text-align: center; margin: 0; padding: 0;">
+                <p style="color: #666; font-size: 14px; margin: 10px;">Loading funny GIF...</p>
+            </div>
+        </aside>
+<!-- include end right-sidebar.html -->
+
+<!-- include start footer.html -->
+    </div>
+    
+    <!-- Additional page-specific scripts -->
+    <script src="chat/scripts/mock-websocket.js"></script>
+    <script src="chat/scripts/chat-widget.js"></script>
+    <script src="chat/scripts/chat-integration.js"></script>
+
+</body>
+</html>
+<!-- include end footer.html -->

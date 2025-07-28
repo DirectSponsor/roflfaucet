@@ -181,6 +181,44 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ====================================
+// MOBILE MENU SYSTEM
+// ====================================
+
+// Mobile hamburger menu functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileNav = document.getElementById('mobile-nav');
+    
+    if (menuBtn && mobileNav) {
+        menuBtn.addEventListener('click', function() {
+            // Toggle mobile nav overlay
+            mobileNav.classList.toggle('active');
+            // Toggle hamburger animation
+            menuBtn.classList.toggle('open');
+        });
+        
+        // Close mobile menu when clicking on navigation links
+        const mobileNavLinks = mobileNav.querySelectorAll('.nav-link');
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileNav.classList.remove('active');
+                menuBtn.classList.remove('open');
+            });
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!menuBtn.contains(event.target) && !mobileNav.contains(event.target)) {
+                mobileNav.classList.remove('active');
+                menuBtn.classList.remove('open');
+            }
+        });
+        
+        console.log('📱 Mobile menu system initialized');
+    }
+});
+
+// ====================================
 // FUTURE UTILITY FUNCTIONS GO HERE
 // ====================================
 

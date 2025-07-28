@@ -257,6 +257,31 @@
             background: #2980b9;
         }
 
+        /* Action row styling - second row in control table */
+        .action-row {
+            border-top: 2px solid #304357; /* Separator line above action buttons */
+        }
+
+        .action-cell {
+            padding: calc(8px * var(--scale-factor, 1)) calc(4px * var(--scale-factor, 1)) !important; /* More padding for buttons */
+            vertical-align: middle;
+            border-right: 2px solid #304357;
+        }
+
+        .action-cell:last-child {
+            border-right: none;
+        }
+
+        /* Style buttons in action cells */
+        .action-cell .flip-button,
+        .action-cell .faucet-countdown-btn {
+            width: 100%;
+            height: calc(40px * var(--scale-factor, 1));
+            margin: 0;
+            font-size: calc(0.9rem * var(--scale-factor, 1));
+            padding: 0 calc(10px * var(--scale-factor, 1));
+        }
+
         /* Action buttons - scaled */
         .action-buttons {
             display: flex;
@@ -325,22 +350,17 @@
             font-weight: bold;
         }
 
-        /* Flip Machine Styles */
+        /* Fade Machine Styles */
         .slot-machine {
-            perspective: 1200px;
-            transition: transform 0.8s;
-            transform-style: preserve-3d;
             position: relative;
-        }
-
-        .slot-machine.flipped {
-            transform: rotateY(180deg);
         }
 
         .machine-front, .machine-back {
-            position: relative;
-            backface-visibility: hidden;
-            transition: all 0.8s;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .machine-front {
+            opacity: 1;
         }
 
         .machine-back {
@@ -348,7 +368,18 @@
             top: 0;
             left: 0;
             width: 100%;
-            transform: rotateY(180deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .slot-machine.flipped .machine-front {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .slot-machine.flipped .machine-back {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         /* Prize Display Styles */
@@ -383,8 +414,8 @@
         }
 
         .prize-symbol {
-            width: calc(24px * var(--scale-factor, 1));
-            height: calc(24px * var(--scale-factor, 1));
+            width: calc(40px * var(--scale-factor, 1));
+            height: calc(40px * var(--scale-factor, 1));
             object-fit: contain;
         }
 
@@ -396,9 +427,9 @@
 
         .empty-symbol {
             display: inline-block;
-            width: calc(24px * var(--scale-factor, 1));
-            height: calc(24px * var(--scale-factor, 1));
-            line-height: calc(24px * var(--scale-factor, 1));
+            width: calc(40px * var(--scale-factor, 1));
+            height: calc(40px * var(--scale-factor, 1));
+            line-height: calc(40px * var(--scale-factor, 1));
             text-align: center;
             font-weight: bold;
             color: #95a5a6;
@@ -457,15 +488,17 @@
                                     <button class="spin-button" onclick="spinReels()" id="spin-btn">SPIN</button>
                                 </td>
                             </tr>
+                            <tr class="action-row">
+                                <td colspan="2" class="action-cell">
+                                    <button class="flip-button" onclick="flipMachine()" id="flip-btn">Payouts</button>
+                                </td>
+                                <td colspan="3" class="action-cell">
+                                    <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                        <span class="btn-text">Faucet: 300</span>
+                                    </button>
+                                </td>
+                            </tr>
                         </table>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <button class="flip-button" onclick="flipMachine()" id="flip-btn">Payouts</button>
-                        <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
-                            <span class="btn-text">Faucet: 300</span>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -585,15 +618,17 @@
                                     <button class="spin-button" disabled>SPIN</button>
                                 </td>
                             </tr>
+                            <tr class="action-row">
+                                <td colspan="2" class="action-cell">
+                                    <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">Slots</button>
+                                </td>
+                                <td colspan="3" class="action-cell">
+                                    <button id="faucet-countdown-btn-back" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                        <span class="btn-text">Faucet: 300</span>
+                                    </button>
+                                </td>
+                            </tr>
                         </table>
-                    </div>
-                    
-                    <!-- Back Action Buttons Row -->
-                    <div class="action-buttons">
-                        <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">Slots</button>
-                        <button id="faucet-countdown-btn-back" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
-                            <span class="btn-text">Faucet: 300</span>
-                        </button>
                     </div>
                 </div>
             </div>

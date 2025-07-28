@@ -1,0 +1,150 @@
+/* Mobile Layout CSS - Override desktop layout for mobile-optimized pages */
+
+/* Mobile flexbox layout - stack everything vertically */
+.container {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: auto !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Allow sidebars to stack below main content on mobile */
+.left-sidebar {
+    width: 100% !important;
+    max-width: 600px !important; /* Match slot machine max-width */
+    margin: 20px auto !important;
+    order: 2 !important; /* Left sidebar comes second */
+}
+
+.right-sidebar {
+    width: 100% !important;
+    max-width: 600px !important; /* Match slot machine max-width */
+    margin: 20px auto !important;
+    order: 3 !important; /* Right sidebar comes third */
+}
+
+/* Center the main content */
+.main-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    order: 1 !important; /* Main content comes first */
+}
+
+/* Center the slot machine specifically */
+.slot-machine {
+    width: 100% !important;
+    max-width: 600px !important; /* Increased from 400px to use more space */
+    margin: 20px auto !important;
+    display: block !important;
+    text-align: center !important;
+}
+
+.slot-machine-container {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
+}
+
+/* Center the reels container */
+.sprite-reels-container {
+    margin: 0 auto !important;
+    width: fit-content !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Control panel centering */
+.control-panel {
+    width: 100% !important;
+    max-width: 600px !important; /* Match slot machine max-width */
+    margin: 0 auto !important;
+}
+
+/* Action buttons centering */
+.action-buttons {
+    width: 100% !important;
+    max-width: 600px !important; /* Match slot machine max-width */
+    margin: 15px auto 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    gap: 15px !important;
+}
+
+/* Prize display centering */
+.prize-display-container {
+    width: 100% !important;
+    max-width: 600px !important; /* Match slot machine max-width */
+    margin: 0 auto !important;
+}
+
+/* Ensure the body doesn't have unwanted positioning */
+body {
+    display: block !important;
+    align-items: unset !important;
+    justify-content: unset !important;
+    text-align: left !important;
+}
+
+/* Fix any iframe or embedded content centering */
+.slots-iframe-container {
+    width: 100% !important;
+    max-width: 600px !important; /* Match slot machine max-width */
+    margin: 0 auto !important;
+    text-align: center !important;
+}
+
+.slots-iframe-container iframe {
+    width: 100% !important;
+    max-width: 600px !important; /* Match slot machine max-width */
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Header adjustments for mobile */
+.header-content {
+    padding: 0.5rem 3% !important;
+}
+
+/* Page title centering */
+h1 {
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 auto 20px auto !important;
+}
+
+/* JavaScript Override - Replace responsive calculation with fixed mobile dimensions */
+
+/* This script will run after slots.js loads and override the responsive function. */
+/* We keep all game logic intact but force fixed dimensions for mobile. */
+
+/* Responsive breakpoints for container only - maintain centering at all sizes */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 5px !important;
+    }
+    
+    .header-content {
+        padding: 0.5rem 2% !important;
+    }
+}

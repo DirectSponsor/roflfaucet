@@ -222,11 +222,10 @@
     color: white;
     border-radius: 8px;
     margin: 0 auto; /* Center like the reels container */
-    width: fit-content; /* Dynamically fit content like reels */
+    width: fit-content; /* Let table size naturally */
     max-width: 100%;
-    height: 80px; /* Fixed height for the control panel */
     box-sizing: border-box;
-    padding: var(--container-padding, 10px); /* Use same responsive padding as reels */
+    padding: var(--container-padding, 10px);
 }
 
 .control-table {
@@ -257,12 +256,70 @@
     border-right: none;
 }
 
-/* Column widths - optimized for dynamic content with better flexibility */
-.control-table td:nth-child(1) { width: auto; min-width: 45px; max-width: 70px; } /* WIN - more compact */
-.control-table td:nth-child(2) { width: auto; min-width: 55px; max-width: 85px; } /* COINS - more compact */
-.control-table td:nth-child(3) { width: auto; min-width: 35px; max-width: 50px; } /* BET - more compact */
-.control-table td:nth-child(4) { width: auto; min-width: 40px; max-width: 50px; } /* NARROW ARROWS - more compact */
-.control-table td:nth-child(5) { width: auto; min-width: 60px; max-width: 120px; } /* SPIN - more compact range */
+/* Let table cells size naturally to their content - no artificial constraints */
+
+/* Action row styling - second row in control table */
+.action-row {
+    border-top: 2px solid #304357; /* Separator line above action buttons */
+}
+
+.action-cell {
+    padding: 8px 4px !important; /* More padding for buttons */
+    vertical-align: middle;
+    border-right: 2px solid #304357;
+}
+
+.action-cell:last-child {
+    border-right: none;
+}
+
+/* Style buttons in action cells */
+.action-cell .flip-button,
+.action-cell .faucet-countdown-btn {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    font-size: 0.9rem;
+    padding: 0 10px;
+}
+
+/* Flip button specific styling */
+.flip-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flip-button:hover {
+    background: #2980b9;
+}
+
+.faucet-countdown-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.faucet-countdown-btn:hover:not(:disabled) {
+    background: #229954;
+}
+
+.faucet-countdown-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
 
 .spin-cell {
     vertical-align: middle;
