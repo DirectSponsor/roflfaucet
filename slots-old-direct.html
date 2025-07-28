@@ -1,0 +1,107 @@
+<!-- Slots Machine Game Page -->
+<!-- TITLE=_ROFLFaucet - Casino Slots_ -->
+<!-- DESC=_Play casino slots and win UselessCoins on ROFLFaucet_ -->
+<!-- KEYWORDS=_slots, casino, faucet, coins, gambling, game_ -->
+<!-- STYLES=_slots/slots.css_ -->
+<!-- SCRIPTS=_slots/slots.js_ -->
+
+<!-- include start header.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROFLFaucet - Casino Slots</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
+    <meta name="description" content="Play casino slots and win UselessCoins on ROFLFaucet">
+    
+    <!-- Base Layout CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <!-- Additional page-specific styles -->
+        <link rel="stylesheet" href="slots/slots.css">
+
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🤣 roflfaucet</h1>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Faucet</a>
+                <a href="slots.html" class="nav-link">Slots</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="header-auth">
+                <button id="oauth-login-btn" class="header-auth-btn">Login</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+<!-- include end header.html -->
+
+<!-- include start left-sidebar.html -->
+        <aside class="left-sidebar">
+            <!-- A-Ads placeholder - no min-width constraint for testing -->
+            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
+                <div>
+                    A-Ads Placeholder<br>
+                    300x250px<br>
+                    (scales to fit)
+                </div>
+            </div>
+        </aside>
+<!-- include end left-sidebar.html -->
+
+        <main class="main-content">
+            <h1 style="margin: 0 0 0.25em 0; font-size: 1.3em; text-align: center;">
+                🎰 Casino Slots
+            </h1>
+            
+            <!-- Embedded Slot Machine via iframe -->
+            <div class="slots-iframe-container">
+                <iframe 
+                    id="slots-iframe" 
+                    src="slots-minimal.html" 
+                    title="Casino Slots Game"
+                    allowfullscreen
+                    allow="fullscreen"
+                ></iframe>
+            </div>
+        </main>
+
+<!-- include start right-sidebar.html -->
+        <aside class="right-sidebar">
+            <!-- Random Giphy Image Container -->
+            <div id="sidebar-giphy-gallery" class="full-width" data-gallery="giphy" style="text-align: center; margin: 0; padding: 0;">
+                <p style="color: #666; font-size: 14px; margin: 10px;">Loading funny GIF...</p>
+            </div>
+        </aside>
+<!-- include end right-sidebar.html -->
+
+<!-- include start footer.html -->
+    </div>
+    
+    <!-- Additional page-specific scripts -->
+        <script src="slots/slots.js"></script>
+
+</body>
+</html>
+<!-- include end footer.html -->
