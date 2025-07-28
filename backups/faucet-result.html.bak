@@ -19,8 +19,8 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="guest-base.css">
-    <link rel="stylesheet" href="member-base.css">
+        <link rel="stylesheet" href="styles/guest-base.css">
+    <link rel="stylesheet" href="styles/member-base.css">
 
     
     <!-- Site-wide scripts -->

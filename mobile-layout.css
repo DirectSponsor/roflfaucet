@@ -15,14 +15,14 @@
 /* Allow sidebars to stack below main content on mobile */
 .left-sidebar {
     width: 100% !important;
-    max-width: 600px !important; /* Match slot machine max-width */
+    max-width: 400px !important; /* Match slot machine max-width */
     margin: 20px auto !important;
     order: 2 !important; /* Left sidebar comes second */
 }
 
 .right-sidebar {
     width: 100% !important;
-    max-width: 600px !important; /* Match slot machine max-width */
+    max-width: 400px !important; /* Match slot machine max-width */
     margin: 20px auto !important;
     order: 3 !important; /* Right sidebar comes third */
 }
@@ -44,8 +44,8 @@
 /* Center the slot machine specifically */
 .slot-machine {
     width: 100% !important;
-    max-width: 600px !important; /* Increased from 400px to use more space */
-    margin: 20px auto !important;
+    max-width: 400px !important; /* Reduced from 480px to prevent oversizing */
+    margin: 5px auto !important; /* Reduce top margin from 20px to 5px */
     display: block !important;
     text-align: center !important;
 }
@@ -71,14 +71,14 @@
 /* Control panel centering */
 .control-panel {
     width: 100% !important;
-    max-width: 600px !important; /* Match slot machine max-width */
+    max-width: 400px !important; /* Match slot machine max-width */
     margin: 0 auto !important;
 }
 
 /* Action buttons centering */
 .action-buttons {
     width: 100% !important;
-    max-width: 600px !important; /* Match slot machine max-width */
+    max-width: 400px !important; /* Match slot machine max-width */
     margin: 15px auto 0 auto !important;
     display: flex !important;
     justify-content: center !important;
@@ -88,7 +88,7 @@
 /* Prize display centering */
 .prize-display-container {
     width: 100% !important;
-    max-width: 600px !important; /* Match slot machine max-width */
+    max-width: 400px !important; /* Match slot machine max-width */
     margin: 0 auto !important;
 }
 
@@ -103,19 +103,23 @@ body {
 /* Fix any iframe or embedded content centering */
 .slots-iframe-container {
     width: 100% !important;
-    max-width: 600px !important; /* Match slot machine max-width */
+    max-width: 400px !important; /* Match slot machine max-width */
     margin: 0 auto !important;
     text-align: center !important;
 }
 
 .slots-iframe-container iframe {
     width: 100% !important;
-    max-width: 600px !important; /* Match slot machine max-width */
+    max-width: 400px !important; /* Match slot machine max-width */
     margin: 0 auto !important;
     display: block !important;
 }
 
 /* Header adjustments for mobile */
+.header {
+    margin-bottom: 0 !important; /* Remove header bottom margin */
+}
+
 .header-content {
     padding: 0.5rem 3% !important;
 }
@@ -124,7 +128,7 @@ body {
 h1 {
     text-align: center !important;
     width: 100% !important;
-    margin: 0 auto 20px auto !important;
+    margin: 0 auto 10px auto !important; /* Reduce bottom margin from 20px to 10px */
 }
 
 /* JavaScript Override - Replace responsive calculation with fixed mobile dimensions */

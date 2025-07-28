@@ -6,7 +6,64 @@
 <!-- SCRIPTS=_slots/slots.js_ -->
 
 <!-- include start header-mobile.html -->
-        <main class="main-content">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>_ROFLFaucet - Casino Slots (Mobile)_</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
+    <meta name="description" content="_Play casino slots and win UselessCoins on ROFLFaucet - Mobile optimized_">
+    
+    <!-- Base Layout CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <!-- Additional page-specific styles -->
+    _    <link rel="stylesheet" href="slots/slots.css">
+    <link rel="stylesheet" href="mobile-layout.css">
+_
+
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🤣 roflfaucet</h1>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Faucet</a>
+                <a href="slots.html" class="nav-link">Slots</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="header-auth">
+                <button id="oauth-login-btn" class="header-auth-btn">Login</button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="index.html" class="nav-link">Faucet</a>
+        <a href="slots.html" class="nav-link">Slots</a>
+        <a href="about.html" class="nav-link">About</a>
+    </div>
+    
+    <div class="container">
 <!-- include start components/slot-machine.html -->
 <div class="slot-machine" id="slot-machine">
 
@@ -26,44 +83,41 @@
             </div>
             <!-- Control Panel -->
             <div class="control-panel">
-                    <table class="control-table">
-                        <tr class="control-row">
-                            <td class="control-cell">
-                                <span class="control-label">WIN</span><br>
-                                <span class="control-value" id="last-win">0</span>
-                            </td>
-                            <td class="control-cell">
-                                <span class="control-label currency-upper">COINS</span><br>
-                                <span class="control-value balance" id="current-balance">100</span>
-                            </td>
-                            <td class="control-cell bet-cell">
-                                <span class="control-label">BET</span><br>
-                                <span class="control-value" id="current-bet">1</span>
-                            </td>
-                            <td class="control-cell narrow-arrow-cell">
-                                <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
-                                <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
-                            </td>
-                            <td class="control-cell spin-cell">
-                                <button class="spin-button" onclick="spinReels()" id="spin-btn">
-                                    SPIN
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="action-row">
-                            <td colspan="2" class="action-cell">
-                                <button class="flip-button" onclick="flipMachine()" id="flip-btn">
-                                    Payouts
-                                </button>
-                            </td>
-                            <td colspan="3" class="action-cell">
-                                <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
-                                    <span class="btn-text">Faucet: 300</span>
-                                </button>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                <table class="control-table">
+                    <tr class="control-row">
+                        <td class="control-cell">
+                            <span class="control-label">WIN</span><br>
+                            <span class="control-value" id="last-win">0</span>
+                        </td>
+                        <td class="control-cell">
+                            <span class="control-label currency-upper">COINS</span><br>
+                            <span class="control-value balance" id="current-balance">100</span>
+                        </td>
+                        <td class="control-cell bet-cell">
+                            <span class="control-label">BET</span><br>
+                            <span class="control-value" id="current-bet">1</span>
+                        </td>
+                        <td class="control-cell narrow-arrow-cell">
+                            <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
+                            <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
+                        </td>
+                        <td class="control-cell spin-cell">
+                            <button class="spin-button" onclick="spinReels()" id="spin-btn">
+                                SPIN
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Action Buttons Row -->
+            <div class="action-buttons">
+                <button class="flip-button" onclick="flipMachine()" id="flip-btn">
+                    Payouts
+                </button>
+                <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                    <span class="btn-text">Faucet: 300</span>
+                </button>
             </div>
         </div>
     </div>
@@ -140,17 +194,19 @@
                             </button>
                         </td>
                     </tr>
+                    <tr class="action-row">
+                        <td colspan="2" class="action-cell">
+                            <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
+                                Slots
+                            </button>
+                        </td>
+                        <td colspan="3" class="action-cell">
+                            <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                <span class="btn-text">Faucet: 300</span>
+                            </button>
+                        </td>
+                    </tr>
                 </table>
-            </div>
-            
-            <!-- Back Action Buttons Row -->
-            <div class="action-buttons">
-                <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
-                    Slots
-                </button>
-                <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
-                    <span class="btn-text">Faucet: 300</span>
-                </button>
             </div>
         </div>
     </div>
@@ -187,128 +243,6 @@
     
     <!-- Additional page-specific scripts -->
         <script src="slots/slots.js"></script>
-    
-    <!-- Mobile-specific JavaScript override -->
-    <script>
-        // Wait for the slot machine to be initialized, then override the responsive function
-        document.addEventListener('DOMContentLoaded', function() {
-            // Small delay to ensure slots.js has finished initialization
-            setTimeout(function() {
-                if (window.slotMachine && typeof window.slotMachine.calculateResponsiveDimensions === 'function') {
-                    console.log('🎰 Mobile: Overriding responsive dimensions with fixed values');
-                    
-                    // Replace the responsive calculation with fixed mobile-optimized dimensions
-                    window.slotMachine.calculateResponsiveDimensions = function() {
-                        const viewportWidth = window.innerWidth;
-                        
-                        // Use progressive scaling for mobile only when necessary
-                        let reelWidth, gap, padding;
-                        
-                        if (viewportWidth >= 420) {
-                            // Default mobile size - fixed 120px reels
-                            reelWidth = 120;
-                            gap = 15;
-                            padding = 15;
-                        } else if (viewportWidth >= 350) {
-                            // Medium scaling for narrow screens
-                            reelWidth = 100;
-                            gap = 12;
-                            padding = 12;
-                        } else if (viewportWidth >= 320) {
-                            // Small scaling for standard minimum mobile width
-                            reelWidth = 80;
-                            gap = 8;
-                            padding = 8;
-                        } else {
-                            // Extra small scaling for very narrow screens (below 320px)
-                            reelWidth = 60;
-                            gap = 5;
-                            padding = 5;
-                        }
-                        
-                        // Calculate other dimensions based on reel width
-                        const reelHeight = reelWidth * 3; // 3:1 aspect ratio
-                        const spriteHeight = reelWidth * 10; // 10 symbols
-                        const positionHeight = spriteHeight / 20; // 20 positions
-                        
-                        // Calculate scale factor for UI elements
-                        const scaleFactor = reelWidth / 120; // 120px is our base size
-                        
-                        // Update CSS custom properties
-                        const root = document.documentElement;
-                        root.style.setProperty('--reel-width', `${reelWidth}px`);
-                        root.style.setProperty('--reel-height', `${reelHeight}px`);
-                        root.style.setProperty('--sprite-height', `${spriteHeight}px`);
-                        root.style.setProperty('--reel-gap', `${gap}px`);
-                        root.style.setProperty('--container-padding', `${padding}px`);
-                        
-                        // Scale control panel elements
-                        const controlPanelHeight = Math.max(60, 80 * scaleFactor);
-                        const controlFontSize = Math.max(1.0, 1.4 * scaleFactor);
-                        const controlLabelSize = Math.max(0.6, 0.8 * scaleFactor);
-                        const buttonHeight = Math.max(40, 56 * scaleFactor);
-                        const buttonMinWidth = Math.max(50, 80 * scaleFactor);
-                        
-                        // Apply control panel scaling
-                        const controlPanel = document.querySelector('.control-panel');
-                        if (controlPanel) {
-                            controlPanel.style.height = `${controlPanelHeight}px`;
-                            controlPanel.style.padding = `${padding}px`;
-                        }
-                        
-                        // Scale control labels and values
-                        const controlLabels = document.querySelectorAll('.control-label');
-                        const controlValues = document.querySelectorAll('.control-value');
-                        const spinButtons = document.querySelectorAll('.spin-button');
-                        const betButtons = document.querySelectorAll('.bet-btn-inline');
-                        
-                        controlLabels.forEach(label => {
-                            label.style.fontSize = `${controlLabelSize}rem`;
-                        });
-                        
-                        controlValues.forEach(value => {
-                            value.style.fontSize = `${controlFontSize}rem`;
-                            value.style.minHeight = `${buttonHeight}px`;
-                        });
-                        
-                        spinButtons.forEach(button => {
-                            button.style.height = `${buttonHeight}px`;
-                            button.style.minWidth = `${buttonMinWidth}px`;
-                            button.style.fontSize = `${Math.max(0.9, 1.1 * scaleFactor)}rem`;
-                        });
-                        
-                        betButtons.forEach(button => {
-                            const btnSize = Math.max(20, 32 * scaleFactor);
-                            const btnHeight = Math.max(18, 26 * scaleFactor);
-                            button.style.width = `${btnSize}px`;
-                            button.style.height = `${btnHeight}px`;
-                            button.style.fontSize = `${Math.max(0.7, 0.9 * scaleFactor)}rem`;
-                        });
-                        
-                        // Update instance variables for positioning calculations
-                        this.reelWidth = reelWidth;
-                        this.symbolHeight = reelWidth;
-                        this.reelHeight = reelHeight;
-                        this.totalSpriteHeight = spriteHeight;
-                        this.totalPositions = 20;
-                        this.positionHeight = positionHeight;
-                        
-                        console.log(`🎰 Mobile fixed dimensions applied:`);
-                        console.log(`  Viewport: ${viewportWidth}px`);
-                        console.log(`  Reel size: ${reelWidth}x${reelHeight}px`);
-                        console.log(`  Position height: ${positionHeight}px`);
-                    };
-                    
-                    // Trigger the new calculation immediately
-                    window.slotMachine.updateSpriteDimensions();
-                    
-                    console.log('🎰 Mobile responsive override complete');
-                } else {
-                    console.warn('🎰 Mobile: Could not find slotMachine instance to override');
-                }
-            }, 100);
-        });
-    </script>
 
 </body>
 </html>

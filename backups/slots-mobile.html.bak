@@ -5,22 +5,23 @@
 <!-- STYLES=_slots/slots.css,mobile-layout.css_ -->
 <!-- SCRIPTS=_slots/slots.js_ -->
 
-<!-- include start header.html -->
+<!-- include start header-mobile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROFLFaucet - Casino Slots (Mobile)</title>
+    <title>_ROFLFaucet - Casino Slots (Mobile)_</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="Play casino slots and win UselessCoins on ROFLFaucet - Mobile optimized">
+    <meta name="description" content="_Play casino slots and win UselessCoins on ROFLFaucet - Mobile optimized_">
     
     <!-- Base Layout CSS -->
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="slots/slots.css">
+    _    <link rel="stylesheet" href="slots/slots.css">
     <link rel="stylesheet" href="mobile-layout.css">
+_
 
     
     <!-- Site-wide scripts -->
@@ -54,6 +55,13 @@
             </div>
         </div>
     </header>
+    
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="index.html" class="nav-link">Faucet</a>
+        <a href="slots.html" class="nav-link">Slots</a>
+        <a href="about.html" class="nav-link">About</a>
+    </div>
     
     <div class="container">
 <!-- include start components/slot-machine.html -->
@@ -204,7 +212,6 @@
 </div>
 
 <!-- include end components/slot-machine.html -->
-            </div>
         </main>
 
 <!-- include start left-sidebar.html -->

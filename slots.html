@@ -101,16 +101,6 @@
     
     <!-- Additional page-specific scripts -->
         <script src="slots/slots.js"></script>
-        
-    <!-- Handle navigation messages from iframe -->
-    <script>
-        window.addEventListener('message', function(event) {
-            if (event.origin !== window.location.origin) return;
-            if (event.data.type === 'navigate') {
-                window.location.href = event.data.url;
-            }
-        });
-    </script>
 
 </body>
 </html>

@@ -250,17 +250,42 @@ class CasinoSlotMachine {
             containerWidth = viewportWidth - (2 * sidebarWidth) - 40;
             gap = 15;
             padding = 15;
-        } else if (viewportWidth > 650) {
+        } else if (viewportWidth > 750) {
             // Medium desktop: only left sidebar visible (right collapsed)
             const leftSidebarWidth = Math.max(160, viewportWidth * 0.22);
             containerWidth = viewportWidth - leftSidebarWidth - 40;
             gap = 12;
             padding = 12;
-        } else {
-            // Mobile/tablet: both sidebars collapsed
+        } else if (viewportWidth > 600) {
+            // Large tablet: both sidebars collapsed but still larger screens
             containerWidth = viewportWidth - 40; // just margins
             gap = 10;
             padding = 10;
+        } else if (viewportWidth > 500) {
+            // Medium tablet: mobile-style layout
+            containerWidth = viewportWidth - 30;
+            gap = 12;
+            padding = 12;
+        } else if (viewportWidth >= 420) {
+            // Large mobile screens - mobile-specific scaling
+            containerWidth = viewportWidth - 20; // minimal margins
+            gap = 13;
+            padding = 13;
+        } else if (viewportWidth >= 350) {
+            // Medium mobile screens
+            containerWidth = viewportWidth - 20;
+            gap = 11;
+            padding = 11;
+        } else if (viewportWidth >= 320) {
+            // Small mobile screens
+            containerWidth = viewportWidth - 16;
+            gap = 8;
+            padding = 8;
+        } else {
+            // Extra small screens (below 320px)
+            containerWidth = viewportWidth - 10;
+            gap = 5;
+            padding = 5;
         }
         
         // Ensure minimum container width
@@ -282,11 +307,23 @@ class CasinoSlotMachine {
             // Desktop: aim for good balance
             reelWidth = Math.max(90, Math.min(120, calculatedReelWidth));
         } else if (viewportWidth > 600) {
-            // Tablet: allow more shrinking
-            reelWidth = Math.max(70, Math.min(100, calculatedReelWidth));
+            // Large tablet: allow more shrinking but keep adequate size
+            reelWidth = Math.max(85, Math.min(110, calculatedReelWidth));
+        } else if (viewportWidth > 500) {
+            // Medium tablet: ensure adequate size with mobile-style layout
+            reelWidth = Math.max(95, Math.min(105, calculatedReelWidth));
+        } else if (viewportWidth >= 420) {
+            // Large mobile: reduced size to prevent overlapping
+            reelWidth = 85;
+        } else if (viewportWidth >= 350) {
+            // Medium mobile: smaller fixed size
+            reelWidth = 75;
+        } else if (viewportWidth >= 320) {
+            // Small mobile: even smaller
+            reelWidth = 65;
         } else {
-            // Mobile: prioritize fitting
-            reelWidth = Math.max(60, calculatedReelWidth);
+            // Extra small: minimum size
+            reelWidth = 55;
         }
         
         // Maintain 3:1 aspect ratio (3 symbols high)

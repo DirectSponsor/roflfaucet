@@ -835,11 +835,11 @@
                 return;
             }
             
-            // Navigate to faucet claim page via parent window
+            // Navigate to faucet page via parent window
             if (window.parent !== window) {
-                window.parent.postMessage({type: 'navigate', url: 'faucet-claim.html'}, '*');
+                window.parent.postMessage({type: 'navigate', url: 'index.html'}, '*');
             } else {
-                window.location.href = 'faucet-claim.html';
+                window.location.href = 'index.html';
             }
         }
         
