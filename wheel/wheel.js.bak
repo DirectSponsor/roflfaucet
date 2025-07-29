@@ -1,0 +1,488 @@
+/*
+OUTCOMES_START - Total: 100
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+2X
+2X
+2X
+2X
+2X
+3X
+3X
+3X
+4X
+4X
+5X
+5X
+5X
+6X
+REFUND
+20X
+50X
+OUTCOMES_END
+*/
+
+// Wheel of Wealth Game Logic
+class WheelOfWealth {
+    constructor() {
+        this.currentBet = 1;
+        this.maxBet = 10;
+        this.minBet = 1;
+        this.spinning = false;
+        this.isFlipped = false;
+        
+        // Wheel segments data (24 segments, 15° each)
+        // Arrow points at 270°, Position 0 = 270°, Position 1 = 285°, etc.
+        this.wheelSegments = [
+            { pos: 0, angle: 270, outcome: '2X' },    // pos 0: 270°
+            { pos: 1, angle: 285, outcome: 'LOSE' },  // pos 1: 285° 
+            { pos: 2, angle: 300, outcome: '50X' },   // pos 2: 300°
+            { pos: 3, angle: 315, outcome: '4X' },    // pos 3: 315°
+            { pos: 4, angle: 330, outcome: '3X' },    // pos 4: 330°
+            { pos: 5, angle: 345, outcome: 'LOSE' },  // pos 5: 345°
+            { pos: 6, angle: 0, outcome: 'REFUND' },  // pos 6: 0° (360°)
+            { pos: 7, angle: 15, outcome: '2X' },     // pos 7: 15°
+            { pos: 8, angle: 30, outcome: '5X' },     // pos 8: 30°
+            { pos: 9, angle: 45, outcome: 'LOSE' },   // pos 9: 45°
+            { pos: 10, angle: 60, outcome: '3X' },    // pos 10: 60°
+            { pos: 11, angle: 75, outcome: '20X' },   // pos 11: 75°
+            { pos: 12, angle: 90, outcome: 'LOSE' },  // pos 12: 90°
+            { pos: 13, angle: 105, outcome: '5X' },   // pos 13: 105°
+            { pos: 14, angle: 120, outcome: '6X' },   // pos 14: 120°
+            { pos: 15, angle: 135, outcome: 'LOSE' }, // pos 15: 135°
+            { pos: 16, angle: 150, outcome: '3X' },   // pos 16: 150°
+            { pos: 17, angle: 165, outcome: '4X' },   // pos 17: 165°
+            { pos: 18, angle: 180, outcome: '2X' },   // pos 18: 180°
+            { pos: 19, angle: 195, outcome: '2X' },   // pos 19: 195°
+            { pos: 20, angle: 210, outcome: '3X' },   // pos 20: 210°
+            { pos: 21, angle: 225, outcome: '3X' },   // pos 21: 225°
+            { pos: 22, angle: 240, outcome: '4X' },   // pos 22: 240°
+            { pos: 23, angle: 255, outcome: 'LOSE' }  // pos 23: 255°
+        ];
+        
+        // Create weighted segment list based on desired probabilities
+        // This matches the embedded outcomes distribution (84 LOSE, 5 2X, etc.)
+        this.weightedSegments = [];
+        
+        // Add segments multiple times based on desired frequency
+        // LOSE segments (84% chance) - positions with LOSE: 1,5,9,12,15,23
+        const losePositions = [1, 5, 9, 12, 15, 23];
+        for (let i = 0; i < 84; i++) {
+            const randomLosePos = losePositions[i % losePositions.length];
+            this.weightedSegments.push(randomLosePos);
+        }
+        
+        // 2X segments (5% chance) - positions: 0,7,18,19
+        const twoXPositions = [0, 7, 18, 19];
+        for (let i = 0; i < 5; i++) {
+            const randomTwoXPos = twoXPositions[i % twoXPositions.length];
+            this.weightedSegments.push(randomTwoXPos);
+        }
+        
+        // 3X segments (4% chance) - positions: 4,10,16,20,21
+        const threeXPositions = [4, 10, 16, 20, 21];
+        for (let i = 0; i < 4; i++) {
+            const randomThreeXPos = threeXPositions[i % threeXPositions.length];
+            this.weightedSegments.push(randomThreeXPos);
+        }
+        
+        // 4X segments (2% chance) - positions: 3,17,22
+        const fourXPositions = [3, 17, 22];
+        for (let i = 0; i < 2; i++) {
+            const randomFourXPos = fourXPositions[i % fourXPositions.length];
+            this.weightedSegments.push(randomFourXPos);
+        }
+        
+        // 5X segments (3% chance) - positions: 8,13
+        const fiveXPositions = [8, 13];
+        for (let i = 0; i < 3; i++) {
+            const randomFiveXPos = fiveXPositions[i % fiveXPositions.length];
+            this.weightedSegments.push(randomFiveXPos);
+        }
+        
+        // Single occurrence outcomes (1% each)
+        this.weightedSegments.push(14); // 6X at position 14
+        this.weightedSegments.push(6);  // REFUND at position 6
+        this.weightedSegments.push(11); // 20X at position 11
+        this.weightedSegments.push(2);  // 50X at position 2
+        
+        // Track current wheel rotation for relative positioning
+        this.currentRotation = 0;
+        
+        this.initializeGame();
+    }
+    
+    initializeGame() {
+        // Initialize balance display (async call for balance not needed)
+        this.updateBalance();
+        this.updateBetDisplay();
+        this.updateLastWin(0);
+        
+        // Initialize faucet countdown
+        if (typeof window.initializeFaucetCountdown === 'function') {
+            window.initializeFaucetCountdown();
+        }
+        
+        console.log('Wheel of Wealth initialized');
+    }
+    
+    async updateBalance() {
+        const balance = window.unifiedBalance ? await window.unifiedBalance.getBalance() : 100;
+        document.getElementById('current-balance').textContent = Math.floor(balance);
+    }
+    
+    updateBetDisplay() {
+        document.getElementById('current-bet').textContent = this.currentBet;
+    }
+    
+    updateLastWin(amount) {
+        document.getElementById('last-win').textContent = Math.floor(amount);
+    }
+    
+    updateStatus(message) {
+        const statusElement = document.querySelector('.status-text');
+        if (statusElement) {
+            statusElement.textContent = message;
+        }
+    }
+    
+    updateProgress(percentage) {
+        const progressFill = document.getElementById('progress-fill');
+        if (progressFill) {
+            progressFill.style.width = percentage + '%';
+        }
+    }
+    
+    increaseBet() {
+        if (this.spinning) return;
+        
+        if (this.currentBet < this.maxBet) {
+            this.currentBet++;
+            this.updateBetDisplay();
+        }
+    }
+    
+    decreaseBet() {
+        if (this.spinning) return;
+        
+        if (this.currentBet > this.minBet) {
+            this.currentBet--;
+            this.updateBetDisplay();
+        }
+    }
+    
+    async canSpin() {
+        const balance = window.unifiedBalance ? await window.unifiedBalance.getBalance() : 100;
+        return balance >= this.currentBet && !this.spinning;
+    }
+    
+    async spinWheel() {
+        if (!(await this.canSpin())) {
+            this.updateStatus('Insufficient balance!');
+            return;
+        }
+        
+        // Prevent multiple spins
+        this.spinning = true;
+        const spinButton = document.getElementById('spin-btn');
+        spinButton.disabled = true;
+        
+        // Deduct bet from balance
+        if (window.unifiedBalance) {
+            const result = await window.unifiedBalance.subtractBalance(this.currentBet, 'wheel_bet', `Wheel of Wealth bet: ${this.currentBet}`);
+            if (!result.success) {
+                this.updateStatus('Insufficient balance!');
+                this.spinning = false;
+                spinButton.disabled = false;
+                return;
+            }
+        }
+        await this.updateBalance();
+        
+        // Start spinning animation
+        this.updateStatus('Spinning...');
+        this.updateProgress(0);
+        
+        try {
+            // Select target segment from weighted list
+            const randomIndex = Math.floor(Math.random() * this.weightedSegments.length);
+            const targetSegmentPos = this.weightedSegments[randomIndex];
+            const targetSegment = this.wheelSegments[targetSegmentPos];
+
+            console.log(`=== SIMPLIFIED SEGMENT CALCULATION ===`);
+            console.log(`Selected: Position ${targetSegmentPos} = ${targetSegment.outcome} at ${targetSegment.angle}°`);
+            console.log(`Current wheel rotation: ${this.currentRotation}°`);
+            
+            // Calculate direct rotation to target segment
+            let neededRotation = (targetSegment.angle - this.currentRotation + 360) % 360;
+            
+            // Add extra complete 360° rotations for effect (2-4 full spins)
+            const extraRotations = 2 + Math.floor(Math.random() * 3); 
+            const totalRotation = neededRotation + (extraRotations * 360);
+            
+            console.log(`Needed rotation: ${neededRotation}° (direct)`);
+            console.log(`Extra rotations: ${extraRotations} (${extraRotations * 360}°)`);
+            console.log(`Total rotation: ${totalRotation}°`);
+            
+            // Update current rotation for next spin
+            this.currentRotation = (this.currentRotation + totalRotation) % 360;
+            console.log(`Updated current rotation: ${this.currentRotation}°`);
+            
+            console.log(`=== END SIMPLIFICATION ===`);
+            
+            // Create result object
+            const result = {
+                segment: { name: targetSegment.outcome, multiplier: this.parseMultiplier(targetSegment.outcome), angle: targetSegment.angle },
+                winAmount: this.currentBet * this.parseMultiplier(targetSegment.outcome),
+                isWin: this.parseMultiplier(targetSegment.outcome) > 0,
+                multiplier: this.parseMultiplier(targetSegment.outcome)
+            };
+            
+            // Calculate total rotation including extra spins
+            const currentWheelAngle = (this.currentRotation - totalRotation + 360) % 360;
+            const finalWheelAngle = currentWheelAngle + totalRotation;
+            
+            console.log(`Animating from ${currentWheelAngle}° to ${finalWheelAngle}° (total: ${totalRotation}°)`);
+            
+            this.animateWheelSpin(finalWheelAngle);
+            
+            // Wait for animation to complete before processing result
+            setTimeout(async () => {
+                await this.processSpinResult(result);
+                
+                // Re-enable spinning after result is processed
+                this.spinning = false;
+                spinButton.disabled = false;
+                this.updateProgress(0);
+            }, 3000); // Match the 3s animation duration
+            
+        } catch (error) {
+            console.error('Spin error:', error);
+            this.updateStatus('Spin failed!');
+            
+            // Re-enable spinning on error
+            this.spinning = false;
+            spinButton.disabled = false;
+            this.updateProgress(0);
+        }
+    }
+    
+    // This method is no longer used - outcome is determined by final wheel position
+    
+    parseMultiplier(outcome) {
+        // Parse multiplier from outcome text
+        if (outcome === 'LOSE') return 0;
+        if (outcome === 'REFUND') return 1;
+        
+        // Extract number from text like "2X", "50X", etc.
+        const match = outcome.match(/(\d+)X?/);
+        return match ? parseInt(match[1]) : 0;
+    }
+    
+    // This method is no longer used - angle is determined by wheel physics
+    
+    animateWheelSpin(finalAngle) {
+        const wheelImage = document.getElementById('wheel-image');
+        if (!wheelImage) return;
+        
+        // DON'T reset to 0 - this was breaking our tracking!
+        // Just smoothly rotate from current position to final angle
+        wheelImage.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+        wheelImage.style.transform = `rotate(${finalAngle}deg)`;
+        
+        console.log(`🎡 Wheel animated to: ${finalAngle}°`);
+    }
+    
+    async processSpinResult(result) {
+        const { segment, winAmount, isWin, multiplier } = result;
+        
+        // Update last win display
+        this.updateLastWin(winAmount);
+        
+        // Add result classes for visual feedback
+        const wheelImage = document.getElementById('wheel-image');
+        if (wheelImage) {
+            // Remove previous result classes
+            wheelImage.classList.remove('result-win', 'result-lose', 'result-jackpot');
+            
+            if (segment.name === '50X') {
+                wheelImage.classList.add('result-jackpot');
+            } else if (isWin) {
+                wheelImage.classList.add('result-win');
+            } else {
+                wheelImage.classList.add('result-lose');
+            }
+        }
+        
+        // Update status message
+        if (segment.name === '50X') {
+            this.updateStatus('🎉 JACKPOT! 🎉');
+        } else if (isWin) {
+            this.updateStatus(`You won ${multiplier}x!`);
+        } else {
+            this.updateStatus('Try again!');
+        }
+        
+        // Add winnings to balance
+        if (isWin && window.unifiedBalance) {
+            await window.unifiedBalance.addBalance(winAmount, 'wheel_win', `Wheel of Wealth win: ${segment.name} = ${winAmount} coins`);
+        }
+        
+        // Update balance display
+        await this.updateBalance();
+        
+        // Clear result classes after delay
+        setTimeout(() => {
+            if (wheelImage) {
+                wheelImage.classList.remove('result-win', 'result-lose', 'result-jackpot');
+            }
+            this.updateStatus('Ready to Spin!');
+        }, 3000);
+    }
+    
+    flipMachine() {
+        if (this.spinning) return;
+        
+        const machine = document.getElementById('wheel-machine');
+        if (machine) {
+            machine.classList.toggle('flipped');
+            this.isFlipped = !this.isFlipped;
+        }
+    }
+}
+
+// Global functions for button onclick handlers
+function increaseBet() {
+    if (window.wheelGame) {
+        window.wheelGame.increaseBet();
+    }
+}
+
+function decreaseBet() {
+    if (window.wheelGame) {
+        window.wheelGame.decreaseBet();
+    }
+}
+
+function spinWheel() {
+    if (window.wheelGame) {
+        window.wheelGame.spinWheel();
+    }
+}
+
+function flipMachine() {
+    if (window.wheelGame) {
+        window.wheelGame.flipMachine();
+    }
+}
+
+function handleFaucetClaim() {
+    if (typeof window.handleFaucetClaim === 'function') {
+        window.handleFaucetClaim();
+    } else {
+        console.log('Faucet claim not available');
+    }
+}
+
+// Initialize game when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for other scripts to load
+    setTimeout(() => {
+        window.wheelGame = new WheelOfWealth();
+    }, 100);
+});
+
+// Export for module systems if needed
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = WheelOfWealth;
+}

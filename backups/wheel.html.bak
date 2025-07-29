@@ -2,8 +2,8 @@
 <!-- TITLE=_ROFLFaucet - Wheel of Wealth_ -->
 <!-- DESC=_Spin the Wheel of Wealth and win UselessCoins on ROFLFaucet_ -->
 <!-- KEYWORDS=_wheel, fortune, casino, faucet, coins, gambling, game_ -->
-<!-- STYLES=_wheel/wheel.css_ -->
-<!-- SCRIPTS=_scripts/core/unified-balance.js,scripts/core/site-utils.js,scripts/core/gallery-system-simple.js,wheel/wheel.js_ -->
+<!-- STYLES=_wheel/wheel-simple.css_ -->
+<!-- SCRIPTS=_wheel/wheel-simple.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -19,10 +19,13 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="wheel/wheel.css">
+        <link rel="stylesheet" href="wheel/wheel-simple.css">
 
     
-    <!-- Site-wide scripts loaded via build system -->
+    <!-- Site-wide scripts -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -220,7 +223,11 @@
 <!-- include start footer.html -->
     </div>
     
-    <!-- Additional page-specific scripts loaded via build system -->
+    <!-- Additional page-specific scripts -->
+        <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
+    <script src="wheel/wheel-simple.js"></script>
 
 </body>
 </html>

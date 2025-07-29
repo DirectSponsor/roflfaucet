@@ -1,0 +1,146 @@
+<div class="slot-machine" id="slot-machine">
+
+    <!-- Front Side - Game -->
+    <div class="machine-front">
+        <div class="slot-machine-container">
+            <!-- Sprite Background Slot Machine Reels -->
+            <div class="sprite-reels-container">
+                <!-- Glass overlay with center line -->
+                <div class="slot-glass-overlay">
+                    <div class="center-line"></div>
+                </div>
+                <!-- Just empty reel windows - sprite moves behind them -->
+                <div class="reel" id="reel-1"></div>
+                <div class="reel" id="reel-2"></div>
+                <div class="reel" id="reel-3"></div>
+            </div>
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <table class="control-table">
+                    <tr class="control-row">
+                        <td class="control-cell">
+                            <span class="control-label">WIN</span><br>
+                            <span class="control-value" id="last-win">0</span>
+                        </td>
+                        <td class="control-cell">
+                            <span class="control-label currency-upper">COINS</span><br>
+                            <span class="control-value balance" id="current-balance">100</span>
+                        </td>
+                        <td class="control-cell bet-cell">
+                            <span class="control-label">BET</span><br>
+                            <span class="control-value" id="current-bet">1</span>
+                        </td>
+                        <td class="control-cell narrow-arrow-cell">
+                            <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
+                            <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
+                        </td>
+                        <td class="control-cell spin-cell">
+                            <button class="spin-button" onclick="spinReels()" id="spin-btn">
+                                SPIN
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Action Buttons Row -->
+            <div class="action-buttons">
+                <button class="flip-button" onclick="flipMachine()" id="flip-btn">
+                    Payouts
+                </button>
+                <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                    <span class="btn-text">Faucet: 300</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Back Side - Prize Display -->
+    <div class="machine-back">
+        <div class="slot-machine-container">
+            
+            <!-- Prize Display Table -->
+            <div class="prize-display-container">
+                <table class="prize-table">
+                    <thead>
+                        <tr>
+                            <th>Combination</th>
+                            <th>Payout</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-symbol="cherry">
+                            <td class="prize-combo">🍒🍒🍒</td>
+                            <td class="prize-payout">50</td>
+                        </tr>
+                        <tr data-symbol="lemon">
+                            <td class="prize-combo">🍋🍋🍋</td>
+                            <td class="prize-payout">75</td>
+                        </tr>
+                        <tr data-symbol="bell">
+                            <td class="prize-combo">🔔🔔🔔</td>
+                            <td class="prize-payout">100</td>
+                        </tr>
+                        <tr data-symbol="bar">
+                            <td class="prize-combo">⬛⬛⬛</td>
+                            <td class="prize-payout">200</td>
+                        </tr>
+                        <tr data-symbol="seven">
+                            <td class="prize-combo">7️⃣7️⃣7️⃣</td>
+                            <td class="prize-payout">500</td>
+                        </tr>
+                        <tr data-symbol="diamond">
+                            <td class="prize-combo">💎💎💎</td>
+                            <td class="prize-payout">1000</td>
+                        </tr>
+                        <tr data-symbol="two_diamonds">
+                            <td class="prize-combo">💎💎⬜</td>
+                            <td class="prize-payout">25</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Back Control Panel - Same as front but with disabled SPIN -->
+            <div class="control-panel">
+                <table class="control-table">
+                    <tr class="control-row">
+                        <td class="control-cell">
+                            <span class="control-label">WIN</span><br>
+                            <span class="control-value" id="last-win-back">0</span>
+                        </td>
+                        <td class="control-cell">
+                            <span class="control-label currency-upper">COINS</span><br>
+                            <span class="control-value balance" id="current-balance-back">100</span>
+                        </td>
+                        <td class="control-cell bet-cell">
+                            <span class="control-label">BET</span><br>
+                            <span class="control-value" id="current-bet-back">1</span>
+                        </td>
+                        <td class="control-cell narrow-arrow-cell">
+                            <button class="bet-btn-inline" onclick="increaseBet()" disabled>▲</button><br>
+                            <button class="bet-btn-inline" onclick="decreaseBet()" disabled>▼</button>
+                        </td>
+                        <td class="control-cell spin-cell">
+                            <button class="spin-button" disabled>
+                                SPIN
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Back Action Buttons Row -->
+            <div class="action-buttons">
+                <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
+                    Slots
+                </button>
+                <button class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                    <span class="btn-text">Faucet: 300</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+</div>
+

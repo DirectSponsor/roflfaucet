@@ -1,0 +1,27 @@
+Wheel Segment Positions:
+
+1. Position 0: Angle 255°, Outcome: 4X
+2. Position 1: Angle 240°, Outcome: 5X
+3. Position 2: Angle 225°, Outcome: 2X
+4. Position 3: Angle 210°, Outcome: 3X
+5. Position 4: Angle 195°, Outcome: LOSE
+6. Position 5: Angle 180°, Outcome: 2X
+7. Position 6: Angle 165°, Outcome: 4X
+8. Position 7: Angle 150°, Outcome: 3X
+9. Position 8: Angle 135°, Outcome: 2X
+10. Position 9: Angle 120°, Outcome: 6X
+11. Position 10: Angle 105°, Outcome: 5X
+12. Position 11: Angle 90°, Outcome: LOSE
+13. Position 12: Angle 75°, Outcome: 20X
+14. Position 13: Angle 60°, Outcome: 3X
+15. Position 14: Angle 45°, Outcome: LOSE
+16. Position 15: Angle 30°, Outcome: 5X
+17. Position 16: Angle 15°, Outcome: 2X
+18. Position 17: Angle 0°, Outcome: REFUND
+19. Position 18: Angle 345°, Outcome: LOSE
+20. Position 19: Angle 330°, Outcome: 3X
+21. Position 20: Angle 315°, Outcome: 4X
+22. Position 21: Angle 300°, Outcome: 50X
+23. Position 22: Angle 285°, Outcome: LOSE
+24. Position 23: Angle 270°, Outcome: 2X
+

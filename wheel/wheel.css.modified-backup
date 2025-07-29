@@ -1,0 +1,392 @@
+/* Wheel of Wealth Game Styles */
+
+/* Outer container - matches slots styling */
+.wheel-direct {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 0.1em;
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+/* Inner container - matches slots dark container */
+.wheel-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 0.1em;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    perspective: 1000px;
+}
+
+.wheel-machine {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.wheel-machine.flipped {
+    transform: rotateY(180deg);
+}
+
+.machine-front,
+.machine-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    background: #1a1a1a;
+    border: 2px solid #333;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.machine-back {
+    transform: rotateY(180deg);
+}
+
+.wheel-machine-container {
+    padding: 20px;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Wheel Display */
+.wheel-display-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.wheel-display {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto 10px;
+}
+
+.wheel-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+    /* Transform and transition controlled by JavaScript only */
+}
+
+.wheel-arrow {
+    position: absolute;
+    top: 50%;
+    left: -15px;
+    width: 30px;
+    height: 30px;
+    transform: translateY(-50%);
+    z-index: 10;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+/* Spin Status */
+.spin-status {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.status-text {
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+
+/* Control Panel */
+.control-panel {
+    background: linear-gradient(145deg, #333, #222);
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.control-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.control-table td {
+    text-align: center;
+    padding: 8px 4px;
+    vertical-align: middle;
+}
+
+.control-label {
+    color: #ccc;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.control-value {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Buttons */
+.bet-btn-inline {
+    background: linear-gradient(145deg, #444, #333);
+    border: 1px solid #666;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    width: 25px;
+    height: 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 1px 0;
+    transition: all 0.2s;
+}
+
+.bet-btn-inline:hover {
+    background: linear-gradient(145deg, #555, #444);
+    border-color: #777;
+}
+
+.bet-btn-inline:active {
+    transform: translateY(1px);
+}
+
+.spin-button {
+    background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+    border: 2px solid #cc4125;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+}
+
+.spin-button:hover {
+    background: linear-gradient(145deg, #ff7b7b, #fe6a62);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.spin-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.spin-button:disabled {
+    background: linear-gradient(145deg, #666, #555);
+    border-color: #444;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.flip-button {
+    background: linear-gradient(145deg, #4ecdc4, #45b7aa);
+    border: 1px solid #3a9691;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    transition: all 0.2s;
+}
+
+.flip-button:hover {
+    background: linear-gradient(145deg, #5eddd4, #55c7ba);
+}
+
+.faucet-countdown-btn {
+    background: linear-gradient(145deg, #45b7aa, #3a9691);
+    border: 1px solid #2f7a73;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.faucet-countdown-btn:disabled {
+    background: linear-gradient(145deg, #666, #555);
+    border-color: #444;
+    cursor: not-allowed;
+}
+
+.faucet-countdown-btn:not(:disabled):hover {
+    background: linear-gradient(145deg, #55c7ba, #4aa29a);
+}
+
+.action-row td {
+    padding-top: 15px;
+}
+
+.action-cell {
+    vertical-align: top;
+}
+
+/* Prize Display (Back Side) */
+.prize-display-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.prize-table {
+    width: 100%;
+    max-width: 300px;
+    border-collapse: collapse;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.prize-cell {
+    text-align: center;
+    padding: 12px 8px;
+    border: 1px solid #444;
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+}
+
+.prize-label {
+    color: #ffd700;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.prize-payout {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .wheel-direct {
+        padding: 5px;
+    }
+    
+    .wheel-display {
+        width: 240px;
+        height: 240px;
+    }
+    
+    .wheel-machine {
+        height: 460px;
+    }
+    
+    .control-table td {
+        padding: 6px 2px;
+    }
+    
+    .control-label {
+        font-size: 10px;
+    }
+    
+    .control-value {
+        font-size: 14px;
+    }
+    
+    .bet-btn-inline {
+        width: 22px;
+        height: 18px;
+        font-size: 11px;
+    }
+    
+    .spin-button {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .flip-button,
+    .faucet-countdown-btn {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+    
+    .prize-table {
+        max-width: 260px;
+    }
+    
+    .prize-cell {
+        padding: 10px 6px;
+    }
+    
+    .prize-label {
+        font-size: 11px;
+    }
+    
+    .prize-payout {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .wheel-display {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .wheel-machine {
+        height: 420px;
+    }
+    
+    .wheel-machine-container {
+        padding: 15px;
+    }
+}
+
+/* Animation Classes */
+.wheel-image.result-win {
+    filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.6));
+}
+
+.wheel-image.result-lose {
+    filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.4));
+}
+
+.wheel-image.result-jackpot {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    animation: jackpot-glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes jackpot-glow {
+    0% {
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    }
+    100% {
+        filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1));
+    }
+}
