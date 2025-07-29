@@ -1,3 +1,117 @@
+/*
+OUTCOMES_START - Total: 100
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+LOSE
+2X
+2X
+2X
+2X
+2X
+3X
+3X
+3X
+4X
+4X
+5X
+5X
+5X
+6X
+REFUND
+20X
+50X
+OUTCOMES_END
+*/
+
 // Wheel of Wealth Game Logic
 class WheelOfWealth {
     constructor() {
@@ -8,26 +122,25 @@ class WheelOfWealth {
         this.isFlipped = false;
         
         // Map outcome text to visual wheel positions (degrees)
-        // 24 segments = 15° each (360/24 = 15)
+        // 24 segments = 15° each, starting from arrow at 9 o'clock (270°)
+        // Based on wheel.txt: 0=2X, 1=LOSE, 2=50X, 3=4X, 4=3X, 5=LOSE, 6=REFUND, etc.
         this.segmentPositions = {
-            'LOSE': [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315], // Multiple LOSE segments
-            'REFUND': [15], 
-            '2X': [75, 195], 
-            '3X': [105, 285],
-            '4X': [165], 
-            '5X': [255, 345],
-            '6X': [330],
-            '7X': [35],
-            '8X': [125, 275],
-            '20X': [185],
-            '50X': [155] // Jackpot position
+            '2X': [270, 360, 45, 225, 315], // positions 0, 7, 15, 18, 21
+            'LOSE': [285, 75, 135, 285, 345], // positions 1, 5, 9, 12, 19
+            '50X': [300], // position 2 - Jackpot
+            '4X': [315, 345], // positions 3, 17, 23
+            '3X': [330, 150, 240], // positions 4, 10, 16, 20
+            'REFUND': [105], // position 6
+            '5X': [120, 195, 330], // positions 8, 13, 22
+            '20X': [165], // position 11
+            '6X': [210], // position 14
         };
         
         this.initializeGame();
     }
     
     initializeGame() {
-        // Initialize balance display
+        // Initialize balance display (async call for balance not needed)
         this.updateBalance();
         this.updateBetDisplay();
         this.updateLastWin(0);
@@ -40,8 +153,8 @@ class WheelOfWealth {
         console.log('Wheel of Wealth initialized');
     }
     
-    updateBalance() {
-        const balance = window.UnifiedBalance ? window.UnifiedBalance.getBalance() : 100;
+    async updateBalance() {
+        const balance = window.unifiedBalance ? await window.unifiedBalance.getBalance() : 100;
         document.getElementById('current-balance').textContent = Math.floor(balance);
     }
     
@@ -85,13 +198,13 @@ class WheelOfWealth {
         }
     }
     
-    canSpin() {
-        const balance = window.UnifiedBalance ? window.UnifiedBalance.getBalance() : 100;
+    async canSpin() {
+        const balance = window.unifiedBalance ? await window.unifiedBalance.getBalance() : 100;
         return balance >= this.currentBet && !this.spinning;
     }
     
     async spinWheel() {
-        if (!this.canSpin()) {
+        if (!(await this.canSpin())) {
             this.updateStatus('Insufficient balance!');
             return;
         }
@@ -102,33 +215,33 @@ class WheelOfWealth {
         spinButton.disabled = true;
         
         // Deduct bet from balance
-        if (window.UnifiedBalance) {
-            window.UnifiedBalance.deductBalance(this.currentBet);
+        if (window.unifiedBalance) {
+            const result = await window.unifiedBalance.subtractBalance(this.currentBet, 'wheel_bet', `Wheel of Wealth bet: ${this.currentBet}`);
+            if (!result.success) {
+                this.updateStatus('Insufficient balance!');
+                this.spinning = false;
+                spinButton.disabled = false;
+                return;
+            }
         }
-        this.updateBalance();
+        await this.updateBalance();
         
         // Start spinning animation
         this.updateStatus('Spinning...');
         this.updateProgress(0);
         
         try {
-            // Simulate progress during spin
-            for (let i = 0; i <= 100; i += 2) {
-                this.updateProgress(i);
-                await new Promise(resolve => setTimeout(resolve, 30));
-            }
-            
             // Determine winning segment
-            const result = await this.getSpinResult();
+            const result = this.getSpinResult();
             
             // Calculate rotation angle
             const rotations = 3 + Math.random() * 2; // 3-5 full rotations
             const finalAngle = result.segment.angle + (rotations * 360);
             
-            // Apply spinning animation
-            await this.animateWheelSpin(finalAngle);
+            // Apply spinning animation (don't wait)
+            this.animateWheelSpin(finalAngle);
             
-            // Process result
+            // Process result immediately
             await this.processSpinResult(result);
             
         } catch (error) {
@@ -142,38 +255,17 @@ class WheelOfWealth {
         }
     }
     
-    async getSpinResult() {
-        try {
-            // Load outcomes from file
-            const response = await fetch('wheel/outcomes.txt');
-            const text = await response.text();
-            const outcomes = text.trim().split('\n');
-            
-            // Simple random selection (like slots)
-            const randomIndex = Math.floor(Math.random() * outcomes.length);
-            const outcome = outcomes[randomIndex];
-            
-            console.log(`Selected outcome: ${outcome} (line ${randomIndex + 1} of ${outcomes.length})`);
-            
-            // Parse multiplier from outcome text
-            const multiplier = this.parseMultiplier(outcome);
-            
-            // Get visual angle for this outcome
-            const visualAngle = this.getVisualAngle(outcome);
-            
-            const winAmount = this.currentBet * multiplier;
-            const isWin = multiplier > 0;
-            
-            return {
-                segment: { name: outcome, multiplier: multiplier, angle: visualAngle },
-                winAmount,
-                isWin,
-                multiplier
-            };
-            
-        } catch (error) {
-            console.error('Error loading outcomes:', error);
-            // Fallback to LOSE
+    getSpinResult() {
+        // Get embedded outcomes from comment at top of this file
+        const scriptSource = this.constructor.toString();
+        const startMarker = 'OUTCOMES_START - Total: ';
+        const endMarker = 'OUTCOMES_END';
+        
+        const startIndex = scriptSource.indexOf(startMarker);
+        const endIndex = scriptSource.indexOf(endMarker);
+        
+        if (startIndex === -1 || endIndex === -1) {
+            console.warn('Could not find outcomes in script, falling back to LOSE');
             return {
                 segment: { name: 'LOSE', multiplier: 0, angle: 0 },
                 winAmount: 0,
@@ -181,6 +273,36 @@ class WheelOfWealth {
                 multiplier: 0
             };
         }
+        
+        // Extract total count and outcomes
+        const headerLine = scriptSource.substring(startIndex, scriptSource.indexOf('\n', startIndex));
+        const totalMatch = headerLine.match(/Total: (\d+)/);
+        const totalOutcomes = totalMatch ? parseInt(totalMatch[1]) : 100;
+        
+        const outcomesSection = scriptSource.substring(
+            scriptSource.indexOf('\n', startIndex) + 1, 
+            endIndex
+        );
+        const outcomeLines = outcomesSection.trim().split('\n');
+        
+        // Simple random selection - pick random line
+        const randomIndex = Math.floor(Math.random() * totalOutcomes);
+        const outcome = outcomeLines[randomIndex] || 'LOSE';
+        
+        console.log(`Selected outcome: ${outcome} (line ${randomIndex + 1} of ${totalOutcomes})`);
+        
+        // Parse multiplier and get visual angle
+        const multiplier = this.parseMultiplier(outcome);
+        const visualAngle = this.getVisualAngle(outcome);
+        const winAmount = this.currentBet * multiplier;
+        const isWin = multiplier > 0;
+        
+        return {
+            segment: { name: outcome, multiplier: multiplier, angle: visualAngle },
+            winAmount,
+            isWin,
+            multiplier
+        };
     }
     
     parseMultiplier(outcome) {
@@ -207,21 +329,17 @@ class WheelOfWealth {
         return randomPos;
     }
     
-    async animateWheelSpin(finalAngle) {
+    animateWheelSpin(finalAngle) {
         const wheelImage = document.getElementById('wheel-image');
         if (!wheelImage) return;
         
-        // Set CSS custom property for final rotation
-        wheelImage.style.setProperty('--final-rotation', finalAngle + 'deg');
+        // Reset to 0 and then spin to final angle for consistent animation
+        wheelImage.style.transition = 'none';
+        wheelImage.style.transform = 'rotate(0deg)';
         
-        // Add spinning class to trigger animation
-        wheelImage.classList.add('spinning');
-        
-        // Wait for animation to complete
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        
-        // Remove spinning class and set permanent rotation
-        wheelImage.classList.remove('spinning');
+        // Force reflow then apply smooth transition
+        wheelImage.offsetHeight;
+        wheelImage.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
         wheelImage.style.transform = `rotate(${finalAngle}deg)`;
     }
     
@@ -256,12 +374,12 @@ class WheelOfWealth {
         }
         
         // Add winnings to balance
-        if (isWin && window.UnifiedBalance) {
-            window.UnifiedBalance.addBalance(winAmount);
+        if (isWin && window.unifiedBalance) {
+            await window.unifiedBalance.addBalance(winAmount, 'wheel_win', `Wheel of Wealth win: ${segment.name} = ${winAmount} coins`);
         }
         
         // Update balance display
-        this.updateBalance();
+        await this.updateBalance();
         
         // Clear result classes after delay
         setTimeout(() => {
