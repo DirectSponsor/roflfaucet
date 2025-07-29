@@ -27,8 +27,12 @@ After multiple attempts with complex 360-degree systems that had CSS/JS conflict
 - [x] **FIXED:** Visual alignment matches expected results
 - [x] Ensure forward-only spinning with full rotations
 
-### Phase 3: Random Selection ⏳
-- [ ] Add simple random segment selection
+### Phase 3: Random Selection 🔄 IN PROGRESS
+- [x] Expanded from 4 to 8 segments (every 45°)
+- [x] Added varied outcomes: 3X, 4X, 5X, JACKPOT
+- [x] Updated test functions (testEights(), testSegment(0-7))
+- [ ] **ISSUE FOUND:** Slight alignment offset - hits adjacent segments sometimes
+- [ ] **ANALYSIS NEEDED:** Wheel appears to be 24-segment, not 8-segment image
 - [ ] Test multiple random spins
 - [ ] Verify no drift or alignment issues
 
@@ -43,7 +47,7 @@ After multiple attempts with complex 360-degree systems that had CSS/JS conflict
 - [ ] Add win/loss display
 - [ ] Final testing
 
-## Current Status: Phase 2 Complete - Visual Alignment Fixed! 🎯
+## Current Status: Phase 3 In Progress - 8 Segments Added, Minor Alignment Issue Found ⚠️
 
 ### Key Decisions Made:
 - **Segments:** 0-23 (24 total)
@@ -83,3 +87,13 @@ If quarter tests work correctly, move to Phase 2.
     * 270° (9 o'clock) → REFUND ✅
   - Removed arrow-based logic (not needed - just wheel rotation matters)
   - Ready for Phase 3: Random Selection
+- 2025-07-29 19:04 - **PHASE 3 STARTED:** Expanded to 8 segments
+  - Added segments 1, 3, 5, 7 with outcomes: 3X, 4X, 5X, JACKPOT
+  - Updated test functions for 8-segment testing
+  - **ISSUE DISCOVERED:** Slight alignment offset on some positions
+    * Debug shows correct target degrees (45°, 135°, 225°, 315°)
+    * Visual shows landing on adjacent segments (e.g., "LOSE TURN" instead of "5X")
+    * Appears to be hitting center of segments correctly, but wrong segments
+    * Wheel image appears to be 24-segment (15° each), not 8-segment
+  - **NEXT ACTION:** Recalibrate degrees to match actual wheel image segments
+  - **STATUS:** Paused for analysis - resume in ~1 hour

@@ -11,13 +11,17 @@ class SimpleWheelGame {
         // Current wheel position (0-359 degrees)
         this.currentPosition = 0;
         
-        // SIMPLIFIED: Direct degree-to-outcome mapping based on actual wheel image
-        // No arrow logic - just wheel rotation degrees to results
+        // PHASE 3: Expanded to 8 segments (every 45°) with varied outcomes
+        // Direct degree-to-outcome mapping - no arrow logic needed
         this.segments = [
-            { id: 0, centerDegree: 0, outcome: 'DOUBLE' },     // 12 o'clock - you saw DOUBLE
-            { id: 1, centerDegree: 90, outcome: 'DOUBLE' },    // 3 o'clock - you saw DOUBLE  
-            { id: 2, centerDegree: 180, outcome: 'LOSE' },     // 6 o'clock - you saw LOSE
-            { id: 3, centerDegree: 270, outcome: 'REFUND' }    // 9 o'clock - you saw REFUND
+            { id: 0, centerDegree: 0, outcome: 'DOUBLE' },     // 12 o'clock - confirmed
+            { id: 1, centerDegree: 45, outcome: '3X' },        // 1:30 position
+            { id: 2, centerDegree: 90, outcome: 'DOUBLE' },    // 3 o'clock - confirmed
+            { id: 3, centerDegree: 135, outcome: '4X' },       // 4:30 position
+            { id: 4, centerDegree: 180, outcome: 'LOSE' },     // 6 o'clock - confirmed
+            { id: 5, centerDegree: 225, outcome: '5X' },       // 7:30 position
+            { id: 6, centerDegree: 270, outcome: 'REFUND' },   // 9 o'clock - confirmed
+            { id: 7, centerDegree: 315, outcome: 'JACKPOT' }   // 10:30 position
         ];
         
         this.initializeGame();
@@ -44,7 +48,7 @@ class SimpleWheelGame {
         // Find segment by ID
         const targetSegment = this.segments.find(segment => segment.id === segmentId);
         if (!targetSegment) {
-            console.log('Segment not found in test mode. Available segments: 0, 1, 2, 3');
+            console.log('Segment not found. Available segments: 0-7 (8 segments total)');
             return;
         }
         const targetDegree = targetSegment.centerDegree;
@@ -106,7 +110,7 @@ class SimpleWheelGame {
     
     // Test function - spin to random segment (from available test segments)
     testRandomSpin() {
-        const availableSegmentIds = this.segments.map(s => s.id); // [0, 1, 2, 3]
+        const availableSegmentIds = this.segments.map(s => s.id); // [0, 1, 2, 3, 4, 5, 6, 7]
         const randomIndex = Math.floor(Math.random() * availableSegmentIds.length);
         const randomSegment = availableSegmentIds[randomIndex];
         console.log('🎲 Testing random spin to segment:', randomSegment);
@@ -221,16 +225,24 @@ function testSegment(segmentId) {
     }
 }
 
+function testEights() {
+    console.log('Testing 8 positions (every 45°): 0, 1, 2, 3, 4, 5, 6, 7');
+    console.log('Confirmed positions: 0(DOUBLE), 2(DOUBLE), 4(LOSE), 6(REFUND)');
+    console.log('New positions: 1(3X), 3(4X), 5(5X), 7(JACKPOT)');
+    console.log('Use: testSegment(0-7)');
+}
+
+// Legacy function for backward compatibility
 function testQuarters() {
-    console.log('Testing quarter positions: 0, 1, 2, 3');
-    // Call these manually one at a time to test
-    console.log('Use: testSegment(0), testSegment(1), testSegment(2), testSegment(3)');
+    console.log('Legacy: Testing original 4 quarter positions...');
+    console.log('Use: testSegment(0), testSegment(2), testSegment(4), testSegment(6)');
 }
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         window.simpleWheelGame = new SimpleWheelGame();
-        console.log('🎯 Simple Wheel loaded! Test with: testSegment(0-23) or testQuarters()');
+        console.log('🎯 Simple Wheel loaded! 8 segments active.');
+        console.log('Test with: testSegment(0-7), testEights(), or spinWheel()');
     }, 100);
 });
