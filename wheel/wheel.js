@@ -121,30 +121,30 @@ class WheelOfWealth {
         // 24 segments, 15 degrees each
         // Arrow points at 270 degrees (9 o'clock position)
         this.wheelSegments = [
-            { pos: 0, angle: 270, outcome: '2X' },
-            { pos: 1, angle: 285, outcome: 'LOSE' },
-            { pos: 2, angle: 300, outcome: '50X' },
-            { pos: 3, angle: 315, outcome: '4X' },
-            { pos: 4, angle: 330, outcome: '3X' },
-            { pos: 5, angle: 345, outcome: 'LOSE' },
-            { pos: 6, angle: 0, outcome: 'REFUND' },
-            { pos: 7, angle: 15, outcome: '2X' },
-            { pos: 8, angle: 30, outcome: '5X' },
-            { pos: 9, angle: 45, outcome: 'LOSE' },
-            { pos: 10, angle: 60, outcome: '3X' },
-            { pos: 11, angle: 75, outcome: '20X' },
-            { pos: 12, angle: 90, outcome: 'LOSE' },
-            { pos: 13, angle: 105, outcome: '5X' },
-            { pos: 14, angle: 120, outcome: '6X' },
-            { pos: 15, angle: 135, outcome: 'LOSE' },
-            { pos: 16, angle: 150, outcome: '3X' },
-            { pos: 17, angle: 165, outcome: '4X' },
-            { pos: 18, angle: 180, outcome: '2X' },
-            { pos: 19, angle: 195, outcome: '2X' },
-            { pos: 20, angle: 210, outcome: '3X' },
-            { pos: 21, angle: 225, outcome: '3X' },
-            { pos: 22, angle: 240, outcome: '4X' },
-            { pos: 23, angle: 255, outcome: 'LOSE' }
+            { pos: 0, angle: 255, outcome: '4X' },    // What you actually SAW on wheel
+            { pos: 1, angle: 240, outcome: '5X' },
+            { pos: 2, angle: 225, outcome: '2X' },
+            { pos: 3, angle: 210, outcome: '3X' },
+            { pos: 4, angle: 195, outcome: 'LOSE' },
+            { pos: 5, angle: 180, outcome: '2X' },
+            { pos: 6, angle: 165, outcome: '4X' },
+            { pos: 7, angle: 150, outcome: '3X' },
+            { pos: 8, angle: 135, outcome: '2X' },
+            { pos: 9, angle: 120, outcome: '6X' },
+            { pos: 10, angle: 105, outcome: '5X' },
+            { pos: 11, angle: 90, outcome: 'LOSE' },
+            { pos: 12, angle: 75, outcome: '20X' },
+            { pos: 13, angle: 60, outcome: '3X' },
+            { pos: 14, angle: 45, outcome: 'LOSE' },
+            { pos: 15, angle: 30, outcome: '5X' },
+            { pos: 16, angle: 15, outcome: '2X' },
+            { pos: 17, angle: 0, outcome: 'REFUND' },
+            { pos: 18, angle: 345, outcome: 'LOSE' },
+            { pos: 19, angle: 330, outcome: '3X' },
+            { pos: 20, angle: 315, outcome: '4X' },
+            { pos: 21, angle: 300, outcome: '50X' },
+            { pos: 22, angle: 285, outcome: 'LOSE' },  // Need to verify these last two
+            { pos: 23, angle: 270, outcome: '2X' }
         ];
         
         // Weighted outcomes for random selection
@@ -260,11 +260,11 @@ class WheelOfWealth {
         console.log('Current logical position:', this.logicalPosition, 'degrees');
         console.log('Current CSS rotation:', this.totalRotation, 'degrees');
         
-        // Test rotation: Always +90 degrees to check for drift
-        const rotationToAdd = 90;
+        // Test rotation: Always +375 degrees to check for drift
+        const rotationToAdd = 375;
         const currentTest = this.testCounter || 0;
         
-        console.log(`Test ${currentTest + 1}: Adding ${rotationToAdd} degrees (90° = quarter turn)`);
+        console.log(`Test ${currentTest + 1}: Adding ${rotationToAdd} degrees (375° = 360° + 15° = full rotation + one segment)`);
         
         // Update both positions
         this.totalRotation += rotationToAdd; // For CSS animation
