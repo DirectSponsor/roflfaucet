@@ -3,7 +3,7 @@
 <!-- DESC=_Play casino slots and win UselessCoins on ROFLFaucet - Mobile optimized_ -->
 <!-- KEYWORDS=_slots, casino, faucet, coins, gambling, game, mobile_ -->
 <!-- STYLES=_slots/slots.css,mobile-layout.css_ -->
-<!-- SCRIPTS=_slots/slots.js_ -->
+<!-- SCRIPTS=_slots/slots-mobile.js_ -->
 
 <!-- include start header-mobile.html -->
 <!DOCTYPE html>
@@ -109,13 +109,13 @@ _
                     </tr>
                     <tr class="action-row">
                         <td class="control-cell action-cell" colspan="2">
-                            <button class="faucet-countdown-btn" onclick="handleFaucetClaim()">
-                                <span class="btn-text">Faucet: 300</span>
+                            <button class="flip-button" onclick="flipMachine()" id="flip-btn">
+                                Payouts
                             </button>
                         </td>
                         <td class="control-cell action-cell" colspan="3">
-                            <button class="flip-button" onclick="flipMachine()" id="flip-btn">
-                                Payouts
+                            <button class="faucet-countdown-btn" onclick="handleFaucetClaim()">
+                                <span class="btn-text">Faucet: 300</span>
                             </button>
                         </td>
                     </tr>
@@ -238,13 +238,13 @@ _
                     </tr>
                     <tr class="action-row">
                         <td class="control-cell action-cell" colspan="2">
-                            <button class="faucet-countdown-btn" onclick="handleFaucetClaim()">
-                                <span class="btn-text">Faucet: 300</span>
+                            <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
+                                Slots
                             </button>
                         </td>
                         <td class="control-cell action-cell" colspan="3">
-                            <button class="flip-button" onclick="flipMachine()" id="flip-btn-back">
-                                Slots
+                            <button class="faucet-countdown-btn" onclick="handleFaucetClaim()">
+                                <span class="btn-text">Faucet: 300</span>
                             </button>
                         </td>
                     </tr>
@@ -284,7 +284,7 @@ _
     </div>
     
     <!-- Additional page-specific scripts -->
-        <script src="slots/slots.js"></script>
+        <script src="slots/slots-mobile.js"></script>
 
 </body>
 </html>

@@ -59,8 +59,9 @@ process_placeholders() {
                     fi
                 done
             fi
-            # Replace #STYLES# with generated HTML
+            # Replace #STYLES# and _STYLES_ with generated HTML
             sed -i "s|#STYLES#|$styles_html|g" "$temp_file"
+            sed -i "s|_STYLES_|$styles_html|g" "$temp_file"
             
         elif [[ "$placeholder_name" == "SCRIPTS" ]]; then
             # Convert comma-separated scripts to script tags
@@ -74,12 +75,14 @@ process_placeholders() {
                     fi
                 done
             fi
-            # Replace #SCRIPTS# with generated HTML
+            # Replace #SCRIPTS# and _SCRIPTS_ with generated HTML
             sed -i "s|#SCRIPTS#|$scripts_html|g" "$temp_file"
+            sed -i "s|_SCRIPTS_|$scripts_html|g" "$temp_file"
             
         else
-            # Regular placeholder replacement
+            # Regular placeholder replacement (both formats)
             sed -i "s|#$placeholder_name#|$placeholder_value|g" "$temp_file"
+            sed -i "s|_${placeholder_name}_|$placeholder_value|g" "$temp_file"
         fi
     done < "$input_file"
     

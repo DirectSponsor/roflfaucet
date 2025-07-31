@@ -236,94 +236,38 @@ class CasinoSlotMachine {
     }
     
     calculateResponsiveDimensions() {
-        // Use viewport width directly to avoid circular reference
+        // MOBILE-ONLY VERSION: Simple responsive logic
         const viewportWidth = window.innerWidth;
         
-        // More granular responsive breakpoints for smooth scaling
-        let containerWidth;
-        let gap, padding;
-        
-        if (viewportWidth > 900) {
-            // Large desktop: both sidebars visible
-            // Account for left sidebar (~25% of viewport) + right sidebar (~25%) + margins
-            const sidebarWidth = Math.max(180, viewportWidth * 0.25); // At least 180px per sidebar
-            containerWidth = viewportWidth - (2 * sidebarWidth) - 40;
-            gap = 15;
-            padding = 15;
-        } else if (viewportWidth > 750) {
-            // Medium desktop: only left sidebar visible (right collapsed)
-            const leftSidebarWidth = Math.max(160, viewportWidth * 0.22);
-            containerWidth = viewportWidth - leftSidebarWidth - 40;
-            gap = 12;
-            padding = 12;
-        } else if (viewportWidth > 600) {
-            // Large tablet: both sidebars collapsed but still larger screens
-            containerWidth = viewportWidth - 40; // just margins
-            gap = 10;
-            padding = 10;
-        } else if (viewportWidth > 500) {
-            // Medium tablet: mobile-style layout
-            containerWidth = viewportWidth - 30;
-            gap = 12;
-            padding = 12;
-        } else if (viewportWidth >= 420) {
-            // Large mobile screens - mobile-specific scaling
-            containerWidth = viewportWidth - 20; // minimal margins
-            gap = 13;
-            padding = 13;
-        } else if (viewportWidth >= 350) {
-            // Medium mobile screens
-            containerWidth = viewportWidth - 20;
-            gap = 11;
-            padding = 11;
-        } else if (viewportWidth >= 320) {
-            // Small mobile screens
-            containerWidth = viewportWidth - 16;
-            gap = 8;
-            padding = 8;
-        } else {
-            // Extra small screens (below 320px)
-            containerWidth = viewportWidth - 10;
-            gap = 5;
-            padding = 5;
-        }
-        
-        // Ensure minimum container width
-        containerWidth = Math.max(300, containerWidth);
+        // Mobile layout: no sidebars, centered content
+        const containerWidth = viewportWidth - 20; // 10px margin on each side
+        const gap = 12;
+        const padding = 12;
         
         // Calculate available width for reels
-        const usedSpace = (2 * gap) + (3 * 4); // gaps + borders (2px each reel)
-        const availableWidth = containerWidth - usedSpace - (2 * padding);
+        const usedSpace = (2 * gap) + (3 * 4) + (2 * padding); // gaps + borders + padding
+        const availableWidth = containerWidth - usedSpace;
         
-        // Calculate reel width with smooth scaling
+        // Calculate ideal reel width (1/3 of available space)
         const calculatedReelWidth = Math.floor(availableWidth / 3);
         
-        // Responsive sizing with smooth transitions
+        // Simple responsive sizing for mobile
         let reelWidth;
-        if (viewportWidth > 1200) {
-            // Very large screens: cap at reasonable size
-            reelWidth = Math.min(130, calculatedReelWidth);
-        } else if (viewportWidth > 800) {
-            // Desktop: aim for good balance
-            reelWidth = Math.max(90, Math.min(120, calculatedReelWidth));
-        } else if (viewportWidth > 600) {
-            // Large tablet: allow more shrinking but keep adequate size
-            reelWidth = Math.max(85, Math.min(110, calculatedReelWidth));
-        } else if (viewportWidth > 500) {
-            // Medium tablet: ensure adequate size with mobile-style layout
-            reelWidth = Math.max(95, Math.min(105, calculatedReelWidth));
-        } else if (viewportWidth >= 420) {
-            // Large mobile: allow scaling up to full size when space permits
-            reelWidth = Math.max(85, Math.min(120, calculatedReelWidth));
-        } else if (viewportWidth >= 350) {
-            // Medium mobile: allow some scaling but smaller max
-            reelWidth = Math.max(75, Math.min(100, calculatedReelWidth));
-        } else if (viewportWidth >= 320) {
-            // Small mobile: allow minimal scaling
-            reelWidth = Math.max(65, Math.min(85, calculatedReelWidth));
+        if (calculatedReelWidth >= 120) {
+            // Plenty of space: use full desktop size
+            reelWidth = 120;
+        } else if (calculatedReelWidth >= 100) {
+            // Good space: scale down a bit
+            reelWidth = 100;
+        } else if (calculatedReelWidth >= 80) {
+            // Medium space: scale down more
+            reelWidth = 80;
+        } else if (calculatedReelWidth >= 65) {
+            // Limited space: small reels
+            reelWidth = 65;
         } else {
-            // Extra small: minimum size with tiny scaling allowance
-            reelWidth = Math.max(55, Math.min(70, calculatedReelWidth));
+            // Very tight: minimum viable size
+            reelWidth = 55;
         }
         
         // Maintain 3:1 aspect ratio (3 symbols high)
