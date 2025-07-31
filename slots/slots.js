@@ -312,18 +312,9 @@ class CasinoSlotMachine {
         } else if (viewportWidth > 500) {
             // Medium tablet: ensure adequate size with mobile-style layout
             reelWidth = Math.max(95, Math.min(105, calculatedReelWidth));
-        } else if (viewportWidth >= 420) {
-            // Large mobile: allow scaling up to full size when space permits
-            reelWidth = Math.max(85, Math.min(120, calculatedReelWidth));
-        } else if (viewportWidth >= 350) {
-            // Medium mobile: allow some scaling but smaller max
-            reelWidth = Math.max(75, Math.min(100, calculatedReelWidth));
-        } else if (viewportWidth >= 320) {
-            // Small mobile: allow minimal scaling
-            reelWidth = Math.max(65, Math.min(85, calculatedReelWidth));
         } else {
-            // Extra small: minimum size with tiny scaling allowance
-            reelWidth = Math.max(55, Math.min(70, calculatedReelWidth));
+            // Mobile/small screens: use calculated width with reasonable limits
+            reelWidth = Math.max(80, Math.min(120, calculatedReelWidth));
         }
         
         // Maintain 3:1 aspect ratio (3 symbols high)
@@ -986,6 +977,12 @@ function claimWinnings() {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🎰 DOM loaded, initializing slot machine...');
+    
+    // Check for mobile redirect first
+    if (typeof checkMobileRedirect === 'function') {
+        checkMobileRedirect();
+    }
+    
     console.log('🎰 Checking global functions availability...');
     console.log('  - getBalance:', typeof getBalance);
     console.log('  - addBalance:', typeof addBalance);
