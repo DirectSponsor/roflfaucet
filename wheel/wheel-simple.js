@@ -1,5 +1,5 @@
-// Wheel Simple System - Phase 1: Basic Structure
-// 24 segments, center-point targeting, no complex ranges
+// Wheel Simple System - Pure Rotation Approach
+// Just spins the wheel by degrees - no segment logic
 
 class SimpleWheelGame {
     constructor() {
@@ -8,21 +8,8 @@ class SimpleWheelGame {
         this.minBet = 1;
         this.spinning = false;
         
-        // Current wheel position (0-359 degrees)
+        // Current wheel position (0-359 degrees) - this is the ONLY state we track
         this.currentPosition = 0;
-        
-        // PHASE 3: Expanded to 8 segments (every 45°) with varied outcomes
-        // Direct degree-to-outcome mapping - no arrow logic needed
-        this.segments = [
-            { id: 0, centerDegree: 0, outcome: 'DOUBLE' },     // 12 o'clock - confirmed
-            { id: 1, centerDegree: 45, outcome: '3X' },        // 1:30 position
-            { id: 2, centerDegree: 90, outcome: 'DOUBLE' },    // 3 o'clock - confirmed
-            { id: 3, centerDegree: 135, outcome: '4X' },       // 4:30 position
-            { id: 4, centerDegree: 180, outcome: 'LOSE' },     // 6 o'clock - confirmed
-            { id: 5, centerDegree: 225, outcome: '5X' },       // 7:30 position
-            { id: 6, centerDegree: 270, outcome: 'REFUND' },   // 9 o'clock - confirmed
-            { id: 7, centerDegree: 315, outcome: 'JACKPOT' }   // 10:30 position
-        ];
         
         this.initializeGame();
     }
@@ -38,49 +25,39 @@ class SimpleWheelGame {
         console.log('Arrow points at 270° (segment 0)');
     }
     
-    // Core rotation function - spin to specific segment
-    spinToSegment(segmentId) {
+    // PURE ROTATION FUNCTION - Just rotates wheel by specified degrees
+    rotateWheel(degrees) {
         if (this.spinning) {
             console.log('Already spinning, ignoring request');
             return;
         }
         
-        // Find segment by ID
-        const targetSegment = this.segments.find(segment => segment.id === segmentId);
-        if (!targetSegment) {
-            console.log('Segment not found. Available segments: 0-7 (8 segments total)');
-            return;
-        }
-        const targetDegree = targetSegment.centerDegree;
-        
-        console.log(`=== SPINNING TO SEGMENT ${segmentId} ===`);
-        console.log(`Target: ${targetSegment.outcome} at ${targetDegree}°`);
-        console.log(`Current position: ${this.currentPosition}°`);
-        
-        // Calculate forward rotation distance
-        let rotationDistance = targetDegree - this.currentPosition;
-        if (rotationDistance < 0) {
-            rotationDistance += 360; // Always spin forward
-        }
+        console.log(`=== ROTATING WHEEL ===`);
+        console.log(`Rotation: ${degrees}°`);
+        console.log(`Starting position: ${this.currentPosition}°`);
         
         // Add minimum 3 full rotations for visual effect
         const fullRotations = 3 + Math.floor(Math.random() * 3); // 3-5 rotations
-        const totalRotation = rotationDistance + (fullRotations * 360);
+        const totalRotation = degrees + (fullRotations * 360);
         
-        console.log(`Rotation distance: ${rotationDistance}°`);
-        console.log(`Full rotations: ${fullRotations} (${fullRotations * 360}°)`);
+        console.log(`Full rotations added: ${fullRotations} (${fullRotations * 360}°)`);
         console.log(`Total rotation: ${totalRotation}°`);
         
-        // Update position and animate
-        this.currentPosition = targetDegree;
+        // Update position (normalize to 0-359)
+        this.currentPosition = (this.currentPosition + degrees) % 360;
+        if (this.currentPosition < 0) this.currentPosition += 360;
+        
+        console.log(`Final position: ${this.currentPosition}°`);
+        
+        // Animate wheel
         this.animateWheel(totalRotation);
         
-        // Process result after animation
+        // Mark as spinning
         this.spinning = true;
         setTimeout(() => {
-            console.log(`✅ Landed on segment ${segmentId}: ${targetSegment.outcome}`);
-            this.updateStatus(`Result: ${targetSegment.outcome}`);
-            this.updateDebugInfo(segmentId, targetSegment);
+            console.log(`✅ Wheel stopped at ${this.currentPosition}°`);
+            this.updateStatus(`Wheel at ${this.currentPosition}°`);
+            this.updateDebugInfo();
             this.spinning = false;
         }, 3000);
     }
@@ -108,13 +85,14 @@ class SimpleWheelGame {
         console.log(`🎡 Animating: ${rotationAmount}° (${currentRotation}° → ${newRotation}°)`);
     }
     
-    // Test function - spin to random segment (from available test segments)
+    // Test function - spin by random degrees (for testing)
     testRandomSpin() {
-        const availableSegmentIds = this.segments.map(s => s.id); // [0, 1, 2, 3, 4, 5, 6, 7]
-        const randomIndex = Math.floor(Math.random() * availableSegmentIds.length);
-        const randomSegment = availableSegmentIds[randomIndex];
-        console.log('🎲 Testing random spin to segment:', randomSegment);
-        this.spinToSegment(randomSegment);
+        const testDegrees = [0, 45, 90, 135, 180, 225, 270, 315]; // 8 test positions
+        const randomIndex = Math.floor(Math.random() * testDegrees.length);
+        const targetDegree = testDegrees[randomIndex];
+        const rotationNeeded = (targetDegree - this.currentPosition + 360) % 360;
+        console.log(`🎲 Testing random rotation to ${targetDegree}° (rotate ${rotationNeeded}°)`);
+        this.rotateWheel(rotationNeeded);
     }
     
     // UI update functions
@@ -138,7 +116,7 @@ class SimpleWheelGame {
         }
     }
     
-    updateDebugInfo(segmentId, targetSegment) {
+    updateDebugInfo() {
         // Create or update debug display
         let debugDiv = document.getElementById('wheel-debug-info');
         if (!debugDiv) {
@@ -161,12 +139,10 @@ class SimpleWheelGame {
         }
         
         debugDiv.innerHTML = `
-            <strong>🎯 WHEEL DEBUG INFO</strong><br>
-            Segment ID: ${segmentId}<br>
-            Target Angle: ${targetSegment.centerDegree}°<br>
-            Result: <strong>${targetSegment.outcome}</strong><br>
-            Position: ${this.getPositionName(targetSegment.centerDegree)}<br>
-            Current Wheel Pos: ${this.currentPosition}°
+            <strong>🎯 PURE ROTATION DEBUG</strong><br>
+            Current Position: ${this.currentPosition}°<br>
+            Position Name: ${this.getPositionName(this.currentPosition)}<br>
+            <em>(External logic determines outcome)</em>
         `;
     }
     
@@ -218,31 +194,41 @@ function spinWheel() {
     }
 }
 
-// Manual test functions (call from console)
-function testSegment(segmentId) {
+// PURE ROTATION TEST FUNCTIONS (call from console)
+function testRotation(degrees) {
     if (window.simpleWheelGame) {
-        window.simpleWheelGame.spinToSegment(segmentId);
+        console.log(`Testing rotation by ${degrees}°`);
+        window.simpleWheelGame.rotateWheel(degrees);
     }
 }
 
-function testEights() {
-    console.log('Testing 8 positions (every 45°): 0, 1, 2, 3, 4, 5, 6, 7');
-    console.log('Confirmed positions: 0(DOUBLE), 2(DOUBLE), 4(LOSE), 6(REFUND)');
-    console.log('New positions: 1(3X), 3(4X), 5(5X), 7(JACKPOT)');
-    console.log('Use: testSegment(0-7)');
+function testPosition(targetDegree) {
+    if (window.simpleWheelGame) {
+        const currentPos = window.simpleWheelGame.currentPosition;
+        const rotationNeeded = (targetDegree - currentPos + 360) % 360;
+        console.log(`Testing move to ${targetDegree}° (rotate ${rotationNeeded}° from ${currentPos}°)`);
+        window.simpleWheelGame.rotateWheel(rotationNeeded);
+    }
 }
 
-// Legacy function for backward compatibility
-function testQuarters() {
-    console.log('Legacy: Testing original 4 quarter positions...');
-    console.log('Use: testSegment(0), testSegment(2), testSegment(4), testSegment(6)');
+function testEightPositions() {
+    console.log('Pure Rotation Testing - 8 key positions:');
+    console.log('testPosition(0)   - 12 o\'clock');
+    console.log('testPosition(45)  - 1:30 position');
+    console.log('testPosition(90)  - 3 o\'clock');
+    console.log('testPosition(135) - 4:30 position');
+    console.log('testPosition(180) - 6 o\'clock');
+    console.log('testPosition(225) - 7:30 position');
+    console.log('testPosition(270) - 9 o\'clock');
+    console.log('testPosition(315) - 10:30 position');
+    console.log('Or use: testRotation(degrees) for exact degree rotation');
 }
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         window.simpleWheelGame = new SimpleWheelGame();
-        console.log('🎯 Simple Wheel loaded! 8 segments active.');
-        console.log('Test with: testSegment(0-7), testEights(), or spinWheel()');
+        console.log('🎯 Pure Rotation Wheel loaded!');
+        console.log('Test with: testPosition(degrees), testRotation(degrees), testEightPositions(), or spinWheel()');
     }, 100);
 });
