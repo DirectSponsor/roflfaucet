@@ -184,13 +184,21 @@ document.addEventListener('DOMContentLoaded', function() {
 // MOBILE DETECTION SYSTEM
 // ====================================
 
-// Simple mobile detection function
+// Simple mobile detection function - avoids layout calculations on early load  
 function isMobileDevice() {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobileKeywords = ['mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone'];
     const isMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
     const isTouchDevice = 'ontouchstart' in window;
-    const isSmallScreen = window.innerWidth <= 768;
+    
+    // Avoid window.innerWidth during early page load to prevent layout forcing
+    let isSmallScreen = false;
+    if (document.readyState === 'complete') {
+        isSmallScreen = window.innerWidth <= 768;
+    } else {
+        // Use media query during early load to avoid layout calculations
+        isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+    }
     
     return isMobileUA || (isTouchDevice && isSmallScreen);
 }

@@ -1,0 +1,230 @@
+<!-- Wheel of Wealth Game Page - Direct implementation -->
+<!-- TITLE=_ROFLFaucet - Wheel of Wealth_ -->
+<!-- DESC=_Spin the Wheel of Wealth and win UselessCoins on ROFLFaucet_ -->
+<!-- KEYWORDS=_wheel, fortune, casino, faucet, coins, gambling, game_ -->
+<!-- STYLES=_wheel/wheel-simple.css_ -->
+<!-- SCRIPTS=_wheel/wheel-simple.js_ -->
+
+<!-- include start header.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROFLFaucet - Wheel of Wealth</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
+    <meta name="description" content="Spin the Wheel of Wealth and win UselessCoins on ROFLFaucet">
+    
+    <!-- Base Layout CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <!-- Additional page-specific styles -->
+        <link rel="stylesheet" href="wheel/wheel-simple.css">
+
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🤣 roflfaucet</h1>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Faucet</a>
+                <a href="slots.html" class="nav-link">Slots</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="header-auth">
+                <button id="oauth-login-btn" class="header-auth-btn">Login</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+<!-- include end header.html -->
+
+<!-- include start left-sidebar.html -->
+        <aside class="left-sidebar">
+            <!-- A-Ads placeholder - no min-width constraint for testing -->
+            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
+                <div>
+                    A-Ads Placeholder<br>
+                    300x250px<br>
+                    (scales to fit)
+                </div>
+            </div>
+        </aside>
+<!-- include end left-sidebar.html -->
+
+        <main class="main-content">
+            <h1 style="margin: 0 0 0.25em 0; font-size: 1.3em; text-align: center;">
+                🎡 Wheel of Wealth
+            </h1>
+            
+            <!-- Direct Wheel of Wealth (no iframe) -->
+            <div class="wheel-direct">
+                <div class="wheel-container">
+                    <!-- Flip Container for Wheel Machine -->
+                    <div class="wheel-machine" id="wheel-machine">
+                        
+                        <!-- Front Side - Game -->
+                        <div class="machine-front">
+                            <div class="wheel-machine-container">
+                                <!-- Wheel Display -->
+                                <div class="wheel-display-container">
+                                    <div class="wheel-display">
+                                        <img src="wheel/images/wofbase.png" alt="Wheel" class="wheel-image" id="wheel-image">
+                                        <img src="wheel/images/arrow.png" alt="Arrow" class="wheel-arrow" id="wheel-arrow">
+                                    </div>
+                                    
+                                    <!-- Spin Status -->
+                                    <div class="spin-status" id="spin-status">
+                                        <div class="status-text">Ready to Spin!</div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Control Panel -->
+                                <div class="control-panel">
+                                    <table class="control-table">
+                                        <tr>
+                                            <td>
+                                                <span class="control-label">WIN</span><br>
+                                                <span class="control-value" id="last-win">0</span>
+                                            </td>
+                                            <td>
+                                                <span class="control-label">COINS</span><br>
+                                                <span class="control-value" id="current-balance">100</span>
+                                            </td>
+                                            <td>
+                                                <span class="control-label">BET</span><br>
+                                                <span class="control-value" id="current-bet">1</span>
+                                            </td>
+                                            <td>
+                                                <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
+                                                <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
+                                            </td>
+                                            <td>
+                                                <button class="spin-button" onclick="spinWheel()" id="spin-btn">SPIN</button>
+                                            </td>
+                                        </tr>
+                        <tr class="action-row">
+                            <td colspan="5" class="action-cell">
+                                <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                    <span class="btn-text">Faucet: 300</span>
+                                </button>
+                            </td>
+                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Back Side - Prize Display -->
+                        <div class="machine-back">
+                            <div class="wheel-machine-container">
+                                
+                                <!-- Prize Display Table - 2 Columns -->
+                                <div class="prize-display-container">
+                                    <table class="prize-table">
+                                        <tbody>
+                                            <tr>
+                                                <!-- Left Column -->
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">LOSE</div>
+                                                    <div class="prize-payout">0x</div>
+                                                </td>
+                                                <!-- Right Column -->
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">JACKPOT</div>
+                                                    <div class="prize-payout">???x</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">2X</div>
+                                                    <div class="prize-payout">2x</div>
+                                                </td>
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">LUCKY 20</div>
+                                                    <div class="prize-payout">20x</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">3X</div>
+                                                    <div class="prize-payout">3x</div>
+                                                </td>
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">SUPER 8</div>
+                                                    <div class="prize-payout">8x</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">4X</div>
+                                                    <div class="prize-payout">4x</div>
+                                                </td>
+                                                <td class="prize-cell">
+                                                    <div class="prize-label">5X</div>
+                                                    <div class="prize-payout">5x</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Control Panel for Back Side -->
+                                <div class="control-panel">
+                                    <table class="control-table">
+                                        <tr>
+                                            <td colspan="5">
+                                                <button class="flip-button" onclick="flipMachine()" id="flip-back-btn">Back to Game</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+                 
+        </main>
+
+<!-- include start right-sidebar.html -->
+        <aside class="right-sidebar">
+            <!-- Random Giphy Image Container - TEMPORARILY DISABLED FOR TESTING -->
+            <div id="sidebar-giphy-gallery-disabled" class="full-width" style="text-align: center; margin: 0; padding: 0;">
+                <p style="color: #666; font-size: 14px; margin: 10px;">Gallery disabled during testing</p>
+            </div>
+        </aside>
+<!-- include end right-sidebar.html -->
+
+<!-- include start footer.html -->
+    </div>
+    
+    <!-- Additional page-specific scripts -->
+    <script src="wheel/wheel-logic.js"></script>
+    <script src="wheel/wheel-animation.js"></script>
+    <script src="wheel/wheel-controller.js"></script>
+
+</body>
+</html>
+<!-- include end footer.html -->
