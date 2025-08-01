@@ -65,7 +65,7 @@ class UnifiedBalanceSystem {
             return total + (tx.type === 'spend' ? -tx.amount : tx.amount);
         }, 0);
         
-        console.log('👤 Guest balance calculated:', this.balance);
+        // console.log('👤 Guest balance calculated:', this.balance);
         return this.balance;
     }
     
@@ -256,7 +256,7 @@ window.updateBalanceDisplays = async () => {
     // Update currency terminology
     updateCurrencyDisplays();
     
-    console.log('💰 Balance displays updated:', Math.floor(balance), terminology.currency);
+    // console.log('💰 Balance displays updated:', Math.floor(balance), terminology.currency);
 };
 
 // Global function to update currency terminology displays
@@ -284,7 +284,7 @@ window.updateCurrencyDisplays = () => {
         element.title = terminology.fullName;
     });
     
-    console.log('🏷️ Currency displays updated:', terminology.currency);
+    // console.log('🏷️ Currency displays updated:', terminology.currency);
 };
 
 // Global convenience functions

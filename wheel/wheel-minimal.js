@@ -51,14 +51,29 @@ class WheelLogic {
     }
 
 calculateSpin() {
-        const stepDegrees = 15; // Testing: always advance by 15 degrees
+        // Simulate realistic random spins with extra rotations
+        // Random spin amounts (0-359) + extra rotations (3-7)
+        const testSequence = [
+            147 + (4 * 360),  // 147° + 4 rotations = 1587°
+            83 + (6 * 360),   // 83° + 6 rotations = 2243°
+            291 + (3 * 360),  // 291° + 3 rotations = 1371°
+            205 + (5 * 360),  // 205° + 5 rotations = 2005°
+            56 + (7 * 360)    // 56° + 7 rotations = 2576°
+        ];
+        
+        if (!this.spinIndex) this.spinIndex = 0;
+        const stepDegrees = testSequence[this.spinIndex % testSequence.length];
+        
         const total = this.currentPosition + stepDegrees;
         const finalPosition = total % 360;
 
+        console.log(`🎯 Spin ${this.spinIndex + 1}: ${this.currentPosition}° + ${stepDegrees}° = ${finalPosition}°`);
+        
         this.currentPosition = finalPosition;
+        this.spinIndex++;
 
 return {
-            totalSpinDegrees: stepDegrees,  // Always rotate by 15 degrees for testing
+            totalSpinDegrees: stepDegrees,
             finalPosition,
             outcome: this.segmentMap[finalPosition]
         };
