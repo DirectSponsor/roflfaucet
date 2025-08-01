@@ -521,7 +521,7 @@ class CasinoSlotMachine {
         if (!betResult.success) {
             console.log('❌ Insufficient balance for bet!');
             if (betResult.error === 'Insufficient balance') {
-                this.showDemoCreditsPrompt();
+                showInsufficientBalanceDialog('slots');
             }
             return;
         }

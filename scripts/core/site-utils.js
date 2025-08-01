@@ -191,14 +191,8 @@ function isMobileDevice() {
     const isMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
     const isTouchDevice = 'ontouchstart' in window;
     
-    // Avoid window.innerWidth during early page load to prevent layout forcing
-    let isSmallScreen = false;
-    if (document.readyState === 'complete') {
-        isSmallScreen = window.innerWidth <= 768;
-    } else {
-        // Use media query during early load to avoid layout calculations
-        isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
-    }
+    // Always use media query to avoid layout forcing completely
+    const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
     
     return isMobileUA || (isTouchDevice && isSmallScreen);
 }
