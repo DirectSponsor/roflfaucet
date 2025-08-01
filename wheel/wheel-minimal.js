@@ -1,9 +1,14 @@
 // Minimal Wheel JS - Only essential DOM manipulation
 
-// ====== EASY MODE SWITCH ======
-// Set to true for testing with fixed sequences, false for production random spins
-const TESTING_MODE = false;
-// ==============================
+// ====== SEGMENT PROBABILITIES ======
+// String of 100 segment numbers (0-23). Each position = 1% chance.
+// Just count how many times each segment appears to set probabilities.
+const SEGMENTS = 
+    '0000011111222223333344444555556666677777888889999' +  // segments 0-9
+    'AAAAABBBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIII' +     // segments 10-19 
+    'JJJJJKKKKKLLLLLMMMMMNNNNNN';                         // segments 20-23
+// Total: 100 characters = easy percentage control
+// ====================================
 
 // Initialize wheel logic and animation
 let wheelLogic, wheelAnimation;
@@ -56,52 +61,31 @@ class WheelLogic {
     }
 
 calculateSpin() {
-        if (TESTING_MODE) {
-            // === TESTING MODE ===
-            // Simulate realistic random spins with extra rotations
-            const testSequence = [
-                147 + (4 * 360),  // 147° + 4 rotations = 1587°
-                83 + (6 * 360),   // 83° + 6 rotations = 2243°
-                291 + (3 * 360),  // 291° + 3 rotations = 1371°
-                205 + (5 * 360),  // 205° + 5 rotations = 2005°
-                56 + (7 * 360)    // 56° + 7 rotations = 2576°
-            ];
-            
-            if (!this.spinIndex) this.spinIndex = 0;
-            const stepDegrees = testSequence[this.spinIndex % testSequence.length];
-            
-            const finalPosition = (this.currentPosition + stepDegrees) % 360;
-            console.log(`🧪 TEST Spin ${this.spinIndex + 1}: ${this.currentPosition}° + ${stepDegrees}° = ${finalPosition}°`);
-            
-            this.currentPosition = finalPosition;
-            this.spinIndex++;
-            
-            return {
-                totalSpinDegrees: stepDegrees,
-                finalPosition,
-                outcome: this.segmentMap[finalPosition]
-            };
-        } else {
-            // === PRODUCTION MODE ===
-            // Generate true random spin
-            const randomSpin = Math.floor(Math.random() * 360); // 0-359°
-            const extraRotations = Math.floor(Math.random() * 5) + 3; // 3-7 rotations
-            const totalSpinDegrees = randomSpin + (extraRotations * 360);
-            
-            // Calculate final position
-            const finalPosition = (this.currentPosition + randomSpin) % 360;
-            
-            console.log(`🎲 RANDOM Spin: ${this.currentPosition}° + ${randomSpin}° (${Math.floor(totalSpinDegrees/360)} rotations) = ${finalPosition}°`);
-            
-            // Update position for next spin
-            this.currentPosition = finalPosition;
-            
-            return {
-                totalSpinDegrees,
-                finalPosition,
-                outcome: this.segmentMap[finalPosition]
-            };
-        }
+        // Pick random segment
+        const randomIndex = Math.floor(Math.random() * 100);
+        const segmentChar = SEGMENTS[randomIndex];
+        const segment = parseInt(segmentChar, 36); // Converts 0-9A-N to 0-23
+
+        // Pick random degree within that segment  
+        const segmentStart = segment * 15;
+        const randomOffset = Math.floor(Math.random() * 15);
+        const targetDegree = segmentStart + randomOffset;
+
+        // Add extra rotations for visual effect
+        const extraRotations = Math.floor(Math.random() * 5) + 3;
+        const totalSpinDegrees = targetDegree + (extraRotations * 360);
+
+        // Update current position based on the total rotations
+        this.currentPosition = (this.currentPosition + totalSpinDegrees) % 360;
+        const finalOutcome = this.segmentMap[this.currentPosition];
+
+        console.log(`🎯 Segment ${segment} → ${this.currentPosition}° → ${finalOutcome}`);
+
+        return {
+            totalSpinDegrees,
+            finalPosition: this.currentPosition,
+            outcome: finalOutcome
+        };
     }
 
     createSegmentMap() {

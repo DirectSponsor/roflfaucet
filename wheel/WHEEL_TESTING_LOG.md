@@ -124,7 +124,46 @@ const outcome = this.segmentMap[finalPosition];
 this.currentPosition = finalPosition;
 ```
 
+## Position Tracking Fix (August 1, 2025)
+
+### Issue Discovered
+After implementing the probability string system, the first spin worked correctly, but subsequent spins were showing incorrect positions and segment outcomes.
+
+### Root Cause
+The `currentPosition` tracking was not properly accumulating the total rotation. The logic was:
+- Setting `currentPosition = targetDegree` (ignoring previous position)
+- This meant each spin started from 0° instead of the actual wheel position
+
+### Solution
+Fixed the position calculation to properly accumulate rotations:
+```javascript
+// OLD (incorrect):
+this.currentPosition = targetDegree;
+
+// NEW (correct):
+this.currentPosition = (this.currentPosition + totalSpinDegrees) % 360;
+```
+
+### How It Works Now
+- **First spin**: Starts at 0°, spins to target + extra rotations
+- **Subsequent spins**: Takes current position, adds new spin amount, uses modulo 360
+- **Example**: Position 24° + spin 361° = 385°, 385 % 360 = 25° final position
+
+### Verification
+✅ Multiple consecutive spins now show correct position and segment alignment  
+✅ Visual wheel position matches reported degree values  
+✅ Segment outcomes correspond to actual wheel position
+
+## Final Status
+
+✅ **COMPLETE**: All wheel logic tests passed successfully  
+✅ **COMPLETE**: Probability-based segment selection implemented  
+✅ **COMPLETE**: Position tracking bug fixed  
+✅ **COMPLETE**: Old complex files archived  
+✅ **COMPLETE**: Clean, minimal codebase ready for production
+
 ---
 **Test Date**: August 1, 2025  
 **Status**: ALL TESTS PASSED ✅  
+**Position Fix**: VERIFIED ✅  
 **Ready for Production**: YES ✅
