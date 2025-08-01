@@ -3,34 +3,43 @@
 // ====== PROBABILITY SYSTEM - ENGAGEMENT FOCUSED ======
 // Array of segment numbers - balanced for slow balance growth and engagement
 const SEGMENTS = [
-    // LOSE segments (33 total - 33%)
-    5,5,5,5,5,5,5,5,5,5,5,  // 11 × segment 5 (LOSE)
-    12,12,12,12,12,12,12,12,12,12,12,  // 11 × segment 12 (LOSE)
-    15,15,15,15,15,15,15,15,15,15,15,  // 11 × segment 15 (LOSE)
-    
-    // 2X wins (30 total - 30%)
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  // 15 × segment 0 (2X)
-    3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  // 15 × segment 3 (2X)
-    
-    // 3X wins (12 total - 12%)
+    // LOSE segments (265 total - 66.25%)
+    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5, // 66 × segment 5 (LOSE)
+    12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12, // 66 × segment 12 (LOSE)
+    15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15, // 66 × segment 15 (LOSE)
+    19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19, // 66 × segment 19 (LOSE)
+    23, // 1 × segment 23 (LOSE - keep minimal)
+
+    // 1X wins (16 total - 4%)
+    6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6, // 16 × segment 6 (1X)
+
+    // 2X wins (86 total - 21.5%)
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 86 × segment 0 (2X)
+
+    // 3X wins (12 total - 3%)
     4,4,4,4,4,4,  // 6 × segment 4 (3X)
     14,14,14,14,14,14,  // 6 × segment 14 (3X)
-    
-    // 4X wins (12 total - 12%)
-    1,1,1,1,1,1,  // 6 × segment 1 (4X)
-    7,7,7,7,7,7,  // 6 × segment 7 (4X)
-    
-    // 5X wins (10 total - 10%)
-    2,2,2,2,2,  // 5 × segment 2 (5X)
-    11,11,11,11,11,  // 5 × segment 11 (5X)
-    
-    // Special wins (3 total - 3%)
-    22,  // 1 × JACKPOT
+
+    // 4X wins (8 total - 2%)
+    1,1,1,1,  // 4 × segment 1 (4X)
+    7,7,7,7,  // 4 × segment 7 (4X)
+
+    // 5X wins (6 total - 1.5%)
+    2,2,2,  // 3 × segment 2 (5X)
+    11,11,11,  // 3 × segment 11 (5X)
+
+    // 6X wins (4 total - 1%)
+    10,10,  // 2 × segment 10 (6X)
+    21,21, // 2 × segment 21 (6X)
+
+    // Special wins (3 total - 0.75%)
+    22,  // 1 × JACKPOT (50X)
     13,  // 1 × 20X
-    18   // 1 × REFUND
+    17   // 1 × 20X
 ];
-// Total: 100 segments = 33% LOSE, 67% WIN (slow balance growth)
-// Target: ~10 coins per 5 minutes (same as faucet baseline)
+// Total: 400 segments = 66.25% LOSE, 33.75% WIN (slow balance growth)
+// 135 winning outcomes out of 400 spins = much better engagement than previous 25% win rate
+// Expected: Players win 1 out of 3 spins instead of 3 out of 4 losses
 // ==============================================================
 
 // Initialize wheel logic and animation
@@ -156,9 +165,9 @@ class WheelLogic {
         // Get the outcome directly from segment number
         const segmentOutcomes = {
             0: '2X', 1: '4X', 2: '5X', 3: '2X', 4: '3X', 5: 'LOSE',
-            6: '2X', 7: '4X', 8: '3X', 9: '2X', 10: '6X', 11: '5X',
-            12: 'LOSE', 13: '20X', 14: '3X', 15: 'LOSE', 16: '5X', 17: '2X',
-            18: 'REFUND', 19: 'LOSE', 20: '3X', 21: '4X', 22: 'JACKPOT', 23: 'LOSE'
+            6: '1X', 7: '4X', 8: '3X', 9: '2X', 10: '6X', 11: '5X',
+            12: 'LOSE', 13: '20X', 14: '3X', 15: 'LOSE', 16: 'LOSE', 17: '20X',
+            18: 'REFUND', 19: 'LOSE', 20: 'LOSE', 21: '6X', 22: 'JACKPOT', 23: 'LOSE'
         };
         const finalOutcome = segmentOutcomes[segment];
 
@@ -207,6 +216,7 @@ class WheelLogic {
         const payouts = {
             'LOSE': 0,
             'REFUND': 1,
+            '1X': 1,
             '2X': 2,
             '3X': 3,
             '4X': 4,
