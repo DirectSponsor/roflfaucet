@@ -1,23 +1,37 @@
 // Minimal Wheel JS - Only essential DOM manipulation
 
-// ====== SIMPLE PROBABILITY SYSTEM ======
-// Array of segment numbers - 75% LOSE segments, 25% others
+// ====== PROBABILITY SYSTEM - ENGAGEMENT FOCUSED ======
+// Array of segment numbers - balanced for slow balance growth and engagement
 const SEGMENTS = [
-    // LOSE segments (75 total)
-    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,  // 15 × segment 5
-    12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,  // 15 × segment 12
-    15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,  // 15 × segment 15
-    19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,  // 15 × segment 19
-    23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,  // 15 × segment 23
-    // Win segments (25 total)
-    0,0,0,0,3,3,3,3,6,6,6,6,9,9,9,9,17,17,17,17,  // 20 × 2X wins
+    // LOSE segments (33 total - 33%)
+    5,5,5,5,5,5,5,5,5,5,5,  // 11 × segment 5 (LOSE)
+    12,12,12,12,12,12,12,12,12,12,12,  // 11 × segment 12 (LOSE)
+    15,15,15,15,15,15,15,15,15,15,15,  // 11 × segment 15 (LOSE)
+    
+    // 2X wins (30 total - 30%)
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  // 15 × segment 0 (2X)
+    3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  // 15 × segment 3 (2X)
+    
+    // 3X wins (12 total - 12%)
+    4,4,4,4,4,4,  // 6 × segment 4 (3X)
+    14,14,14,14,14,14,  // 6 × segment 14 (3X)
+    
+    // 4X wins (12 total - 12%)
+    1,1,1,1,1,1,  // 6 × segment 1 (4X)
+    7,7,7,7,7,7,  // 6 × segment 7 (4X)
+    
+    // 5X wins (10 total - 10%)
+    2,2,2,2,2,  // 5 × segment 2 (5X)
+    11,11,11,11,11,  // 5 × segment 11 (5X)
+    
+    // Special wins (3 total - 3%)
     22,  // 1 × JACKPOT
     13,  // 1 × 20X
-    10,10,  // 2 × 6X
-    18  // 1 × REFUND
+    18   // 1 × REFUND
 ];
-// Total: 100 segments = easy percentage control
-// ============================================
+// Total: 100 segments = 33% LOSE, 67% WIN (slow balance growth)
+// Target: ~10 coins per 5 minutes (same as faucet baseline)
+// ==============================================================
 
 // Initialize wheel logic and animation
 let wheelLogic, wheelAnimation, balanceSystem;
