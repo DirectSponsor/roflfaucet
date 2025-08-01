@@ -1,5 +1,10 @@
 // Minimal Wheel JS - Only essential DOM manipulation
 
+// ====== EASY MODE SWITCH ======
+// Set to true for testing with fixed sequences, false for production random spins
+const TESTING_MODE = false;
+// ==============================
+
 // Initialize wheel logic and animation
 let wheelLogic, wheelAnimation;
 
@@ -51,32 +56,52 @@ class WheelLogic {
     }
 
 calculateSpin() {
-        // Simulate realistic random spins with extra rotations
-        // Random spin amounts (0-359) + extra rotations (3-7)
-        const testSequence = [
-            147 + (4 * 360),  // 147° + 4 rotations = 1587°
-            83 + (6 * 360),   // 83° + 6 rotations = 2243°
-            291 + (3 * 360),  // 291° + 3 rotations = 1371°
-            205 + (5 * 360),  // 205° + 5 rotations = 2005°
-            56 + (7 * 360)    // 56° + 7 rotations = 2576°
-        ];
-        
-        if (!this.spinIndex) this.spinIndex = 0;
-        const stepDegrees = testSequence[this.spinIndex % testSequence.length];
-        
-        const total = this.currentPosition + stepDegrees;
-        const finalPosition = total % 360;
-
-        console.log(`🎯 Spin ${this.spinIndex + 1}: ${this.currentPosition}° + ${stepDegrees}° = ${finalPosition}°`);
-        
-        this.currentPosition = finalPosition;
-        this.spinIndex++;
-
-return {
-            totalSpinDegrees: stepDegrees,
-            finalPosition,
-            outcome: this.segmentMap[finalPosition]
-        };
+        if (TESTING_MODE) {
+            // === TESTING MODE ===
+            // Simulate realistic random spins with extra rotations
+            const testSequence = [
+                147 + (4 * 360),  // 147° + 4 rotations = 1587°
+                83 + (6 * 360),   // 83° + 6 rotations = 2243°
+                291 + (3 * 360),  // 291° + 3 rotations = 1371°
+                205 + (5 * 360),  // 205° + 5 rotations = 2005°
+                56 + (7 * 360)    // 56° + 7 rotations = 2576°
+            ];
+            
+            if (!this.spinIndex) this.spinIndex = 0;
+            const stepDegrees = testSequence[this.spinIndex % testSequence.length];
+            
+            const finalPosition = (this.currentPosition + stepDegrees) % 360;
+            console.log(`🧪 TEST Spin ${this.spinIndex + 1}: ${this.currentPosition}° + ${stepDegrees}° = ${finalPosition}°`);
+            
+            this.currentPosition = finalPosition;
+            this.spinIndex++;
+            
+            return {
+                totalSpinDegrees: stepDegrees,
+                finalPosition,
+                outcome: this.segmentMap[finalPosition]
+            };
+        } else {
+            // === PRODUCTION MODE ===
+            // Generate true random spin
+            const randomSpin = Math.floor(Math.random() * 360); // 0-359°
+            const extraRotations = Math.floor(Math.random() * 5) + 3; // 3-7 rotations
+            const totalSpinDegrees = randomSpin + (extraRotations * 360);
+            
+            // Calculate final position
+            const finalPosition = (this.currentPosition + randomSpin) % 360;
+            
+            console.log(`🎲 RANDOM Spin: ${this.currentPosition}° + ${randomSpin}° (${Math.floor(totalSpinDegrees/360)} rotations) = ${finalPosition}°`);
+            
+            // Update position for next spin
+            this.currentPosition = finalPosition;
+            
+            return {
+                totalSpinDegrees,
+                finalPosition,
+                outcome: this.segmentMap[finalPosition]
+            };
+        }
     }
 
     createSegmentMap() {
