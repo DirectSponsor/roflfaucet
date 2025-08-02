@@ -11,7 +11,7 @@ class ChatWidget {
         this.container = container;
         this.options = {
             mode: 'sidebar', // 'sidebar', 'floating', 'fullpage'
-            rooms: ['general', 'vip', 'help'],
+            rooms: ['general', 'help'],
             defaultRoom: 'general',
             wsUrl: options.wsUrl || 'wss://roflfaucet.com:8082/chat',
             maxMessages: options.maxMessages || 100,
@@ -122,22 +122,23 @@ class ChatWidget {
                 <h4>🎮 ROFLChat Commands</h4>
                 <div class="help-section">
                     <strong>/tip [user] [amount]</strong> - Send coins to another user<br>
-                    <strong>/rain [amount]</strong> - Add coins to rain pool (VIP only)<br>
+                    <strong>/rain [amount]</strong> - Add coins to rain pool<br>
                     <strong>/balance</strong> - Check your coin balance<br>
                     <strong>/online</strong> - Show online users count
                 </div>
                 
-                <h4>🏆 VIP Room Access</h4>
-                <div class="help-section">
-                    VIP room requires 1000+ coins or special status.<br>
-                    Enjoy exclusive features and higher tip limits!
-                </div>
-                
                 <h4>🌧️ Rain System</h4>
                 <div class="help-section">
-                    VIP users can contribute to the rain pool.<br>
+                    Users can contribute to the rain pool with the /rain command.<br>
                     When pool reaches 100+ coins, random users get rewards!<br>
                     Active chatters have higher rain chances.
+                </div>
+                
+                <h4>💰 Tipping System</h4>
+                <div class="help-section">
+                    Send coins to other users with /tip command.<br>
+                    Minimum tip: 1 coin, maximum: your balance.<br>
+                    Tips are instant and help support fellow players!
                 </div>
                 
                 <h4>📜 Chat Rules</h4>
