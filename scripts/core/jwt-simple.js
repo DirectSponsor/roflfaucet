@@ -47,7 +47,7 @@ class SimpleFaucet {
     
     setupEventListeners() {
         // Main login button
-        const loginBtn = document.getElementById('oauth-login-btn');
+        const loginBtn = document.getElementById('login-btn');
         if (loginBtn) {
             loginBtn.addEventListener('click', () => this.showLoginDialog());
         }
@@ -382,7 +382,7 @@ initializeFaucet() {
         }
         
         // Update header login button
-        const loginBtn = document.getElementById('oauth-login-btn');
+        const loginBtn = document.getElementById('login-btn');
         if (loginBtn) {
             if (this.jwtToken && this.userProfile) {
                 loginBtn.textContent = `👤 ${this.userProfile.username}`;
