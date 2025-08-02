@@ -41,6 +41,9 @@ class ROFLChatIntegration {
             this.connectToAuth();
             this.setupEventListeners();
             
+            // TESTING MODE: Create mock user if no auth found
+            this.enableTestingMode();
+            
             this.isInitialized = true;
             this.updateConnectionStatus('Connected to ROFLFaucet systems', 'success');
             
@@ -105,7 +108,7 @@ class ROFLChatIntegration {
         
         // For development, try localhost first
         if (host.includes('localhost') || host.includes('127.0.0.1')) {
-            return 'ws://localhost:8080/chat';
+            return 'wss://roflfaucet.com:8081/chat';
         }
         
         // For production, use the same host
@@ -186,7 +189,21 @@ class ROFLChatIntegration {
         
         return null;
     }
-    
+
+    enableTestingMode() {
+        // Check if the user is already authenticated
+        const authData = this.getCurrentAuthData();
+        if (!authData) {
+            // No auth data found, generate mock user for testing
+            const mockUser = {
+                id: `test_user_${Math.floor(Math.random() * 10000)}`,
+                username: `TestUser${Math.floor(Math.random() * 100)}`,
+                balance: Math.floor(Math.random() * 1000),
+            };
+            this.handleAuthUpdate({ user: mockUser });
+        }
+    }
+
     handleAuthUpdate(authData) {
         if (!this.chatWidget) return;
         

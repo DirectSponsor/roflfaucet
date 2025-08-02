@@ -13,7 +13,7 @@ class ChatWidget {
             mode: 'sidebar', // 'sidebar', 'floating', 'fullpage'
             rooms: ['general', 'vip', 'help'],
             defaultRoom: 'general',
-            wsUrl: options.wsUrl || 'ws://localhost:8080/chat',
+            wsUrl: options.wsUrl || 'wss://roflfaucet.com:8081/chat',
             maxMessages: options.maxMessages || 100,
             ...options
         };
