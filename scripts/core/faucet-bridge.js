@@ -62,20 +62,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Redirect to result page instead of showing step
             window.location.href = 'faucet-result.html';
             
-    // Add tokens using unified balance system
-            if (!isLoggedIn) {
-                console.log('🎁 Faucet Bridge: Adding tokens for guest user...');
-                addBalance(10, 'faucet_claim', 'Faucet claim reward');
-                updateLastClaimTime();
-                // Balance displays are automatically updated by unified-balance.js
-            } else {
-                console.log('💰 Faucet Bridge: Logged in user, skipping token addition');
-            }
+            // Use unified balance system for ALL users (guest and member)
+            console.log('💰 Faucet Bridge: Adding coins via unified balance system...');
+            addBalance(10, 'faucet_claim', 'Faucet claim reward');
+            updateLastClaimTime();
             
-            if (window.jwtSimpleFaucet) {
-                console.log('🔧 Faucet Bridge: Calling jwtSimpleFaucet.handleClaim()');
-                window.jwtSimpleFaucet.handleClaim();
-            }
+            // The unified balance system automatically:
+            // - For guests: adds to localStorage
+            // - For members: makes API call to data server
+            // - Updates all UI elements automatically
         });
     }
 });
