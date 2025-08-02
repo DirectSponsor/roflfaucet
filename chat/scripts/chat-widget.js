@@ -452,11 +452,14 @@ class ChatWidget {
         const messagesContainer = document.getElementById(`messages-${room}`);
         if (!messagesContainer) return;
         
+        const wasAtBottom = this.isScrolledToBottom(messagesContainer);
         messagesContainer.appendChild(messageElement);
         
-        // Auto-scroll if user is at bottom
-        if (this.isScrolledToBottom(messagesContainer)) {
-            this.scrollToBottom(messagesContainer);
+        // Always scroll to bottom for current room or if user was already at bottom
+        if (room === this.state.currentRoom || wasAtBottom) {
+            setTimeout(() => {
+                this.scrollToBottom(messagesContainer);
+            }, 50);
         }
     }
     
