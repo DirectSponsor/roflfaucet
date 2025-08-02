@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Currency terminology is now handled by the unified balance system
     // via currency classes (.currency, .currency-upper, .currency-full)
 
-    // Load and display current balance
-    loadAndDisplayBalance();
+    // Balance is now handled by unified-balance.js
 
     // Reference to all steps
     const welcomeStep = document.getElementById('welcome-step');
@@ -68,8 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('🎁 Faucet Bridge: Adding tokens for guest user...');
                 addBalance(10, 'faucet_claim', 'Faucet claim reward');
                 updateLastClaimTime();
-                // Update all balance displays after adding tokens
-                setTimeout(updateBalanceDisplays, 100);
+                // Balance displays are automatically updated by unified-balance.js
             } else {
                 console.log('💰 Faucet Bridge: Logged in user, skipping token addition');
             }
@@ -107,22 +105,7 @@ function updateLastClaimTime() {
     }
 }
 
-async function loadAndDisplayBalance() {
-    // Use unified balance system
-    const balance = await getBalance();
-    updateBalanceDisplay(balance);
-    console.log('💰 Loaded unified balance:', balance);
-}
-
-function updateBalanceDisplay(balance) {
-    const balanceElement = document.getElementById('balance');
-    if (balanceElement) {
-        balanceElement.textContent = balance;
-        console.log('📊 Updated balance display:', balance);
-    } else {
-        console.warn('⚠️ Balance element not found');
-    }
-}
+// Balance display functions removed - now handled by unified-balance.js
 
 // Guest member-only feature prompts
 function initGuestPrompts() {
