@@ -210,7 +210,7 @@ class UnifiedBalanceSystem {
         if (wasLoggedIn !== this.isLoggedIn) {
             console.log(`💰 Login status changed: ${wasLoggedIn ? 'member' : 'guest'} → ${this.isLoggedIn ? 'member' : 'guest'}`);
             // Trigger balance and currency display updates
-            setTimeout(window.updateBalanceDisplays, 100);
+            setTimeout(updateBalanceDisplays, 100);
         }
     }
     
