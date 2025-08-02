@@ -121,12 +121,14 @@ class ROFLChatIntegration {
             return;
         }
         
-        // Update chat widget when balance changes
-        window.unifiedBalance.onBalanceUpdate((newBalance) => {
-            if (this.chatWidget) {
-                this.chatWidget.updateBalanceFromAPI(newBalance);
-            }
-        });
+        // Update chat widget when balance changes (if onBalanceUpdate exists)
+        if (typeof window.unifiedBalance.onBalanceUpdate === 'function') {
+            window.unifiedBalance.onBalanceUpdate((newBalance) => {
+                if (this.chatWidget) {
+                    this.chatWidget.updateBalanceFromAPI(newBalance);
+                }
+            });
+        }
         
         // Set initial balance
         const currentBalance = window.unifiedBalance.getBalance();
