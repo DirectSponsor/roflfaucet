@@ -495,7 +495,7 @@ class ChatServer {
 }
 
 // Start the server
-const server = new ChatServer(8081);
+const server = new ChatServer(8082);
 
 // Graceful shutdown
 process.on('SIGINT', () => {

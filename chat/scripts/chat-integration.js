@@ -102,17 +102,8 @@ class ROFLChatIntegration {
     }
     
     getWebSocketUrl() {
-        // Use the same protocol as the current page (ws/wss)
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = window.location.host;
-        
-        // For development, try localhost first
-        if (host.includes('localhost') || host.includes('127.0.0.1')) {
-            return 'wss://roflfaucet.com:8082/chat';
-        }
-        
-        // For production, use the same host
-        return `${protocol}//${host}/chat`;
+        // Always use the production server for chat
+        return 'wss://roflfaucet.com/ws';
     }
     
     connectToBalance() {
@@ -214,10 +205,8 @@ class ROFLChatIntegration {
             this.chatWidget.setUser(authData.user);
             this.updateConnectionStatus(`Signed in as ${authData.user.username}`, 'success');
             
-            // Update balance if available
-            if (authData.user.balance !== undefined) {
-                window.unifiedBalance?.setBalance(authData.user.balance);
-            }
+            // Update balance if available - note: unified balance manages its own state
+            // No need to manually set balance as it's loaded from API/localStorage
             
         } else {
             // User is not authenticated
