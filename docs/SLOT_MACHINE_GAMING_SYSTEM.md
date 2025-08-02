@@ -225,7 +225,7 @@ this.bigWinPool    // Current jackpot size
 - [ ] API endpoints implemented
 - [ ] Transaction type support added
 - [ ] Daily rollup job scheduled
-- [ ] OAuth token validation
+- [ ] JWT token validation
 
 ### Testing Scenarios
 - [ ] Demo mode functionality

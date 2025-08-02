@@ -315,7 +315,7 @@ The existing build script already processes `#STYLES#` and `#SCRIPTS#` placehold
 - Progressive enhancement approach
 
 ### Authentication Integration
-- OAuth system already in place
+- JWT system already in place
 - Member/guest detection via JWT
 - Centralized auth through DirectSponsor
 - Cross-site authentication

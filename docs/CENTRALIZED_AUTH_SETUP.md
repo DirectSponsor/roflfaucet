@@ -2,7 +2,7 @@
 
 ## 🎯 **COMPLETED: Frontend-Only + Centralized Auth**
 
-ROFLFaucet has been successfully cleaned up and converted to a **pure frontend solution** with **centralized OAuth authentication** through auth.directsponsor.org.
+ROFLFaucet has been successfully cleaned up and converted to a **pure frontend solution** with a **centralized authentication system using JWT** through auth.directsponsor.org.
 
 ---
 
@@ -16,10 +16,10 @@ ROFLFaucet has been successfully cleaned up and converted to a **pure frontend s
 - ✅ **Cleaned up scripts** - Single clean auth script
 
 ### **🔐 Centralized Authentication System**
-- ✅ **OAuth2 integration** with auth.directsponsor.org
+- ✅ **JWT integration** with auth.directsponsor.org
 - ✅ **Cross-site login** - One account works everywhere
 - ✅ **Token management** - Access token + refresh token handling
-- ✅ **Secure callback** - Proper OAuth flow with state verification
+- ✅ **Secure authentication** - State verification included
 - ✅ **Auto-redirect** - Seamless login experience
 
 ### **🎭 Content Management**
@@ -57,15 +57,15 @@ roflfaucet/
 │                    CENTRALIZED ECOSYSTEM                    │
 ├─────────────────────────────────────────────────────────────┤
 │  auth.directsponsor.org:3002                               │
-│  ├── OAuth Server (login/signup)                           │
+│  ├── JWT Auth Server (login/signup)                       │
 │  ├── Centralized Database                                  │
 │  │   ├── Users (all sites)                               │
 │  │   ├── Balances (UselessCoins + site tokens)           │
 │  │   ├── Activities (cross-site tracking)                │
 │  │   └── Achievements (ecosystem-wide)                   │
 │  └── API Endpoints                                         │
-│      ├── /oauth/authorize                                 │
-│      ├── /oauth/token                                     │
+│      ├── /jwt-login.php                                   │
+│      ├── /jwt-refresh.php                                 │
 │      ├── /api/user/me                                     │
 │      ├── /api/user/stats                                  │
 │      └── /api/claim                                       │
@@ -76,50 +76,42 @@ roflfaucet/
 ├─────────────────────────────────────────────────────────────┤
 │  ROFLFaucet (roflfaucet.com)                              │
 │  ├── Pure HTML/CSS/JS                                     │
-│  ├── OAuth redirects to auth server                       │
+│  ├── JWT redirects to auth server                         │
 │  ├── API calls to centralized database                    │
 │  └── Content management system                            │
 │                                                            │
 │  ClickForCharity (clickforcharity.net)                    │
 │  ├── Pure HTML/CSS/JS                                     │
-│  ├── Same OAuth system                                    │
+│  ├── Same JWT system                                      │
 │  └── Shared user accounts & UselessCoins                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🔄 **OAuth Authentication Flow**
+## 🔄 **JWT Authentication Flow**
 
 ### **1. User Clicks "Start Claiming"**
 ```javascript
 // ROFLFaucet redirects to auth server
-window.location = 'https://auth.directsponsor.org/oauth/authorize?client_id=roflfaucet&redirect_uri=https://roflfaucet.com/auth/callback'
+window.location = 'https://auth.directsponsor.org/jwt-login.php?redirect_uri=https://roflfaucet.com/auth/callback'
 ```
 
 ### **2. User Authenticates**
 - User logs in at auth.directsponsor.org
 - Same account works for all ecosystem sites
 
-### **3. Callback & Token Exchange**
+### **3. JWT Received & Stored**
 ```javascript
-// Callback page receives auth code
-// Exchanges code for access token
-const tokenResponse = await fetch('https://auth.directsponsor.org/oauth/token', {
-  method: 'POST',
-  body: new URLSearchParams({
-    grant_type: 'authorization_code',
-    client_id: 'roflfaucet',
-    code: authCode
-  })
-});
+// Access token is received as JWT
+localStorage.setItem('jwt_token', jwt);
 ```
 
-### **4. API Calls with Token**
+### **4. API Calls with JWT**
 ```javascript
 // All user data comes from centralized API
 const userData = await fetch('https://auth.directsponsor.org/api/user/me', {
-  headers: { 'Authorization': `Bearer ${accessToken}` }
+  headers: { 'Authorization': `Bearer ${jwt_token}` }
 });
 
 // Claims update centralized database
@@ -152,7 +144,7 @@ const claimResult = await fetch('https://auth.directsponsor.org/api/claim', {
 
 ### **Cross-Site User**
 1. Visits ClickForCharity (different site)
-2. Automatically logged in (same OAuth system)
+2. Automatically logged in (same JWT system)
 3. Same account, same UselessCoins balance
 4. Seamless cross-site experience
 
@@ -198,7 +190,7 @@ const claimResult = await fetch('https://auth.directsponsor.org/api/claim', {
 4. **Test content rotation** and slot system
 
 ### **Future Sites**
-1. **Update ClickForCharity** to use same OAuth system
+1. **Update ClickForCharity** to use same JWT system
 2. **Deploy additional sites** with same architecture
 3. **Scale the ecosystem** with unified accounts
 
@@ -212,14 +204,14 @@ const claimResult = await fetch('https://auth.directsponsor.org/api/claim', {
 - **No complex setup** - Just upload HTML/CSS/JS files
 
 ### **✅ Scalability**  
-- **Add new sites easily** - Just implement OAuth client
+- **Add new sites easily** - Just implement JWT client
 - **Unified user base** - One account, all sites
 - **Cross-site features** - Shared achievements, balances
 
 ### **✅ Reliability**
 - **Fewer moving parts** - Less to break
 - **Centralized data** - Single source of truth
-- **Standard OAuth** - Well-tested authentication
+- **Standard JWT** - Well-tested authentication
 
 ### **✅ User Experience**
 - **Single login** - Works everywhere

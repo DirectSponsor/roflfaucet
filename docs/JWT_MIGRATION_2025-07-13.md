@@ -112,4 +112,26 @@ All previous OAuth documentation preserved in:
 6. **Update CSP headers for JWT endpoints**
 
 ---
+
+## Documentation Updates (August 2, 2025)
+
+### Updated Files for JWT Migration
+The following documentation files have been updated to reflect the current JWT authentication system:
+
+1. **`CENTRALIZED_AUTH_SETUP.md`** - Updated from OAuth to JWT references
+   - Changed authentication flow descriptions
+   - Updated API endpoints from OAuth to JWT
+   - Fixed server architecture diagrams
+
+2. **`MULTI_STEP_FAUCET_IMPLEMENTATION.md`** - Updated OAuth reference to JWT
+
+3. **`DEPLOYMENT_BEST_PRACTICES.md`** - Updated DirectSponsor server description
+
+4. **`MEMBER_GUEST_EXPERIENCE_PLAN.md`** - Updated OAuth system reference to JWT
+
+5. **`SLOT_MACHINE_GAMING_SYSTEM.md`** - Updated OAuth token validation to JWT
+
+All OAuth references have been systematically updated to reflect the current JWT authentication system without breaking the meaning or context of the documentation.
+
+---
 *Migration completed successfully - ready for testing and production deployment*

@@ -7,7 +7,7 @@ Our ecosystem uses a **distributed server architecture** to prevent conflicts an
 ### **Server Responsibilities:**
 - **ROFLFaucet Server** (89.116.44.206) → ROFLFaucet site files only
 - **UselessCoin Server** (89.116.106.121) → Widget scripts + API + Core functionality  
-- **DirectSponsor Server** (TBD) → OAuth authentication + User management
+- **DirectSponsor Server** (86.38.200.119) → JWT authentication + User management
 - **ClickForCharity Server** (TBD) → Charity platform integration
 
 ---

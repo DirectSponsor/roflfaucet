@@ -55,7 +55,7 @@ Converted the single-page faucet to a traditional multi-step faucet process to i
 
 ### Authentication Integration
 - **JWT login** system maintained from previous implementation
-- **Seamless auth flow** with DirectSponsor OAuth
+- **Seamless auth flow** with DirectSponsor JWT
 - **Proper logout** handling
 
 ## Testing Status
