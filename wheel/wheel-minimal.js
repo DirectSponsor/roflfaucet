@@ -116,7 +116,7 @@ async function spinWheel() {
     const totalSpinDegrees = spinResult.totalSpinDegrees;
     const payout = wheelLogic.calculatePayout(spinResult.outcome, currentBet);
 
-    wheelAnimation.animateRotation(totalSpinDegrees).then(async () => {
+    wheelAnimation.animateRotation(totalSpinDegrees, spinResult.extraRotations).then(async () => {
         // Handle winnings
         if (payout > 0) {
             const winResult = await balanceSystem.addBalance(payout, 'wheel_win', `Wheel win: ${spinResult.outcome} × ${currentBet} = ${payout}`);
@@ -166,9 +166,10 @@ class WheelLogic {
         // Get the outcome directly from segment number
         const segmentOutcomes = {
             0: '2X', 1: '4X', 2: '5X', 3: '2X', 4: '3X', 5: 'LOSE',
-            6: '1X', 7: '4X', 8: '3X', 9: '2X', 10: '6X', 11: '5X',
-            12: 'LOSE', 13: '20X', 14: '3X', 15: 'LOSE', 16: 'LOSE', 17: '20X',
-            18: 'REFUND', 19: 'LOSE', 20: 'LOSE', 21: '6X', 22: 'JACKPOT', 23: 'LOSE'
+            6: '2X', 7: '4X', 8: '3X', 9: '2X', 10: '6X', 11: '5X',
+            12: 'LOSE', 13: '20X', 14: '3X', 15: 'LOSE', 16: '5X', 17: '2X',
+            18: 'REFUND', 19: 'LOSE', 20: '3X', 21: '4X', 22: 'JACKPOT', 23: 'LOSE',
+            24: '2X'  // Added missing segment 24
         };
         const finalOutcome = segmentOutcomes[segment];
 
@@ -179,7 +180,7 @@ class WheelLogic {
         const targetDegree = (segmentCenter + randomOffset + 360) % 360; // Handle negative wrap
 
         // Add extra rotations for visual effect (at least 1 full rotation)
-        const extraRotations = Math.floor(Math.random() * 3) + 1;
+        const extraRotations = Math.floor(Math.random() * 3) + 3; // 3 to 5 rotations
         const totalSpinDegrees = (targetDegree - this.currentPosition) + (extraRotations * 360);
         
         // Update current position to the target for next spin
@@ -191,7 +192,8 @@ class WheelLogic {
         return {
             totalSpinDegrees,
             finalPosition: targetDegree,
-            outcome: finalOutcome
+            outcome: finalOutcome,
+            extraRotations: extraRotations
         };
     }
 
@@ -246,7 +248,7 @@ class WheelAnimation {
         }
     }
 
-    animateRotation(degrees) {
+    animateRotation(degrees, extraRotations = 2) {
         return new Promise((resolve) => {
             const wheel = document.getElementById('wheel-image');
             if (!wheel) return resolve();
@@ -256,11 +258,13 @@ class WheelAnimation {
             const currentRotation = parseFloat(currentTransform.match(/rotate\(([^)]+)deg\)/)[1] || '0');
             const newRotation = currentRotation + degrees;
 
-            // Just rotate by the degrees given - no other logic
-            wheel.style.transition = 'transform 1s ease';
+            // Calculate animation duration based on rotations (3-6 seconds)
+            const duration = 3 + (extraRotations * 0.8); // Base 3s + 0.8s per extra rotation
+            wheel.style.transition = `transform ${duration}s cubic-bezier(0.25, 0.1, 0.25, 1)`;
             wheel.style.transform = `rotate(${newRotation}deg)`;
 
-            setTimeout(resolve, 1000);
+            // Wait for animation to complete
+            setTimeout(resolve, duration * 1000);
         });
     }
 
