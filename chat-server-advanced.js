@@ -8,7 +8,6 @@ class ChatServer {
         this.connections = new Map(); // ws -> user data
         this.rooms = {
             general: { users: new Set(), messages: [] },
-            vip: { users: new Set(), messages: [] },
             help: { users: new Set(), messages: [] }
         };
         this.rainPool = 0;
@@ -436,14 +435,7 @@ class ChatServer {
         const room = message.room;
         if (!this.rooms[room]) return;
         
-        // Check VIP access
-        if (room === 'vip' && !this.isUserVip(user)) {
-            this.sendToUser(ws, {
-                type: 'error',
-                message: 'VIP room requires 1000+ coins or special status'
-            });
-            return;
-        }
+        // No special room access restrictions anymore
         
         // Remove from all rooms and add to new room
         Object.values(this.rooms).forEach(r => r.users.delete(user.id));
