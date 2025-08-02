@@ -442,9 +442,9 @@ initializeFaucet() {
             return;
         }
         
-        // Redirect to local auth system
+        // Redirect to external auth server
         const currentUrl = window.location.href;
-        const authUrl = `/auth/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
+        const authUrl = `https://auth.directsponsor.org/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
         window.location.href = authUrl;
     }
     
