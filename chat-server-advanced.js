@@ -14,6 +14,9 @@ class ChatServer {
         this.rainPool = 0;
         this.userBalances = new Map(); // userId -> balance
         this.messageHistory = [];
+        this.dailyMessageContributions = new Map(); // userId -> count
+        this.lastResetDate = new Date().toDateString();
+        this.maxDailyContributions = 20;
         
         this.wss = new WebSocket.Server({ 
             port: this.port, 
@@ -140,14 +143,7 @@ class ChatServer {
     handleChatMessage(ws, user, message) {
         const room = message.room || 'general';
         
-        // Check if user has access to room
-        if (room === 'vip' && !this.isUserVip(user)) {
-            this.sendToUser(ws, {
-                type: 'error',
-                message: 'VIP room requires 1000+ coins or special status'
-            });
-            return;
-        }
+        // Check if user has access to room (removed VIP room check since we removed it)
         
         const chatMessage = {
             type: 'message',
@@ -163,6 +159,9 @@ class ChatServer {
         if (this.messageHistory.length > 1000) {
             this.messageHistory = this.messageHistory.slice(-1000);
         }
+        
+        // Auto-contribute to rain pool (1 coin per message, max 20 per user per day)
+        this.processMessageRainContribution(user);
         
         // Broadcast to room
         this.broadcastToRoom(room, chatMessage);
@@ -252,18 +251,19 @@ class ChatServer {
     handleRain(ws, user, message) {
         const amount = parseInt(message.amount);
         
-        if (!this.isUserVip(user)) {
-            this.sendToUser(ws, {
-                type: 'error',
-                message: 'Only VIP users can create rain events'
-            });
-            return;
-        }
-        
+        // Allow all users to contribute to rain now (not just VIP)
         if (!amount || amount <= 0 || amount > user.balance) {
             this.sendToUser(ws, {
                 type: 'error',
                 message: 'Invalid rain amount or insufficient balance'
+            });
+            return;
+        }
+        
+        if (amount < 5) {
+            this.sendToUser(ws, {
+                type: 'error',
+                message: 'Minimum rain contribution is 5 coins'
             });
             return;
         }
@@ -278,6 +278,13 @@ class ChatServer {
             amount: amount,
             newBalance: user.balance,
             rainPool: this.rainPool
+        });
+        
+        // Broadcast rain contribution message
+        this.broadcastToRoom('general', {
+            type: 'system',
+            text: `${user.username} contributed ${amount} coins to rain pool! (Total: ${this.rainPool})`,
+            timestamp: Date.now()
         });
         
         // Broadcast rain pool update
@@ -492,8 +499,42 @@ class ChatServer {
             }
         }, 3600000); // 1 hour
     }
-}
 
+    // Adds message-based contributions to the rain pool
+    processMessageRainContribution(user) {
+        const currentDate = new Date().toDateString();
+        if (this.lastResetDate !== currentDate) {
+            // Reset daily contributions if day has changed
+            this.dailyMessageContributions.clear();
+            this.lastResetDate = currentDate;
+        }
+
+        const currentContributions = this.dailyMessageContributions.get(user.id) || 0;
+
+        if (currentContributions < this.maxDailyContributions) {
+            this.rainPool += 1; // Add 1 coin to the rain pool
+            this.dailyMessageContributions.set(user.id, currentContributions + 1);
+            console.log(`🌧️ ${user.username} contributed to rain pool via message. Total contributions today: ${currentContributions + 1}`);
+            
+            // Notify user of their contribution
+            const userWs = Array.from(this.connections.entries())
+                .find(([, u]) => u.id === user.id)?.[0];
+            if (userWs) {
+                this.sendToUser(userWs, {
+                    type: 'rainContribution',
+                    contributionCount: currentContributions + 1,
+                    message: `You've contributed ${currentContributions + 1} out of 20 possible rain coins today by chatting!`
+                });
+            }
+
+            // Broadcast rain pool update
+            this.broadcastToAll({
+                type: 'rainPool',
+                amount: this.rainPool
+            });
+        }
+    }
+}
 // Start the server
 const server = new ChatServer(8082);
 
