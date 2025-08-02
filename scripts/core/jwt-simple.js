@@ -203,7 +203,9 @@ class SimpleFaucet {
                 
             } else {
                 // Fallback: use JWT data directly
-                this.userProfile = { username: `User ${payload.sub}` };
+                const username = payload.username || payload.name || payload.user || `User ${payload.sub}`;
+                this.userProfile = { username: username };
+                console.log('✅ Using JWT username:', username);
                 await this.loadBalance();
                 this.showFaucetScreen();
             }
