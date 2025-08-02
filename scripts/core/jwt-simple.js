@@ -47,7 +47,7 @@ class SimpleFaucet {
     
     setupEventListeners() {
         // Main login button
-        const loginBtn = document.getElementById('login-btn');
+        const loginBtn = document.getElementById('oauth-login-btn');
         if (loginBtn) {
             loginBtn.addEventListener('click', () => this.showLoginDialog());
         }

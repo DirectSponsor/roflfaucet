@@ -160,8 +160,8 @@ function showMemberPrompt(featureName) {
 }
 
 function redirectToLogin() {
-    // You can customize this URL to your OAuth login
-    const loginUrl = 'https://auth.directsponsor.org/oauth/authorize?client_id=roflfaucet&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/callback');
+    // Redirect to local login
+    const loginUrl = '/auth/jwt-login.php';
     window.location.href = loginUrl;
 }
 
