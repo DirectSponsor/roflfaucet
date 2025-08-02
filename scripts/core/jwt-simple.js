@@ -359,15 +359,11 @@ class SimpleFaucet {
     }
     
 initializeFaucet() {
-        const faucetSection = document.getElementById('oauth-faucet-section');
-        
-        if (faucetSection) {
-            faucetSection.style.display = 'block';
-            const loginNotice = document.getElementById('login-notice');
-            const welcomeMessage = document.getElementById('welcome-message');
-            if (welcomeMessage) welcomeMessage.style.display = this.jwtToken ? 'block' : 'none';
-            if (loginNotice) loginNotice.style.display = this.jwtToken ? 'none' : 'block';
-        }
+        // Initialize faucet UI elements (most are now handled by unified balance system)
+        const loginNotice = document.getElementById('login-notice');
+        const welcomeMessage = document.getElementById('welcome-message');
+        if (welcomeMessage) welcomeMessage.style.display = this.jwtToken ? 'block' : 'none';
+        if (loginNotice) loginNotice.style.display = this.jwtToken ? 'none' : 'block';
     }
     
     showFaucetScreen() {
@@ -410,20 +406,20 @@ initializeFaucet() {
             }
         }
         
-        // Update claim button
-        const claimBtn = document.getElementById('oauth-claim-btn');
+        // Update faucet claim button (if exists on page)
+        const claimBtn = document.getElementById('faucet-countdown-btn');
         if (claimBtn) {
             claimBtn.disabled = this.jwtToken ? !this.canClaim : false;
             
-            if (!this.jwtToken) {
-                claimBtn.textContent = '🎲 Claim 5 UselessCoins';
-                claimBtn.className = 'claim-button';
-            } else if (this.canClaim) {
-                claimBtn.textContent = '🎲 Claim 5 UselessCoins';
-                claimBtn.className = 'claim-button';
-            } else {
-                claimBtn.textContent = '⏱️ Cooldown Active';
-                claimBtn.className = 'claim-button disabled';
+            const btnText = claimBtn.querySelector('.btn-text');
+            if (btnText) {
+                if (!this.jwtToken) {
+                    btnText.textContent = 'Faucet: 300';
+                } else if (this.canClaim) {
+                    btnText.textContent = 'Faucet: Ready';
+                } else {
+                    btnText.textContent = 'Faucet: Cooldown';
+                }
             }
         }
     }
@@ -486,11 +482,12 @@ initializeFaucet() {
     }
     
     showLoginScreen() {
-        const loginSection = document.getElementById('oauth-login-section');
-        const faucetSection = document.getElementById('oauth-faucet-section');
+        // Show/hide relevant UI elements for login state
+        const loginNotice = document.getElementById('login-notice');
+        const welcomeMessage = document.getElementById('welcome-message');
         
-        if (loginSection) loginSection.style.display = 'block';
-        if (faucetSection) faucetSection.style.display = 'none';
+        if (loginNotice) loginNotice.style.display = 'block';
+        if (welcomeMessage) welcomeMessage.style.display = 'none';
         
         this.updateUI();
     }

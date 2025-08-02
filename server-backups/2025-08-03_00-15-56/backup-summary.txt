@@ -1,0 +1,13 @@
+Backup created: Sun  3 Aug 00:16:08 BST 2025
+Server: 86.38.200.119
+Contents:
+- nginx configurations (sites-available, sites-enabled, nginx.conf)
+- PHP configuration (if custom)
+- API application files
+- This backup includes the CORS fixes and transaction endpoint routing
+
+Recent fixes applied:
+1. Removed duplicate CORS headers from PHP and nginx
+2. Added /api/user/transaction endpoint routing
+3. Secured CORS to specific origins only
+4. Fixed faucet balance updates for logged-in users
