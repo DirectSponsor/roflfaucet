@@ -50,12 +50,16 @@ class UnifiedBalanceSystem {
                 console.log('✅ Real balance loaded:', this.balance);
                 return this.balance;
             } else {
-                console.log('⚠️ API unavailable, falling back to guest mode');
-                return this.fallbackToGuestMode();
+                console.log('⚠️ API unavailable, using fallback balance');
+                // Don't reset login status - just use a fallback balance
+                this.balance = 0;
+                return this.balance;
             }
         } catch (error) {
             console.error('💥 Balance loading error:', error);
-            return this.fallbackToGuestMode();
+            // Don't reset login status - just use a fallback balance
+            this.balance = 0;
+            return this.balance;
         }
     }
     
