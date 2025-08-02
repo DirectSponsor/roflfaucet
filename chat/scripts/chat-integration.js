@@ -108,7 +108,7 @@ class ROFLChatIntegration {
         
         // For development, try localhost first
         if (host.includes('localhost') || host.includes('127.0.0.1')) {
-            return 'wss://roflfaucet.com:8081/chat';
+            return 'wss://roflfaucet.com:8082/chat';
         }
         
         // For production, use the same host

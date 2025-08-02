@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const crypto = require('crypto');
 
 class ChatServer {
-    constructor(port = 8081) {
+    constructor(port = 8082) {
         this.port = port;
         this.users = new Map(); // userId -> user data
         this.connections = new Map(); // ws -> user data
