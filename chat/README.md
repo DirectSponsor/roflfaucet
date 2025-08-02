@@ -5,10 +5,11 @@
 - **Three chat rooms**: General, VIP, Help
 - **Mock user testing** for development
 - **Tip system** - Send coins to other users with `/tip username amount`
-- **Rain events** - VIP users can distribute coins to active chatters
-- **Balance integration** - Shows current coin balance
+- **Rain events** - VIP users can create rain events to reward active chatters
+- **Balance integration** - Integrated with unified balance system
 - **Modern responsive UI** - Works on desktop, tablet, and mobile
 - **Testing mode** - Automatically creates test users for multi-browser testing
+- **SSL/TLS Support** - Secure WebSocket connections via nginx proxy
 
 ## 🏗️ Architecture
 
@@ -16,13 +17,13 @@
 - `chat-widget.js` - Main chat widget with WebSocket connection
 - `chat-integration.js` - Integration with ROFLFaucet systems (auth, balance)
 - `chat-widget.css` - Complete styling system with modern gradients
-- `mock-websocket.js` - Development testing without server
 
-### Backend
-- `websocket-server.js` - Node.js WebSocket server for real-time messaging
-- Port: 8081
-- Path: `/chat`
-- Supports message broadcasting, user management, and command processing
+### Backend (Production Setup)
+- `chat-server-advanced.js` - Advanced Node.js WebSocket server 
+- **Server Port**: 8082 (internal)
+- **WebSocket Path**: `/chat` (server-side)
+- **Public Access**: `wss://roflfaucet.com/ws` (via nginx proxy)
+- **Features**: Multi-room support, user management, tips, rain events, VIP rooms
 
 ## 🚀 Quick Start
 

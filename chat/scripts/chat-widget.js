@@ -237,7 +237,8 @@ class ChatWidget {
             }
         });
         
-        this.switchRoom(this.state.currentRoom);
+        // Force initial room setup with explicit DOM updates
+        this.initializeDefaultRoom();
     }
     
     connectWebSocket() {
@@ -638,6 +639,37 @@ class ChatWidget {
     
     isMobile() {
         return window.innerWidth <= 768;
+    }
+    
+    initializeDefaultRoom() {
+        // Ensure the default room and tab are properly set up
+        const defaultRoom = this.state.currentRoom;
+        
+        // Set the correct tab as active
+        this.elements.tabs.forEach(tab => {
+            const isActive = tab.dataset.room === defaultRoom;
+            tab.classList.toggle('active', isActive);
+        });
+        
+        // Set the correct room as active
+        this.elements.rooms.forEach(room => {
+            const isActive = room.dataset.room === defaultRoom;
+            room.classList.toggle('active', isActive);
+        });
+        
+        // Force a repaint to ensure messages are visible
+        setTimeout(() => {
+            const activeRoom = document.querySelector(`[data-room="${defaultRoom}"].chat-room`);
+            if (activeRoom) {
+                activeRoom.style.display = 'flex';
+                const messagesContainer = activeRoom.querySelector('.chat-messages');
+                if (messagesContainer) {
+                    this.scrollToBottom(messagesContainer);
+                }
+            }
+        }, 100);
+        
+        console.log(`🎯 Default room initialized: ${defaultRoom}`);
     }
     
     // Public API methods
