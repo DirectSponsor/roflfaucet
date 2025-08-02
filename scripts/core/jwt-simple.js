@@ -115,7 +115,7 @@ class SimpleFaucet {
         try {
             console.log('🔐 Logging in with JWT...');
             
-            const response = await fetch(`${this.authApiBase}/jwt-auth.php`, {
+            const response = await fetch(`${this.authApiBase}/jwt-login.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -128,10 +128,11 @@ class SimpleFaucet {
             
             const data = await response.json();
             
-            if (data.jwt) {
+            if (data.jwt_token || data.jwt) {
+                const token = data.jwt_token || data.jwt;
                 console.log('✅ JWT received successfully');
-                localStorage.setItem('jwt_token', data.jwt);
-                this.jwtToken = data.jwt;
+                localStorage.setItem('jwt_token', token);
+                this.jwtToken = token;
                 
                 this.hideLoginDialog();
                 await this.loadUserData();
@@ -156,7 +157,7 @@ class SimpleFaucet {
         try {
             console.log('🎉 Signing up with JWT...');
             
-            const response = await fetch(`${this.authApiBase}/jwt-register.php`, {
+            const response = await fetch(`${this.authApiBase}/jwt-signup.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -170,10 +171,11 @@ class SimpleFaucet {
             
             const data = await response.json();
             
-            if (data.jwt) {
+            if (data.jwt_token || data.jwt) {
+                const token = data.jwt_token || data.jwt;
                 console.log('✅ Signup successful, JWT received');
-                localStorage.setItem('jwt_token', data.jwt);
-                this.jwtToken = data.jwt;
+                localStorage.setItem('jwt_token', token);
+                this.jwtToken = token;
                 
                 this.hideLoginDialog();
                 this.showMessage('Welcome to ROFLFaucet! Account created successfully.', 'success');
@@ -205,7 +207,8 @@ class SimpleFaucet {
             });
             
             if (profileResponse.ok) {
-                this.userProfile = await profileResponse.json();
+                const profileData = await profileResponse.json();
+                this.userProfile = { username: profileData.profile.username };
                 console.log('✅ Profile loaded:', this.userProfile.username);
                 
                 // Load balance
@@ -339,10 +342,11 @@ class SimpleFaucet {
             
             const data = await response.json();
             
-            if (data.jwt) {
+            if (data.jwt_token || data.jwt) {
+                const token = data.jwt_token || data.jwt;
                 console.log('✅ JWT refreshed successfully');
-                localStorage.setItem('jwt_token', data.jwt);
-                this.jwtToken = data.jwt;
+                localStorage.setItem('jwt_token', token);
+                this.jwtToken = token;
             } else {
                 console.log('⚠️ Token refresh failed, logging out');
                 this.handleLogout();
