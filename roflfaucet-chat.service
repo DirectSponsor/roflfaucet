@@ -1,0 +1,26 @@
+[Unit]
+Description=ROFL Faucet Chat Server
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/roflfaucet
+ExecStart=/usr/bin/node chat-server-advanced.js
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=roflfaucet-chat
+
+# Environment variables (if needed)
+# Environment=NODE_ENV=production
+
+# Graceful shutdown
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
