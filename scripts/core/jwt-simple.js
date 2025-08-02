@@ -40,6 +40,12 @@ class SimpleFaucet {
             
             // Load user data and show faucet
             this.loadUserData();
+            
+            // Refresh login status in unified balance system
+            if (window.unifiedBalance) {
+                window.unifiedBalance.refreshLoginStatus();
+            }
+            
             return true;
         }
         return false;
@@ -129,6 +135,11 @@ class SimpleFaucet {
                 
                 this.hideLoginDialog();
                 await this.loadUserData();
+                
+                // Refresh login status in unified balance system
+                if (window.unifiedBalance) {
+                    window.unifiedBalance.refreshLoginStatus();
+                }
                 
             } else {
                 console.error('❌ Login failed:', data.error);
@@ -425,6 +436,11 @@ initializeFaucet() {
         
         this.showLoginScreen();
         this.showMessage('Logged out successfully', 'info');
+        
+        // Refresh login status in unified balance system
+        if (window.unifiedBalance) {
+            window.unifiedBalance.refreshLoginStatus();
+        }
     }
     
     handleClaimClick() {

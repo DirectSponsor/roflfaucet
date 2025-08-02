@@ -201,6 +201,19 @@ class UnifiedBalanceSystem {
         return this.getGuestBalance();
     }
     
+    refreshLoginStatus() {
+        const wasLoggedIn = this.isLoggedIn;
+        this.isLoggedIn = !!localStorage.getItem('jwt_token');
+        this.userId = this.isLoggedIn ? this.getUserIdFromToken() : 'guest';
+        this.accessToken = localStorage.getItem('jwt_token');
+        
+        if (wasLoggedIn !== this.isLoggedIn) {
+            console.log(`💰 Login status changed: ${wasLoggedIn ? 'member' : 'guest'} → ${this.isLoggedIn ? 'member' : 'guest'}`);
+            // Trigger balance and currency display updates
+            setTimeout(updateBalanceDisplays, 100);
+        }
+    }
+    
     getTerminology() {
         return {
             currency: this.isLoggedIn ? 'Coins' : 'Tokens',
