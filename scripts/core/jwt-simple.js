@@ -382,7 +382,7 @@ initializeFaucet() {
         }
         
         // Update header login button
-        const loginBtn = document.getElementById('login-btn');
+        const loginBtn = document.getElementById('oauth-login-btn');
         if (loginBtn) {
             if (this.jwtToken && this.userProfile) {
                 loginBtn.textContent = `👤 ${this.userProfile.username}`;
@@ -442,9 +442,9 @@ initializeFaucet() {
             return;
         }
         
-        // Redirect to centralized auth server
+        // Redirect to local auth system
         const currentUrl = window.location.href;
-        const authUrl = `https://auth.directsponsor.org/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
+        const authUrl = `/auth/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
         window.location.href = authUrl;
     }
     
