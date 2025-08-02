@@ -14,9 +14,9 @@ class ChatServer {
         this.rainPool = 0;
         this.userBalances = new Map(); // userId -> balance
         this.messageHistory = [];
-        this.dailyMessageContributions = new Map(); // userId -> count
-        this.lastResetDate = new Date().toDateString();
-        this.maxDailyContributions = 20;
+        this.hourlyMessageContributions = new Map(); // userId -> {count, hour}
+        this.maxHourlyContributions = 20;
+        this.systemBots = new Map(); // Bot management
         
         this.wss = new WebSocket.Server({ 
             port: this.port, 
@@ -28,6 +28,7 @@ class ChatServer {
         });
         
         this.setupEventHandlers();
+        this.createSystemBots();
         this.startPeriodicTasks();
         
         console.log(`🚀 Advanced Chat Server running on port ${this.port}`);
@@ -211,6 +212,38 @@ class ChatServer {
             return;
         }
         
+        // Special handling for tipping Anzar - goes to rain pool
+        if (targetUser.isBot && targetUser.username === 'Anzar') {
+            user.balance -= amount;
+            this.rainPool += amount;
+            this.userBalances.set(user.id, user.balance);
+            
+            this.sendToUser(ws, {
+                type: 'tipSent',
+                to: targetUser.username,
+                amount: amount,
+                newBalance: user.balance
+            });
+            
+            // Anzar acknowledges the tip
+            setTimeout(() => {
+                this.sendBotMessage('anzar', `🌧️ ${user.username} blessed the rain pool with ${amount} coins! The clouds grow stronger! (Pool: ${this.rainPool})`);
+            }, 1000);
+            
+            // Broadcast rain pool update
+            this.broadcastToAll({
+                type: 'rainPool',
+                amount: this.rainPool
+            });
+            
+            // Check for immediate rain
+            if (this.rainPool >= 100) {
+                this.triggerRainEvent();
+            }
+            
+            return;
+        }
+        
         // Process tip
         user.balance -= amount;
         targetUser.balance += amount;
@@ -302,15 +335,25 @@ class ChatServer {
     triggerRainEvent() {
         const activeUsers = Array.from(this.users.values())
             .filter(user => {
+                // Exclude bots from rain events
+                if (user.isBot) return false;
                 const lastActivity = user.lastActivity || user.joinedAt;
                 return Date.now() - lastActivity < 300000; // Active in last 5 minutes
             });
         
-        if (activeUsers.length === 0) return;
+        if (activeUsers.length === 0) {
+            console.log('🌧️ No active users for rain event');
+            return;
+        }
         
         const winners = this.selectRandomUsers(activeUsers, Math.min(activeUsers.length, 10));
         const perUserAmount = Math.floor(this.rainPool / winners.length);
+        const totalRainAmount = this.rainPool;
         
+        // Anzar announces the rain event
+        this.sendBotMessage('anzar', `🌧️ RAIN TIME! ${totalRainAmount} coins falling from the sky! ${winners.length} lucky users will be blessed!`);
+        
+        // Distribute coins to winners
         winners.forEach(winner => {
             winner.balance += perUserAmount;
             this.userBalances.set(winner.id, winner.balance);
@@ -331,13 +374,19 @@ class ChatServer {
         // Broadcast rain event
         this.broadcastToAll({
             type: 'rain',
-            message: `🌧️ Rain event! ${this.rainPool} coins distributed to ${winners.length} users!`,
-            amount: this.rainPool,
+            message: `🌧️ Rain event! ${totalRainAmount} coins distributed to ${winners.length} users!`,
+            amount: totalRainAmount,
             winners: winners.map(w => w.username),
             timestamp: Date.now()
         });
         
+        // Reset rain pool
         this.rainPool = 0;
+        
+        // Anzar celebrates the rain
+        setTimeout(() => {
+            this.sendBotMessage('anzar', `🎉 Congratulations to the rain winners: ${winners.map(w => w.username).join(', ')}! Each received ${perUserAmount} coins!`);
+        }, 2000);
         
         // Update rain pool display
         this.broadcastToAll({
@@ -498,23 +547,136 @@ class ChatServer {
                 this.messageHistory = this.messageHistory.slice(-500);
             }
         }, 3600000); // 1 hour
+        
+        // Schedule hourly rain at :30 past each hour
+        this.scheduleHourlyRain();
+    }
+    
+    // Schedule rain to happen at :30 past each hour if pool >= 100
+    scheduleHourlyRain() {
+        const now = new Date();
+        const currentMinute = now.getMinutes();
+        const targetMinute = 30;
+        
+        let msUntilNext;
+        if (currentMinute < targetMinute) {
+            // Next :30 is this hour
+            msUntilNext = (targetMinute - currentMinute) * 60 * 1000;
+        } else {
+            // Next :30 is next hour
+            msUntilNext = (60 - currentMinute + targetMinute) * 60 * 1000;
+        }
+        
+        console.log(`⏰ Next scheduled rain check in ${Math.round(msUntilNext / 60000)} minutes`);
+        
+        setTimeout(() => {
+            this.checkScheduledRain();
+            // Schedule the next hourly check
+            setInterval(() => {
+                this.checkScheduledRain();
+            }, 60 * 60 * 1000); // Every hour
+        }, msUntilNext);
+    }
+    
+    // Check if rain should happen at scheduled time
+    checkScheduledRain() {
+        const now = new Date();
+        console.log(`⏰ Scheduled rain check at ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`);
+        
+        if (this.rainPool >= 100) {
+            this.sendBotMessage('anzar', `⏰ Hourly rain time! The clouds have gathered ${this.rainPool} coins!`);
+            setTimeout(() => {
+                this.triggerRainEvent();
+            }, 2000);
+        } else {
+            this.sendBotMessage('anzar', `⏰ Hourly rain check: Only ${this.rainPool} coins in the pool. Need ${100 - this.rainPool} more coins for rain!`);
+        }
+    }
+    
+    // Get next rain time as formatted string
+    getNextRainTime() {
+        const now = new Date();
+        const currentMinute = now.getMinutes();
+        const targetMinute = 30;
+        
+        let nextHour = now.getHours();
+        if (currentMinute >= targetMinute) {
+            nextHour = (nextHour + 1) % 24;
+        }
+        
+        return `${nextHour.toString().padStart(2, '0')}:30`;
     }
 
-    // Adds message-based contributions to the rain pool
-    processMessageRainContribution(user) {
-        const currentDate = new Date().toDateString();
-        if (this.lastResetDate !== currentDate) {
-            // Reset daily contributions if day has changed
-            this.dailyMessageContributions.clear();
-            this.lastResetDate = currentDate;
+    // Create system bots
+    createSystemBots() {
+        // Create Anzar - the rain bot
+        const anzar = {
+            id: 'bot_anzar',
+            username: 'Anzar',
+            balance: 999999,
+            isBot: true,
+            isVip: true,
+            joinedAt: Date.now(),
+            lastActivity: Date.now()
+        };
+        
+        this.systemBots.set('anzar', anzar);
+        this.users.set(anzar.id, anzar);
+        this.userBalances.set(anzar.id, anzar.balance);
+        
+        console.log('🤖 System bot Anzar created for rain events');
+    }
+
+    // Sends a message from a system bot
+    sendBotMessage(botName, message, room = 'general') {
+        const bot = this.systemBots.get(botName);
+        if (!bot) return;
+        
+        const chatMessage = {
+            type: 'message',
+            user: bot.username,
+            message: message,
+            room: room,
+            timestamp: Date.now(),
+            userId: bot.id,
+            isBot: true
+        };
+        
+        // Store message
+        this.messageHistory.push(chatMessage);
+        if (this.messageHistory.length > 1000) {
+            this.messageHistory = this.messageHistory.slice(-1000);
         }
+        
+        // Broadcast to room
+        this.broadcastToRoom(room, chatMessage);
+        
+        console.log(`🤖 ${bot.username} sent message: ${message}`);
+    }
 
-        const currentContributions = this.dailyMessageContributions.get(user.id) || 0;
-
-        if (currentContributions < this.maxDailyContributions) {
+    // Adds message-based contributions to the rain pool (hourly limit)
+    processMessageRainContribution(user) {
+        // Skip contribution for system bots
+        if (user.isBot) return;
+        
+        const currentHour = new Date().getHours();
+        const currentDate = new Date().toDateString();
+        const userKey = user.id;
+        const userContrib = this.hourlyMessageContributions.get(userKey) || { count: 0, hour: -1, date: '' };
+        
+        // Reset if hour has changed or date has changed
+        if (userContrib.hour !== currentHour || userContrib.date !== currentDate) {
+            userContrib.count = 0;
+            userContrib.hour = currentHour;
+            userContrib.date = currentDate;
+        }
+        
+        if (userContrib.count < this.maxHourlyContributions) {
             this.rainPool += 1; // Add 1 coin to the rain pool
-            this.dailyMessageContributions.set(user.id, currentContributions + 1);
-            console.log(`🌧️ ${user.username} contributed to rain pool via message. Total contributions today: ${currentContributions + 1}`);
+            userContrib.count++;
+            this.hourlyMessageContributions.set(userKey, userContrib);
+            
+            console.log(`🌧️ ${user.username} contributed to rain pool via message. Total contributions this hour: ${userContrib.count}`);
             
             // Notify user of their contribution
             const userWs = Array.from(this.connections.entries())
@@ -522,8 +684,8 @@ class ChatServer {
             if (userWs) {
                 this.sendToUser(userWs, {
                     type: 'rainContribution',
-                    contributionCount: currentContributions + 1,
-                    message: `You've contributed ${currentContributions + 1} out of 20 possible rain coins today by chatting!`
+                    contributionCount: userContrib.count,
+                    message: `You've contributed ${userContrib.count} out of 20 possible rain coins this hour by chatting!`
                 });
             }
 
