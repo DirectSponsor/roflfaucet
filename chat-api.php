@@ -289,10 +289,20 @@ if (!$pdo) {
     exit();
 }
 
-// Get JWT token from Authorization header
-$headers = getallheaders();
-$authHeader = $headers['Authorization'] ?? '';
+// Get JWT token from Authorization header (multiple methods for PHP-FPM compatibility)
+$authHeader = '';
 $token = '';
+
+// Try different ways to get Authorization header
+if (function_exists('getallheaders')) {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+}
+
+if (empty($authHeader)) {
+    // Try $_SERVER variables
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+}
 
 if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
     $token = $matches[1];
