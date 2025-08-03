@@ -296,6 +296,40 @@
             color: var(--text-primary);
             font-weight: 500;
         }
+        
+        /* User mention highlighting - only visible to mentioned user */
+        .mentions-me {
+            background: rgba(74, 144, 226, 0.1) !important;
+            border-left: 3px solid var(--primary-color) !important;
+            animation: mentionPulse 0.6s ease-out;
+        }
+        
+        .mentions-me .message-text {
+            background: rgba(74, 144, 226, 0.15) !important;
+            border-color: var(--primary-color) !important;
+        }
+        
+        /* Highlight specific username mentions in text */
+        .username-mention {
+            background: var(--primary-color);
+            color: var(--text-white);
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        
+        /* Subtle animation for mentions */
+        @keyframes mentionPulse {
+            0% {
+                background: rgba(74, 144, 226, 0.3);
+                transform: translateX(-2px);
+            }
+            100% {
+                background: rgba(74, 144, 226, 0.1);
+                transform: translateX(0);
+            }
+        }
     </style>
 
     

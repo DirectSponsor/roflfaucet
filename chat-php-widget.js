@@ -526,6 +526,16 @@ class ChatWidget {
         
         const timeStr = this.formatTime(message.timestamp);
         const isOwnMessage = message.user_id === this.userId;
+        
+        // Check if message mentions current user (only for logged-in users)
+        const mentionsMe = this.username && message.message && 
+                          message.message.toLowerCase().includes(this.username.toLowerCase()) &&
+                          !isOwnMessage; // Don't highlight own messages
+
+        // Add mention highlight class if user is mentioned
+        if (mentionsMe) {
+            messageEl.classList.add('mentions-me');
+        }
 
         // Compact inline format: username: message (single line)
         if (message.type === 'system') {
@@ -536,10 +546,13 @@ class ChatWidget {
             `;
         } else {
             // Single line format: username: message text
+            // Highlight username mentions in the message text
+            const messageText = this.highlightMentions(message.message);
+            
             messageEl.innerHTML = `
                 <p class="message-text">
                     <span class="message-username clickable-username" data-username="${message.username}">${message.username}:</span>
-                    <span class="message-content-text">${this.escapeHtml(message.message)}</span>
+                    <span class="message-content-text">${messageText}</span>
                     <small class="message-time-inline">${timeStr}</small>
                 </p>
             `;
@@ -624,6 +637,27 @@ class ChatWidget {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    highlightMentions(text) {
+        // Only highlight mentions for logged-in users
+        if (!this.username) {
+            return this.escapeHtml(text);
+        }
+        
+        // Escape HTML first
+        let escapedText = this.escapeHtml(text);
+        
+        // Create regex to match username (case insensitive, word boundaries)
+        const usernameRegex = new RegExp(
+            `\\b(${this.username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 
+            'gi'
+        );
+        
+        // Replace username with highlighted version
+        escapedText = escapedText.replace(usernameRegex, '<span class="username-mention">$1</span>');
+        
+        return escapedText;
     }
 
     replyToUser(username) {
