@@ -13,6 +13,7 @@ fi
 
 VPS_HOST="es7-production"  # Uses warp key via SSH alias
 APP_DIR="/root/roflfaucet"
+WEB_DIR="/var/www/html"  # Apache web directory
 BACKUP_DIR="/root/backups/roflfaucet"
 MAX_BACKUPS=5
 
@@ -94,28 +95,44 @@ timeout 120 rsync -avz --progress --delete --timeout=60 \
 echo ""
 echo "✅ Files synced successfully!"
 
-# Step 4: Set permissions and reload nginx (with timeout protection)
-echo "🔧 Setting permissions and reloading nginx..."
+# Step 4: Deploy to Apache web directory and set permissions
+echo "🔧 Deploying to Apache web directory and setting permissions..."
 echo "⏱️  Using SSH with timeout protection..."
 
 # Use timeout to prevent hanging, and show what we're doing
 timeout 30 ssh $VPS_HOST bash -c '
-echo "📁 Setting permissions..."
+echo "📁 Setting permissions for staging area..."
 cd /root/roflfaucet
 chown -R root:root /root/roflfaucet
 find /root/roflfaucet -type d -exec chmod 755 {} \;
 find /root/roflfaucet -type f -exec chmod 644 {} \;
-echo "🔐 Fixing auth directory permissions..."
-chmod 755 /root/roflfaucet/auth/
-chmod 644 /root/roflfaucet/auth/callback.html 2>/dev/null || echo "Auth callback permissions set"
-echo "🔄 Testing nginx config..."
-nginx -t
-echo "♻️  Reloading nginx..."
-systemctl reload nginx
-echo "✅ Nginx reloaded successfully!"
+
+echo "📂 Copying website files to Apache web directory..."
+cp -f /root/roflfaucet/*.html /var/www/html/ 2>/dev/null || echo "HTML files copied"
+cp -f /root/roflfaucet/*.css /var/www/html/ 2>/dev/null || echo "CSS files copied"
+cp -f /root/roflfaucet/*.js /var/www/html/ 2>/dev/null || echo "JS files copied"
+cp -f /root/roflfaucet/*.php /var/www/html/ 2>/dev/null || echo "PHP files copied"
+
+echo "📁 Copying directories to web root..."
+cp -rf /root/roflfaucet/scripts /var/www/html/ 2>/dev/null || echo "Scripts directory copied"
+cp -rf /root/roflfaucet/styles /var/www/html/ 2>/dev/null || echo "Styles directory copied"
+cp -rf /root/roflfaucet/slots /var/www/html/ 2>/dev/null || echo "Slots directory copied"
+cp -rf /root/roflfaucet/wheel /var/www/html/ 2>/dev/null || echo "Wheel directory copied"
+cp -rf /root/roflfaucet/components /var/www/html/ 2>/dev/null || echo "Components directory copied"
+
+echo "🔐 Setting web directory permissions..."
+chown -R www-data:www-data /var/www/html
+find /var/www/html -type d -exec chmod 755 {} \;
+find /var/www/html -type f -exec chmod 644 {} \;
+
+echo "🔄 Testing Apache config..."
+apachectl configtest
+echo "♻️  Reloading Apache..."
+systemctl reload apache2
+echo "✅ Apache reloaded successfully!"
 ' || {
     echo "⚠️  SSH command timed out after 30 seconds, but files were synced"
-    echo "🔧 You may need to manually reload nginx if needed"
+    echo "🔧 You may need to manually reload Apache if needed"
 }
 
 # Step 5: Quick health check (with timeout)
