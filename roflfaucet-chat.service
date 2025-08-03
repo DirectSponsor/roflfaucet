@@ -9,18 +9,30 @@ User=root
 WorkingDirectory=/root/roflfaucet
 ExecStart=/usr/bin/node chat-server-advanced.js
 Restart=always
-RestartSec=10
-StandardOutput=syslog
-StandardError=syslog
+RestartSec=3
+StartLimitBurst=5
+StartLimitInterval=300
+
+# Logging
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=roflfaucet-chat
 
-# Environment variables (if needed)
-# Environment=NODE_ENV=production
+# Environment variables
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS="--max-old-space-size=256"
 
-# Graceful shutdown
+# Improved shutdown handling
 KillMode=mixed
 KillSignal=SIGTERM
-TimeoutStopSec=30
+SendSIGKILL=yes
+TimeoutStopSec=12
+TimeoutStartSec=30
+
+# Security and resource limits
+NoNewPrivileges=yes
+LimitNOFILE=65536
+PrivateTmp=yes
 
 [Install]
 WantedBy=multi-user.target

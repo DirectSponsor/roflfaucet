@@ -256,6 +256,20 @@ class ChatWidget {
                 this.reconnectAttempts = 0;
                 this.updateConnectionStatus();
                 this.addSystemMessage('Connected to chat server', 'general');
+                
+                // Send auth data immediately if user is set
+                if (this.state.user) {
+                    console.log('Sending auth data for user:', this.state.user.username);
+                    this.sendWebSocketMessage({
+                        type: 'auth',
+                        user: {
+                            id: this.state.user.id,
+                            username: this.state.user.username,
+                            balance: this.state.user.balance || 0,
+                            isVip: this.state.user.isVip || false
+                        }
+                    });
+                }
             };
             
             this.ws.onmessage = (event) => {

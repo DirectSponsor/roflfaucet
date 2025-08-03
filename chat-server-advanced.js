@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const crypto = require('crypto');
 
 class ChatServer {
-    constructor(port = 8082) {
+    constructor(port = 8081) {
         this.port = port;
         this.users = new Map(); // userId -> user data
         this.connections = new Map(); // ws -> user data
@@ -38,48 +38,11 @@ class ChatServer {
         this.wss.on('connection', (ws, request) => {
             console.log('💬 New WebSocket connection established');
             
-            // Generate temporary user if none provided
-            const tempUser = {
-                id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                username: `User${Math.floor(Math.random() * 1000)}`,
-                balance: Math.floor(Math.random() * 500) + 100,
-                isVip: false,
-                joinedAt: Date.now()
-            };
-            
-            this.connections.set(ws, tempUser);
-            this.users.set(tempUser.id, tempUser);
-            this.userBalances.set(tempUser.id, tempUser.balance);
-            
-            // Add to general room by default
-            this.rooms.general.users.add(tempUser.id);
-            
-            // Send welcome messages
-            this.sendToUser(ws, {
-                type: 'welcome',
-                user: tempUser,
-                message: 'Connected to ROFLFaucet Chat!'
-            });
-            
-            this.sendToUser(ws, {
-                type: 'userCount',
-                count: this.getOnlineUserCount()
-            });
-            
-            this.sendToUser(ws, {
-                type: 'rainPool',
-                amount: this.rainPool
-            });
-            
-            // Send recent message history
-            this.sendRecentHistory(ws);
-            
-            // Broadcast user join
-            this.broadcastToRoom('general', {
-                type: 'userJoin',
-                user: tempUser.username,
-                userCount: this.getOnlineUserCount()
-            }, ws);
+        // Handle the connection without a temporary user
+        this.sendToUser(ws, {
+            type: 'welcome',
+            message: 'Please authenticate to participate in the chat.'
+        });
             
             // Handle incoming messages
             ws.on('message', (data) => {
@@ -103,8 +66,19 @@ class ChatServer {
             const message = JSON.parse(data);
             const user = this.connections.get(ws);
             
+            // Allow auth messages without a user being set
+            if (message.type === 'auth') {
+                this.handleAuth(ws, message);
+                return;
+            }
+            
+            // For all other message types, require authenticated user
             if (!user) {
-                console.log('Message from unknown user, ignoring');
+                console.log('Message from unauthenticated user, sending auth required');
+                this.sendToUser(ws, {
+                    type: 'error',
+                    message: 'Please authenticate to use chat features'
+                });
                 return;
             }
             
@@ -125,9 +99,6 @@ class ChatServer {
                     break;
                 case 'online':
                     this.handleOnlineRequest(ws);
-                    break;
-                case 'auth':
-                    this.handleAuth(ws, message);
                     break;
                 case 'joinRoom':
                     this.handleJoinRoom(ws, user, message);
@@ -412,22 +383,53 @@ class ChatServer {
     }
     
     handleAuth(ws, message) {
-        const user = this.connections.get(ws);
-        if (!user) return;
-        
-        // Update user data with auth info
+        // Create user data from auth info
         if (message.user) {
-            user.username = message.user.username || user.username;
-            user.balance = message.user.balance || user.balance;
-            user.isVip = message.user.balance >= 1000 || message.user.isVip;
+            const user = {
+                id: message.user.id || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                username: message.user.username,
+                balance: message.user.balance || 0,
+                isVip: message.user.balance >= 1000 || message.user.isVip || false,
+                joinedAt: Date.now(),
+                lastActivity: Date.now()
+            };
             
+            // Store user in all relevant maps
+            this.connections.set(ws, user);
             this.users.set(user.id, user);
             this.userBalances.set(user.id, user.balance);
             
+            // Add to general room by default
+            this.rooms.general.users.add(user.id);
+            
+            console.log(`✅ User authenticated: ${user.username} (Balance: ${user.balance})`);
+            
+            // Send success response
             this.sendToUser(ws, {
                 type: 'authSuccess',
                 user: user
             });
+            
+            // Send current state
+            this.sendToUser(ws, {
+                type: 'userCount',
+                count: this.getOnlineUserCount()
+            });
+            
+            this.sendToUser(ws, {
+                type: 'rainPool',
+                amount: this.rainPool
+            });
+            
+            // Send recent message history
+            this.sendRecentHistory(ws);
+            
+            // Broadcast user join
+            this.broadcastToRoom('general', {
+                type: 'userJoin',
+                user: user.username,
+                userCount: this.getOnlineUserCount()
+            }, ws);
         }
     }
     
@@ -690,23 +692,95 @@ class ChatServer {
     }
 }
 // Start the server
-const server = new ChatServer(8082);
+const server = new ChatServer(8081);
 
-// Graceful shutdown
-process.on('SIGINT', () => {
-    console.log('\n🛑 Shutting down chat server...');
-    server.wss.close(() => {
+// Improved graceful shutdown with timeout and cleanup
+let shutdownInProgress = false;
+let allTimers = []; // Track all timers for cleanup
+
+// Override setInterval to track timers
+const originalSetInterval = setInterval;
+setInterval = function(callback, delay) {
+    const timer = originalSetInterval(callback, delay);
+    allTimers.push(timer);
+    return timer;
+};
+
+// Override setTimeout to track timers
+const originalSetTimeout = setTimeout;
+setTimeout = function(callback, delay) {
+    const timer = originalSetTimeout(callback, delay);
+    allTimers.push(timer);
+    return timer;
+};
+
+function gracefulShutdown(signal) {
+    if (shutdownInProgress) {
+        console.log('⚠️ Shutdown already in progress, forcing exit...');
+        process.exit(1);
+    }
+    
+    shutdownInProgress = true;
+    console.log(`\n🛑 Received ${signal}, shutting down chat server...`);
+    
+    // Set a hard timeout to prevent hanging
+    const forceExitTimer = originalSetTimeout(() => {
+        console.log('⚠️ Graceful shutdown timed out, forcing exit');
+        process.exit(1);
+    }, 8000); // 8 seconds - less than systemd's 30s timeout
+    
+    // Clear all intervals and timeouts
+    console.log('🧹 Clearing all timers...');
+    allTimers.forEach(timer => {
+        clearInterval(timer);
+        clearTimeout(timer);
+    });
+    allTimers = [];
+    
+    // Close all WebSocket connections immediately
+    console.log('🔌 Closing WebSocket connections...');
+    const clients = Array.from(server.wss.clients);
+    clients.forEach(ws => {
+        if (ws.readyState === ws.OPEN) {
+            ws.close(1001, 'Server shutting down');
+        }
+    });
+    
+    // Force terminate any remaining connections after 2 seconds
+    originalSetTimeout(() => {
+        clients.forEach(ws => {
+            if (ws.readyState !== ws.CLOSED) {
+                ws.terminate();
+            }
+        });
+    }, 2000);
+    
+    // Close the WebSocket server
+    server.wss.close((err) => {
+        if (err) {
+            console.error('❌ Error closing WebSocket server:', err);
+        } else {
+            console.log('✅ WebSocket server closed');
+        }
+        
+        clearTimeout(forceExitTimer);
         console.log('✅ Chat server shut down gracefully');
         process.exit(0);
     });
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+// Handle uncaught exceptions and rejections
+process.on('uncaughtException', (error) => {
+    console.error('💥 Uncaught Exception:', error);
+    gracefulShutdown('UNCAUGHT_EXCEPTION');
 });
 
-process.on('SIGTERM', () => {
-    console.log('\n🛑 Received SIGTERM, shutting down...');
-    server.wss.close(() => {
-        console.log('✅ Chat server shut down gracefully');
-        process.exit(0);
-    });
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+    gracefulShutdown('UNHANDLED_REJECTION');
 });
 
 module.exports = ChatServer;
