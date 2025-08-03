@@ -289,16 +289,20 @@ if (!$pdo) {
     exit();
 }
 
-// Get request parameters
-$userId = $_GET['user_id'] ?? $_POST['user_id'] ?? null;
-$username = $_GET['username'] ?? $_POST['username'] ?? null;
+// Get request parameters (only for GET requests that aren't simple polling)
 $roomId = intval($_GET['room'] ?? 1);
 $isPolling = isset($_GET['action']) && $_GET['action'] === 'poll';
 $isGuest = isset($_GET['guest']) && $_GET['guest'] == '1';
 
-// Only update online status when sending messages, not when polling
-if (!$isPolling && !$isGuest && $userId && $username) {
-    updateOnlineStatus($pdo, $userId, $username, $roomId);
+// For GET requests, only get user info if it's not simple polling
+if (!$isPolling && !$isGuest) {
+    $userId = $_GET['user_id'] ?? null;
+    $username = $_GET['username'] ?? null;
+    
+    // Update online status if we have user info
+    if ($userId && $username) {
+        updateOnlineStatus($pdo, $userId, $username, $roomId);
+    }
 }
 
 if ($method === 'GET') {
