@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Include config and auth functions
-require_once 'server-backups/2025-08-03_00-16-55/config.php';
+// Database connection is handled in getDbConnection() function below
+// No external config file needed
 
 // JWT Secret - same as auth system
 define('JWT_SECRET', 'rofl_jwt_secret_key_2025');
@@ -58,9 +58,10 @@ function validateJWT($token) {
  */
 function getDbConnection() {
     try {
-        // Production setup with Docker PostgreSQL
-        $pdo = new PDO('pgsql:host=localhost;port=9432;dbname=listmonk', 'listmonk', 'listmonk');
+        // Production setup with MySQL
+        $pdo = new PDO('mysql:host=localhost;dbname=roflfaucet;charset=utf8mb4', 'roflfaucet', 'RoflFaucet2025SecureDB!');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         return $pdo;
     } catch (PDOException $e) {
         error_log("Chat API DB Error: " . $e->getMessage());
@@ -123,13 +124,13 @@ function checkRateLimit($pdo, $userId) {
  * Update user online status
  */
 function updateOnlineStatus($pdo, $userId, $username, $roomId = 1) {
-    // PostgreSQL UPSERT syntax
+    // MySQL UPSERT syntax
     $stmt = $pdo->prepare('
         INSERT INTO chat_users_online (user_id, username, room_id, last_seen) 
         VALUES (?, ?, ?, NOW()) 
-        ON CONFLICT (user_id) DO UPDATE SET 
-        username = EXCLUDED.username,
-        room_id = EXCLUDED.room_id,
+        ON DUPLICATE KEY UPDATE 
+        username = VALUES(username),
+        room_id = VALUES(room_id),
         last_seen = NOW()
     ');
     $stmt->execute([$userId, $username, $roomId]);
@@ -168,8 +169,8 @@ function getMessages($pdo, $roomId, $lastMessageId = 0) {
  * Get online users count
  */
 function getOnlineCount($pdo, $roomId) {
-    // Clean up old users (inactive for more than 5 minutes) - PostgreSQL syntax
-    $stmt = $pdo->prepare('DELETE FROM chat_users_online WHERE last_seen < NOW() - INTERVAL \'5 minutes\'');
+    // Clean up old users (inactive for more than 5 minutes) - MySQL syntax
+    $stmt = $pdo->prepare('DELETE FROM chat_users_online WHERE last_seen < NOW() - INTERVAL 5 MINUTE');
     $stmt->execute();
     
     // Get current count
