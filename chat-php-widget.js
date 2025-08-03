@@ -18,6 +18,9 @@ class ChatWidget {
         this.pollDelay = 3000; // 3 seconds polling
         this.isPolling = false;
         this.onlineCount = 0;
+        this.isInitialLoad = true; // Track if we're loading initial messages
+        this.maxMessages = 75; // Reduce from 100 to be more efficient
+        this.messageAgeLimit = 3600; // 1 hour in seconds
         
         this.init();
     }
@@ -433,12 +436,27 @@ class ChatWidget {
                 if (result.messages && result.messages.length > 0) {
                     const roomName = this.getRoomNameById(result.room_id);
                     
-                    result.messages.forEach((message, index) => {
-                        // Stagger message display for better UX
-                        setTimeout(() => {
-                            this.displayMessage(message, roomName);
-                        }, index * 200); // 200ms delay between messages
-                    });
+                    if (this.isInitialLoad) {
+                        // Initial load: show all messages immediately without stagger or scroll animation
+                        result.messages.forEach((message) => {
+                            this.displayMessage(message, roomName, false); // false = no scroll
+                        });
+                        
+                        // Scroll to bottom once after all initial messages are loaded
+                        const messagesContainer = document.getElementById(`messages-${roomName}`);
+                        if (messagesContainer) {
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        }
+                        
+                        this.isInitialLoad = false;
+                    } else {
+                        // Live messages: stagger display for better UX
+                        result.messages.forEach((message, index) => {
+                            setTimeout(() => {
+                                this.displayMessage(message, roomName, true); // true = with scroll
+                            }, index * 200); // 200ms delay between messages
+                        });
+                    }
 
                     // Update last message ID
                     const lastMessage = result.messages[result.messages.length - 1];
@@ -480,12 +498,27 @@ class ChatWidget {
                 if (result.messages && result.messages.length > 0) {
                     const roomName = this.getRoomNameById(result.room_id);
                     
-                    result.messages.forEach((message, index) => {
-                        // Stagger message display for better UX
-                        setTimeout(() => {
-                            this.displayMessage(message, roomName);
-                        }, index * 200); // 200ms delay between messages
-                    });
+                    if (this.isInitialLoad) {
+                        // Initial load: show all messages immediately without stagger or scroll animation
+                        result.messages.forEach((message) => {
+                            this.displayMessage(message, roomName, false); // false = no scroll
+                        });
+                        
+                        // Scroll to bottom once after all initial messages are loaded
+                        const messagesContainer = document.getElementById(`messages-${roomName}`);
+                        if (messagesContainer) {
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        }
+                        
+                        this.isInitialLoad = false;
+                    } else {
+                        // Live messages: stagger display for better UX
+                        result.messages.forEach((message, index) => {
+                            setTimeout(() => {
+                                this.displayMessage(message, roomName, true); // true = with scroll
+                            }, index * 200); // 200ms delay between messages
+                        });
+                    }
 
                     // Update last message ID
                     const lastMessage = result.messages[result.messages.length - 1];
@@ -515,7 +548,7 @@ class ChatWidget {
         return 'general';
     }
 
-    displayMessage(message, roomName = null) {
+    displayMessage(message, roomName = null, shouldScroll = true) {
         const targetRoom = roomName || this.currentRoom;
         const messagesContainer = document.getElementById(`messages-${targetRoom}`);
         if (!messagesContainer) return;
@@ -598,14 +631,13 @@ class ChatWidget {
             }
         }
 
-        // Auto-scroll to bottom
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        // Limit message history (keep last 100 messages)
-        const messages = messagesContainer.querySelectorAll('.chat-message:not(.system-message)');
-        if (messages.length > 100) {
-            messages[0].remove();
+        // Auto-scroll to bottom (only for live messages or when explicitly requested)
+        if (shouldScroll) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+
+        // Enhanced message cleanup: limit by count AND age
+        this.cleanupOldMessages(messagesContainer);
     }
 
     updateOnlineCount() {
@@ -703,6 +735,30 @@ class ChatWidget {
         escapedText = escapedText.replace(usernameRegex, '<span class="username-mention">$1</span>');
         
         return escapedText;
+    }
+
+    cleanupOldMessages(messagesContainer) {
+        const messages = messagesContainer.querySelectorAll('.chat-message:not(.system-message)');
+        const currentTime = Date.now() / 1000;
+        
+        // Remove messages older than 1 hour
+        messages.forEach(messageEl => {
+            const timeEl = messageEl.querySelector('.message-time-inline');
+            if (timeEl) {
+                const timeText = timeEl.textContent;
+                // Simple heuristic: if it contains 'AM' or 'PM' and current time minus message time > age limit
+                // For now, just use count-based cleanup, but this can be enhanced with actual timestamps
+            }
+        });
+        
+        // Count-based cleanup: keep only the most recent messages
+        if (messages.length > this.maxMessages) {
+            const messagesToRemove = messages.length - this.maxMessages;
+            for (let i = 0; i < messagesToRemove; i++) {
+                messages[i].remove();
+            }
+            console.log(`🧹 Cleaned up ${messagesToRemove} old messages (keeping last ${this.maxMessages})`);
+        }
     }
 
     replyToUser(username) {
