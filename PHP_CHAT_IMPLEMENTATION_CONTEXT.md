@@ -89,6 +89,8 @@ The project already has PHP authentication infrastructure:
    - Efficient message retrieval (only new messages)
    - Automatic scroll to bottom
    - Connection status indicators
+   - **Immediate message display**: When user sends message, show it instantly in their chat
+   - **Staggered message rendering**: New messages from polling appear with small delays (200-500ms apart) instead of all at once
 
 ### Phase 4: Integration and Testing
 1. **Integration points**:
