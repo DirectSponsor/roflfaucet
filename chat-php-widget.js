@@ -541,21 +541,33 @@ class ChatWidget {
         if (message.type === 'system') {
             messageEl.innerHTML = `
                 <div class="message-content system-message">
-                    <p class="message-text">${this.escapeHtml(message.message)}</p>
+                    <p class="message-text"></p>
                 </div>
             `;
+            // Set text content safely
+            const textEl = messageEl.querySelector('.message-text');
+            textEl.textContent = message.message;
         } else {
             // Single line format: username: message text
-            // Highlight username mentions in the message text
-            const messageText = this.highlightMentions(message.message);
-            
             messageEl.innerHTML = `
                 <p class="message-text">
-                    <span class="message-username clickable-username" data-username="${message.username}">${message.username}:</span>
-                    <span class="message-content-text">${messageText}</span>
+                    <span class="message-username clickable-username" data-username="${this.escapeHtml(message.username)}">${this.escapeHtml(message.username)}:</span>
+                    <span class="message-content-text"></span>
                     <small class="message-time-inline">${timeStr}</small>
                 </p>
             `;
+            
+            // Set message content safely and handle mentions
+            const contentEl = messageEl.querySelector('.message-content-text');
+            if (this.username && message.message && 
+                message.message.toLowerCase().includes(this.username.toLowerCase()) && 
+                !isOwnMessage) {
+                // Handle mentions with innerHTML (safe because we control the highlighting)
+                contentEl.innerHTML = this.highlightMentions(message.message);
+            } else {
+                // Regular message - use textContent for safety
+                contentEl.textContent = message.message;
+            }
         }
 
         // Add message with animation
