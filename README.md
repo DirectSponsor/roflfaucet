@@ -19,6 +19,12 @@ A fun and engaging cryptocurrency faucet platform that combines gaming entertain
 - **JWT Authentication** - Secure user sessions and balance persistence
 - **Guest & Member Experience** - Play as guest or register for enhanced features
 
+### 💬 Community Features
+- **Real-time Chat System** - Connect with other users in community chat rooms
+- **Click-to-Reply** - Easy username clicking for targeted conversations
+- **Tip System** - Send tokens to other users directly through chat
+- **Rain Events** - Community-wide token distribution events
+
 ### 🎯 Charity Integration
 - **Support Charitable Causes** - All site income goes directly to our recipients, no expenses, no middleman organization
 - **Transparent Donations** - Track charitable contributions
@@ -50,6 +56,7 @@ cd roflfaucet
 roflfaucet/
 ├── index.html              # Main faucet page
 ├── slots.html              # Slot machine game
+├── chat.html               # Community chat page
 ├── slots/                  # Game assets and logic
 │   ├── slots.js           # Game mechanics
 │   ├── slots.css          # Game styling
@@ -58,6 +65,8 @@ roflfaucet/
 │   ├── simple-faucet.js   # Faucet logic
 │   ├── unified-balance.js  # Balance management
 │   └── jwt-simple.js      # Authentication
+├── chat-php-widget.js     # Chat system with click-to-reply
+├── chat-api.php           # Chat backend API
 ├── auth/                  # Authentication system
 ├── includes/              # Reusable components
 ├── docs/                  # Comprehensive documentation
@@ -79,6 +88,7 @@ roflfaucet/
 - ✅ **Core Gaming Logic** - Slot machine fully functional
 - ✅ **Balance System** - Unified token management
 - ✅ **Authentication** - JWT-based user system
+- ✅ **Community Chat** - Real-time chat with click-to-reply and tip system
 - ✅ **Mobile Navigation** - Hamburger menu with overlay
 - 🔄 **Ad System** - In development
 - 🔄 **Charity Integration** - Planning phase
