@@ -58,13 +58,8 @@ function validateJWT($token) {
  */
 function getDbConnection() {
     try {
-        // Try PostgreSQL first (preferred for production)
-        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER') && defined('DB_PASS')) {
-            $pdo = new PDO('pgsql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
-        } else {
-            // Fallback for local development or different config
-            $pdo = new PDO('pgsql:host=localhost;dbname=roflfaucet', 'postgres', '');
-        }
+        // Production setup with Docker PostgreSQL
+        $pdo = new PDO('pgsql:host=localhost;port=9432;dbname=listmonk', 'listmonk', 'listmonk');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     } catch (PDOException $e) {
