@@ -289,17 +289,17 @@ if (!$pdo) {
     exit();
 }
 
-// Simple authentication - trust the frontend
-// If the chat widget initialized, user is logged in
-$userId = $_GET['user_id'] ?? $_POST['user_id'] ?? '2'; // Default user for testing
-$username = $_GET['username'] ?? $_POST['username'] ?? 'andytest1'; // Default username
-
-// For now, we'll trust that if the request is coming from the chat widget,
-// the user is authenticated. In the future, we can add proper session validation.
+// Get request parameters
+$userId = $_GET['user_id'] ?? $_POST['user_id'] ?? null;
+$username = $_GET['username'] ?? $_POST['username'] ?? null;
 $roomId = intval($_GET['room'] ?? 1);
+$isPolling = isset($_GET['action']) && $_GET['action'] === 'poll';
+$isGuest = isset($_GET['guest']) && $_GET['guest'] == '1';
 
-// Update user online status
-updateOnlineStatus($pdo, $userId, $username, $roomId);
+// Only update online status when sending messages, not when polling
+if (!$isPolling && !$isGuest && $userId && $username) {
+    updateOnlineStatus($pdo, $userId, $username, $roomId);
+}
 
 if ($method === 'GET') {
     // POLLING - Get new messages

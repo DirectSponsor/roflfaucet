@@ -417,7 +417,8 @@ class ChatWidget {
     async pollMessages() {
         try {
             const currentRoomData = this.rooms[this.currentRoom];
-            const response = await fetch(`/chat-api.php?room=${currentRoomData.id}&last_id=${currentRoomData.lastMessageId}&username=${this.username}&user_id=${this.userId}`, {
+            // Simple polling - just get messages, no user info needed
+            const response = await fetch(`/chat-api.php?room=${currentRoomData.id}&last_id=${currentRoomData.lastMessageId}&action=poll`, {
                 method: 'GET'
             });
 
