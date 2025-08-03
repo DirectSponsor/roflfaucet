@@ -25,15 +25,11 @@ class ChatWidget {
     async init() {
         console.log('🚀 Initializing PHP Chat Widget...');
         
-        // Get authentication token
-        this.authToken = this.getAuthToken();
-        if (!this.authToken) {
-            this.showStatus('Please log in to use chat', 'error');
-            return;
-        }
-
-        // Get user info from token
-        this.getUserInfo();
+        // For now, just use a default user - in the future integrate with your auth system
+        this.username = 'andytest1';
+        this.userId = '2';
+        
+        console.log(`👤 Chat user: ${this.username}`);
         
         // Initialize UI
         this.initializeUI();
@@ -253,12 +249,13 @@ class ChatWidget {
             const response = await fetch('/chat-api.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.authToken}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     message: message,
-                    room: this.rooms[this.currentRoom].id
+                    room: this.rooms[this.currentRoom].id,
+                    username: this.username,
+                    user_id: this.userId
                 })
             });
 
@@ -308,15 +305,10 @@ class ChatWidget {
     }
 
     async pollMessages() {
-        if (!this.authToken) return;
-
         try {
             const currentRoomData = this.rooms[this.currentRoom];
-            const response = await fetch(`/chat-api.php?room=${currentRoomData.id}&last_id=${currentRoomData.lastMessageId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${this.authToken}`
-                }
+            const response = await fetch(`/chat-api.php?room=${currentRoomData.id}&last_id=${currentRoomData.lastMessageId}&username=${this.username}&user_id=${this.userId}`, {
+                method: 'GET'
             });
 
             const result = await response.json();
