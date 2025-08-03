@@ -249,8 +249,17 @@ function sendMessage($pdo, $userId, $username, $message, $roomId = 1) {
                 break;
                 
             case 'balance':
-                // Return current balance (would integrate with user_balances table)
-                return ['success' => true, 'message' => 'Your balance: 1000 coins', 'type' => 'system'];
+                // Get actual balance from user_balances table
+                $stmt = $pdo->prepare('SELECT balance FROM user_balances WHERE user_id = ?');
+                $stmt->execute([$userId]);
+                $balanceRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($balanceRow) {
+                    $balance = floatval($balanceRow['balance']);
+                    return ['success' => true, 'message' => "Your balance: {$balance} tokens", 'type' => 'system'];
+                } else {
+                    return ['success' => true, 'message' => 'Your balance: 0 tokens (account not found)', 'type' => 'system'];
+                }
                 
             case 'online':
                 $count = getOnlineCount($pdo, $roomId);
