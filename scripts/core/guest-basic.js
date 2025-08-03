@@ -18,12 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize guest interface
 function initGuestInterface() {
     // Set up basic UI elements
-    const authBtn = document.getElementById('oauth-login-btn');
+    const authBtn = document.getElementById('login-btn');
     if (authBtn) {
         authBtn.textContent = 'Login to Earn More';
         authBtn.addEventListener('click', function() {
             // Redirect to login
-            window.location.href = 'https://auth.directsponsor.org/oauth/authorize?client_id=roflfaucet&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/callback');
+            window.location.href = 'https://auth.directsponsor.org/auth/authorize?client_id=roflfaucet&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/callback');
         });
     }
     
@@ -59,7 +59,7 @@ function initGuestCallToAction() {
 
 // Redirect to signup
 function redirectToSignup() {
-    window.location.href = 'https://auth.directsponsor.org/oauth/authorize?client_id=roflfaucet&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/callback');
+    window.location.href = 'https://auth.directsponsor.org/auth/authorize?client_id=roflfaucet&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/callback');
 }
 
 // Basic guest faucet functionality
@@ -78,7 +78,7 @@ function showGuestDemo() {
     alert('🎮 Demo Mode\n\nThis is a preview of the faucet. Sign up to earn real UselessCoins!');
     
     // Simulate basic claim process
-    const balanceElement = document.getElementById('oauth-balance');
+    const balanceElement = document.getElementById('balance');
     if (balanceElement) {
         const currentBalance = parseInt(balanceElement.textContent) || 0;
         balanceElement.textContent = currentBalance + 5;

@@ -61,13 +61,13 @@ class SimpleFaucet {
         }
 
         // Header login button
-        const loginBtn = document.getElementById('oauth-login-btn');
+        const loginBtn = document.getElementById('login-btn');
         if (loginBtn) {
             loginBtn.addEventListener('click', () => this.handleLoginClick());
         }
         
         // Logout button
-        const logoutBtn = document.getElementById('oauth-logout-btn');
+        const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => this.handleLogout());
         }
@@ -176,7 +176,7 @@ class SimpleFaucet {
     
     updateUI() {
         // Update username displays
-        const usernameEls = document.querySelectorAll('#oauth-username');
+        const usernameEls = document.querySelectorAll('#username');
         if (this.userProfile) {
             usernameEls.forEach(el => {
                 if (el) el.textContent = this.userProfile.username;
@@ -184,7 +184,7 @@ class SimpleFaucet {
         }
         
         // Update balance display
-        const balanceEl = document.getElementById('oauth-balance');
+        const balanceEl = document.getElementById('balance');
         if (balanceEl) {
             if (this.jwtToken) {
                 balanceEl.textContent = this.balance;
@@ -206,7 +206,7 @@ class SimpleFaucet {
         }
         
         // Update header login button
-        const loginBtn = document.getElementById('oauth-login-btn');
+        const loginBtn = document.getElementById('login-btn');
         if (loginBtn) {
             if (this.jwtToken && this.userProfile) {
                 loginBtn.textContent = `👤 ${this.userProfile.username}`;
@@ -261,7 +261,7 @@ class SimpleFaucet {
     showMessage(text, type = 'info') {
         console.log(`📢 ${type.toUpperCase()}: ${text}`);
         
-        const messageEl = document.getElementById('oauth-message');
+        const messageEl = document.getElementById('message');
         if (messageEl) {
             messageEl.textContent = text;
             messageEl.className = `message ${type}`;

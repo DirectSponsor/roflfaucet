@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize member interface
 function initMemberInterface() {
     // Set up enhanced UI elements
-    const authBtn = document.getElementById('oauth-login-btn');
+    const authBtn = document.getElementById('login-btn');
     if (authBtn) {
         authBtn.textContent = 'Dashboard';
         authBtn.addEventListener('click', function() {
@@ -58,7 +58,7 @@ function simulateMemberDataFetch() {
 
 // Load member-specific stats
 function loadMemberStats() {
-    const balanceElement = document.getElementById('oauth-balance');
+    const balanceElement = document.getElementById('balance');
     if (balanceElement) {
         // Example balance fetch (should be replaced with real API call)
         balanceElement.textContent = fetchMemberBalance();
