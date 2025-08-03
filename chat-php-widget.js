@@ -546,7 +546,7 @@ class ChatWidget {
             `;
             // Set text content safely
             const textEl = messageEl.querySelector('.message-text');
-            textEl.textContent = message.message;
+            textEl.textContent = this.decodeHtmlEntities(message.message);
         } else {
             // Single line format: username: message text
             messageEl.innerHTML = `
@@ -559,14 +559,16 @@ class ChatWidget {
             
             // Set message content safely and handle mentions
             const contentEl = messageEl.querySelector('.message-content-text');
-            if (this.username && message.message && 
-                message.message.toLowerCase().includes(this.username.toLowerCase()) && 
+            const decodedMessage = this.decodeHtmlEntities(message.message);
+            
+            if (this.username && decodedMessage && 
+                decodedMessage.toLowerCase().includes(this.username.toLowerCase()) && 
                 !isOwnMessage) {
                 // Handle mentions with innerHTML (safe because we control the highlighting)
-                contentEl.innerHTML = this.highlightMentions(message.message);
+                contentEl.innerHTML = this.highlightMentions(decodedMessage);
             } else {
                 // Regular message - use textContent for safety
-                contentEl.textContent = message.message;
+                contentEl.textContent = decodedMessage;
             }
         }
 
@@ -649,6 +651,13 @@ class ChatWidget {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    decodeHtmlEntities(text) {
+        // Create a temporary DOM element to decode HTML entities
+        const div = document.createElement('div');
+        div.innerHTML = text;
+        return div.textContent || div.innerText || '';
     }
 
     highlightMentions(text) {
