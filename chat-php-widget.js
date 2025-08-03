@@ -637,8 +637,32 @@ class ChatWidget {
 
         // Also update main page status
         const mainStatus = document.getElementById('connection-status');
+        const mainStatusContainer = document.getElementById('chat-status');
+        
         if (mainStatus) {
             mainStatus.textContent = message;
+        }
+        
+        // Update main status container class based on type
+        if (mainStatusContainer) {
+            // Remove all status classes
+            mainStatusContainer.classList.remove('status-connecting', 'status-connected', 'status-error', 'status-warning');
+            
+            // Add appropriate class based on type
+            switch (type) {
+                case 'connected':
+                    mainStatusContainer.classList.add('status-connected');
+                    break;
+                case 'error':
+                    mainStatusContainer.classList.add('status-error');
+                    break;
+                case 'warning':
+                    mainStatusContainer.classList.add('status-warning');
+                    break;
+                default:
+                    mainStatusContainer.classList.add('status-connecting');
+                    break;
+            }
         }
     }
 

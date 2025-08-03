@@ -330,6 +330,47 @@
                 transform: translateX(0);
             }
         }
+        
+        /* Dynamic status container colors */
+        .chat-status-container {
+            transition: all 0.3s ease;
+        }
+        
+        .status-connecting {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .status-connecting .status-label {
+            color: var(--primary-color);
+        }
+        
+        .status-connected {
+            background: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .status-connected .status-label {
+            color: var(--success-color);
+        }
+        
+        .status-error {
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .status-error .status-label {
+            color: var(--danger-color);
+        }
+        
+        .status-warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+        }
+        
+        .status-warning .status-label {
+            color: #ffc107;
+        }
     </style>
 
     
@@ -405,8 +446,8 @@
             </div>
             
             <!-- Connection Status -->
-            <div id="chat-status" style="text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px; border-left: 4px solid #e74c3c; max-width: 600px; width: 100%;">
-                <strong style="color: #e74c3c;">Chat Status:</strong> 
+            <div id="chat-status" class="chat-status-container status-connecting" style="text-align: center; margin-bottom: 20px; padding: 15px; border-radius: 8px; max-width: 600px; width: 100%;">
+                <strong class="status-label">Chat Status:</strong> 
                 <span id="connection-status">Connecting to chat server...</span>
             </div>
             
