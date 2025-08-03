@@ -19,8 +19,12 @@ class ChatWidget {
         this.isPolling = false;
         this.onlineCount = 0;
         this.isInitialLoad = true; // Track if we're loading initial messages
-        this.maxMessages = 75; // Reduce from 100 to be more efficient
-        this.messageAgeLimit = 3600; // 1 hour in seconds
+        this.minMessages = 50; // Always keep at least this many messages (never empty)
+        this.maxMessages = 100; // Comfortable viewing limit
+        this.cleanupThreshold = 200; // Only cleanup when we exceed this many messages
+        this.messageAgeLimit = 7200; // 2 hours in seconds (generous time limit)
+        this.lastCleanupTime = 0; // Track when we last did cleanup
+        this.cleanupInterval = 300; // Run cleanup every 5 minutes
         
         this.init();
     }
@@ -557,6 +561,9 @@ class ChatWidget {
         const messageEl = document.createElement('div');
         messageEl.className = `chat-message ${message.type === 'system' ? 'system-message' : ''}`;
         
+        // Store timestamp for cleanup purposes
+        messageEl.dataset.timestamp = message.timestamp;
+        
         const timeStr = this.formatTime(message.timestamp);
         const isOwnMessage = message.user_id === this.userId;
         
@@ -636,8 +643,8 @@ class ChatWidget {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Enhanced message cleanup: limit by count AND age
-        this.cleanupOldMessages(messagesContainer);
+        // Enhanced message cleanup: limit by count AND age (throttled)
+        this.throttledCleanup(messagesContainer);
     }
 
     updateOnlineCount() {
@@ -737,27 +744,66 @@ class ChatWidget {
         return escapedText;
     }
 
+    throttledCleanup(messagesContainer) {
+        const messages = messagesContainer.querySelectorAll('.chat-message:not(.system-message)');
+        const messageCount = messages.length;
+        
+        // Smart cleanup strategy: only cleanup when we have way too many messages
+        if (messageCount >= this.cleanupThreshold) {
+            // Only cleanup if we haven't done it recently
+            const currentTime = Date.now() / 1000;
+            if (currentTime - this.lastCleanupTime > this.cleanupInterval) {
+                this.cleanupOldMessages(messagesContainer);
+                this.lastCleanupTime = currentTime;
+            }
+        }
+        // If we have fewer than 200 messages, do nothing - let the chat stay populated!
+    }
+
     cleanupOldMessages(messagesContainer) {
         const messages = messagesContainer.querySelectorAll('.chat-message:not(.system-message)');
         const currentTime = Date.now() / 1000;
+        const messageCount = messages.length;
         
-        // Remove messages older than 1 hour
-        messages.forEach(messageEl => {
-            const timeEl = messageEl.querySelector('.message-time-inline');
-            if (timeEl) {
-                const timeText = timeEl.textContent;
-                // Simple heuristic: if it contains 'AM' or 'PM' and current time minus message time > age limit
-                // For now, just use count-based cleanup, but this can be enhanced with actual timestamps
-            }
-        });
+        console.log(`🔍 Smart cleanup check: ${messageCount} messages (threshold: ${this.cleanupThreshold})`);
         
-        // Count-based cleanup: keep only the most recent messages
-        if (messages.length > this.maxMessages) {
-            const messagesToRemove = messages.length - this.maxMessages;
-            for (let i = 0; i < messagesToRemove; i++) {
-                messages[i].remove();
+        // First: Remove very old messages (older than 2 hours) but only if we have plenty
+        let removedByAge = 0;
+        if (messageCount > this.minMessages + 20) { // Only remove old messages if we have enough buffer
+            messages.forEach(messageEl => {
+                const messageTimestamp = messageEl.dataset.timestamp;
+                if (messageTimestamp && (currentTime - parseFloat(messageTimestamp)) > this.messageAgeLimit) {
+                    messageEl.remove();
+                    removedByAge++;
+                }
+            });
+        }
+        
+        if (removedByAge > 0) {
+            console.log(`🕐 Cleaned up ${removedByAge} messages older than 2 hours`);
+        }
+        
+        // Second: Smart count-based cleanup - only if we still have too many after age cleanup
+        const remainingMessages = messagesContainer.querySelectorAll('.chat-message:not(.system-message)');
+        const remainingCount = remainingMessages.length;
+        
+        if (remainingCount > this.cleanupThreshold) {
+            // Remove oldest messages but ALWAYS keep at least minMessages (50)
+            const targetCount = this.maxMessages; // Keep 100 messages
+            const messagesToRemove = Math.max(0, remainingCount - targetCount);
+            
+            if (messagesToRemove > 0) {
+                // Make sure we never go below minMessages
+                const safeRemovalCount = Math.min(messagesToRemove, remainingCount - this.minMessages);
+                
+                for (let i = 0; i < safeRemovalCount; i++) {
+                    remainingMessages[i].remove();
+                }
+                
+                console.log(`🧹 Smart cleanup: removed ${safeRemovalCount} oldest messages (${remainingCount} → ${remainingCount - safeRemovalCount})`);
             }
-            console.log(`🧹 Cleaned up ${messagesToRemove} old messages (keeping last ${this.maxMessages})`);
+        } else {
+            console.log(`✅ No cleanup needed: ${remainingCount} messages is within healthy limits`);
         }
     }
 
