@@ -189,14 +189,6 @@ class ChatWidget {
 
         container.innerHTML = `
             <div class="chat-widget" id="chat-widget">
-                <div class="chat-header">
-                    <div class="chat-title">
-                        <i class="chat-icon">💬</i>
-                        <span class="chat-title-text">Community Chat</span>
-                        <span class="chat-user-count" id="chat-user-count">0 online</span>
-                    </div>
-                </div>
-
                 <div class="chat-tabs">
                     <div class="chat-tab active" data-room="general">
                         <span class="tab-icon">🌟</span>
@@ -262,9 +254,18 @@ class ChatWidget {
                             <span class="send-icon">📤</span>
                         </button>
                     </div>
-                    <div class="chat-status" id="chat-status-widget">
-                        <span class="status-text">Connecting...</span>
-                        <span class="online-users">Online: <span id="online-count">0</span></span>
+                    <div class="chat-bottom-status">
+                        <div class="status-item">
+                            <span class="status-label">💰 Pool:</span>
+                            <span class="rainpool-amount" id="rainpool-amount">0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">👥 Online:</span>
+                            <span id="online-count">0</span>
+                        </div>
+                        <div class="status-item status-connection">
+                            <span class="status-text" id="chat-status-text">Connecting...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -665,13 +666,11 @@ class ChatWidget {
     }
 
     showStatus(message, type = 'info') {
-        const statusEl = document.getElementById('chat-status-widget');
-        if (!statusEl) return;
-
-        const statusText = statusEl.querySelector('.status-text');
-        if (statusText) {
-            statusText.textContent = message;
-            statusText.className = `status-text ${type}`;
+        // Update the new bottom status text
+        const statusTextEl = document.getElementById('chat-status-text');
+        if (statusTextEl) {
+            statusTextEl.textContent = message;
+            statusTextEl.className = `status-text ${type}`;
         }
 
         // Also update main page status
