@@ -58,7 +58,13 @@ function validateJWT($token) {
  */
 function getDbConnection() {
     try {
-        $pdo = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
+        // Try PostgreSQL first (preferred for production)
+        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER') && defined('DB_PASS')) {
+            $pdo = new PDO('pgsql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
+        } else {
+            // Fallback for local development or different config
+            $pdo = new PDO('pgsql:host=localhost;dbname=roflfaucet', 'postgres', '');
+        }
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     } catch (PDOException $e) {
@@ -122,12 +128,13 @@ function checkRateLimit($pdo, $userId) {
  * Update user online status
  */
 function updateOnlineStatus($pdo, $userId, $username, $roomId = 1) {
+    // PostgreSQL UPSERT syntax
     $stmt = $pdo->prepare('
         INSERT INTO chat_users_online (user_id, username, room_id, last_seen) 
         VALUES (?, ?, ?, NOW()) 
-        ON DUPLICATE KEY UPDATE 
-        username = VALUES(username),
-        room_id = VALUES(room_id),
+        ON CONFLICT (user_id) DO UPDATE SET 
+        username = EXCLUDED.username,
+        room_id = EXCLUDED.room_id,
         last_seen = NOW()
     ');
     $stmt->execute([$userId, $username, $roomId]);
@@ -166,8 +173,8 @@ function getMessages($pdo, $roomId, $lastMessageId = 0) {
  * Get online users count
  */
 function getOnlineCount($pdo, $roomId) {
-    // Clean up old users (inactive for more than 5 minutes)
-    $stmt = $pdo->prepare('DELETE FROM chat_users_online WHERE last_seen < DATE_SUB(NOW(), INTERVAL 5 MINUTE)');
+    // Clean up old users (inactive for more than 5 minutes) - PostgreSQL syntax
+    $stmt = $pdo->prepare('DELETE FROM chat_users_online WHERE last_seen < NOW() - INTERVAL \'5 minutes\'');
     $stmt->execute();
     
     // Get current count
