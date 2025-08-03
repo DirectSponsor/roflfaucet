@@ -41,8 +41,8 @@ class ROFLChatIntegration {
             this.connectToAuth();
             this.setupEventListeners();
             
-            // TESTING MODE: Create mock user if no auth found
-            this.enableTestingMode();
+            // Initialize with current authentication state
+            this.initializeAuthState();
             
             this.isInitialized = true;
             this.updateConnectionStatus('Connected to ROFLFaucet systems', 'success');
@@ -103,7 +103,7 @@ class ROFLChatIntegration {
     
     getWebSocketUrl() {
         // Always use the production server for chat
-        return 'wss://roflfaucet.com/ws';
+        return 'wss://roflfaucet.com:8081/chat';
     }
     
     connectToBalance() {
@@ -121,11 +121,8 @@ class ROFLChatIntegration {
             });
         }
         
-        // Set initial balance
-        const currentBalance = window.unifiedBalance.getBalance();
-        if (this.chatWidget && currentBalance !== null) {
-            this.chatWidget.updateBalanceFromAPI(currentBalance);
-        }
+        // Set initial balance (async)
+        this.updateChatBalance();
         
         console.log('💰 Connected to unified balance system');
     }
@@ -143,7 +140,7 @@ class ROFLChatIntegration {
         });
         
         // Listen for login button clicks
-        const loginBtn = document.getElementById('oauth-login-btn');
+        const loginBtn = document.getElementById('login-btn');
         if (loginBtn) {
             loginBtn.addEventListener('click', () => {
                 this.updateConnectionStatus('Authentication required for chat', 'warning');
@@ -157,16 +154,16 @@ class ROFLChatIntegration {
         // Try to get auth data from various sources
         
         // From localStorage (JWT token)
-        const token = localStorage.getItem('jwt_token') || localStorage.getItem('authToken');
+        const token = localStorage.getItem('jwt_token');
         if (token) {
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 return {
                     user: {
-                        id: payload.userId || payload.id,
-                        username: payload.username || payload.name,
+                        id: payload.sub || payload.userId || payload.id,
+                        username: payload.username || payload.name || payload.user,
                         email: payload.email,
-                        balance: payload.balance || 0
+                        balance: 0 // Balance will be loaded from unified balance system
                     },
                     token: token
                 };
@@ -175,25 +172,41 @@ class ROFLChatIntegration {
             }
         }
         
-        // From global variables (if set by other scripts)
-        if (window.currentUser) {
-            return { user: window.currentUser };
+        // Check if JWT Simple Faucet has user data
+        if (window.jwtSimpleFaucet && window.jwtSimpleFaucet.userProfile) {
+            return {
+                user: {
+                    id: window.jwtSimpleFaucet.userProfile.id || 'jwt_user',
+                    username: window.jwtSimpleFaucet.userProfile.username,
+                    email: window.jwtSimpleFaucet.userProfile.email,
+                    balance: 0 // Balance will be loaded from unified balance system
+                },
+                token: window.jwtSimpleFaucet.jwtToken
+            };
         }
         
         return null;
     }
 
-    enableTestingMode() {
-        // Check if the user is already authenticated
+    async initializeAuthState() {
+        // Initialize with current authentication state
         const authData = this.getCurrentAuthData();
-        if (!authData) {
-            // No auth data found, generate mock user for testing
-            const mockUser = {
-                id: `test_user_${Math.floor(Math.random() * 10000)}`,
-                username: `TestUser${Math.floor(Math.random() * 100)}`,
-                balance: Math.floor(Math.random() * 1000),
-            };
-            this.handleAuthUpdate({ user: mockUser });
+        if (authData) {
+            await this.handleAuthUpdate(authData);
+        } else {
+            this.updateConnectionStatus('Sign in to participate in chat', 'warning');
+        }
+    }
+    
+    async updateChatBalance() {
+        if (!this.chatWidget || !window.unifiedBalance) return;
+        
+        try {
+            const currentBalance = await window.unifiedBalance.getBalance();
+            this.chatWidget.updateBalanceFromAPI(currentBalance);
+            console.log('💰 Chat balance updated:', currentBalance);
+        } catch (error) {
+            console.warn('⚠️ Failed to update chat balance:', error);
         }
     }
 
