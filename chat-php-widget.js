@@ -415,13 +415,22 @@ class ChatWidget {
         const timeStr = this.formatTime(message.timestamp);
         const isOwnMessage = message.user_id === this.userId;
 
-        messageEl.innerHTML = `
-            <div class="message-content ${isOwnMessage ? 'own-message' : ''}">
-                ${message.type !== 'system' ? `<span class="message-username">${message.username}:</span>` : ''}
-                <span class="message-text">${this.escapeHtml(message.message)}</span>
-                <span class="message-time">${timeStr}</span>
-            </div>
-        `;
+        // Use FaucetGame's simple inline structure
+        if (message.type === 'system') {
+            messageEl.innerHTML = `
+                <div class="message-content system-message">
+                    <p class="message-text">${this.escapeHtml(message.message)}</p>
+                </div>
+            `;
+        } else {
+            messageEl.innerHTML = `
+                <div class="message-header">
+                    <strong class="message-username clickable-username" data-username="${message.username}">${message.username}</strong>
+                    <small class="message-time">${timeStr}</small>
+                </div>
+                <p class="message-text">${this.escapeHtml(message.message)}</p>
+            `;
+        }
 
         // Add message with animation
         messageEl.style.opacity = '0';
@@ -439,6 +448,14 @@ class ChatWidget {
         if (targetRoom !== this.currentRoom) {
             this.rooms[targetRoom].unread++;
             this.updateUnreadCount(targetRoom);
+        }
+
+        // Add click event for username reply (only for non-system messages)
+        if (message.type !== 'system') {
+            const usernameEl = messageEl.querySelector('.clickable-username');
+            if (usernameEl) {
+                usernameEl.addEventListener('click', () => this.replyToUser(message.username));
+            }
         }
 
         // Auto-scroll to bottom
@@ -494,6 +511,25 @@ class ChatWidget {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    replyToUser(username) {
+        // Don't allow replying to yourself
+        if (username === this.username) {
+            return;
+        }
+
+        const input = document.getElementById('chat-input');
+        if (!input) return;
+
+        // Set focus to input and add username with colon and space
+        input.focus();
+        input.value = `${username}: `;
+        
+        // Move cursor to end
+        input.setSelectionRange(input.value.length, input.value.length);
+        
+        console.log(`💬 Replying to user: ${username}`);
     }
 
     destroy() {

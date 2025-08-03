@@ -122,40 +122,59 @@
             margin-bottom: 15px;
         }
         
-        .message-content {
+        /* FaucetGame-style message header with username and time */
+        .message-header {
             display: flex;
-            align-items: baseline;
-            padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
-            word-wrap: break-word;
-        }
-        
-        .message-content.own-message {
-            background: rgba(46, 204, 113, 0.3);
-            margin-left: 50px;
-        }
-        
-        .system-message .message-content {
-            background: rgba(52, 152, 219, 0.3);
-            font-style: italic;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            padding: 0 4px;
         }
         
         .message-username {
             font-weight: bold;
-            margin-right: 8px;
             color: #ffd700;
+            font-size: 14px;
         }
         
-        .message-text {
-            flex: 1;
-            word-break: break-word;
+        .clickable-username {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .clickable-username:hover {
+            color: #fff;
+            text-decoration: underline;
         }
         
         .message-time {
             font-size: 12px;
             opacity: 0.7;
-            margin-left: 10px;
+            color: #ccc;
+        }
+        
+        /* Message text in separate paragraph */
+        .message-text {
+            margin: 0;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        
+        /* System messages */
+        .message-content.system-message {
+            background: rgba(52, 152, 219, 0.3);
+            font-style: italic;
+            padding: 10px 15px;
+            border-radius: 18px;
+            text-align: center;
+        }
+        
+        .system-message .message-text {
+            background: transparent;
+            padding: 0;
         }
         
         .chat-help-content {
