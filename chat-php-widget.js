@@ -25,11 +25,18 @@ class ChatWidget {
     async init() {
         console.log('🚀 Initializing PHP Chat Widget...');
         
-        // For now, just use a default user - in the future integrate with your auth system
-        this.username = 'andytest1';
-        this.userId = '2';
+        // Get user info from existing authentication system
+        const userInfo = this.getUserFromAuth();
         
-        console.log(`👤 Chat user: ${this.username}`);
+        if (!userInfo) {
+            this.showStatus('Please log in to use chat', 'error');
+            return;
+        }
+        
+        this.username = userInfo.username;
+        this.userId = userInfo.userId;
+        
+        console.log(`👤 Chat user: ${this.username} (ID: ${this.userId})`);
         
         // Initialize UI
         this.initializeUI();
@@ -66,6 +73,62 @@ class ChatWidget {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    getUserFromAuth() {
+        // Method 1: Try to get user info from SimpleFaucet system
+        if (window.simpleFaucet && window.simpleFaucet.userProfile && window.simpleFaucet.jwtToken) {
+            try {
+                // Decode JWT to get user ID
+                const payload = window.simpleFaucet.jwtToken.split('.')[1];
+                const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+                
+                console.log('🔗 Chat: Getting user from SimpleFaucet system');
+                return {
+                    username: window.simpleFaucet.userProfile.username,
+                    userId: decoded.sub
+                };
+            } catch (e) {
+                console.warn('🔗 Chat: Error decoding SimpleFaucet JWT:', e);
+            }
+        }
+        
+        // Method 2: Try to get from localStorage JWT token
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            try {
+                const payload = token.split('.')[1];
+                const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+                
+                // Check if token is expired
+                if (decoded.exp && decoded.exp > Date.now() / 1000) {
+                    console.log('🔗 Chat: Getting user from localStorage JWT');
+                    return {
+                        username: decoded.username,
+                        userId: decoded.sub
+                    };
+                } else {
+                    console.warn('🔗 Chat: JWT token is expired');
+                }
+            } catch (e) {
+                console.warn('🔗 Chat: Error decoding localStorage JWT:', e);
+            }
+        }
+        
+        // Method 3: Check if unified balance system indicates user is logged in
+        if (window.unifiedBalance && window.unifiedBalance.isLoggedIn) {
+            const userId = window.unifiedBalance.userId;
+            if (userId && userId !== 'guest') {
+                console.log('🔗 Chat: Getting user from UnifiedBalance system');
+                return {
+                    username: `User${userId}`, // Fallback username
+                    userId: userId
+                };
+            }
+        }
+        
+        console.log('🔗 Chat: No authenticated user found');
         return null;
     }
 
