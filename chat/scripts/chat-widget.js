@@ -11,7 +11,7 @@ class ChatWidget {
         this.container = container;
         this.options = {
             mode: 'sidebar', // 'sidebar', 'floating', 'fullpage'
-            rooms: ['general', 'help'],
+            rooms: ['general', 'vip', 'help'],
             defaultRoom: 'general',
             wsUrl: options.wsUrl || 'wss://roflfaucet.com:8082/chat',
             maxMessages: options.maxMessages || 100,
@@ -122,23 +122,22 @@ class ChatWidget {
                 <h4>🎮 ROFLChat Commands</h4>
                 <div class="help-section">
                     <strong>/tip [user] [amount]</strong> - Send coins to another user<br>
-                    <strong>/rain [amount]</strong> - Add coins to rain pool<br>
+                    <strong>/rain [amount]</strong> - Add coins to rain pool (VIP only)<br>
                     <strong>/balance</strong> - Check your coin balance<br>
                     <strong>/online</strong> - Show online users count
                 </div>
                 
-                <h4>🌧️ Rain System</h4>
+                <h4>🏆 VIP Room Access</h4>
                 <div class="help-section">
-                    Users can contribute to the rain pool with the /rain command.<br>
-                    When pool reaches 100+ coins, random users get rewards!<br>
-                    Active chatters have higher rain chances.
+                    VIP room requires 1000+ coins or special status.<br>
+                    Enjoy exclusive features and higher tip limits!
                 </div>
                 
-                <h4>💰 Tipping System</h4>
+                <h4>🌧️ Rain System</h4>
                 <div class="help-section">
-                    Send coins to other users with /tip command.<br>
-                    Minimum tip: 1 coin, maximum: your balance.<br>
-                    Tips are instant and help support fellow players!
+                    VIP users can contribute to the rain pool.<br>
+                    When pool reaches 100+ coins, random users get rewards!<br>
+                    Active chatters have higher rain chances.
                 </div>
                 
                 <h4>📜 Chat Rules</h4>
@@ -256,20 +255,6 @@ class ChatWidget {
                 this.reconnectAttempts = 0;
                 this.updateConnectionStatus();
                 this.addSystemMessage('Connected to chat server', 'general');
-                
-                // Send auth data immediately if user is set
-                if (this.state.user) {
-                    console.log('Sending auth data for user:', this.state.user.username);
-                    this.sendWebSocketMessage({
-                        type: 'auth',
-                        user: {
-                            id: this.state.user.id,
-                            username: this.state.user.username,
-                            balance: this.state.user.balance || 0,
-                            isVip: this.state.user.isVip || false
-                        }
-                    });
-                }
             };
             
             this.ws.onmessage = (event) => {

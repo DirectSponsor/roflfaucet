@@ -143,7 +143,7 @@ class ROFLChatIntegration {
         });
         
         // Listen for login button clicks
-        const loginBtn = document.getElementById('login-btn');
+        const loginBtn = document.getElementById('oauth-login-btn');
         if (loginBtn) {
             loginBtn.addEventListener('click', () => {
                 this.updateConnectionStatus('Authentication required for chat', 'warning');
@@ -203,18 +203,6 @@ class ROFLChatIntegration {
         if (authData && authData.user) {
             // User is authenticated
             this.chatWidget.setUser(authData.user);
-            
-            // Send auth data to chat server
-            this.chatWidget.sendWebSocketMessage({
-                type: 'auth',
-                user: {
-                    id: authData.user.id,
-                    username: authData.user.username,
-                    balance: authData.user.balance || 0,
-                    isVip: authData.user.isVip || false
-                }
-            });
-            
             this.updateConnectionStatus(`Signed in as ${authData.user.username}`, 'success');
             
             // Update balance if available - note: unified balance manages its own state
