@@ -20,6 +20,233 @@
     
     <!-- Additional page-specific styles -->
         <link rel="stylesheet" href="chat/styles/chat-widget.css">
+    
+    <!-- PHP Chat Widget Styles -->
+    <style>
+        .chat-widget {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-title-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .chat-user-count {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .chat-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-tab {
+            flex: 1;
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            position: relative;
+        }
+        
+        .chat-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid #ffd700;
+        }
+        
+        .tab-name {
+            margin-left: 8px;
+        }
+        
+        .unread-count {
+            background: #ff4757;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 12px;
+            margin-left: 8px;
+            display: none;
+        }
+        
+        .chat-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-room {
+            display: none;
+            height: 100%;
+        }
+        
+        .chat-room.active {
+            display: block;
+        }
+        
+        .chat-messages {
+            height: 100%;
+            padding: 15px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+        }
+        
+        .message-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        
+        .message-content.own-message {
+            background: rgba(46, 204, 113, 0.3);
+            margin-left: 50px;
+        }
+        
+        .system-message .message-content {
+            background: rgba(52, 152, 219, 0.3);
+            font-style: italic;
+        }
+        
+        .message-username {
+            font-weight: bold;
+            margin-right: 8px;
+            color: #ffd700;
+        }
+        
+        .message-text {
+            flex: 1;
+            word-break: break-word;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-left: 10px;
+        }
+        
+        .chat-help-content {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .chat-help-content h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .chat-help-content h4:first-child {
+            margin-top: 0;
+        }
+        
+        .help-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .chat-footer {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .chat-input::placeholder {
+            color: #666;
+        }
+        
+        .chat-send-btn {
+            background: #2ecc71;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .chat-send-btn:hover {
+            background: #27ae60;
+        }
+        
+        .chat-send-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+        
+        .chat-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .status-text.error {
+            color: #ff4757;
+        }
+        
+        .status-text.connected {
+            color: #2ecc71;
+        }
+    </style>
 
     
     <!-- Site-wide scripts -->
@@ -140,9 +367,8 @@
 <!-- include start footer.html -->
     </div>
     
-    <!-- Additional page-specific scripts -->
-        <script src="chat/scripts/chat-widget.js"></script>
-    <script src="chat/scripts/chat-integration.js"></script>
+    <!-- PHP Chat Widget Script -->
+    <script src="chat-php-widget.js"></script>
 
 </body>
 </html>
