@@ -27,9 +27,26 @@ define('JWT_SECRET', 'rofl_jwt_secret_key_2025');
 function validateJWT($token) {
     try {
         $parts = explode('.', $token);
-        if (count($parts) !== 3) return false;
+        if (count($parts) !== 3) {
+            error_log("Chat JWT Debug: Invalid token format - expected 3 parts, got " . count($parts));
+            return false;
+        }
         
         list($headerEncoded, $payloadEncoded, $signatureEncoded) = $parts;
+        
+        // Decode and log payload for debugging
+        $payload = str_replace(['-', '_'], ['+', '/'], $payloadEncoded);
+        $payload = base64_decode($payload . str_repeat('=', (4 - strlen($payload) % 4) % 4));
+        $payloadData = json_decode($payload, true);
+        
+        error_log("Chat JWT Debug: Token payload: " . json_encode($payloadData));
+        error_log("Chat JWT Debug: Current time: " . time() . ", Token exp: " . ($payloadData['exp'] ?? 'not set'));
+        
+        // Check expiration first
+        if (isset($payloadData['exp']) && $payloadData['exp'] < time()) {
+            error_log("Chat JWT Debug: Token expired");
+            return false;
+        }
         
         // Verify signature
         $signature = str_replace(['-', '_'], ['+', '/'], $signatureEncoded);
@@ -37,18 +54,15 @@ function validateJWT($token) {
         
         $expectedSignature = hash_hmac('sha256', $headerEncoded . "." . $payloadEncoded, JWT_SECRET, true);
         
-        if (!hash_equals($signature, $expectedSignature)) return false;
+        if (!hash_equals($signature, $expectedSignature)) {
+            error_log("Chat JWT Debug: Signature validation failed");
+            return false;
+        }
         
-        // Decode payload
-        $payload = str_replace(['-', '_'], ['+', '/'], $payloadEncoded);
-        $payload = base64_decode($payload . str_repeat('=', (4 - strlen($payload) % 4) % 4));
-        $payloadData = json_decode($payload, true);
-        
-        // Check expiration
-        if ($payloadData['exp'] < time()) return false;
-        
+        error_log("Chat JWT Debug: Token validation successful for user: " . ($payloadData['username'] ?? 'unknown'));
         return $payloadData;
     } catch (Exception $e) {
+        error_log("Chat JWT Debug: Exception during validation: " . $e->getMessage());
         return false;
     }
 }
