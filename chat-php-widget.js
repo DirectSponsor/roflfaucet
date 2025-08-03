@@ -527,7 +527,7 @@ class ChatWidget {
         const timeStr = this.formatTime(message.timestamp);
         const isOwnMessage = message.user_id === this.userId;
 
-        // Use FaucetGame's simple inline structure
+        // Compact inline format: username: message (single line)
         if (message.type === 'system') {
             messageEl.innerHTML = `
                 <div class="message-content system-message">
@@ -535,12 +535,13 @@ class ChatWidget {
                 </div>
             `;
         } else {
+            // Single line format: username: message text
             messageEl.innerHTML = `
-                <div class="message-header">
-                    <strong class="message-username clickable-username" data-username="${message.username}">${message.username}</strong>
-                    <small class="message-time">${timeStr}</small>
-                </div>
-                <p class="message-text">${this.escapeHtml(message.message)}</p>
+                <p class="message-text">
+                    <span class="message-username clickable-username" data-username="${message.username}">${message.username}:</span>
+                    <span class="message-content-text">${this.escapeHtml(message.message)}</span>
+                    <small class="message-time-inline">${timeStr}</small>
+                </p>
             `;
         }
 

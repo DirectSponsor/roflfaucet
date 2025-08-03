@@ -127,22 +127,26 @@
         }
         
         .chat-message {
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
         
-        /* FaucetGame-style message header with username and time */
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            padding: 0 4px;
+        /* Compact single-line message format */
+        .message-text {
+            margin: 0;
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            word-wrap: break-word;
+            line-height: 1.4;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
         
         .message-username {
             font-weight: bold;
             color: var(--primary-color);
             font-size: 14px;
+            margin-right: 6px;
         }
         
         .clickable-username {
@@ -155,22 +159,16 @@
             text-decoration: underline;
         }
         
-        .message-time {
-            font-size: 12px;
-            opacity: 0.7;
-            color: var(--text-secondary);
+        .message-content-text {
+            margin-left: 4px;
         }
         
-        /* Message text in separate paragraph */
-        .message-text {
-            margin: 0;
-            padding: 8px 12px;
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            word-wrap: break-word;
-            line-height: 1.4;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
+        .message-time-inline {
+            font-size: 11px;
+            opacity: 0.6;
+            color: var(--text-secondary);
+            margin-left: 8px;
+            float: right;
         }
         
         /* System messages */
