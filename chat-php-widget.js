@@ -45,10 +45,25 @@ class ChatWidget {
     }
 
     getAuthToken() {
-        // Try to get token from various sources
-        return localStorage.getItem('jwt_token') || 
-               sessionStorage.getItem('jwt_token') || 
-               this.getCookie('jwt_token');
+        // Integration with unified JWT system
+        // First check if SimpleFaucet is available and has a token
+        if (window.simpleFaucet && window.simpleFaucet.jwtToken) {
+            console.log('🔗 Chat: Using token from SimpleFaucet system');
+            return window.simpleFaucet.jwtToken;
+        }
+        
+        // Fallback to storage locations
+        const token = localStorage.getItem('jwt_token') || 
+                     sessionStorage.getItem('jwt_token') || 
+                     this.getCookie('jwt_token');
+        
+        if (token) {
+            console.log('🔗 Chat: Found token in storage');
+        } else {
+            console.log('🔗 Chat: No token found anywhere');
+        }
+        
+        return token;
     }
 
     getCookie(name) {
@@ -453,9 +468,13 @@ class ChatWidget {
     }
 }
 
-// Initialize chat widget when DOM is ready
+// Initialize chat widget when DOM is ready, with delay for JWT system
 document.addEventListener('DOMContentLoaded', () => {
-    window.chatWidget = new ChatWidget();
+    // Wait a bit for JWT system to load
+    setTimeout(() => {
+        console.log('🔄 Initializing chat widget (after JWT delay)...');
+        window.chatWidget = new ChatWidget();
+    }, 1000); // 1 second delay
 });
 
 // Clean up on page unload
