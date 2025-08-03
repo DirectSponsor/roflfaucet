@@ -29,7 +29,12 @@ class ChatWidget {
         const userInfo = this.getUserFromAuth();
         
         if (!userInfo) {
-            this.showStatus('Please log in to use chat', 'error');
+            // Allow guests to view chat but not participate
+            console.log('🔗 Chat: Guest user - showing read-only chat');
+            this.username = null;
+            this.userId = null;
+            this.initializeGuestUI();
+            this.showStatus('Sign in to chat', 'warning');
             return;
         }
         
@@ -38,7 +43,7 @@ class ChatWidget {
         
         console.log(`👤 Chat user: ${this.username} (ID: ${this.userId})`);
         
-        // Initialize UI
+        // Initialize UI for logged-in users
         this.initializeUI();
         
         // Start polling
@@ -149,6 +154,26 @@ class ChatWidget {
             sendBtn.disabled = false;
             input.placeholder = 'Type a message...';
         }
+    }
+
+    initializeGuestUI() {
+        // Create chat widget HTML for guests (read-only)
+        this.createChatWidget();
+        
+        // Bind event listeners (limited for guests)
+        this.bindGuestEvents();
+        
+        // Keep input disabled for guests
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('chat-send-btn');
+        if (input && sendBtn) {
+            input.disabled = true;
+            sendBtn.disabled = true;
+            input.placeholder = 'Sign in to chat...';
+        }
+        
+        // Start polling for guest to see messages
+        this.startGuestPolling();
     }
 
     createChatWidget() {
@@ -262,6 +287,31 @@ class ChatWidget {
         }
     }
 
+    bindGuestEvents() {
+        // Only allow tab switching for guests - no message sending
+        document.querySelectorAll('.chat-tab').forEach(tab => {
+            tab.addEventListener('click', () => this.switchRoom(tab.dataset.room));
+        });
+
+        // Disable input events for guests
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('chat-send-btn');
+
+        if (input) {
+            input.addEventListener('click', () => {
+                // Show friendly reminder to sign in when guest clicks input
+                this.showStatus('Sign in to participate in chat', 'warning');
+            });
+        }
+
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => {
+                // Show friendly reminder to sign in when guest clicks send
+                this.showStatus('Sign in to participate in chat', 'warning');
+            });
+        }
+    }
+
     switchRoom(roomName) {
         if (!this.rooms[roomName]) return;
 
@@ -350,6 +400,20 @@ class ChatWidget {
         await this.pollMessages();
     }
 
+    async startGuestPolling() {
+        if (this.isPolling) return;
+        
+        this.isPolling = true;
+        console.log('🔄 Starting guest chat polling (read-only)...');
+
+        this.pollInterval = setInterval(async () => {
+            await this.pollGuestMessages();
+        }, this.pollDelay);
+
+        // Initial poll
+        await this.pollGuestMessages();
+    }
+
     async pollMessages() {
         try {
             const currentRoomData = this.rooms[this.currentRoom];
@@ -389,6 +453,53 @@ class ChatWidget {
             }
         } catch (error) {
             console.error('❌ Polling error:', error);
+            if (this.isConnected) {
+                this.isConnected = false;
+                this.showStatus('Connection lost, retrying...', 'error');
+            }
+        }
+    }
+
+    async pollGuestMessages() {
+        try {
+            const currentRoomData = this.rooms[this.currentRoom];
+            // For guests, don't send username/user_id to avoid auth issues
+            const response = await fetch(`/chat-api.php?room=${currentRoomData.id}&last_id=${currentRoomData.lastMessageId}&guest=1`, {
+                method: 'GET'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Update online count
+                this.onlineCount = result.online_count || 0;
+                this.updateOnlineCount();
+
+                // Process new messages
+                if (result.messages && result.messages.length > 0) {
+                    const roomName = this.getRoomNameById(result.room_id);
+                    
+                    result.messages.forEach((message, index) => {
+                        // Stagger message display for better UX
+                        setTimeout(() => {
+                            this.displayMessage(message, roomName);
+                        }, index * 200); // 200ms delay between messages
+                    });
+
+                    // Update last message ID
+                    const lastMessage = result.messages[result.messages.length - 1];
+                    this.rooms[roomName].lastMessageId = lastMessage.id;
+                }
+
+                if (!this.isConnected) {
+                    this.isConnected = true;
+                    this.showStatus('Sign in to chat', 'warning');
+                }
+            } else {
+                throw new Error(result.error || 'Guest polling failed');
+            }
+        } catch (error) {
+            console.error('❌ Guest polling error:', error);
             if (this.isConnected) {
                 this.isConnected = false;
                 this.showStatus('Connection lost, retrying...', 'error');
