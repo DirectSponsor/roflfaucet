@@ -320,11 +320,25 @@ if ($method === 'GET') {
     $input = json_decode(file_get_contents('php://input'), true);
     $message = $input['message'] ?? '';
     
+    // Get user info from JSON payload for POST requests
+    $userId = $input['user_id'] ?? null;
+    $username = $input['username'] ?? null;
+    $roomId = intval($input['room'] ?? 1);
+    
     if (empty($message)) {
         http_response_code(400);
         echo json_encode(['error' => 'Message cannot be empty']);
         exit();
     }
+    
+    if (!$userId || !$username) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User authentication required']);
+        exit();
+    }
+    
+    // Update online status when sending messages
+    updateOnlineStatus($pdo, $userId, $username, $roomId);
     
     // Check rate limiting
     if (!checkRateLimit($pdo, $userId)) {
