@@ -582,6 +582,11 @@ class ChatWidget {
 
                 // Update last message ID to prevent duplicate
                 this.rooms[this.currentRoom].lastMessageId = result.message_id;
+                
+                // Notify Anzar bot about the message (for rainpool accumulation)
+                if (window.anzarBot && this.username) {
+                    window.anzarBot.onUserMessage(this.username, message);
+                }
             } else if (result.type === 'system') {
                 // Show system response (like /balance command)
                 this.displayMessage({
