@@ -10,6 +10,7 @@ class AnzarRainbot {
         this.lastRainHour = -1;
         this.minRainBalance = 10;
         this.coinsPerMessage = 1;
+        this.currentRainpoolBalance = 0;
         
         this.init();
     }
@@ -17,8 +18,14 @@ class AnzarRainbot {
     async init() {
         console.log('🤖 Anzar Rainbot: Ready for rain! ⛈️');
         
+        // Initial rainpool balance update
+        this.updateRainpoolDisplay();
+        
         // Check for rain time every minute
         setInterval(() => this.checkRainTime(), 60000);
+        
+        // Update rainpool display every 30 seconds
+        setInterval(() => this.updateRainpoolDisplay(), 30000);
         
         // Random announcements
         setInterval(() => this.maybeAnnounce(), 3600000);
@@ -84,10 +91,80 @@ class AnzarRainbot {
         if (username === this.botUsername || message.startsWith('/')) return;
         
         console.log('🪙 Message from', username, '- adding coin to Anzar');
+        // Simulate adding coin to rainpool for now
+        this.currentRainpoolBalance += this.coinsPerMessage;
+        this.updateRainpoolDisplay();
         // TODO: Add 1 coin to Anzar's balance via API
+    }
+    
+    // Update the rainpool display in chat UI
+    updateRainpoolDisplay() {
+        const rainpoolElement = document.getElementById('rainpool-amount');
+        if (rainpoolElement) {
+            rainpoolElement.textContent = Math.floor(this.currentRainpoolBalance);
+            console.log('💰 Rainpool display updated:', Math.floor(this.currentRainpoolBalance));
+        }
+        
+        // Also update any other elements with rainpool-balance class
+        const rainpoolElements = document.querySelectorAll('.rainpool-balance');
+        rainpoolElements.forEach(element => {
+            element.textContent = Math.floor(this.currentRainpoolBalance);
+        });
+    }
+    
+    // Get Anzar's actual balance from DirectSponsor API
+    async getAnzarBalance() {
+        if (!this.botJwtToken) {
+            console.log('⚠️ Anzar: No JWT token set, using simulated balance');
+            return this.currentRainpoolBalance;
+        }
+        
+        try {
+            const response = await fetch('https://data.directsponsor.org/api/user/balance', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.botJwtToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const balance = Math.floor(data.balance.current);
+                this.currentRainpoolBalance = balance;
+                this.updateRainpoolDisplay();
+                console.log('✅ Anzar balance loaded:', balance);
+                return balance;
+            } else {
+                console.error('❌ Failed to get Anzar balance from API');
+                return this.currentRainpoolBalance;
+            }
+        } catch (error) {
+            console.error('❌ Error fetching Anzar balance:', error);
+            return this.currentRainpoolBalance;
+        }
+    }
+    
+    // Set Anzar's JWT token
+    setBotToken(token) {
+        this.botJwtToken = token;
+        console.log('🔑 Anzar bot token set');
+        // Immediately fetch real balance
+        this.getAnzarBalance();
+    }
+    
+    // Get current rainpool balance
+    getRainpoolBalance() {
+        return Math.floor(this.currentRainpoolBalance);
     }
 }
 
 // Global instance
 window.anzarBot = new AnzarRainbot();
+
+// Global convenience functions
+window.setAnzarToken = (token) => window.anzarBot.setBotToken(token);
+window.getRainpoolBalance = () => window.anzarBot.getRainpoolBalance();
+window.updateRainpoolDisplay = () => window.anzarBot.updateRainpoolDisplay();
+
 console.log('🤖 Anzar Rainbot loaded! ⛈️');
