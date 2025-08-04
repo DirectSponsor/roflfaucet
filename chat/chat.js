@@ -349,13 +349,19 @@ class ChatWidget {
         const message = input.value.trim();
         input.value = '';
 
+        console.log('🔄 Chat: Sending message:', message);
+
         // Handle all coin commands locally using unified balance system
         if (message.startsWith('/')) {
+            console.log('💡 Chat: Command detected:', message);
             const parts = message.split(' ');
             const command = parts[0].toLowerCase();
+            console.log('💡 Chat: Parsed command:', command);
             
             // Handle /balance command completely on frontend - never send to backend
             if (command === '/balance') {
+                console.log('💡 Chat: Processing /balance command...');
+                
                 try {
                     // Check if unified balance system is available
                     if (!window.unifiedBalance) {
