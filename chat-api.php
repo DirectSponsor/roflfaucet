@@ -194,6 +194,52 @@ function getOnlineCount($pdo, $roomId) {
 }
 
 /**
+ * Get user balance from external API
+ */
+function getUserBalance($userId) {
+    // We need to get the JWT token for the user to make API calls
+    // For now, we'll return a placeholder since we don't have the token in chat context
+    // In a real implementation, this would need to be stored or passed through
+    
+    // For now, let's try to get balance from a local user table if it exists
+    // This is a fallback approach
+    try {
+        $pdo = getDbConnection();
+        if (!$pdo) {
+            return false;
+        }
+        
+        // Try to find user balance in any existing balance table
+        $tables = ['user_balances', 'users'];
+        $balanceFields = ['balance', 'useless_coins', 'coins'];
+        
+        foreach ($tables as $table) {
+            foreach ($balanceFields as $field) {
+                try {
+                    $stmt = $pdo->prepare("SELECT {$field} FROM {$table} WHERE user_id = ? OR id = ?");
+                    $stmt->execute([$userId, $userId]);
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($result && isset($result[$field])) {
+                        return floatval($result[$field]);
+                    }
+                } catch (PDOException $e) {
+                    // Table or field doesn't exist, continue trying
+                    continue;
+                }
+            }
+        }
+        
+        // If no balance found, return 0
+        return 0;
+        
+    } catch (Exception $e) {
+        error_log("Balance fetch error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Send message to chat
  */
 function sendMessage($pdo, $userId, $username, $message, $roomId = 1) {
@@ -249,16 +295,14 @@ function sendMessage($pdo, $userId, $username, $message, $roomId = 1) {
                 break;
                 
             case 'balance':
-                // Get actual balance from user_balances table
-                $stmt = $pdo->prepare('SELECT balance FROM user_balances WHERE user_id = ?');
-                $stmt->execute([$userId]);
-                $balanceRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Get actual balance from external API (same as unified balance system)
+                $balance = getUserBalance($userId);
                 
-                if ($balanceRow) {
-                    $balance = floatval($balanceRow['balance']);
-                    return ['success' => true, 'message' => "Your balance: {$balance} tokens", 'type' => 'system'];
+                if ($balance !== false) {
+                    $formattedBalance = floor($balance);
+                    return ['success' => true, 'message' => "Your balance: {$formattedBalance} coins", 'type' => 'system'];
                 } else {
-                    return ['success' => true, 'message' => 'Your balance: 0 tokens (account not found)', 'type' => 'system'];
+                    return ['success' => true, 'message' => 'Your balance: 0 coins (unable to fetch)', 'type' => 'system'];
                 }
                 
             case 'online':
