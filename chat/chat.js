@@ -354,8 +354,50 @@ class ChatWidget {
             const parts = message.split(' ');
             const command = parts[0].toLowerCase();
             
+            // Handle /balance command completely on frontend - never send to backend
+            if (command === '/balance') {
+                try {
+                    // Check if unified balance system is available
+                    if (!window.unifiedBalance) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Please log in to check your balance',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                    console.log('🔍 Chat: Fetching balance via unified system...');
+                    const balance = await window.unifiedBalance.getBalance();
+                    const terminology = window.unifiedBalance.getTerminology();
+                    const formattedBalance = Math.floor(balance);
+                    
+                    console.log('💰 Chat: Balance fetched:', formattedBalance, terminology.currency);
+                    
+                    this.displayMessage({
+                        username: 'System',
+                        message: `Your balance: ${formattedBalance} ${terminology.currency.toLowerCase()}`,
+                        type: 'system',
+                        timestamp: Date.now() / 1000
+                    }, this.currentRoom);
+                    return;
+                } catch (error) {
+                    console.error('❌ Chat: Balance fetch error:', error);
+                    this.displayMessage({
+                        username: 'System',
+                        message: `Unable to fetch balance: ${error.message || 'Unknown error'}`,
+                        type: 'system',
+                        timestamp: Date.now() / 1000
+                    }, this.currentRoom);
+                    return;
+                }
+            }
+            
             switch (command) {
                 case '/balance':
+                    // This case should never be reached now
+                    return;
                     try {
                         // Check if unified balance system is available
                         if (!window.unifiedBalance) {
