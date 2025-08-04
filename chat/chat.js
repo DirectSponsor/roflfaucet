@@ -349,6 +349,148 @@ class ChatWidget {
         const message = input.value.trim();
         input.value = '';
 
+        // Handle all coin commands locally using unified balance system
+        if (message.startsWith('/')) {
+            const parts = message.split(' ');
+            const command = parts[0].toLowerCase();
+            
+            switch (command) {
+                case '/balance':
+                    try {
+                        const balance = await window.unifiedBalance.getBalance();
+                        const terminology = window.unifiedBalance.getTerminology();
+                        const formattedBalance = Math.floor(balance);
+                        
+                        this.displayMessage({
+                            username: 'System',
+                            message: `Your balance: ${formattedBalance} ${terminology.currency.toLowerCase()}`,
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    } catch (error) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Unable to fetch balance',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                case '/tip':
+                    if (parts.length < 3) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Usage: /tip username amount',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                    const tipUser = parts[1];
+                    const tipAmount = parseFloat(parts[2]);
+                    
+                    if (isNaN(tipAmount) || tipAmount <= 0 || tipAmount > 1000) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Invalid tip amount (1-1000 coins)',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                    try {
+                        const result = await window.unifiedBalance.subtractBalance(
+                            tipAmount, 
+                            'chat_tip', 
+                            `Tipped ${tipUser} ${tipAmount} coins`
+                        );
+                        
+                        if (result.success) {
+                            // Send tip message to backend for other users to see
+                            // Don't return here - let it fall through to send the message
+                            break;
+                        } else {
+                            this.displayMessage({
+                                username: 'System',
+                                message: result.error || 'Insufficient balance for tip',
+                                type: 'system',
+                                timestamp: Date.now() / 1000
+                            }, this.currentRoom);
+                            return;
+                        }
+                    } catch (error) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Error processing tip',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                case '/rain':
+                    if (parts.length < 2) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Usage: /rain amount',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                    const rainAmount = parseFloat(parts[1]);
+                    
+                    if (isNaN(rainAmount) || rainAmount < 10) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Rain minimum is 10 coins',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                    try {
+                        const result = await window.unifiedBalance.subtractBalance(
+                            rainAmount, 
+                            'chat_rain', 
+                            `Started rain of ${rainAmount} coins`
+                        );
+                        
+                        if (result.success) {
+                            // Send rain message to backend for distribution
+                            // Don't return here - let it fall through to send the message
+                            break;
+                        } else {
+                            this.displayMessage({
+                                username: 'System',
+                                message: result.error || 'Insufficient balance for rain',
+                                type: 'system',
+                                timestamp: Date.now() / 1000
+                            }, this.currentRoom);
+                            return;
+                        }
+                    } catch (error) {
+                        this.displayMessage({
+                            username: 'System',
+                            message: 'Error processing rain',
+                            type: 'system',
+                            timestamp: Date.now() / 1000
+                        }, this.currentRoom);
+                        return;
+                    }
+                    
+                default:
+                    // Unknown command - let backend handle it (like /online)
+                    break;
+            }
+        }
+
         try {
             const response = await fetch('/chat-api.php', {
                 method: 'POST',
