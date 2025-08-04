@@ -357,9 +357,23 @@ class ChatWidget {
             switch (command) {
                 case '/balance':
                     try {
+                        // Check if unified balance system is available
+                        if (!window.unifiedBalance) {
+                            this.displayMessage({
+                                username: 'System',
+                                message: 'Balance system not loaded yet, please try again',
+                                type: 'system',
+                                timestamp: Date.now() / 1000
+                            }, this.currentRoom);
+                            return;
+                        }
+                        
+                        console.log('🔍 Chat: Fetching balance via unified system...');
                         const balance = await window.unifiedBalance.getBalance();
                         const terminology = window.unifiedBalance.getTerminology();
                         const formattedBalance = Math.floor(balance);
+                        
+                        console.log('💰 Chat: Balance fetched:', formattedBalance, terminology.currency);
                         
                         this.displayMessage({
                             username: 'System',
@@ -369,9 +383,10 @@ class ChatWidget {
                         }, this.currentRoom);
                         return;
                     } catch (error) {
+                        console.error('❌ Chat: Balance fetch error:', error);
                         this.displayMessage({
                             username: 'System',
-                            message: 'Unable to fetch balance',
+                            message: `Unable to fetch balance: ${error.message || 'Unknown error'}`,
                             type: 'system',
                             timestamp: Date.now() / 1000
                         }, this.currentRoom);
