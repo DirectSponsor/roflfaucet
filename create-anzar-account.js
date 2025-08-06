@@ -26,6 +26,17 @@ async function createAnzarAccount() {
             })
         });
         
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('❌ Non-JSON response:', text.substring(0, 200));
+            return {
+                success: false,
+                error: 'Server returned non-JSON response (possibly auth endpoint not found)'
+            };
+        }
+        
         const data = await response.json();
         
         if (data.jwt_token || data.jwt) {

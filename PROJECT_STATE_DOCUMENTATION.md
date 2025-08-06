@@ -96,11 +96,53 @@
 - ✅ Chat system functionality
 - ✅ Guest mode balance system
 
-### What's Broken
+## What's Broken
 - ❌ Member mode balance display (stuck on guest currency)
 - ❌ Balance API authentication (401 errors)
 - ❌ Faucet timer for logged-in users
 - ❌ Persistent login state across page refreshes
+
+## ⚠️ RECURRING ISSUE: "Username shows as undefined, claims don't work"
+
+### Symptoms:
+- User can create account and login in another browser
+- Shows "0 Coins" (not "Tokens") indicating system recognizes member status
+- Login button shows "👤 undefined" instead of actual username
+- Faucet claims don't get credited to balance
+- API calls return 401 errors despite having valid JWT token
+
+### Root Causes (in order of likelihood):
+1. **JWT Token Missing Username Field**: 
+   - Auth server not including `username` field in JWT payload
+   - Only includes `sub` (user ID) but frontend expects `username`
+   - Profile API fallback failing with 401 errors
+
+2. **Backend JWT Validation Failing**:
+   - Data server not properly validating JWT tokens
+   - Wrong secret key or validation logic
+   - Recent changes to `/var/www/html/config.php` on data.directsponsor.org
+
+3. **Token Format/Timing Issues**:
+   - Expired tokens
+   - Malformed JWT structure
+   - Clock sync issues between servers
+
+### Quick Diagnostic Steps:
+1. Check JWT token in browser console: `localStorage.getItem('jwt_token')`
+2. Decode JWT payload: `JSON.parse(atob(localStorage.getItem('jwt_token').split('.')[1]))`
+3. Test API directly: `fetch('https://data.directsponsor.org/api/dashboard?site_id=roflfaucet', {headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')}})`
+
+### Common Fixes:
+1. **Fix JWT Username Field**: Ensure auth server includes `username` in JWT payload
+2. **Fix Backend Validation**: Update `validateToken()` function in data server config.php
+3. **Use Fallback Username**: Modify frontend to use `User ${payload.sub}` when username missing
+4. **Check Server Clocks**: Ensure auth and data servers have synchronized time
+
+### Files to Check:
+- `/var/www/html/config.php` on data.directsponsor.org (validateToken function)
+- JWT generation code on auth.directsponsor.org
+- `scripts/core/jwt-simple.js` lines 200-225 (username extraction)
+- `scripts/core/unified-balance.js` line 37-63 (API calls)
 
 ## User's Next Request
 User wants to:

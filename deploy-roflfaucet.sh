@@ -150,17 +150,5 @@ else
     echo "🔗 Please check manually: https://roflfaucet.com"
 fi
 
-# Check if progress.html was deployed
-echo ""
-echo "📝 Checking progress page..."
-PROGRESS_CODE=$(timeout 10 curl -s -o /dev/null -w "%{http_code}" https://roflfaucet.com/progress.html 2>/dev/null || echo "timeout")
-
-if [[ "$PROGRESS_CODE" == "200" ]]; then
-    echo "✅ Progress page is live! (HTTP $PROGRESS_CODE)"
-    echo "📖 View at: https://roflfaucet.com/progress.html"
-else
-    echo "⚠️  Progress page check: $PROGRESS_CODE"
-fi
-
 echo "🎯 Deployment script complete!"
 
