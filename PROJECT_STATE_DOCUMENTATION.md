@@ -1,5 +1,33 @@
 # ROFLFaucet Project State Documentation
-*Last Updated: 2025-08-02T19:17:45Z*
+*Last Updated: 2025-08-06T00:48:00Z*
+
+## 🚨 RECENT SECURITY FIX (August 6, 2025)
+**GitGuardian Alert Resolved**: Fixed exposed database credentials in repository
+
+### What Happened:
+- GitGuardian detected hardcoded PostgreSQL password in `export_emails.php` (committed Aug 3, pushed Aug 4)
+- Additional hardcoded credentials found in `chat-api.php` (MySQL password + JWT secret)
+- Files were in public GitHub repository - security risk
+
+### What Was Fixed:
+✅ **Removed** `export_emails.php` entirely (obsolete after Listmonk removal)  
+✅ **Implemented** secure configuration system with templates  
+✅ **Updated** `chat-api.php` to use secure config file  
+✅ **Added** `.gitignore` to prevent future credential exposure  
+✅ **Created** `SECURITY_SETUP.md` documentation  
+
+### New Security System:
+- **`config.template.php`** - Safe template with placeholders (committed to Git)
+- **`config.php`** - Real credentials (never committed, protected by .gitignore)
+- **All PHP files** now use `require_once 'config.php'` instead of hardcoded passwords
+
+### TODO: Check Other Projects
+**Action Required**: Audit other projects for similar hardcoded credentials:
+- Auth server (auth.directsponsor.org)
+- Data API (data.directsponsor.org) 
+- Any other repositories with database connections
+
+**Search for**: Hardcoded passwords, API keys, JWT secrets, database credentials
 
 ## Current System Architecture
 
