@@ -15,11 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Database connection is handled in getDbConnection() function below
-// No external config file needed
+// Load configuration
+require_once 'config.php';
 
-// JWT Secret - same as auth system
-define('JWT_SECRET', 'rofl_jwt_secret_key_2025');
+// JWT Secret is now loaded from config.php
 
 /**
  * Validate JWT token
@@ -72,8 +71,9 @@ function validateJWT($token) {
  */
 function getDbConnection() {
     try {
-        // Production setup with MySQL
-        $pdo = new PDO('mysql:host=localhost;dbname=roflfaucet;charset=utf8mb4', 'roflfaucet', 'RoflFaucet2025SecureDB!');
+        // Use configuration constants
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+        $pdo = new PDO($dsn, DB_USER, DB_PASS);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         return $pdo;
