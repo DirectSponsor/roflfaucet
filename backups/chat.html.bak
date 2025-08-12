@@ -2,8 +2,8 @@
 <!-- TITLE=_ROFLChat - Community Chat_ -->
 <!-- DESC=_Join the ROFLFaucet community chat, tip coins, and participate in rain events_ -->
 <!-- KEYWORDS=_chat, community, crypto chat, tip coins, faucet community_ -->
-<!-- STYLES=_chat/styles/chat-widget.css_ -->
-<!-- SCRIPTS=_chat/scripts/chat-widget.js, chat/scripts/chat-integration.js_ -->
+<!-- STYLES=_chat/chat.css_ -->
+<!-- SCRIPTS=_chat/chat.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -18,8 +18,8 @@
     <!-- Base Layout CSS -->
     <link rel="stylesheet" href="styles/styles.css">
     
-    <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="chat/styles/chat-widget.css">
+    <!-- Chat System CSS -->
+    <link rel="stylesheet" href="chat/chat.css">
 
     
     <!-- Site-wide scripts -->
@@ -94,8 +94,8 @@
             </div>
             
             <!-- Connection Status -->
-            <div id="chat-status" style="text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(231, 76, 60, 0.1); border-radius: 8px; border-left: 4px solid #e74c3c; max-width: 600px; width: 100%;">
-                <strong style="color: #e74c3c;">Chat Status:</strong> 
+            <div id="chat-status" class="chat-status-container status-connecting" style="text-align: center; margin-bottom: 20px; padding: 15px; border-radius: 8px; max-width: 600px; width: 100%;">
+                <strong class="status-label">Chat Status:</strong> 
                 <span id="connection-status">Connecting to chat server...</span>
             </div>
             
@@ -111,12 +111,7 @@
                     <div style="text-align: center; padding: 20px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
                         <div style="font-size: 2em; margin-bottom: 10px;">🌧️</div>
                         <strong style="display: block; margin-bottom: 8px; color: #2c3e50;">Rain Events</strong>
-                        <span style="color: #666; line-height: 1.4;">VIP users can create rain events to reward active chatters</span>
-                    </div>
-                    <div style="text-align: center; padding: 20px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
-                        <div style="font-size: 2em; margin-bottom: 10px;">👑</div>
-                        <strong style="display: block; margin-bottom: 8px; color: #2c3e50;">VIP Room</strong>
-                        <span style="color: #666; line-height: 1.4;">Exclusive room for users with 1000+ coins or special status</span>
+                        <span style="color: #666; line-height: 1.4;">Create rain events to reward active chatters and spread coins to everyone!</span>
                     </div>
                     <div style="text-align: center; padding: 20px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
                         <div style="font-size: 2em; margin-bottom: 10px;">❓</div>
@@ -140,9 +135,14 @@
 <!-- include start footer.html -->
     </div>
     
-    <!-- Additional page-specific scripts -->
-        <script src="chat/scripts/chat-widget.js"></script>
-    <script src="chat/scripts/chat-integration.js"></script>
+    <!-- Chat System Script -->
+    <script src="chat/chat.js"></script>
+    
+    <!-- Anzar Rainbot System -->
+    <script src="scripts/core/anzar-rainbot.js"></script>
+    
+    <!-- Anzar Account Creation (temporary) -->
+    <script src="create-anzar-account.js"></script>
 
 </body>
 </html>
