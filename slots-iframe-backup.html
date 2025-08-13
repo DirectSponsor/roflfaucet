@@ -23,14 +23,13 @@
 
     
     <!-- Site-wide scripts -->
-    <script src="js/flat-file-balance.js"></script>
     <script src="scripts/core/unified-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
     <script src="scripts/core/gallery-system-simple.js"></script>
     <script src="scripts/core/jwt-simple.js"></script>
     
-    <!-- Flat-file user data system -->
-    <script>console.log('🔧 Loading flat-file user data system...');</script>
+    <!-- Unified Balance System -->
+    <script>console.log('🔧 Loading unified balance system...');</script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -42,7 +41,17 @@
             
             <nav class="nav">
                 <a href="index.html" class="nav-link">Faucet</a>
-                <a href="slots.html" class="nav-link">Slots</a>
+                
+                <!-- Games Dropdown -->
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Games ▼</a>
+                    <div class="dropdown-menu">
+                        <a href="slots.html" class="dropdown-item">🎰 Slots</a>
+                        <a href="dice.html" class="dropdown-item">🎲 Roll of Chance</a>
+                        <a href="wheel.html" class="dropdown-item">🎡 Wheel of Wealth</a>
+                    </div>
+                </div>
+                
                 <a href="profile.html" class="nav-link">Profile</a>
                 <a href="about.html" class="nav-link">About</a>
             </nav>
