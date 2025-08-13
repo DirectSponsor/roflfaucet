@@ -89,6 +89,60 @@ body {
     color: #4A90E2;
 }
 
+/* Dropdown Menu Styles */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle::after {
+    content: '';
+    transition: transform 0.3s ease;
+}
+
+.nav-dropdown:hover .dropdown-toggle::after {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    min-width: 200px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(74, 144, 226, 0.2);
+    border: 1px solid rgba(225, 232, 237, 0.6);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    padding: 0.5rem 0;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: #2C3E50;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 0;
+}
+
+.dropdown-item:hover {
+    background: #E8F4FD;
+    color: #4A90E2;
+    padding-left: 2rem;
+}
+
 .header-auth-btn {
     background: #4A90E2;
     color: white;
@@ -332,6 +386,11 @@ body {
     
     .hamburger-menu {
         display: flex;
+    }
+    
+    /* Mobile-specific dropdown adjustments */
+    .nav-dropdown:hover .dropdown-menu {
+        display: none; /* Disable hover on mobile */
     }
     
     /* Mobile navigation overlay - keep hidden by default */

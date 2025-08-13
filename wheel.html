@@ -42,7 +42,17 @@
             
             <nav class="nav">
                 <a href="index.html" class="nav-link">Faucet</a>
-                <a href="slots.html" class="nav-link">Slots</a>
+                
+                <!-- Games Dropdown -->
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Games ▼</a>
+                    <div class="dropdown-menu">
+                        <a href="slots.html" class="dropdown-item">🎰 Slots</a>
+                        <a href="dice.html" class="dropdown-item">🎲 Roll of Chance</a>
+                        <a href="wheel.html" class="dropdown-item">🎡 Wheel of Wealth</a>
+                    </div>
+                </div>
+                
                 <a href="profile.html" class="nav-link">Profile</a>
                 <a href="about.html" class="nav-link">About</a>
             </nav>
@@ -141,6 +151,22 @@
 
 <!-- include start footer.html -->
     </div>
+    
+    <!-- Audio Elements for Sound Effects -->
+    <audio id="wheelSpinSound" preload="auto">
+        <source src="sounds/wheel-spin.wav" type="audio/wav">
+        <source src="sounds/wheel-spin.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="wheelWinSound" preload="auto">
+        <source src="sounds/win.wav" type="audio/wav">
+        <source src="sounds/win.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="wheelLoseSound" preload="auto">
+        <source src="sounds/lose.wav" type="audio/wav">
+        <source src="sounds/lose.mp3" type="audio/mpeg">
+    </audio>
     
     <!-- Additional page-specific scripts -->
         <script src="scripts/core/insufficient-balance-dialog.js"></script>
