@@ -35,7 +35,7 @@ class UnifiedBalanceSystem {
     
     async getRealBalance() {
         try {
-            const response = await fetch('https://data.directsponsor.org/api/dashboard?site_id=roflfaucet&_t=' + Date.now(), {
+            const response = await fetch('api/user-data.php?action=balance&_t=' + Date.now(), {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.accessToken}`,
@@ -46,14 +46,15 @@ class UnifiedBalanceSystem {
             
             if (response.ok) {
                 const data = await response.json();
-                this.balance = Math.floor(parseFloat(data.dashboard.balance.useless_coins) || 0);
-                console.log('✅ Real balance loaded:', this.balance);
-                return this.balance;
+                if (data.success) {
+                    this.balance = parseFloat(data.balance) || 0;
+                    console.log('✅ Real balance loaded from flat-file:', this.balance);
+                    return this.balance;
+                } else {
+                    throw new Error(data.error || 'API returned error');
+                }
             } else {
-                console.log('⚠️ API unavailable, using fallback balance');
-                // Don't reset login status - just use a fallback balance
-                this.balance = 0;
-                return this.balance;
+                throw new Error('API request failed');
             }
         } catch (error) {
             console.error('💥 Balance loading error:', error);
@@ -106,29 +107,29 @@ class UnifiedBalanceSystem {
     
     async addRealBalance(amount, source, description) {
         try {
-            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
+            const response = await fetch('api/user-data.php?action=update_balance', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.accessToken}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    type: 'earn',
                     amount: amount,
-                    source: source,
-                    site_id: 'roflfaucet',
-                    description: description
+                    source: `${source}: ${description}`
                 })
             });
             
             if (response.ok) {
                 const data = await response.json();
-                this.balance = Math.floor(data.balance.current);
-                console.log('✅ Real balance added:', amount, 'New balance:', this.balance);
-                return { success: true, balance: this.balance };
+                if (data.success) {
+                    this.balance = parseFloat(data.new_balance) || 0;
+                    console.log('✅ Real balance added via flat-file:', amount, 'New balance:', this.balance);
+                    return { success: true, balance: this.balance };
+                } else {
+                    throw new Error(data.error || 'API returned error');
+                }
             } else {
-                console.log('⚠️ API transaction failed, falling back to guest mode');
-                return this.addGuestBalance(amount, source, description);
+                throw new Error('API request failed');
             }
         } catch (error) {
             console.error('💥 Add balance error:', error);
@@ -154,29 +155,29 @@ class UnifiedBalanceSystem {
     
     async subtractRealBalance(amount, source, description) {
         try {
-            const response = await fetch('https://data.directsponsor.org/api/user/transaction', {
+            const response = await fetch('api/user-data.php?action=update_balance', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.accessToken}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    type: 'spend',
-                    amount: amount,
-                    source: source,
-                    site_id: 'roflfaucet',
-                    description: description
+                    amount: -amount, // Negative amount for subtraction
+                    source: `${source}: ${description}`
                 })
             });
             
             if (response.ok) {
                 const data = await response.json();
-                this.balance = Math.floor(data.balance.current);
-                console.log('✅ Real balance subtracted:', amount, 'New balance:', this.balance);
-                return { success: true, balance: this.balance };
+                if (data.success) {
+                    this.balance = parseFloat(data.new_balance) || 0;
+                    console.log('✅ Real balance subtracted via flat-file:', amount, 'New balance:', this.balance);
+                    return { success: true, balance: this.balance };
+                } else {
+                    throw new Error(data.error || 'API returned error');
+                }
             } else {
-                console.log('⚠️ API transaction failed, falling back to guest mode');
-                return this.subtractGuestBalance(amount, source, description);
+                throw new Error('API request failed');
             }
         } catch (error) {
             console.error('💥 Subtract balance error:', error);
