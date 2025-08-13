@@ -382,11 +382,16 @@ class FlatFileUserData {
     }
     
     updateCurrencyDisplay(currency) {
+        console.log(`💱 Updating currency display to: ${currency}`);
+        
         // Update all currency display elements
         const currencyElements = document.querySelectorAll('.currency, .currency-full, [data-currency]');
         
+        console.log(`🔄 Found ${currencyElements.length} currency elements to update`);
         currencyElements.forEach(element => {
+            const oldValue = element.textContent;
             element.textContent = currency;
+            console.log(`  → Updated element: ${oldValue} → ${currency}`);
         });
         
         // Update page title if needed
