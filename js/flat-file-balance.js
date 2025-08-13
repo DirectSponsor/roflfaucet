@@ -65,7 +65,7 @@ class FlatFileUserData {
             try {
                 const loginData = JSON.parse(roflToken);
                 const now = Date.now();
-                // Check if token is still valid (24 hours)
+                // Check if token is still valid (7 days)
                 if (loginData.expires > now) {
                     return true;
                 }
@@ -114,7 +114,7 @@ class FlatFileUserData {
         const loginData = {
             username: username,
             loginTime: Date.now(),
-            expires: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+            expires: Date.now() + (7 * 24 * 60 * 60 * 1000), // 7 days (user-friendly for fun faucet)
             jwtToken: jwtToken // Keep JWT for API calls if needed
         };
         
@@ -483,6 +483,35 @@ class FlatFileUserData {
     
     getCurrencyName() {
         return this.isLoggedIn() ? 'coins' : 'tokens';
+    }
+    
+    // Get remaining login time (useful for showing users when they need to re-login)
+    getRemainingLoginTime() {
+        const roflToken = localStorage.getItem('rofl_login_token');
+        if (roflToken) {
+            try {
+                const loginData = JSON.parse(roflToken);
+                const now = Date.now();
+                const remaining = loginData.expires - now;
+                
+                if (remaining > 0) {
+                    const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+                    const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                    
+                    return {
+                        milliseconds: remaining,
+                        days: days,
+                        hours: hours,
+                        minutes: minutes,
+                        formatted: days > 0 ? `${days}d ${hours}h` : hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
+                    };
+                }
+            } catch (e) {
+                // Invalid token
+            }
+        }
+        return null;
     }
     
     // Clear all data (for logout)
