@@ -607,6 +607,12 @@ function updateProfileDisplay(data) {
         document.getElementById('notifications-enabled').checked = profile.settings.notifications || false;
         document.getElementById('public-profile').checked = profile.settings.public_profile || false;
     }
+    
+    // Update avatar display if user has one
+    if (profile.avatar) {
+        const avatarDisplay = document.getElementById('avatar-display');
+        avatarDisplay.innerHTML = `<img src="userdata/avatars/${profile.avatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+    }
 }
 
 function showTab(tabName) {
@@ -703,7 +709,7 @@ async function savePreferences(event) {
     }
 }
 
-function handleAvatarUpload(event) {
+async function handleAvatarUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
     
@@ -718,7 +724,7 @@ function handleAvatarUpload(event) {
         return;
     }
     
-    // Preview the image
+    // Preview the image immediately
     const reader = new FileReader();
     reader.onload = function(e) {
         const avatarDisplay = document.getElementById('avatar-display');
@@ -726,8 +732,36 @@ function handleAvatarUpload(event) {
     };
     reader.readAsDataURL(file);
     
-    // TODO: Upload to server
-    showMessage('Avatar preview updated! (Upload to server not implemented yet)', 'success');
+    // Upload to server
+    try {
+        showMessage('Uploading avatar...', 'success');
+        
+        const formData = new FormData();
+        formData.append('avatar', file);
+        
+        const token = window.flatFileUserData.getJWTToken();
+        const response = await fetch('api/avatar-upload.php', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showMessage('Avatar uploaded successfully!', 'success');
+            // Update the avatar display with the server URL
+            const avatarDisplay = document.getElementById('avatar-display');
+            avatarDisplay.innerHTML = `<img src="${result.avatar_url}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        } else {
+            showMessage(`Upload failed: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Avatar upload error:', error);
+        showMessage('Failed to upload avatar. Please try again.', 'error');
+    }
 }
 
 function showMessage(text, type) {
@@ -736,9 +770,12 @@ function showMessage(text, type) {
     messageEl.className = `message ${type}`;
     messageEl.style.display = 'block';
     
+    // Scroll to the message so user can see it
+    messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
     setTimeout(() => {
         messageEl.style.display = 'none';
-    }, 3000);
+    }, 5000); // Increased from 3 to 5 seconds
 }
 
 function showLoginDialog() {
