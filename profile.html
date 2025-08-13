@@ -448,7 +448,10 @@
         let currentProfile = null;
         
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthAndLoadProfile();
+            // Wait a bit for JWT system to initialize
+            setTimeout(() => {
+                checkAuthAndLoadProfile();
+            }, 500);
             
             // Listen for flat-file system updates
             if (window.flatFileUserData) {
@@ -462,6 +465,14 @@
             
             // Avatar upload handling
             document.getElementById('avatar-input').addEventListener('change', handleAvatarUpload);
+            
+            // Also listen for JWT system initialization
+            const checkJWTReady = setInterval(() => {
+                if (window.jwtSimpleFaucet && window.flatFileUserData) {
+                    clearInterval(checkJWTReady);
+                    checkAuthAndLoadProfile();
+                }
+            }, 200);
         });
         
         function checkAuthAndLoadProfile() {

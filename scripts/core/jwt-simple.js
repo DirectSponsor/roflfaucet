@@ -462,11 +462,9 @@ initializeFaucet() {
     }
     
     showLoginDialog() {
-        // If already logged in, show member menu (logout)
+        // If already logged in, show member menu
         if (this.jwtToken) {
-            if (confirm('Are you sure you want to logout?')) {
-                this.handleLogout();
-            }
+            this.showUserMenu();
             return;
         }
         
@@ -474,6 +472,65 @@ initializeFaucet() {
         const currentUrl = window.location.href;
         const authUrl = `https://auth.directsponsor.org/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
         window.location.href = authUrl;
+    }
+    
+    showUserMenu() {
+        // Create or show user menu dropdown
+        let existingMenu = document.getElementById('user-menu-dropdown');
+        
+        if (existingMenu) {
+            // Toggle existing menu
+            existingMenu.style.display = existingMenu.style.display === 'none' ? 'block' : 'none';
+            return;
+        }
+        
+        // Create user menu dropdown
+        const menu = document.createElement('div');
+        menu.id = 'user-menu-dropdown';
+        menu.style.cssText = `
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 180px;
+            z-index: 1000;
+            display: block;
+        `;
+        
+        const username = this.userProfile?.username || 'User';
+        
+        menu.innerHTML = `
+            <div style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #333;">
+                👤 ${username}
+            </div>
+            <a href="profile.html" style="display: block; padding: 10px; text-decoration: none; color: #333; border-bottom: 1px solid #eee;">
+                ✏️ Edit Profile
+            </a>
+            <a href="profile.html" style="display: block; padding: 10px; text-decoration: none; color: #333; border-bottom: 1px solid #eee;">
+                👁️ View Profile
+            </a>
+            <div onclick="window.jwtSimpleFaucet.handleLogout()" style="padding: 10px; cursor: pointer; color: #dc3545; border-bottom: none;">
+                🚪 Logout
+            </div>
+        `;
+        
+        // Position relative to login button
+        const loginBtn = document.getElementById('login-btn');
+        loginBtn.style.position = 'relative';
+        loginBtn.appendChild(menu);
+        
+        // Close menu when clicking outside
+        setTimeout(() => {
+            document.addEventListener('click', function closeMenu(e) {
+                if (!loginBtn.contains(e.target)) {
+                    menu.style.display = 'none';
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }, 100);
     }
     
     showMessage(text, type = 'info') {
