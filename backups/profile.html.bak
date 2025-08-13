@@ -1,9 +1,9 @@
 <!-- Profile page for user account management -->
-<!-- TITLE=Profile - ROFLFaucet -->
-<!-- DESC=View and manage your ROFLFaucet profile, settings, and activity -->
-<!-- KEYWORDS=profile, account, settings, user, faucet, coins -->
-<!-- STYLES=styles/guest-base.css, styles/member-base.css -->
-<!-- SCRIPTS= -->
+<!-- TITLE=_Profile - ROFLFaucet_ -->
+<!-- DESC=_View and manage your ROFLFaucet profile, settings, and activity_ -->
+<!-- KEYWORDS=_profile, account, settings, user, faucet, coins_ -->
+<!-- STYLES=_styles/guest-base.css, styles/member-base.css_ -->
+<!-- SCRIPTS=_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>

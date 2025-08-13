@@ -12,26 +12,34 @@ class FlatFileUserData {
     }
     
     init() {
-        // Check if user is logged in via JWT
-        const token = this.getJWTToken();
+        // Check if user is logged in via our ROFLFaucet token system
+        const loggedIn = this.isLoggedIn();
         
-        if (token) {
+        if (loggedIn) {
             // User is logged in - load their data
+            console.log('🔧 FlatFile: Initializing for logged-in user');
             this.loadUserData();
             this.updateCurrencyDisplay('coins');
             this.updateLongCurrencyDisplay('Useless Coins');
+            
+            // Set up periodic updates for logged-in users
+            if (!this.refreshInterval) {
+                this.refreshInterval = setInterval(() => {
+                    this.refreshBalance();
+                }, 30000); // Refresh every 30 seconds
+            }
         } else {
             // Guest mode - use localStorage fallback
+            console.log('🔧 FlatFile: Initializing for guest user');
             this.loadGuestData();
             this.updateCurrencyDisplay('tokens');
             this.updateLongCurrencyDisplay('Pointless Tokens');
-        }
-        
-        // Set up periodic updates for logged-in users
-        if (token) {
-            setInterval(() => {
-                this.refreshBalance();
-            }, 30000); // Refresh every 30 seconds
+            
+            // Clear any existing refresh interval
+            if (this.refreshInterval) {
+                clearInterval(this.refreshInterval);
+                this.refreshInterval = null;
+            }
         }
     }
     
@@ -49,8 +57,89 @@ class FlatFileUserData {
         return null;
     }
     
+    // ROFLFaucet-specific login state management
     isLoggedIn() {
+        // First check our own login token
+        const roflToken = localStorage.getItem('rofl_login_token');
+        if (roflToken) {
+            try {
+                const loginData = JSON.parse(roflToken);
+                const now = Date.now();
+                // Check if token is still valid (24 hours)
+                if (loginData.expires > now) {
+                    return true;
+                }
+                // Token expired, clean it up
+                localStorage.removeItem('rofl_login_token');
+            } catch (e) {
+                localStorage.removeItem('rofl_login_token');
+            }
+        }
+        
+        // Fallback to JWT system for backwards compatibility
         return !!this.getJWTToken();
+    }
+    
+    getCurrentUsername() {
+        // Get username from our own login token first
+        const roflToken = localStorage.getItem('rofl_login_token');
+        if (roflToken) {
+            try {
+                const loginData = JSON.parse(roflToken);
+                if (loginData.expires > Date.now()) {
+                    return loginData.username;
+                }
+            } catch (e) {
+                // Invalid token, remove it
+                localStorage.removeItem('rofl_login_token');
+            }
+        }
+        
+        // Fallback to JWT token
+        const jwtToken = this.getJWTToken();
+        if (jwtToken) {
+            try {
+                const payload = JSON.parse(atob(jwtToken.split('.')[1]));
+                return payload.username || payload.name || payload.sub;
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        return null;
+    }
+    
+    // Set ROFLFaucet login state
+    setLoginState(username, jwtToken = null) {
+        const loginData = {
+            username: username,
+            loginTime: Date.now(),
+            expires: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+            jwtToken: jwtToken // Keep JWT for API calls if needed
+        };
+        
+        localStorage.setItem('rofl_login_token', JSON.stringify(loginData));
+        
+        // Reinitialize with new login state
+        this.init();
+        
+        console.log(`🎉 ROFLFaucet login set for user: ${username}`);
+    }
+    
+    // Clear login state
+    clearLoginState() {
+        localStorage.removeItem('rofl_login_token');
+        localStorage.removeItem('jwt_token');
+        sessionStorage.removeItem('jwt_token');
+        
+        // Clear cookie
+        document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        
+        // Reinitialize as guest
+        this.clear();
+        this.init();
+        
+        console.log('👋 ROFLFaucet logout completed');
     }
     
     // === USER DATA LOADING ===
@@ -294,7 +383,7 @@ class FlatFileUserData {
     
     updateCurrencyDisplay(currency) {
         // Update all currency display elements
-        const currencyElements = document.querySelectorAll('.currency, [data-currency]');
+        const currencyElements = document.querySelectorAll('.currency, .currency-full, [data-currency]');
         
         currencyElements.forEach(element => {
             element.textContent = currency;

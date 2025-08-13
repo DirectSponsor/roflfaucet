@@ -139,9 +139,18 @@ class SimpleFaucet {
                 
                 // Hand off to flat-file system
                 if (window.flatFileUserData) {
-                    // Force flat-file system to reinitialize with new token
-                    window.flatFileUserData.init();
-                    console.log('✅ Handed off to flat-file system');
+                    // Extract username from JWT for ROFLFaucet login state
+                    let username = 'user';
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        username = payload.username || payload.name || payload.sub || username;
+                    } catch (e) {
+                        console.warn('Could not extract username from JWT, using default');
+                    }
+                    
+                    // Set ROFLFaucet login state with username and JWT token
+                    window.flatFileUserData.setLoginState(username, token);
+                    console.log('✅ Handed off to flat-file system with login state');
                 } else {
                     // Fallback to old system if flat-file not available
                     await this.loadUserData();
@@ -442,7 +451,13 @@ initializeFaucet() {
     handleLogout() {
         console.log('🚪 Logging out...');
         
-        localStorage.removeItem('jwt_token');
+        // Clear ROFLFaucet login state first
+        if (window.flatFileUserData) {
+            window.flatFileUserData.clearLoginState();
+        } else {
+            // Fallback cleanup if flat-file system not available
+            localStorage.removeItem('jwt_token');
+        }
         
         this.jwtToken = null;
         this.userProfile = null;
