@@ -34,17 +34,10 @@ class SimpleFaucet {
             localStorage.setItem('jwt_token', jwt);
             this.jwtToken = jwt;
             
-            // Clean up URL by removing the JWT parameter
+            // Clean up URL by removing the JWT parameter and refresh page
             const cleanUrl = window.location.pathname;
-            history.replaceState({}, document.title, cleanUrl);
-            
-            // Load user data and show faucet
-            this.loadUserData();
-            
-            // Refresh login status in unified balance system
-            if (window.unifiedBalance) {
-                window.unifiedBalance.refreshLoginStatus();
-            }
+            console.log('🔄 Login successful, refreshing page to update UI...');
+            window.location.href = cleanUrl; // This will refresh the page with clean URL
             
             return true;
         }
@@ -137,23 +130,12 @@ class SimpleFaucet {
                 this.hideLoginDialog();
                 this.showMessage('Login successful! Loading your data...', 'success');
                 
-                // Hand off to flat-file system
-                if (window.flatFileUserData) {
-                    // Extract username from JWT for ROFLFaucet login state
-                    let username = 'user';
-                    try {
-                        const payload = JSON.parse(atob(token.split('.')[1]));
-                        username = payload.username || payload.name || payload.sub || username;
-                    } catch (e) {
-                        console.warn('Could not extract username from JWT, using default');
-                    }
-                    
-                    // Set ROFLFaucet login state with username and JWT token
-                    window.flatFileUserData.setLoginState(username, token);
-                    console.log('✅ Handed off to flat-file system with login state');
-                } else {
-                    // Fallback to old system if flat-file not available
-                    await this.loadUserData();
+                // Load user data and update UI
+                await this.loadUserData();
+                
+                // Refresh unified balance system login status
+                if (window.unifiedBalance) {
+                    window.unifiedBalance.refreshLoginStatus();
                 }
                 
             } else {
@@ -320,10 +302,9 @@ class SimpleFaucet {
                 this.balance = result.new_balance;
                 this.updateUI();
                 
-                // Trigger flat-file balance system update if available
-                if (window.flatFileUserData) {
-                    window.flatFileUserData.balanceCache = result.new_balance;
-                    window.flatFileUserData.updateBalanceDisplay(result.new_balance);
+                // Trigger unified balance system update
+                if (window.updateBalanceDisplays) {
+                    setTimeout(window.updateBalanceDisplays, 100);
                 }
                 
             } else {
@@ -451,18 +432,19 @@ initializeFaucet() {
     handleLogout() {
         console.log('🚪 Logging out...');
         
-        // Clear ROFLFaucet login state first
-        if (window.flatFileUserData) {
-            window.flatFileUserData.clearLoginState();
-        } else {
-            // Fallback cleanup if flat-file system not available
-            localStorage.removeItem('jwt_token');
-        }
+        // Clear JWT token
+        localStorage.removeItem('jwt_token');
         
         this.jwtToken = null;
         this.userProfile = null;
         this.balance = 0;
         this.canClaim = false;
+        
+        // Close any open user menu
+        const existingMenu = document.getElementById('user-menu-dropdown');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
         
         this.showLoginScreen();
         this.showMessage('Logged out successfully', 'info');
@@ -537,10 +519,16 @@ initializeFaucet() {
             </div>
         `;
         
-        // Position relative to login button
+        // Position relative to login button but append to body to avoid event bubbling
         const loginBtn = document.getElementById('login-btn');
-        loginBtn.style.position = 'relative';
-        loginBtn.appendChild(menu);
+        const btnRect = loginBtn.getBoundingClientRect();
+        
+        // Position the menu relative to the button but append to body
+        menu.style.position = 'fixed';
+        menu.style.top = (btnRect.bottom + window.scrollY) + 'px';
+        menu.style.right = (window.innerWidth - btnRect.right) + 'px';
+        
+        document.body.appendChild(menu);
         
         // Close menu when clicking outside
         setTimeout(() => {

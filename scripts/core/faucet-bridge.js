@@ -4,16 +4,34 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🌉 Faucet Bridge: Starting initialization...');
     
-    const isLoggedIn = localStorage.getItem('jwt_token') !== null;
-    console.log('🔍 Faucet Bridge: Login status:', isLoggedIn ? 'logged in' : 'guest');
-    
-    // Initialize member/guest behavior (no visual theming, just currency and prompts)
-    if (isLoggedIn) {
-        console.log('📑 Member mode: Full features available');
-    } else {
-        console.log('📑 Guest mode: Limited features, prompts for member-only actions');
-        initGuestPrompts();
+    // Wait for unified balance system to be ready
+    function waitForUnifiedBalance() {
+        if (window.unifiedBalance) {
+            initializeFaucetBridge();
+        } else {
+            setTimeout(waitForUnifiedBalance, 100);
+        }
     }
+    
+    function initializeFaucetBridge() {
+        const isLoggedIn = window.unifiedBalance.isLoggedIn;
+        console.log('🔍 Faucet Bridge: Login status via unified balance:', isLoggedIn ? 'logged in' : 'guest');
+        
+        // Initialize member/guest behavior (no visual theming, just currency and prompts)
+        if (isLoggedIn) {
+            console.log('📑 Member mode: Full features available');
+        } else {
+            console.log('📑 Guest mode: Limited features, prompts for member-only actions');
+            initGuestPrompts();
+        }
+        
+        // Update currency display using unified balance system
+        if (window.unifiedBalance.updateCurrencyDisplay) {
+            window.unifiedBalance.updateCurrencyDisplay();
+        }
+    }
+    
+    waitForUnifiedBalance();
 
     // Currency terminology is now handled by the unified balance system
     // via currency classes (.currency, .currency-upper, .currency-full)
@@ -64,8 +82,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Use unified balance system for ALL users (guest and member)
             console.log('💰 Faucet Bridge: Adding coins via unified balance system...');
-            addBalance(10, 'faucet_claim', 'Faucet claim reward');
+            window.unifiedBalance.addBalance(10, 'faucet_claim', 'Faucet claim reward');
             updateLastClaimTime();
+            
+            // Update balance displays after claim
+            if (window.updateBalanceDisplays) {
+                setTimeout(window.updateBalanceDisplays, 500);
+            }
             
             // The unified balance system automatically:
             // - For guests: adds to localStorage

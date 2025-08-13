@@ -12,7 +12,7 @@ class FlatFileUserData {
     }
     
     init() {
-        // Check if user is logged in via our ROFLFaucet token system
+        // Check if user is logged in via JWT token
         const loggedIn = this.isLoggedIn();
         
         if (loggedIn) {
@@ -57,45 +57,12 @@ class FlatFileUserData {
         return null;
     }
     
-    // ROFLFaucet-specific login state management
+    // Simple JWT-based login detection
     isLoggedIn() {
-        // First check our own login token
-        const roflToken = localStorage.getItem('rofl_login_token');
-        if (roflToken) {
-            try {
-                const loginData = JSON.parse(roflToken);
-                const now = Date.now();
-                // Check if token is still valid (7 days)
-                if (loginData.expires > now) {
-                    return true;
-                }
-                // Token expired, clean it up
-                localStorage.removeItem('rofl_login_token');
-            } catch (e) {
-                localStorage.removeItem('rofl_login_token');
-            }
-        }
-        
-        // Fallback to JWT system for backwards compatibility
         return !!this.getJWTToken();
     }
     
     getCurrentUsername() {
-        // Get username from our own login token first
-        const roflToken = localStorage.getItem('rofl_login_token');
-        if (roflToken) {
-            try {
-                const loginData = JSON.parse(roflToken);
-                if (loginData.expires > Date.now()) {
-                    return loginData.username;
-                }
-            } catch (e) {
-                // Invalid token, remove it
-                localStorage.removeItem('rofl_login_token');
-            }
-        }
-        
-        // Fallback to JWT token
         const jwtToken = this.getJWTToken();
         if (jwtToken) {
             try {
@@ -107,39 +74,6 @@ class FlatFileUserData {
         }
         
         return null;
-    }
-    
-    // Set ROFLFaucet login state
-    setLoginState(username, jwtToken = null) {
-        const loginData = {
-            username: username,
-            loginTime: Date.now(),
-            expires: Date.now() + (7 * 24 * 60 * 60 * 1000), // 7 days (user-friendly for fun faucet)
-            jwtToken: jwtToken // Keep JWT for API calls if needed
-        };
-        
-        localStorage.setItem('rofl_login_token', JSON.stringify(loginData));
-        
-        // Reinitialize with new login state
-        this.init();
-        
-        console.log(`🎉 ROFLFaucet login set for user: ${username}`);
-    }
-    
-    // Clear login state
-    clearLoginState() {
-        localStorage.removeItem('rofl_login_token');
-        localStorage.removeItem('jwt_token');
-        sessionStorage.removeItem('jwt_token');
-        
-        // Clear cookie
-        document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        
-        // Reinitialize as guest
-        this.clear();
-        this.init();
-        
-        console.log('👋 ROFLFaucet logout completed');
     }
     
     // === USER DATA LOADING ===
@@ -485,34 +419,6 @@ class FlatFileUserData {
         return this.isLoggedIn() ? 'coins' : 'tokens';
     }
     
-    // Get remaining login time (useful for showing users when they need to re-login)
-    getRemainingLoginTime() {
-        const roflToken = localStorage.getItem('rofl_login_token');
-        if (roflToken) {
-            try {
-                const loginData = JSON.parse(roflToken);
-                const now = Date.now();
-                const remaining = loginData.expires - now;
-                
-                if (remaining > 0) {
-                    const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
-                    const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-                    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-                    
-                    return {
-                        milliseconds: remaining,
-                        days: days,
-                        hours: hours,
-                        minutes: minutes,
-                        formatted: days > 0 ? `${days}d ${hours}h` : hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
-                    };
-                }
-            } catch (e) {
-                // Invalid token
-            }
-        }
-        return null;
-    }
     
     // Clear all data (for logout)
     clear() {
