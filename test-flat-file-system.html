@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flat File User Data System Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .guest { background: #e3f2fd; border: 1px solid #1976d2; }
+        .member { background: #e8f5e8; border: 1px solid #4caf50; }
+        .error { background: #ffebee; border: 1px solid #f44336; }
+        .balance-display { font-size: 24px; font-weight: bold; margin: 20px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .test-section { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        #log { background: #f5f5f5; padding: 10px; max-height: 300px; overflow-y: scroll; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Flat File User Data System Test</h1>
+        
+        <div id="status" class="status">
+            <h3>Status: <span id="user-status">Loading...</span></h3>
+            <p>Balance: <span class="balance">0</span> <span class="currency">tokens</span></p>
+            <p>User: <span id="username">Unknown</span></p>
+        </div>
+        
+        <div class="test-section">
+            <h3>Authentication Simulation</h3>
+            <button onclick="simulateLogin()">Simulate Login (Member)</button>
+            <button onclick="simulateLogout()">Logout (Guest Mode)</button>
+            <p><small>This simulates JWT login/logout by setting/clearing localStorage tokens</small></p>
+        </div>
+        
+        <div class="test-section">
+            <h3>Balance Operations</h3>
+            <button onclick="claimFaucet()">Claim Faucet (+10)</button>
+            <button onclick="addBalance(50, 'test bonus')">Add 50 (Bonus)</button>
+            <button onclick="subtractBalance(25, 'test fee')">Subtract 25 (Fee)</button>
+            <button onclick="refreshBalance()">Refresh Balance</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Game Operations</h3>
+            <button onclick="testGameBet(5)">Place Bet (5)</button>
+            <button onclick="testGameWin(20)">Win Game (20)</button>
+            <button onclick="testSlotSpin()">Test Slot Spin</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Profile Operations</h3>
+            <button onclick="updateUsername()">Update Username</button>
+            <button onclick="updateTheme()">Change Theme</button>
+            <button onclick="showProfile()">Show Profile</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>System Log</h3>
+            <button onclick="clearLog()">Clear Log</button>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script src="js/flat-file-balance.js"></script>
+    <script>
+        // Test script
+        let logElement;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            logElement = document.getElementById('log');
+            updateStatus();
+            
+            // Listen for system events
+            window.flatFileUserData.onUpdate((event, data) => {
+                log(`Event: ${event}`, data);
+                updateStatus();
+            });
+        });
+        
+        function log(message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            let logMessage = `[${timestamp}] ${message}`;
+            
+            if (data) {
+                logMessage += '\n' + JSON.stringify(data, null, 2);
+            }
+            
+            logElement.textContent += logMessage + '\n\n';
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function clearLog() {
+            logElement.textContent = '';
+        }
+        
+        function updateStatus() {
+            const isLoggedIn = window.flatFileUserData.isLoggedIn();
+            const statusElement = document.getElementById('status');
+            const userStatusElement = document.getElementById('user-status');
+            const usernameElement = document.getElementById('username');
+            
+            if (isLoggedIn) {
+                statusElement.className = 'status member';
+                userStatusElement.textContent = 'Logged In (Member)';
+                usernameElement.textContent = window.flatFileUserData.profileCache?.username || 'Member';
+            } else {
+                statusElement.className = 'status guest';
+                userStatusElement.textContent = 'Guest Mode';
+                usernameElement.textContent = 'Guest';
+            }
+        }
+        
+        // === AUTHENTICATION TESTS ===
+        
+        function simulateLogin() {
+            // Create a fake JWT token (in real use, this comes from your auth server)
+            const fakeToken = btoa(JSON.stringify({
+                alg: 'HS256',
+                typ: 'JWT'
+            })) + '.' + 
+            btoa(JSON.stringify({
+                sub: 'user_' + Date.now(),
+                username: 'TestUser',
+                email: 'test@example.com',
+                exp: Math.floor(Date.now() / 1000) + 3600
+            })) + '.fake_signature';
+            
+            localStorage.setItem('jwt_token', fakeToken);
+            log('Simulated login with fake JWT token');
+            
+            // Reinitialize the system
+            window.flatFileUserData = new FlatFileUserData();
+            
+            // Re-attach event listener
+            window.flatFileUserData.onUpdate((event, data) => {
+                log(`Event: ${event}`, data);
+                updateStatus();
+            });
+            
+            updateStatus();
+        }
+        
+        function simulateLogout() {
+            localStorage.removeItem('jwt_token');
+            sessionStorage.removeItem('jwt_token');
+            window.flatFileUserData.clear();
+            log('Logged out - cleared all data');
+            
+            // Reinitialize the system
+            window.flatFileUserData = new FlatFileUserData();
+            
+            // Re-attach event listener
+            window.flatFileUserData.onUpdate((event, data) => {
+                log(`Event: ${event}`, data);
+                updateStatus();
+            });
+            
+            updateStatus();
+        }
+        
+        // === BALANCE TESTS ===
+        
+        async function claimFaucet() {
+            try {
+                const newBalance = await window.flatFileUserData.claimFaucet(10);
+                log(`Faucet claimed successfully. New balance: ${newBalance}`);
+            } catch (error) {
+                log(`Faucet claim failed: ${error.message}`);
+            }
+        }
+        
+        async function addBalance(amount, source) {
+            try {
+                const newBalance = await window.flatFileUserData.updateBalance(amount, source);
+                log(`Added ${amount} (${source}). New balance: ${newBalance}`);
+            } catch (error) {
+                log(`Add balance failed: ${error.message}`);
+            }
+        }
+        
+        async function subtractBalance(amount, reason) {
+            try {
+                const newBalance = await window.flatFileUserData.updateBalance(-amount, reason);
+                log(`Subtracted ${amount} (${reason}). New balance: ${newBalance}`);
+            } catch (error) {
+                log(`Subtract balance failed: ${error.message}`);
+            }
+        }
+        
+        async function refreshBalance() {
+            try {
+                const balance = await window.flatFileUserData.getBalance();
+                log(`Current balance: ${balance}`);
+            } catch (error) {
+                log(`Refresh balance failed: ${error.message}`);
+            }
+        }
+        
+        // === GAME TESTS ===
+        
+        async function testGameBet(amount) {
+            try {
+                const newBalance = await window.flatFileUserData.placeBet(amount);
+                log(`Placed bet of ${amount}. New balance: ${newBalance}`);
+            } catch (error) {
+                log(`Game bet failed: ${error.message}`);
+            }
+        }
+        
+        async function testGameWin(amount) {
+            try {
+                const newBalance = await window.flatFileUserData.creditWin(amount);
+                log(`Won ${amount}! New balance: ${newBalance}`);
+            } catch (error) {
+                log(`Credit win failed: ${error.message}`);
+            }
+        }
+        
+        async function testSlotSpin() {
+            try {
+                const betAmount = 5;
+                const currentBalance = await window.flatFileUserData.getBalance();
+                
+                if (currentBalance < betAmount) {
+                    log(`Insufficient balance for slot spin. Need ${betAmount}, have ${currentBalance}`);
+                    return;
+                }
+                
+                // Place bet
+                const balanceAfterBet = await window.flatFileUserData.placeBet(betAmount);
+                log(`Slot spin: Placed bet of ${betAmount}. Balance: ${balanceAfterBet}`);
+                
+                // Simulate random outcome
+                const isWin = Math.random() > 0.7; // 30% win chance
+                
+                if (isWin) {
+                    const winMultiplier = Math.random() * 4 + 1; // 1x to 5x
+                    const winAmount = Math.floor(betAmount * winMultiplier);
+                    const finalBalance = await window.flatFileUserData.creditWin(winAmount);
+                    log(`Slot win! Won ${winAmount} (${winMultiplier.toFixed(1)}x). Balance: ${finalBalance}`);
+                } else {
+                    log(`Slot loss. Better luck next time!`);
+                }
+            } catch (error) {
+                log(`Slot spin failed: ${error.message}`);
+            }
+        }
+        
+        // === PROFILE TESTS ===
+        
+        async function updateUsername() {
+            const newUsername = prompt('Enter new username:');
+            if (newUsername) {
+                try {
+                    const success = await window.flatFileUserData.updateProfile({
+                        username: newUsername
+                    });
+                    log(`Username update ${success ? 'successful' : 'failed'}: ${newUsername}`);
+                    updateStatus();
+                } catch (error) {
+                    log(`Username update failed: ${error.message}`);
+                }
+            }
+        }
+        
+        async function updateTheme() {
+            const themes = ['default', 'dark', 'light', 'blue'];
+            const currentTheme = window.flatFileUserData.profileCache?.settings?.theme || 'default';
+            const newTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
+            
+            try {
+                const success = await window.flatFileUserData.updateProfile({
+                    settings: { theme: newTheme }
+                });
+                log(`Theme update ${success ? 'successful' : 'failed'}: ${currentTheme} → ${newTheme}`);
+            } catch (error) {
+                log(`Theme update failed: ${error.message}`);
+            }
+        }
+        
+        async function showProfile() {
+            const profile = window.flatFileUserData.profileCache;
+            log('Current profile:', profile);
+        }
+    </script>
+</body>
+</html>
