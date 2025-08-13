@@ -417,15 +417,8 @@ initializeFaucet() {
             claimBtn.disabled = this.jwtToken ? !this.canClaim : false;
             
             const btnText = claimBtn.querySelector('.btn-text');
-            if (btnText) {
-                if (!this.jwtToken) {
-                    btnText.textContent = 'Faucet: 300';
-                } else if (this.canClaim) {
-                    btnText.textContent = 'Faucet: Ready';
-                } else {
-                    btnText.textContent = 'Faucet: Cooldown';
-                }
-            }
+            // Faucet button text is now handled by site-utils.js countdown system
+            // Don't interfere with it here
         }
     }
     
@@ -446,13 +439,12 @@ initializeFaucet() {
             existingMenu.remove();
         }
         
-        this.showLoginScreen();
         this.showMessage('Logged out successfully', 'info');
         
-        // Refresh login status in unified balance system
-        if (window.unifiedBalance) {
-            window.unifiedBalance.refreshLoginStatus();
-        }
+        // Force page refresh after logout to ensure all UI elements reset properly
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000); // Give time for the logout message to be visible
     }
     
     handleClaimClick() {
