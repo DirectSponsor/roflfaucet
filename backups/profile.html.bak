@@ -11,15 +11,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#TITLE#</title>
+    <title>Profile - ROFLFaucet</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="#DESC#">
+    <meta name="description" content="View and manage your ROFLFaucet profile, settings, and activity">
     
     <!-- Base Layout CSS -->
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-    #STYLES#
+        <link rel="stylesheet" href="styles/guest-base.css">
+    <link rel="stylesheet" href="styles/member-base.css">
+
     
     <!-- Site-wide scripts -->
     <script src="js/flat-file-balance.js"></script>
@@ -246,7 +248,8 @@
     </div>
     
     <!-- Additional page-specific scripts -->
-    #SCRIPTS#
+        <script src="-->"></script>
+
 </body>
 </html>
 <!-- include end footer.html -->

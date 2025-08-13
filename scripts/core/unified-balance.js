@@ -3,12 +3,69 @@
 
 class UnifiedBalanceSystem {
     constructor() {
-        this.isLoggedIn = !!localStorage.getItem('jwt_token');
-        this.userId = this.isLoggedIn ? this.getUserIdFromToken() : 'guest';
-        this.accessToken = localStorage.getItem('jwt_token');
+        // Use flat-file system for login detection
+        this.isLoggedIn = this.checkROFLLogin();
+        this.userId = this.isLoggedIn ? this.getUserIdFromROFLToken() : 'guest';
+        this.accessToken = localStorage.getItem('jwt_token'); // Still use JWT for API calls
         this.balance = 0;
         
         console.log(`💰 Unified Balance System initialized for ${this.isLoggedIn ? 'member' : 'guest'} user`);
+        
+        // Update currency display immediately
+        this.updateCurrencyDisplay();
+    }
+    
+    updateCurrencyDisplay() {
+        const currency = this.isLoggedIn ? 'coins' : 'tokens';
+        console.log(`💱 Unified: Updating currency display to: ${currency}`);
+        
+        // Update all currency display elements
+        const currencyElements = document.querySelectorAll('.currency, .currency-full, [data-currency]');
+        
+        console.log(`🔄 Unified: Found ${currencyElements.length} currency elements to update`);
+        currencyElements.forEach(element => {
+            const oldValue = element.textContent;
+            element.textContent = currency;
+            console.log(`  → Unified: Updated element: ${oldValue} → ${currency}`);
+        });
+    }
+    
+    checkROFLLogin() {
+        // Check ROFLFaucet login token first
+        const roflToken = localStorage.getItem('rofl_login_token');
+        if (roflToken) {
+            try {
+                const loginData = JSON.parse(roflToken);
+                const now = Date.now();
+                if (loginData.expires > now) {
+                    return true;
+                }
+                localStorage.removeItem('rofl_login_token');
+            } catch (e) {
+                localStorage.removeItem('rofl_login_token');
+            }
+        }
+        
+        // Fallback to JWT token
+        return !!localStorage.getItem('jwt_token');
+    }
+    
+    getUserIdFromROFLToken() {
+        // First try ROFLFaucet token
+        const roflToken = localStorage.getItem('rofl_login_token');
+        if (roflToken) {
+            try {
+                const loginData = JSON.parse(roflToken);
+                if (loginData.expires > Date.now()) {
+                    return loginData.username;
+                }
+            } catch (e) {
+                // Fall through to JWT token
+            }
+        }
+        
+        // Fallback to JWT token
+        return this.getUserIdFromToken();
     }
     
     getUserIdFromToken() {
