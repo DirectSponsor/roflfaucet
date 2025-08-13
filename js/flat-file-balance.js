@@ -19,10 +19,12 @@ class FlatFileUserData {
             // User is logged in - load their data
             this.loadUserData();
             this.updateCurrencyDisplay('coins');
+            this.updateLongCurrencyDisplay('Useless Coins');
         } else {
             // Guest mode - use localStorage fallback
             this.loadGuestData();
             this.updateCurrencyDisplay('tokens');
+            this.updateLongCurrencyDisplay('Pointless Tokens');
         }
         
         // Set up periodic updates for logged-in users
@@ -306,6 +308,15 @@ class FlatFileUserData {
                 title.textContent.replace(/coins?/gi, 'tokens').replace(/Coins?/gi, 'Tokens');
             title.textContent = newTitle;
         }
+    }
+    
+    updateLongCurrencyDisplay(longCurrency) {
+        // Update long currency display elements (for full names like "Useless Coins")
+        const longCurrencyElements = document.querySelectorAll('.long-currency, [data-long-currency]');
+        
+        longCurrencyElements.forEach(element => {
+            element.textContent = longCurrency;
+        });
     }
     
     async refreshBalance() {

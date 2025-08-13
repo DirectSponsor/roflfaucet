@@ -300,7 +300,7 @@ class SimpleFaucet {
                 const coinsEarned = result.claimed_amount;
                 console.log('✅ Faucet claim successful! Earned:', coinsEarned);
                 
-                this.showMessage(`🎉 Claimed ${coinsEarned} Coins!`, 'success');
+                this.showMessage(`🎉 Claimed ${coinsEarned} Useless Coins!`, 'success');
                 
                 // Update local balance
                 this.balance = result.new_balance;
