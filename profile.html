@@ -24,7 +24,6 @@
 
     
     <!-- Site-wide scripts -->
-    <script src="js/flat-file-balance.js"></script>
     <script src="scripts/core/unified-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
     <script src="scripts/core/gallery-system-simple.js"></script>
@@ -494,22 +493,18 @@ document.addEventListener('DOMContentLoaded', function() {
         checkAuthAndLoadProfile();
     }, 500);
     
-    // Listen for flat-file system updates
-    if (window.flatFileUserData) {
-        window.flatFileUserData.onUpdate((event, data) => {
-            console.log('Profile: Received update:', event, data);
-            if (event === 'data_loaded' || event === 'profile_updated') {
-                updateProfileDisplay(data);
-            }
-        });
+    // Listen for unified balance system updates
+    if (window.unifiedBalance) {
+        // No specific update callbacks needed for profile page
+        console.log('🔧 Profile: Unified balance system ready');
     }
     
     // Avatar upload handling
     document.getElementById('avatar-input').addEventListener('change', handleAvatarUpload);
     
-    // Also listen for JWT system initialization
+    // Also listen for unified balance system initialization
     const checkJWTReady = setInterval(() => {
-        if (window.jwtSimpleFaucet && window.flatFileUserData) {
+        if (window.jwtSimpleFaucet && window.unifiedBalance) {
             clearInterval(checkJWTReady);
             checkAuthAndLoadProfile();
         }
@@ -517,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function checkAuthAndLoadProfile() {
-    const isLoggedIn = window.flatFileUserData && window.flatFileUserData.isLoggedIn();
+    const isLoggedIn = window.unifiedBalance && window.unifiedBalance.isLoggedIn;
     
     if (isLoggedIn) {
         document.getElementById('guest-notice').style.display = 'none';
@@ -536,19 +531,20 @@ function checkAuthAndLoadProfile() {
 
 async function loadUserProfile() {
     try {
-        // Get profile from flat-file system
-        const profileData = window.flatFileUserData.profileCache;
-        const balanceData = window.flatFileUserData.balanceCache;
-        
-        if (profileData) {
-            currentProfile = profileData;
-            updateProfileDisplay({ profile: profileData, balance: balanceData });
-        } else {
+        // Load profile directly from API since we don't cache in unified balance system
             // Try to load from API
-            const response = await window.flatFileUserData.makeAuthenticatedRequest('GET', '?action=all');
-            if (response.success) {
-                currentProfile = response.profile;
-                updateProfileDisplay(response);
+        const response = await fetch('api/user-data.php?action=all', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${window.unifiedBalance.accessToken}`
+                }
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+            if (result.success) {
+                currentProfile = result.profile;
+                updateProfileDisplay(result);
             }
         }
     } catch (error) {
@@ -565,9 +561,9 @@ function updateProfileDisplay(data) {
     
     // Get username from profile or fallback to JWT data
     let displayUsername = profile.username;
-    if (!displayUsername && window.flatFileUserData && window.flatFileUserData.isLoggedIn()) {
+    if (!displayUsername && window.unifiedBalance && window.unifiedBalance.isLoggedIn) {
         // Try to get username from JWT token
-        const token = window.flatFileUserData.getJWTToken();
+        const token = window.unifiedBalance.accessToken;
         if (token) {
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
@@ -638,22 +634,32 @@ function showTab(tabName) {
 
 async function loadRecentActivity() {
     try {
-        const response = await window.flatFileUserData.makeAuthenticatedRequest('GET', '?action=balance');
+        const response = await fetch('api/user-data.php?action=balance', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${window.unifiedBalance.accessToken}`
+            }
+        });
         
-        const transactions = response.transactions || [];
-        const activityHtml = transactions.length > 0 ? 
-            transactions.map(tx => `
-                <div style="padding: 10px; border-bottom: 1px solid #eee;">
-                    <strong>${tx.description || tx.type}</strong><br>
-                    <small>${new Date(tx.timestamp * 1000).toLocaleString()}</small><br>
-                    <span style="color: ${tx.change > 0 ? 'green' : 'red'}">
-                        ${tx.change > 0 ? '+' : ''}${tx.change} coins
-                    </span>
-                </div>
-            `).join('') :
-            '<p>No recent activity.</p>';
-        
-        document.getElementById('recent-transactions').innerHTML = activityHtml;
+        if (response.ok) {
+            const result = await response.json();
+            const transactions = result.transactions || [];
+            const activityHtml = transactions.length > 0 ? 
+                transactions.map(tx => `
+                    <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <strong>${tx.description || tx.type}</strong><br>
+                        <small>${new Date(tx.timestamp * 1000).toLocaleString()}</small><br>
+                        <span style="color: ${tx.change > 0 ? 'green' : 'red'}">
+                            ${tx.change > 0 ? '+' : ''}${tx.change} coins
+                        </span>
+                    </div>
+                `).join('') :
+                '<p>No recent activity.</p>';
+            
+            document.getElementById('recent-transactions').innerHTML = activityHtml;
+        } else {
+            throw new Error('Failed to fetch activity');
+        }
     } catch (error) {
         document.getElementById('recent-transactions').innerHTML = '<p>Failed to load recent activity.</p>';
     }
@@ -671,10 +677,23 @@ async function saveBasicInfo(event) {
     };
     
     try {
-        const success = await window.flatFileUserData.updateProfile(updates);
-        if (success) {
-            showMessage('Profile updated successfully!', 'success');
-            currentProfile = { ...currentProfile, ...updates };
+        const response = await fetch('api/user-data.php?action=update_profile', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${window.unifiedBalance.accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updates)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+                showMessage('Profile updated successfully!', 'success');
+                currentProfile = { ...currentProfile, ...updates };
+            } else {
+                showMessage('Failed to update profile.', 'error');
+            }
         } else {
             showMessage('Failed to update profile.', 'error');
         }
@@ -697,9 +716,22 @@ async function savePreferences(event) {
     };
     
     try {
-        const success = await window.flatFileUserData.updateProfile(settings);
-        if (success) {
-            showMessage('Preferences saved successfully!', 'success');
+        const response = await fetch('api/user-data.php?action=update_profile', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${window.unifiedBalance.accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settings)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+                showMessage('Preferences saved successfully!', 'success');
+            } else {
+                showMessage('Failed to save preferences.', 'error');
+            }
         } else {
             showMessage('Failed to save preferences.', 'error');
         }
@@ -739,7 +771,7 @@ async function handleAvatarUpload(event) {
         const formData = new FormData();
         formData.append('avatar', file);
         
-        const token = window.flatFileUserData.getJWTToken();
+        const token = window.unifiedBalance.accessToken;
         const response = await fetch('api/avatar-upload.php', {
             method: 'POST',
             headers: {
