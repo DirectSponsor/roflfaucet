@@ -139,6 +139,9 @@ function handlePostRequest($userManager, $action) {
             }
             
             if ($success) {
+                // Auto-increment stats based on source type
+                autoIncrementStats($userManager, $userId, $source, $amount);
+                
                 $newBalanceData = $userManager->getBalanceData($userId);
                 echo json_encode([
                     'success' => true,
@@ -239,13 +242,16 @@ function handlePostRequest($userManager, $action) {
             break;
             
         case 'update_profile':
-            if (!isset($input['profile_updates']) || !is_array($input['profile_updates'])) {
+            // Accept both direct format and nested format for flexibility
+            $profileUpdates = $input['profile_updates'] ?? $input;
+            
+            if (!is_array($profileUpdates)) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Invalid profile data']);
                 return;
             }
             
-            $success = $userManager->updateProfile($userId, $input['profile_updates']);
+            $success = $userManager->updateProfile($userId, $profileUpdates);
             
             if ($success) {
                 echo json_encode([
@@ -262,6 +268,24 @@ function handlePostRequest($userManager, $action) {
             http_response_code(400);
             echo json_encode(['error' => 'Invalid action']);
             break;
+    }
+}
+
+// Helper function to automatically increment stats based on transaction source
+function autoIncrementStats($userManager, $userId, $source, $amount) {
+    $source = strtolower($source);
+    
+    // Increment stats based on what type of action this was
+    if (strpos($source, 'faucet') !== false) {
+        $userManager->incrementStat($userId, 'total_claims');
+    } elseif (strpos($source, 'game') !== false || strpos($source, 'slot') !== false) {
+        if ($amount < 0) {
+            // Negative amount = bet/spend
+            $userManager->incrementStat($userId, 'total_games_played');
+        } else {
+            // Positive amount = win
+            $userManager->incrementStat($userId, 'total_won', $amount);
+        }
     }
 }
 

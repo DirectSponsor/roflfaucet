@@ -80,9 +80,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Redirect to result page instead of showing step
             window.location.href = 'faucet-result.html';
             
-            // Use unified balance system for ALL users (guest and member)
-            console.log('💰 Faucet Bridge: Adding coins via unified balance system...');
-            window.unifiedBalance.addBalance(10, 'faucet_claim', 'Faucet claim reward');
+            // Super simple: just add balance, API will auto-detect and increment stats
+            console.log('💰 Faucet Bridge: Processing faucet claim...');
+            window.unifiedBalance.addBalance(10, 'faucet', 'Faucet claim reward');
             updateLastClaimTime();
             
             // Update balance displays after claim
@@ -182,4 +182,6 @@ function redirectToLogin() {
     const loginUrl = '/auth/jwt-login.php';
     window.location.href = loginUrl;
 }
+
+// All the complexity is gone! The API automatically handles stats based on the source.
 
