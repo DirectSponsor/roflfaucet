@@ -22,10 +22,13 @@
     
     
     <!-- Site-wide scripts -->
-    <script src="scripts/core/unified-balance.js"></script>
+    <script src="js/flat-file-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
     <script src="scripts/core/gallery-system-simple.js"></script>
     <script src="scripts/core/jwt-simple.js"></script>
+    
+    <!-- Flat-file user data system -->
+    <script>console.log('🔧 Loading flat-file user data system...');</script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -38,6 +41,7 @@
             <nav class="nav">
                 <a href="index.html" class="nav-link">Faucet</a>
                 <a href="slots.html" class="nav-link">Slots</a>
+                <a href="profile.html" class="nav-link">Profile</a>
                 <a href="about.html" class="nav-link">About</a>
             </nav>
             
