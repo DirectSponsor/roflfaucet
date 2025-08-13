@@ -559,8 +559,23 @@ function updateProfileDisplay(data) {
     
     if (!profile) return;
     
+    // Get username from profile or fallback to JWT data
+    let displayUsername = profile.username;
+    if (!displayUsername && window.flatFileUserData && window.flatFileUserData.isLoggedIn()) {
+        // Try to get username from JWT token
+        const token = window.flatFileUserData.getJWTToken();
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                displayUsername = payload.username || payload.name || profile.user_id || 'User';
+            } catch (e) {
+                displayUsername = profile.user_id || 'User';
+            }
+        }
+    }
+    
     // Update header info
-    document.getElementById('profile-username').textContent = profile.username || 'Unknown User';
+    document.getElementById('profile-username').textContent = displayUsername || 'Unknown User';
     
     const joinedDate = profile.joined_date || profile.created_at;
     if (joinedDate) {

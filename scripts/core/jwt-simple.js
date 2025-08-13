@@ -135,11 +135,16 @@ class SimpleFaucet {
                 this.jwtToken = token;
                 
                 this.hideLoginDialog();
-                await this.loadUserData();
+                this.showMessage('Login successful! Loading your data...', 'success');
                 
-                // Refresh login status in unified balance system
-                if (window.unifiedBalance) {
-                    window.unifiedBalance.refreshLoginStatus();
+                // Hand off to flat-file system
+                if (window.flatFileUserData) {
+                    // Force flat-file system to reinitialize with new token
+                    window.flatFileUserData.init();
+                    console.log('✅ Handed off to flat-file system');
+                } else {
+                    // Fallback to old system if flat-file not available
+                    await this.loadUserData();
                 }
                 
             } else {
