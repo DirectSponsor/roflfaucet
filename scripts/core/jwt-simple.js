@@ -5,7 +5,7 @@ class SimpleFaucet {
     constructor() {
         // JWT settings
         this.authApiBase = 'auth'; // Use local auth directory
-        this.userDataApiBase = 'https://data.directsponsor.org/api';
+        this.userDataApiBase = 'api'; // Use local flat-file API
         
         // User state
         this.jwtToken = null;
@@ -199,8 +199,8 @@ class SimpleFaucet {
             // Get user info from JWT payload
             const payload = JSON.parse(atob(this.jwtToken.split('.')[1]));
             
-            // For now, use JWT user ID to get profile from user data API
-            const profileResponse = await fetch(`${this.userDataApiBase}/profile?user_id=${payload.sub}`, {
+            // Try to load from flat-file API
+            const profileResponse = await fetch(`${this.userDataApiBase}/user-data.php?action=profile`, {
                 headers: {
                     'Authorization': `Bearer ${this.jwtToken}`
                 }
@@ -208,26 +208,31 @@ class SimpleFaucet {
             
             if (profileResponse.ok) {
                 const profileData = await profileResponse.json();
-                this.userProfile = { username: profileData.profile.username };
-                console.log('✅ Profile loaded:', this.userProfile.username);
-                
-                // Load balance
-                await this.loadBalance();
-                this.showFaucetScreen();
-                
+                if (profileData.success) {
+                    this.userProfile = { username: profileData.profile.username || payload.username };
+                    console.log('✅ Profile loaded from flat-file API:', this.userProfile.username);
+                } else {
+                    throw new Error('Profile API returned error');
+                }
             } else {
-                // Fallback: use JWT data directly
-                const username = payload.username || payload.name || payload.user || `User ${payload.sub}`;
-                this.userProfile = { username: username };
-                console.log('✅ Using JWT username:', username);
-                await this.loadBalance();
-                this.showFaucetScreen();
+                throw new Error('Profile API request failed');
             }
             
+            // Load balance
+            await this.loadBalance();
+            this.showFaucetScreen();
+            
         } catch (error) {
-            console.error('💥 User data loading error:', error);
-            this.showMessage('Failed to load user data.', 'error');
-            this.handleLogout();
+            console.log('⚠️ Using JWT fallback data due to:', error.message);
+            
+            // Fallback: use JWT data directly
+            const payload = JSON.parse(atob(this.jwtToken.split('.')[1]));
+            const username = payload.username || payload.name || payload.user || `User${payload.sub.slice(-4)}`;
+            this.userProfile = { username: username };
+            console.log('✅ Using JWT username:', username);
+            
+            await this.loadBalance();
+            this.showFaucetScreen();
         }
     }
     
@@ -235,9 +240,7 @@ class SimpleFaucet {
         try {
             console.log('💰 Loading user balance...');
             
-            const url = `${this.userDataApiBase}/dashboard?site_id=roflfaucet&_t=${Date.now()}`;
-            
-            const response = await fetch(url, {
+            const response = await fetch(`${this.userDataApiBase}/user-data.php?action=balance`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.jwtToken}`,
@@ -248,23 +251,23 @@ class SimpleFaucet {
             
             if (response.ok) {
                 const data = await response.json();
-                this.balance = parseFloat(data.dashboard.balance.useless_coins);
-                this.canClaim = data.dashboard.claim_statuses.roflfaucet.can_claim;
-                
-                console.log('✅ Balance loaded:', this.balance, 'Can claim:', this.canClaim);
-                this.updateUI();
+                if (data.success) {
+                    this.balance = parseFloat(data.balance);
+                    this.canClaim = true; // For now, always allow claims for testing
+                    
+                    console.log('✅ Balance loaded from flat-file API:', this.balance);
+                    this.updateUI();
+                } else {
+                    throw new Error('Balance API returned error: ' + (data.error || 'Unknown'));
+                }
                 
             } else {
-                console.log('⚠️ Using fallback balance (API unavailable)');
-                this.balance = 0;
-                this.canClaim = true;
-                this.updateUI();
+                throw new Error('Balance API request failed: ' + response.status);
             }
             
         } catch (error) {
-            console.error('💥 Balance loading error:', error);
-            console.log('⚠️ Using fallback balance');
-            this.balance = 0;
+            console.log('⚠️ Using fallback balance due to:', error.message);
+            this.balance = 10; // Default balance for new users
             this.canClaim = true;
             this.updateUI();
         }
@@ -277,38 +280,45 @@ class SimpleFaucet {
         }
         
         try {
-            console.log('🎲 Processing claim...');
+            console.log('🎲 Processing faucet claim...');
             this.showMessage('Processing claim...', 'info');
             
-            const response = await fetch(`${this.userDataApiBase}/balance/claim`, {
+            const response = await fetch(`${this.userDataApiBase}/user-data.php?action=faucet_claim`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.jwtToken}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    site_id: 'roflfaucet'
+                    amount: 10
                 })
             });
             
             const result = await response.json();
             
             if (response.ok && result.success) {
-                const coinsEarned = result.rewards.useless_coins;
-                console.log('✅ Claim successful! Earned:', coinsEarned);
+                const coinsEarned = result.claimed_amount;
+                console.log('✅ Faucet claim successful! Earned:', coinsEarned);
                 
-                this.showMessage(`🎉 Claimed ${coinsEarned} UselessCoins!`, 'success');
+                this.showMessage(`🎉 Claimed ${coinsEarned} Coins!`, 'success');
                 
-                // Reload balance
-                await this.loadBalance();
+                // Update local balance
+                this.balance = result.new_balance;
+                this.updateUI();
+                
+                // Trigger flat-file balance system update if available
+                if (window.flatFileUserData) {
+                    window.flatFileUserData.balanceCache = result.new_balance;
+                    window.flatFileUserData.updateBalanceDisplay(result.new_balance);
+                }
                 
             } else {
-                console.error('❌ Claim failed:', result);
+                console.error('❌ Faucet claim failed:', result);
                 this.showMessage(result.error || 'Claim failed. Please try again.', 'error');
             }
             
         } catch (error) {
-            console.error('💥 Claim error:', error);
+            console.error('💥 Faucet claim error:', error);
             this.showMessage('Network error during claim. Please try again.', 'error');
         }
     }
