@@ -142,7 +142,16 @@ class DiceGame {
         // Calculate win chance based on payout multiplier and house edge
         // Formula: winChance = (100 - houseEdge) / payoutMultiplier
         const winChance = (100 - this.houseEdge) / payoutMultiplier;
-        const rollThreshold = winChance;
+        
+        // Calculate the correct roll threshold based on mode
+        let rollThreshold;
+        if (this.isLowMode) {
+            // LOW mode: roll UNDER this number to win
+            rollThreshold = winChance;
+        } else {
+            // HIGH mode: roll OVER this number to win
+            rollThreshold = 100 - winChance;
+        }
         
         // Update display
         document.getElementById('winChance').textContent = winChance.toFixed(2) + '%';
@@ -151,7 +160,11 @@ class DiceGame {
         
         // Update roll button state
         this.updateRollButton();
+        
+        // Debug logging
+        console.log(`🎲 Mode: ${this.isLowMode ? 'LOW' : 'HIGH'}, WinChance: ${winChance.toFixed(2)}%, Threshold: ${rollThreshold.toFixed(2)}, Balance: ${this.balanceSystem ? this.balanceSystem.getBalance() : 'N/A'}`);
     }
+    
     
     updateRollButton() {
         const rollButton = document.getElementById('rollButton');
