@@ -3,7 +3,7 @@
 <!-- DESC=_Intelligent dice game with dynamic probability calculations and High/Low mechanics_ -->
 <!-- KEYWORDS=_dice, game, gambling, ROFLFaucet, roll, chance, probability, high, low, multiplier_ -->
 <!-- STYLES=_css/dice.css_ -->
-<!-- SCRIPTS=_js/jwt-simple.js, scripts/core/unified-balance.js, js/dice-game.js_ -->
+<!-- SCRIPTS=_js/dice-game.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -11,15 +11,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#TITLE#</title>
+    <title>Roll of Chance - ROFLFaucet</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="#DESC#">
+    <meta name="description" content="Intelligent dice game with dynamic probability calculations and High/Low mechanics">
     
     <!-- Base Layout CSS -->
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-    #STYLES#
+        <link rel="stylesheet" href="css/dice.css">
+
     
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
@@ -315,7 +316,10 @@
     </div>
     
     <!-- Additional page-specific scripts -->
-    #SCRIPTS#
+        <script src="js/jwt-simple.js"></script>
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="js/dice-game.js"></script>
+
 </body>
 </html>
 <!-- include end footer.html -->
