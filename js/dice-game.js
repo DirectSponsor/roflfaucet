@@ -225,7 +225,7 @@ class DiceGame {
         // Check if player has enough balance
         const currentBalance = this.balanceSystem.getBalance();
         if (currentBalance < betAmount) {
-            this.showMessage('Insufficient balance!', 'error');
+            this.showInsufficientBalanceDialog(betAmount, currentBalance);
             return;
         }
         
@@ -343,7 +343,7 @@ class DiceGame {
         setTimeout(() => {
             resultContainer.className = 'roll-result';
             rollValue.textContent = '0.00';
-            rollStatus.textContent = 'Ready to roll!';
+            rollStatus.textContent = 'Roll result';
             rollPayout.textContent = '';
         }, 5000);
     }
@@ -467,6 +467,30 @@ class DiceGame {
     showMessage(message, type = 'info') {
         // You can implement a toast notification system here
         console.log(`${type.toUpperCase()}: ${message}`);
+    }
+    
+    showInsufficientBalanceDialog(needed, current) {
+        const isLoggedIn = this.balanceSystem ? this.balanceSystem.isLoggedIn : false;
+        const currency = isLoggedIn ? 'coins' : 'tokens';
+        
+        const message = `🎲 Insufficient ${currency}!\n\n` +
+                       `You need ${needed} ${currency} to roll, but you only have ${current}.\n\n` +
+                       `💡 Use the faucet button below to claim free ${currency}!`;
+        
+        alert(message);
+        
+        // Highlight the faucet button to draw attention
+        const faucetBtn = document.getElementById('faucet-countdown-btn');
+        if (faucetBtn) {
+            faucetBtn.style.animation = 'pulse 1s ease-in-out 3';
+            faucetBtn.style.boxShadow = '0 0 15px #3CE74C';
+            
+            // Remove highlight after animation
+            setTimeout(() => {
+                faucetBtn.style.animation = '';
+                faucetBtn.style.boxShadow = '';
+            }, 3000);
+        }
     }
     
     saveGameStats() {

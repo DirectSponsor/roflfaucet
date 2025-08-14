@@ -87,188 +87,161 @@
 
         <main class="main-content">
 <!-- UNIQUE PAGE CONTENT GOES HERE -->
-            <div class="container-fluid mt-4">
-                <div class="row">
-                    <!-- Left Sidebar - Game Stats -->
-                    <div class="col-lg-3 col-md-4 mb-4">
-                        <div class="stats-panel">
-                            <h5 class="stats-title">
-                                <i class="fas fa-chart-bar"></i> Game Stats
-                            </h5>
-                            
-                            <div class="stat-item">
-                                <div class="stat-label">Total Rolls</div>
-                                <div class="stat-value" id="totalRolls">0</div>
-                            </div>
-                            
-                            <div class="stat-item">
-                                <div class="stat-label">Total Wagered</div>
-                                <div class="stat-value" id="totalWagered">0</div>
-                            </div>
-                            
-                            <div class="stat-item">
-                                <div class="stat-label">Total Won</div>
-                                <div class="stat-value" id="totalWon">0</div>
-                            </div>
-                            
-                            <div class="stat-item">
-                                <div class="stat-label">Win Rate</div>
-                                <div class="stat-value" id="winRate">0%</div>
-                            </div>
+            <div class="content-container">
+                <div class="game-container">
+                    <h1 class="game-title">🎲 Roll of Chance</h1>
+                    
+                    <!-- Balance Display -->
+                    <div class="balance-display">
+                        <div class="balance-item">
+                            <span class="balance-label">Balance:</span>
+                            <span class="balance-value" id="playerBalance">0</span>
+                            <span class="currency-display">tokens</span>
                         </div>
+                        <!-- Faucet Countdown Button -->
+                        <div class="balance-faucet" style="margin-top: 10px; text-align: center;">
+                            <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                <span class="btn-text">Faucet: Loading...</span>
+                            </button>
+                        </div>
+                    </div>
 
-                        <!-- Recent Rolls -->
-                        <div class="recent-rolls-panel mt-3">
-                            <h5 class="stats-title">
-                                <i class="fas fa-history"></i> Recent Rolls
-                            </h5>
-                            <div class="recent-rolls-list" id="recentRolls">
+                    <!-- Table-based Betting Panel -->
+                    <div style="padding: 20px; background: rgba(0,0,0,0.05); border-radius: 8px; margin: 20px 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px; text-align: right; font-weight: bold;">Bet Amount:</td>
+                                <td style="padding: 8px;">
+                                    <button id="betDown" type="button" style="padding: 4px 8px; margin-right: 5px;">-</button>
+                                    <input type="number" id="betAmount" value="1" min="1" max="100" style="width: 80px; text-align: center;">
+                                    <button id="betUp" type="button" style="padding: 4px 8px; margin-left: 5px;">+</button>
+                                </td>
+                                <td style="padding: 8px; text-align: right; font-weight: bold;">Win Chance:</td>
+                                <td style="padding: 8px; color: #28a745; font-weight: bold;" id="winChance">49.50%</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: right; font-weight: bold;">Multiplier:</td>
+                                <td style="padding: 8px;">
+                                    <button id="payoutDown" type="button" style="padding: 4px 8px; margin-right: 5px;">-</button>
+                                    <input type="number" id="payoutMultiplier" value="2" min="1.01" max="1000" step="0.01" style="width: 80px; text-align: center;">
+                                    <button id="payoutUp" type="button" style="padding: 4px 8px; margin-left: 5px;">+</button>
+                                    <span style="margin-left: 5px;">x</span>
+                                </td>
+                                <td style="padding: 8px; text-align: right; font-weight: bold;">Potential Win:</td>
+                                <td style="padding: 8px; color: #007bff; font-weight: bold;">
+                                    <span id="potentialPayout">2</span> <span style="font-size: 0.9em;">tokens</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- High/Low Toggle -->
+                    <div class="highlow-controls" style="text-align: center; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                        <div class="highlow-label" style="margin-bottom: 10px;">
+                            <span id="rollCondition">Roll UNDER to win</span>
+                        </div>
+                        <div class="highlow-threshold" style="margin-bottom: 15px;">
+                            <span>Target: </span>
+                            <span id="rollThreshold">49.50</span>
+                        </div>
+                        <button class="btn btn-primary highlow-toggle" id="highlowToggle" style="padding: 8px 16px;">
+                            Switch to HIGH
+                        </button>
+                    </div>
+
+                    <!-- Roll Button -->
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button class="btn btn-success btn-lg roll-button" id="rollButton">🎲 ROLL DICE</button>
+                    </div>
+
+                    <!-- Roll Result -->
+                    <div class="roll-result" id="rollResult" style="text-align: center; padding: 20px;">
+                        <div class="result-number" id="rollValue">0.00</div>
+                        <div class="result-status" id="rollStatus">Roll result</div>
+                        <div class="result-payout" id="rollPayout"></div>
+                    </div>
+                </div>
+                
+                <!-- Collapsible Sections -->
+                <div style="margin-top: 30px;">
+                    <!-- How to Play -->
+                    <div class="instructions-panel" style="margin-bottom: 15px;">
+                        <details>
+                            <summary style="cursor: pointer; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; margin-bottom: 10px; font-weight: bold;">
+                                📝 How to Play ▼
+                            </summary>
+                            
+                            <div style="padding: 10px; background: rgba(0,0,0,0.02); border-radius: 5px;">
+                                <div style="margin-bottom: 10px;">
+                                    <strong>1.</strong> Choose your bet amount
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <strong>2.</strong> Set your payout multiplier (higher = riskier but bigger wins)
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <strong>3.</strong> Choose HIGH or LOW strategy
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <strong>4.</strong> Click ROLL DICE and hope for the best!
+                                </div>
+
+                                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #2196f3;">
+                                    <h6>💡 Strategy Tips</h6>
+                                    <ul style="margin: 10px 0; padding-left: 20px;">
+                                        <li><strong>2x multiplier</strong> = ~49.5% win chance (safest)</li>
+                                        <li><strong>10x multiplier</strong> = ~9.9% win chance (medium risk)</li>
+                                        <li><strong>100x multiplier</strong> = ~0.99% win chance (high risk)</li>
+                                        <li><strong>1000x multiplier</strong> = ~0.099% win chance (EXTREME!)</li>
+                                        <li>🎯 <strong>99% RTP</strong> - One of the fairest dice games online!</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                    
+                    <!-- Recent Rolls -->
+                    <div class="recent-rolls-panel" style="margin-bottom: 15px;">
+                        <details>
+                            <summary style="cursor: pointer; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; margin-bottom: 10px; font-weight: bold;">
+                                📈 Recent Rolls ▼
+                            </summary>
+                            <div class="recent-rolls-list" id="recentRolls" style="padding: 10px; background: rgba(0,0,0,0.02); border-radius: 5px; max-height: 300px; overflow-y: auto;">
                                 <!-- Rolls will be populated here -->
                             </div>
-                        </div>
+                        </details>
                     </div>
-
-                    <!-- Main Game Area -->
-                    <div class="col-lg-6 col-md-8">
-                        <div class="game-container">
-                            <h1 class="game-title">
-                                <i class="fas fa-dice"></i> Roll of Chance
-                            </h1>
-
-                            <!-- Balance Display -->
-                            <div class="balance-display">
-                                <div class="balance-item">
-                                    <span class="balance-label">Balance:</span>
-                                    <span class="balance-value" id="playerBalance">0</span>
-                                    <span class="currency-display">tokens</span>
-                                </div>
-                            </div>
-
-                            <!-- Game Controls -->
-                            <div class="game-controls">
-                                <div class="row">
-                                    <!-- Bet Amount -->
-                                    <div class="col-md-6 mb-3">
-                                        <div class="control-group">
-                                            <label class="control-label">Bet Amount</label>
-                                            <div class="input-group">
-                                                <button class="btn btn-outline-secondary" id="betDown" type="button">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                                <input type="number" class="form-control text-center" id="betAmount" value="1" min="1" max="100">
-                                                <button class="btn btn-outline-secondary" id="betUp" type="button">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Payout Multiplier -->
-                                    <div class="col-md-6 mb-3">
-                                        <div class="control-group">
-                                            <label class="control-label">Payout Multiplier</label>
-                                            <div class="input-group">
-                                                <button class="btn btn-outline-secondary" id="payoutDown" type="button">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                                <input type="number" class="form-control text-center" id="payoutMultiplier" value="2" min="1.01" max="1000" step="0.01">
-                                                <button class="btn btn-outline-secondary" id="payoutUp" type="button">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                            <div class="multiplier-suffix">x</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Win Probability Display -->
-                                <div class="probability-display">
-                                    <div class="probability-item">
-                                        <span class="probability-label">Win Chance:</span>
-                                        <span class="probability-value" id="winChance">49.50%</span>
-                                    </div>
-                                    <div class="probability-item">
-                                        <span class="probability-label">Potential Payout:</span>
-                                        <span class="probability-value" id="potentialPayout">2</span>
-                                        <span class="currency-display">tokens</span>
-                                    </div>
-                                </div>
-
-                                <!-- High/Low Toggle -->
-                                <div class="highlow-controls">
-                                    <div class="highlow-label">
-                                        <span id="rollCondition">Roll UNDER to win</span>
-                                    </div>
-                                    <div class="highlow-threshold">
-                                        <span>Target: </span>
-                                        <span id="rollThreshold">49.50</span>
-                                    </div>
-                                    <button class="btn btn-primary highlow-toggle" id="highlowToggle">
-                                        <i class="fas fa-exchange-alt"></i>
-                                        Switch to HIGH
-                                    </button>
-                                </div>
-
-                                <!-- Roll Button -->
-                                <div class="roll-button-container">
-                                    <button class="btn btn-success btn-lg roll-button" id="rollButton">
-                                        <i class="fas fa-dice"></i>
-                                        ROLL DICE
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Roll Result Display -->
-                            <div class="roll-result" id="rollResult">
-                                <div class="result-number" id="rollValue">0.00</div>
-                                <div class="result-status" id="rollStatus">Ready to roll!</div>
-                                <div class="result-payout" id="rollPayout"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Sidebar - Instructions -->
-                    <div class="col-lg-3 d-none d-lg-block">
-                        <div class="instructions-panel">
-                            <h5 class="stats-title">
-                                <i class="fas fa-info-circle"></i> How to Play
-                            </h5>
+                    
+                    <!-- Game Stats -->
+                    <div class="stats-panel">
+                        <details>
+                            <summary style="cursor: pointer; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; margin-bottom: 10px; font-weight: bold;">
+                                📊 Game Stats ▼
+                            </summary>
                             
-                            <div class="instruction-step">
-                                <div class="step-number">1</div>
-                                <div class="step-text">Choose your bet amount</div>
+                            <div style="padding: 10px; background: rgba(0,0,0,0.02); border-radius: 5px;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Total Rolls:</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; text-align: right;" id="totalRolls">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Total Wagered:</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; text-align: right;" id="totalWagered">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Total Won:</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; text-align: right;" id="totalWon">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px;">Win Rate:</td>
+                                        <td style="padding: 8px; font-weight: bold; text-align: right;" id="winRate">0%</td>
+                                    </tr>
+                                </table>
                             </div>
-                            
-                            <div class="instruction-step">
-                                <div class="step-number">2</div>
-                                <div class="step-text">Set your payout multiplier (higher = riskier but bigger wins)</div>
-                            </div>
-                            
-                            <div class="instruction-step">
-                                <div class="step-number">3</div>
-                                <div class="step-text">Choose HIGH or LOW strategy</div>
-                            </div>
-                            
-                            <div class="instruction-step">
-                                <div class="step-number">4</div>
-                                <div class="step-text">Click ROLL DICE and hope for the best!</div>
-                            </div>
-
-                            <div class="strategy-tip">
-                                <h6><i class="fas fa-lightbulb"></i> Strategy Tips</h6>
-                                <ul>
-                                    <li><strong>2x multiplier</strong> = ~49.5% win chance (safest)</li>
-                                    <li><strong>10x multiplier</strong> = ~9.9% win chance (medium risk)</li>
-                                    <li><strong>100x multiplier</strong> = ~0.99% win chance (high risk)</li>
-                                    <li><strong>1000x multiplier</strong> = ~0.099% win chance (EXTREME!)</li>
-                                    <li>🎯 <strong>99% RTP</strong> - One of the fairest dice games online!</li>
-                                </ul>
-                            </div>
-                        </div>
+                        </details>
                     </div>
                 </div>
             </div>
-
             <!-- Audio Elements -->
             <audio id="rollSound" preload="auto">
                 <source src="sounds/dice-roll.mp3" type="audio/mpeg">

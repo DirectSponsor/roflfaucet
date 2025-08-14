@@ -23,14 +23,13 @@
 
     
     <!-- Site-wide scripts -->
-    <script src="js/flat-file-balance.js"></script>
     <script src="scripts/core/unified-balance.js"></script>
     <script src="scripts/core/site-utils.js"></script>
     <script src="scripts/core/gallery-system-simple.js"></script>
     <script src="scripts/core/jwt-simple.js"></script>
     
-    <!-- Flat-file user data system -->
-    <script>console.log('🔧 Loading flat-file user data system...');</script>
+    <!-- Unified Balance System -->
+    <script>console.log('🔧 Loading unified balance system...');</script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -151,22 +150,6 @@
 
 <!-- include start footer.html -->
     </div>
-    
-    <!-- Audio Elements for Sound Effects -->
-    <audio id="wheelSpinSound" preload="auto">
-        <source src="sounds/wheel-spin.wav" type="audio/wav">
-        <source src="sounds/wheel-spin.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="wheelWinSound" preload="auto">
-        <source src="sounds/win.wav" type="audio/wav">
-        <source src="sounds/win.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="wheelLoseSound" preload="auto">
-        <source src="sounds/lose.wav" type="audio/wav">
-        <source src="sounds/lose.mp3" type="audio/mpeg">
-    </audio>
     
     <!-- Additional page-specific scripts -->
         <script src="scripts/core/insufficient-balance-dialog.js"></script>
