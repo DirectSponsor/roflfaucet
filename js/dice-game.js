@@ -95,7 +95,21 @@ class DiceGame {
     }
     
     setBet(amount) {
-        const bet = Math.max(1, Math.min(100, parseInt(amount) || 1));
+        let bet = Math.max(1, parseInt(amount) || 1);
+        
+        // Validate with levels system - no fallbacks, fail if not available
+        if (!window.levelsSystem) {
+            console.error('🎲 ❌ Levels system not available!');
+            return;
+        }
+        
+        const maxBet = window.levelsSystem.getMaxBet();
+        if (bet > maxBet) {
+            // Show level upgrade modal
+            window.levelsSystem.showInsufficientLevelModal(bet, maxBet);
+            bet = maxBet; // Cap to current max
+        }
+        
         document.getElementById('betAmount').value = bet;
         this.updateProbability();
     }
@@ -263,16 +277,64 @@ class DiceGame {
         resultContainer.className = 'roll-result rolling';
         rollStatus.textContent = 'Rolling...';
         
-        // Animate random numbers
+        // Make the number element more prominent during animation
+        rollValue.style.transform = 'scale(1.2)';
+        rollValue.style.color = '#ffffff';
+        rollValue.style.fontWeight = 'bold';
+        rollValue.style.textShadow = '0 0 15px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 255, 255, 0.6)';
+        rollValue.style.transition = 'all 0.1s ease';
+        
+        // Animate rapidly changing numbers with varying speed
         let animationCount = 0;
-        const maxAnimations = 10;
+        const totalAnimations = 20; // More iterations for better effect
+        let currentSpeed = 50; // Start fast
         
         const animateNumbers = () => {
-            if (animationCount < maxAnimations && this.isRolling) {
+            if (animationCount < totalAnimations && this.isRolling) {
+                // Generate random roll value
                 const randomRoll = (Math.random() * 99.99 + 0.01).toFixed(2);
                 rollValue.textContent = randomRoll;
+                
+                // Add a slight bounce effect every few frames
+                if (animationCount % 3 === 0) {
+                    rollValue.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        if (this.isRolling) {
+                            rollValue.style.transform = 'scale(1.2)';
+                        }
+                    }, 30);
+                }
+                
+                // Gradually slow down the animation
+                currentSpeed = Math.min(200, currentSpeed + (animationCount * 3));
                 animationCount++;
-                setTimeout(animateNumbers, 150);
+                
+                setTimeout(animateNumbers, currentSpeed);
+            } else if (this.isRolling) {
+                // Final dramatic pause before showing result
+                rollValue.style.color = '#666';
+                rollValue.textContent = '???';
+                rollValue.style.transform = 'scale(1.4)';
+                
+                setTimeout(() => {
+                    if (this.isRolling) {
+                        // Flash effect before final result
+                        rollValue.style.color = '#fff';
+                        rollValue.style.background = '#007bff';
+                        rollValue.style.borderRadius = '8px';
+                        rollValue.style.padding = '5px 10px';
+                        
+                        setTimeout(() => {
+                            // Reset styles for final result
+                            rollValue.style.background = '';
+                            rollValue.style.padding = '';
+                            rollValue.style.borderRadius = '';
+                            rollValue.style.transform = 'scale(1)';
+                            rollValue.style.textShadow = '';
+                            rollValue.style.transition = 'all 0.3s ease';
+                        }, 200);
+                    }
+                }, 300);
             }
         };
         
@@ -393,7 +455,7 @@ class DiceGame {
     }
     
     updateRecentRollsDisplay() {
-        const container = document.getElementById('recentRolls');
+        const container = document.getElementById('recentRollsList');
         if (!container) return;
         
         container.innerHTML = this.recentRolls.map(roll => {

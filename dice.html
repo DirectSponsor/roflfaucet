@@ -3,7 +3,7 @@
 <!-- DESC=_Intelligent dice game with dynamic probability calculations and High/Low mechanics_ -->
 <!-- KEYWORDS=_dice, game, gambling, ROFLFaucet, roll, chance, probability, high, low, multiplier_ -->
 <!-- STYLES=_css/dice.css_ -->
-<!-- SCRIPTS=_js/dice-game.js_ -->
+<!-- SCRIPTS=_js/levels-system.js,js/dice-game.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -162,83 +162,72 @@
                     </div>
                 </div>
                 
-                <!-- Collapsible Sections -->
+                <!-- Tab System -->
                 <div style="margin-top: 30px;">
-                    <!-- How to Play -->
-                    <div class="instructions-panel" style="margin-bottom: 15px;">
-                        <details>
-                            <summary style="cursor: pointer; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; margin-bottom: 10px; font-weight: bold;">
-                                📝 How to Play ▼
-                            </summary>
-                            
-                            <div style="padding: 10px; background: rgba(0,0,0,0.02); border-radius: 5px;">
-                                <div style="margin-bottom: 10px;">
-                                    <strong>1.</strong> Choose your bet amount
-                                </div>
-                                <div style="margin-bottom: 10px;">
-                                    <strong>2.</strong> Set your payout multiplier (higher = riskier but bigger wins)
-                                </div>
-                                <div style="margin-bottom: 10px;">
-                                    <strong>3.</strong> Choose HIGH or LOW strategy
-                                </div>
-                                <div style="margin-bottom: 15px;">
-                                    <strong>4.</strong> Click ROLL DICE and hope for the best!
-                                </div>
-
-                                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #2196f3;">
-                                    <h6>💡 Strategy Tips</h6>
-                                    <ul style="margin: 10px 0; padding-left: 20px;">
-                                        <li><strong>2x multiplier</strong> = ~49.5% win chance (safest)</li>
-                                        <li><strong>10x multiplier</strong> = ~9.9% win chance (medium risk)</li>
-                                        <li><strong>100x multiplier</strong> = ~0.99% win chance (high risk)</li>
-                                        <li><strong>1000x multiplier</strong> = ~0.099% win chance (EXTREME!)</li>
-                                        <li>🎯 <strong>99% RTP</strong> - One of the fairest dice games online!</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </details>
+                    <!-- Tab Navigation -->
+                    <div class="tab-nav" style="display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px;">
+                        <button class="tab-btn active" onclick="showTab('howToPlay')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid #007bff; font-weight: bold;">📝 How to Play</button>
+                        <button class="tab-btn" onclick="showTab('recentRolls')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid transparent;">📈 Recent Rolls</button>
+                        <button class="tab-btn" onclick="showTab('gameStats')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid transparent;">📊 Game Stats</button>
                     </div>
                     
-                    <!-- Recent Rolls -->
-                    <div class="recent-rolls-panel" style="margin-bottom: 15px;">
-                        <details>
-                            <summary style="cursor: pointer; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; margin-bottom: 10px; font-weight: bold;">
-                                📈 Recent Rolls ▼
-                            </summary>
-                            <div class="recent-rolls-list" id="recentRolls" style="padding: 10px; background: rgba(0,0,0,0.02); border-radius: 5px; max-height: 300px; overflow-y: auto;">
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- How to Play Tab -->
+                        <div id="howToPlay" class="tab-panel" style="display: block; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 8px; min-height: 300px;">
+                            <div style="margin-bottom: 10px;">
+                                <strong>1.</strong> Choose your bet amount
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>2.</strong> Set your payout multiplier (higher = riskier but bigger wins)
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>3.</strong> Choose HIGH or LOW strategy
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <strong>4.</strong> Click ROLL DICE and hope for the best!
+                            </div>
+
+                            <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #2196f3;">
+                                <h6>💡 Strategy Tips</h6>
+                                <ul style="margin: 10px 0; padding-left: 20px;">
+                                    <li><strong>2x multiplier</strong> = ~49.5% win chance (safest)</li>
+                                    <li><strong>10x multiplier</strong> = ~9.9% win chance (medium risk)</li>
+                                    <li><strong>100x multiplier</strong> = ~0.99% win chance (high risk)</li>
+                                    <li><strong>1000x multiplier</strong> = ~0.099% win chance (EXTREME!)</li>
+                                    <li>🎯 <strong>99% RTP</strong> - One of the fairest dice games online!</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Rolls Tab -->
+                        <div id="recentRolls" class="tab-panel" style="display: none; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 8px; min-height: 300px;">
+                            <div class="recent-rolls-list" id="recentRollsList" style="max-height: 280px; overflow-y: auto;">
                                 <!-- Rolls will be populated here -->
                             </div>
-                        </details>
-                    </div>
-                    
-                    <!-- Game Stats -->
-                    <div class="stats-panel">
-                        <details>
-                            <summary style="cursor: pointer; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; margin-bottom: 10px; font-weight: bold;">
-                                📊 Game Stats ▼
-                            </summary>
-                            
-                            <div style="padding: 10px; background: rgba(0,0,0,0.02); border-radius: 5px;">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <tr>
-                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Total Rolls:</td>
-                                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; text-align: right;" id="totalRolls">0</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Total Wagered:</td>
-                                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; text-align: right;" id="totalWagered">0</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">Total Won:</td>
-                                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; text-align: right;" id="totalWon">0</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px;">Win Rate:</td>
-                                        <td style="padding: 8px; font-weight: bold; text-align: right;" id="winRate">0%</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </details>
+                        </div>
+                        
+                        <!-- Game Stats Tab -->
+                        <div id="gameStats" class="tab-panel" style="display: none; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 8px; min-height: 300px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 2px solid #eee; font-size: 16px;">Total Rolls:</td>
+                                    <td style="padding: 12px; border-bottom: 2px solid #eee; font-weight: bold; text-align: right; font-size: 16px;" id="totalRolls">0</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 2px solid #eee; font-size: 16px;">Total Wagered:</td>
+                                    <td style="padding: 12px; border-bottom: 2px solid #eee; font-weight: bold; text-align: right; font-size: 16px;" id="totalWagered">0</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; border-bottom: 2px solid #eee; font-size: 16px;">Total Won:</td>
+                                    <td style="padding: 12px; border-bottom: 2px solid #eee; font-weight: bold; text-align: right; font-size: 16px;" id="totalWon">0</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; font-size: 16px;">Win Rate:</td>
+                                    <td style="padding: 12px; font-weight: bold; text-align: right; font-size: 16px;" id="winRate">0%</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -259,6 +248,37 @@
             </audio>
 
             <script>
+                // Tab switching function
+                function showTab(tabName) {
+                    // Hide all tab panels
+                    const panels = document.querySelectorAll('.tab-panel');
+                    panels.forEach(panel => {
+                        panel.style.display = 'none';
+                    });
+                    
+                    // Remove active class from all tab buttons
+                    const buttons = document.querySelectorAll('.tab-btn');
+                    buttons.forEach(button => {
+                        button.classList.remove('active');
+                        button.style.borderBottomColor = 'transparent';
+                        button.style.fontWeight = 'normal';
+                    });
+                    
+                    // Show selected tab panel
+                    const selectedPanel = document.getElementById(tabName);
+                    if (selectedPanel) {
+                        selectedPanel.style.display = 'block';
+                    }
+                    
+                    // Add active class to clicked button
+                    const activeButton = event ? event.target : document.querySelector(`[onclick="showTab('${tabName}')"]`);
+                    if (activeButton) {
+                        activeButton.classList.add('active');
+                        activeButton.style.borderBottomColor = '#007bff';
+                        activeButton.style.fontWeight = 'bold';
+                    }
+                }
+                
                 // Initialize dice game when page loads
                 document.addEventListener('DOMContentLoaded', function() {
                     // Initialize dice game
@@ -290,7 +310,8 @@
     </div>
     
     <!-- Additional page-specific scripts -->
-        <script src="js/dice-game.js"></script>
+        <script src="js/levels-system.js"></script>
+    <script src="js/dice-game.js"></script>
 
 </body>
 </html>

@@ -288,18 +288,13 @@
 
 .roll-result.rolling {
     background: linear-gradient(135deg, #ff9800, #f57c00);
-    animation: rollAnimation 1s infinite;
+    /* No rotation - keep container stable */
 }
 
 @keyframes glow {
     0% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
     50% { text-shadow: 0 0 20px #ffeb3b, 2px 2px 4px rgba(0,0,0,0.5); }
     100% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-}
-
-@keyframes rollAnimation {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 /* Sidebar Panels */
