@@ -135,9 +135,9 @@ async function spinWheel() {
 }
 
 // Increase bet function
-function increaseBet() {
+async function increaseBet() {
     if (wheelAnimation) {
-        wheelAnimation.increaseBet();
+        await wheelAnimation.increaseBet();
     }
 }
 
@@ -280,10 +280,16 @@ class WheelAnimation {
         }
     }
 
-    increaseBet() {
-        if (this.currentBet < 10) {
+    async increaseBet() {
+        // Check level-based betting limit
+        const maxBet = await getUserBettingLimit();
+        
+        if (this.currentBet < maxBet) {
             this.currentBet += 1;
             this.updateBetDisplay();
+        } else {
+            // Show level restriction modal
+            showLevelUpgradeModal(maxBet, this.currentBet + 1);
         }
     }
 

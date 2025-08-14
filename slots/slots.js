@@ -959,6 +959,15 @@ function decreaseBet() {
 
 function increaseBet() {
     if (slotMachine && !slotMachine.isSpinning) {
+        const newBet = slotMachine.currentBet + 1;
+        
+        // Check levels system first if available
+        if (window.levelsSystem) {
+            if (!window.levelsSystem.validateBet(newBet, 'slots')) {
+                return; // Level system will show appropriate modal
+            }
+        }
+        
         const maxBet = Math.min(10, slotMachine.credits); // Max bet is 10 or current credits
         if (slotMachine.currentBet < maxBet) {
             slotMachine.currentBet++;

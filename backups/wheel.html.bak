@@ -3,7 +3,7 @@
 <!-- DESC=_Spin the Wheel of Wealth and win UselessCoins on ROFLFaucet_ -->
 <!-- KEYWORDS=_wheel, fortune, casino, faucet, coins, gambling, game_ -->
 <!-- STYLES=_wheel/wheel-minimal.css_ -->
-<!-- SCRIPTS=_scripts/core/insufficient-balance-dialog.js,wheel/wheel-minimal.js_ -->
+<!-- SCRIPTS=_js/levels-system.js,scripts/core/insufficient-balance-dialog.js,wheel/wheel-minimal.js_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
