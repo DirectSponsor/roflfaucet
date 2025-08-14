@@ -8,7 +8,7 @@ class DiceGame {
         // Game state
         this.isRolling = false;
         this.isLowMode = true; // true = roll under to win, false = roll over to win
-        this.houseEdge = 0.5; // 0.5% house edge (very fair)
+        this.houseEdge = 1.0; // 1% house edge (99% RTP - competitive for dice games)
         
         // Game statistics
         this.gameStats = {
@@ -105,14 +105,14 @@ class DiceGame {
         if (!payoutInput) return;
         
         const currentPayout = parseFloat(payoutInput.value) || 2;
-        const newPayout = Math.max(1.01, Math.min(100, currentPayout + delta));
+        const newPayout = Math.max(1.01, Math.min(1000, currentPayout + delta));
         
         payoutInput.value = newPayout.toFixed(2);
         this.setPayout(newPayout);
     }
     
     setPayout(amount) {
-        const payout = Math.max(1.01, Math.min(100, parseFloat(amount) || 2));
+        const payout = Math.max(1.01, Math.min(1000, parseFloat(amount) || 2));
         document.getElementById('payoutMultiplier').value = payout.toFixed(2);
         this.updateProbability();
     }
