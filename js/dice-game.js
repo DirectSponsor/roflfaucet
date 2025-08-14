@@ -71,15 +71,15 @@ class DiceGame {
         // Roll button
         document.getElementById('rollButton')?.addEventListener('click', () => this.roll());
         
-        // Balance updates
+        // Set up periodic balance updates
         if (this.balanceSystem) {
-            this.balanceSystem.onBalanceUpdate((balance) => {
-                this.updateBalanceDisplay(balance);
-            });
+            // Initial setup
+            this.refreshBalance();
             
-            this.balanceSystem.onLoginStatusChange((isLoggedIn) => {
-                this.updateCurrencyDisplay(isLoggedIn);
-            });
+            // Update balance every 5 seconds or when bet amount changes
+            this.balanceUpdateInterval = setInterval(() => {
+                this.refreshBalance();
+            }, 5000);
         }
     }
     
@@ -403,14 +403,25 @@ class DiceGame {
         });
     }
     
-    updateDisplay() {
-        // Update balance and currency
-        if (this.balanceSystem) {
-            const balance = this.balanceSystem.getBalance();
-            const isLoggedIn = this.balanceSystem.isLoggedIn();
+    async refreshBalance() {
+        if (!this.balanceSystem) return;
+        
+        try {
+            const balance = await this.balanceSystem.getBalance();
+            const isLoggedIn = this.balanceSystem.isLoggedIn;
             
             this.updateBalanceDisplay(balance);
             this.updateCurrencyDisplay(isLoggedIn);
+            console.log(`🎲 Balance refreshed: ${balance} ${isLoggedIn ? 'coins' : 'tokens'}`);
+        } catch (error) {
+            console.error('Error refreshing balance:', error);
+        }
+    }
+    
+    updateDisplay() {
+        // Update balance and currency
+        if (this.balanceSystem) {
+            this.refreshBalance();
         }
         
         // Update stats
