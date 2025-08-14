@@ -11,16 +11,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roll of Chance - ROFLFaucet</title>
+    <title>#TITLE#</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="Intelligent dice game with dynamic probability calculations and High/Low mechanics">
+    <meta name="description" content="#DESC#">
     
     <!-- Base Layout CSS -->
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="css/dice.css">
-
+    #STYLES#
     
     <!-- Site-wide scripts -->
     <script src="scripts/core/unified-balance.js"></script>
@@ -316,10 +315,7 @@
     </div>
     
     <!-- Additional page-specific scripts -->
-        <script src="js/jwt-simple.js"></script>
-    <script src="scripts/core/unified-balance.js"></script>
-    <script src="js/dice-game.js"></script>
-
+    #SCRIPTS#
 </body>
 </html>
 <!-- include end footer.html -->
