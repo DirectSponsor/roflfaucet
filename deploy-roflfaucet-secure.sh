@@ -244,10 +244,15 @@ chown www-data:www-data /var/www/html/config.php
 echo "📁 Copying directories to web root..."
 cp -rf /root/roflfaucet/scripts /var/www/html/ 2>/dev/null || echo "Scripts directory copied"
 cp -rf /root/roflfaucet/styles /var/www/html/ 2>/dev/null || echo "Styles directory copied"
+cp -rf /root/roflfaucet/css /var/www/html/ 2>/dev/null || echo "CSS directory copied"
 cp -rf /root/roflfaucet/slots /var/www/html/ 2>/dev/null || echo "Slots directory copied"
 cp -rf /root/roflfaucet/wheel /var/www/html/ 2>/dev/null || echo "Wheel directory copied"
 cp -rf /root/roflfaucet/components /var/www/html/ 2>/dev/null || echo "Components directory copied"
 cp -rf /root/roflfaucet/user-data /var/www/html/ 2>/dev/null || echo "User-data directory copied"
+cp -rf /root/roflfaucet/userdata /var/www/html/ 2>/dev/null || echo "Userdata directory copied"
+cp -rf /root/roflfaucet/api /var/www/html/ 2>/dev/null || echo "API directory copied"
+cp -rf /root/roflfaucet/js /var/www/html/ 2>/dev/null || echo "JS directory copied"
+cp -rf /root/roflfaucet/sounds /var/www/html/ 2>/dev/null || echo "Sounds directory copied"
 
 echo "🔐 Setting web directory permissions..."
 chown -R www-data:www-data /var/www/html
