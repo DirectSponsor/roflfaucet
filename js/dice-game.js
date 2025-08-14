@@ -166,28 +166,52 @@ class DiceGame {
     }
     
     
-    updateRollButton() {
+    async updateRollButton() {
         const rollButton = document.getElementById('rollButton');
         const betAmount = parseInt(document.getElementById('betAmount')?.value) || 1;
         
-        if (!rollButton) return;
+        if (!rollButton) {
+            console.log('🎲 ❌ Roll button not found');
+            return;
+        }
         
         if (this.isRolling) {
+            console.log('🎲 🎯 Button disabled: Rolling in progress');
             rollButton.disabled = true;
             rollButton.innerHTML = '<div class="spinner"></div> ROLLING...';
             rollButton.classList.add('rolling');
         } else {
-            const currentBalance = this.balanceSystem ? this.balanceSystem.getBalance() : 0;
+            // Get balance - handle async properly
+            let currentBalance = 0;
+            if (this.balanceSystem) {
+                try {
+                    if (typeof this.balanceSystem.getBalance === 'function') {
+                        const balanceResult = this.balanceSystem.getBalance();
+                        // Handle both sync and async balance results
+                        currentBalance = await Promise.resolve(balanceResult);
+                    }
+                } catch (error) {
+                    console.error('🎲 ❌ Error getting balance for button:', error);
+                    currentBalance = 0;
+                }
+            }
+            
             const canAffordBet = currentBalance >= betAmount;
+            
+            console.log(`🎲 🎯 Button update: Balance=${currentBalance}, Bet=${betAmount}, CanAfford=${canAffordBet}`);
             
             rollButton.disabled = !canAffordBet;
             rollButton.innerHTML = '<i class="fas fa-dice"></i> ROLL DICE';
             rollButton.classList.remove('rolling');
             
             if (!canAffordBet) {
-                rollButton.title = 'Insufficient balance';
+                rollButton.title = `Insufficient balance (need ${betAmount}, have ${currentBalance})`;
+                rollButton.classList.add('insufficient-balance');
+                console.log(`🎲 ❌ Button disabled: Insufficient balance (need ${betAmount}, have ${currentBalance})`);
             } else {
                 rollButton.title = '';
+                rollButton.classList.remove('insufficient-balance');
+                console.log(`🎲 ✅ Button enabled: Sufficient balance (need ${betAmount}, have ${currentBalance})`);
             }
         }
     }
