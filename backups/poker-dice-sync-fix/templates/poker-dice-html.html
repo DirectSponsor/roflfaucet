@@ -1,0 +1,206 @@
+<!-- 5 Poker Dice 3D Animation Structure -->
+<div class="dice-container" id="diceContainer">
+    <!-- Die 1 -->
+    <div class="die-container">
+        <div class="die" id="die1">
+            <div class="die-face face-9" data-value="9">
+                <span class="value value-9">9</span>
+            </div>
+            <div class="die-face face-10" data-value="10">
+                <span class="value value-10">10</span>
+            </div>
+            <div class="die-face face-jack" data-value="J">
+                <span class="value value-jack">J</span>
+            </div>
+            <div class="die-face face-queen" data-value="Q">
+                <span class="value value-queen">Q</span>
+            </div>
+            <div class="die-face face-king" data-value="K">
+                <span class="value value-king">K</span>
+            </div>
+            <div class="die-face face-ace" data-value="A">
+                <span class="value value-ace">A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Die 2 -->
+    <div class="die-container">
+        <div class="die" id="die2">
+            <div class="die-face face-9" data-value="9">
+                <span class="value value-9">9</span>
+            </div>
+            <div class="die-face face-10" data-value="10">
+                <span class="value value-10">10</span>
+            </div>
+            <div class="die-face face-jack" data-value="J">
+                <span class="value value-jack">J</span>
+            </div>
+            <div class="die-face face-queen" data-value="Q">
+                <span class="value value-queen">Q</span>
+            </div>
+            <div class="die-face face-king" data-value="K">
+                <span class="value value-king">K</span>
+            </div>
+            <div class="die-face face-ace" data-value="A">
+                <span class="value value-ace">A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Die 3 -->
+    <div class="die-container">
+        <div class="die" id="die3">
+            <div class="die-face face-9" data-value="9">
+                <span class="value value-9">9</span>
+            </div>
+            <div class="die-face face-10" data-value="10">
+                <span class="value value-10">10</span>
+            </div>
+            <div class="die-face face-jack" data-value="J">
+                <span class="value value-jack">J</span>
+            </div>
+            <div class="die-face face-queen" data-value="Q">
+                <span class="value value-queen">Q</span>
+            </div>
+            <div class="die-face face-king" data-value="K">
+                <span class="value value-king">K</span>
+            </div>
+            <div class="die-face face-ace" data-value="A">
+                <span class="value value-ace">A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Die 4 -->
+    <div class="die-container">
+        <div class="die" id="die4">
+            <div class="die-face face-9" data-value="9">
+                <span class="value value-9">9</span>
+            </div>
+            <div class="die-face face-10" data-value="10">
+                <span class="value value-10">10</span>
+            </div>
+            <div class="die-face face-jack" data-value="J">
+                <span class="value value-jack">J</span>
+            </div>
+            <div class="die-face face-queen" data-value="Q">
+                <span class="value value-queen">Q</span>
+            </div>
+            <div class="die-face face-king" data-value="K">
+                <span class="value value-king">K</span>
+            </div>
+            <div class="die-face face-ace" data-value="A">
+                <span class="value value-ace">A</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Die 5 -->
+    <div class="die-container">
+        <div class="die" id="die5">
+            <div class="die-face face-9" data-value="9">
+                <span class="value value-9">9</span>
+            </div>
+            <div class="die-face face-10" data-value="10">
+                <span class="value value-10">10</span>
+            </div>
+            <div class="die-face face-jack" data-value="J">
+                <span class="value value-jack">J</span>
+            </div>
+            <div class="die-face face-queen" data-value="Q">
+                <span class="value value-queen">Q</span>
+            </div>
+            <div class="die-face face-king" data-value="K">
+                <span class="value value-king">K</span>
+            </div>
+            <div class="die-face face-ace" data-value="A">
+                <span class="value value-ace">A</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Hand Display -->
+<div class="current-hand" id="currentHand" style="display: none;">
+    <div class="hand-name" id="handName">Ready to Roll</div>
+    <div class="hand-payout" id="handPayout">Place your bet and roll!</div>
+</div>
+
+<!-- Hand Rankings Table -->
+<div class="hand-rankings">
+    <h3>🏆 Hand Rankings & Payouts</h3>
+    <table class="rankings-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Hand</th>
+                <th>Payout</th>
+                <th>Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="hand-rank">1st</td>
+                <td>Five of a Kind</td>
+                <td class="payout">400:1</td>
+                <td>K-K-K-K-K</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">2nd</td>
+                <td>Royal Flush</td>
+                <td class="payout">150:1</td>
+                <td>10-J-Q-K-A (same color)</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">3rd</td>
+                <td>Four of a Kind</td>
+                <td class="payout">20:1</td>
+                <td>A-A-A-A-9</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">4th</td>
+                <td>Full House</td>
+                <td class="payout">10:1</td>
+                <td>Q-Q-Q-10-10</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">5th</td>
+                <td>Straight</td>
+                <td class="payout">15:1</td>
+                <td>9-10-J-Q-K or 10-J-Q-K-A</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">6th</td>
+                <td>Flush</td>
+                <td class="payout">6:1</td>
+                <td>All same color</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">7th</td>
+                <td>Three of a Kind</td>
+                <td class="payout">3:1</td>
+                <td>J-J-J-A-10</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">8th</td>
+                <td>Two Pair</td>
+                <td class="payout">2:1</td>
+                <td>K-K-9-9-Q</td>
+            </tr>
+            <tr>
+                <td class="hand-rank">9th</td>
+                <td>One Pair</td>
+                <td class="payout">1:1</td>
+                <td>A-A-J-10-9</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Roll Button (replaces the existing one) -->
+<div style="text-align: center; margin: 20px 0;">
+    <button class="btn btn-success btn-lg roll-button" id="pokerDiceRollButton">
+        🎲 ROLL POKER DICE
+    </button>
+</div>

@@ -1,0 +1,854 @@
+/* CSS Styles for Sliding Symbol Slot Machine */
+
+/* Reels Container - Responsive */
+.sprite-reels-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--reel-gap, 15px); /* Responsive gap - smaller default */
+    background: #1a1a1a;
+    padding: var(--container-padding, 15px);
+    border-radius: 10px;
+    border: 2px solid #333;
+    width: fit-content; /* Dynamically fit content */
+    max-width: 100%;
+    margin: 2px auto;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Individual Reel - Fixed 120px dimensions */
+.reel {
+    width: 120px; /* Fixed width - 120px */
+    height: 360px; /* Fixed height (3 symbols × 120px) */
+    overflow: hidden; /* CRITICAL: Hide symbols outside the window */
+    background: #333;
+    border-radius: 3px;
+    position: relative;
+    border: 2px solid #222;
+    
+/* Sprite background setup - 120px sprite with fixed sizing */
+    background-image: url('images/sprite_reel_vertical_120px.png');
+    background-size: 120px 1200px;
+    background-repeat: repeat-y;
+    background-position: 0 0;
+}
+
+/* Depth shading overlay - creates illusion of deep reel cylinder */
+.reel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+    
+    /* Gradient shadows to simulate depth - darker at edges, transparent in center */
+    background: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.3) 15%,
+        rgba(0, 0, 0, 0.08) 30%,
+        rgba(0, 0, 0, 0) 40%,
+        rgba(0, 0, 0, 0) 60%,
+        rgba(0, 0, 0, 0.08) 70%,
+        rgba(0, 0, 0, 0.3) 85%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    
+    /* Additional side shading for cylindrical depth */
+    box-shadow: 
+        inset 8px 0 12px -8px rgba(0, 0, 0, 0.4),
+        inset -8px 0 12px -8px rgba(0, 0, 0, 0.4);
+}
+
+/* Spinning animation - CSS animation for smooth looping */
+/* Different speeds for each reel to prevent synchronization */
+.reel.spinning {
+    animation: spinReel 0.5s linear infinite;
+}
+
+/* Reel 1 - Fastest speed */
+#reel-1.spinning {
+    animation: spinReel1 0.5s linear infinite;
+}
+
+/* Reel 2 - Medium speed */
+#reel-2.spinning {
+    animation: spinReel2 0.55s linear infinite;
+}
+
+/* Reel 3 - Slowest speed */
+#reel-3.spinning {
+    animation: spinReel3 0.6s linear infinite;
+}
+
+@keyframes spinReel {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1200px; }
+}
+
+@keyframes spinReel1 {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1200px; }
+}
+
+@keyframes spinReel2 {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1200px; }
+}
+
+@keyframes spinReel3 {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -1200px; }
+}
+
+/* Non-spinning reels - smooth transition to final position */
+.reel:not(.spinning) {
+    transition: background-position 0.3s ease-out;
+}
+
+/* Video Reels Container - Natural Video Size */
+.video-reels-container {
+    display: flex;
+    width: fit-content;
+    margin: 0 auto;
+    background: transparent;
+    position: relative; /* For absolute positioning of overlay */
+}
+
+/* Individual Video Reel - Natural Width */
+.video-reel {
+    width: auto;
+    height: auto;
+    overflow: visible;
+}
+
+/* Video Elements - Natural Size */
+.video-reel video {
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* Glass Overlay with Realistic 3D Effect */
+.slot-glass-overlay {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 120px; /* One symbol height */
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 10;
+    
+    /* Glass effect with subtle 3D shading */
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.08) 20%,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(255, 255, 255, 0.08) 80%,
+        rgba(255, 255, 255, 0.15) 100%
+    );
+    
+    /* More visible glass borders */
+    border-top: 2px solid rgba(255, 255, 255, 0.6);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(255, 255, 255, 0.4),
+        0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* More visible center reference line */
+.center-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.4);
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+    z-index: 11;
+    pointer-events: none;
+}
+
+/* Separators Between Reels - Thin Green Lines */
+.reel-separator {
+    width: 2px;
+    height: 388px;
+    background: #2d5a2d;
+}
+
+/* Faucet Progress Indicator - Fills the gap between reels and control panel */
+.faucet-progress-indicator {
+    width: var(--reels-container-width, 394px); /* Match reels container width */
+    height: 6px;
+    background: #8B0000; /* Dark red background */
+    border-radius: 3px;
+    margin: 0 auto; /* Zero margin for seamless integration */
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        inset 0 1px 2px rgba(0, 0, 0, 0.3),
+        0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid #5a0000;
+    display: block;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, 
+        #00ff00 0%,
+        #32cd32 50%,
+        #00ff00 100%
+    );
+    border-radius: 2px;
+    transition: width 1s ease-out;
+    position: relative;
+    box-shadow: 
+        0 0 4px rgba(0, 255, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+
+/* Control Panel - HTML Table Layout - Responsive */
+.control-panel {
+    background: #2c3e50;
+    color: white;
+    border-radius: 8px;
+    margin: 0 auto; /* Center like the reels container */
+    width: fit-content; /* Let table size naturally */
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: var(--container-padding, 10px);
+}
+
+.control-table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    table-layout: auto; /* Let columns size naturally */
+    display: table;
+}
+
+.control-table tr {
+    display: table-row;
+    height: 100%; /* Single row takes full height */
+}
+
+.control-table td {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    padding: 4px 6px; /* Reduced horizontal padding from 8px to 6px */
+    border: none;
+    border-right: 2px solid #304357; /* Reduced separator from 4px to 2px */
+    background: #1a1a1a; /* Match reels container background */
+}
+
+/* Remove right border from last cell */
+.control-table td:last-child {
+    border-right: none;
+}
+
+/* Let table cells size naturally to their content - no artificial constraints */
+
+/* Action row styling - second row in control table */
+.action-row {
+    border-top: 2px solid #304357; /* Separator line above action buttons */
+}
+
+.action-cell {
+    padding: 8px 4px !important; /* More padding for buttons */
+    vertical-align: middle;
+    border-right: 2px solid #304357;
+}
+
+.action-cell:last-child {
+    border-right: none;
+}
+
+/* Style buttons in action cells */
+.action-cell .flip-button,
+.action-cell .faucet-countdown-btn {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    font-size: 0.9rem;
+    padding: 0 10px;
+}
+
+/* Flip button specific styling */
+.flip-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flip-button:hover {
+    background: #2980b9;
+}
+
+.faucet-countdown-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.faucet-countdown-btn:hover:not(:disabled) {
+    background: #229954;
+}
+
+.faucet-countdown-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+.spin-cell {
+    vertical-align: middle;
+}
+
+.spin-cell .spin-button {
+    height: 56px;
+    min-width: 80px; /* Much smaller minimum width for better flexibility */
+    width: 100%; /* Fill available cell width */
+    max-width: 140px; /* But don't get too wide */
+    margin: 0 auto;
+}
+
+/* BET cell - right aligned to get close to arrows */
+.bet-cell {
+    text-align: right !important;
+    padding-right: 4px !important;
+}
+
+/* Narrow arrow cell styling - left aligned */
+.narrow-arrow-cell {
+    width: 60px !important;
+    padding: 2px;
+    text-align: left !important;
+    padding-left: 4px !important;
+}
+
+.narrow-arrow-cell .bet-btn-inline {
+    width: 32px;
+    height: 26px;
+    margin: -.5em 0; /* Negative margin to overlap and reduce overall height */
+    font-size: 0.9rem;
+}
+
+.control-label {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #ecf0f1;
+    margin: 0;
+    line-height: 1;
+}
+
+.control-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #f1c40f;
+    transition: all 0.3s ease;
+    margin: 0;
+    line-height: 1;
+    min-height: 56px; /* Match the spin button height */
+}
+
+/* Winning number animation */
+.control-value.winning {
+    font-size: 2rem;
+    color: #2ecc71;
+    text-shadow: 0 0 10px #2ecc71;
+    animation: winPulse 0.6s ease-in-out;
+}
+
+@keyframes winPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Credit counter animation */
+.control-value.counting {
+    color: #f39c12;
+    text-shadow: 0 0 5px #f39c12;
+    animation: countUp 0.1s ease-in-out;
+}
+
+@keyframes countUp {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Spin Button */
+.spin-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0 25px; /* Remove vertical padding, use height instead */
+    height: 56px; /* Almost full height of control panel (60px - 4px clearance) */
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spin-button:hover {
+    background: #c0392b;
+}
+
+.spin-button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* Bet Label and Controls - Inline Layout */
+.bet-label-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.bet-arrows {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.bet-btn-inline {
+    background: #3498db;
+    color: white;
+    border: none;
+    width: 20px;
+    height: 16px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 0.6rem;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.bet-btn-inline:hover {
+    background: #2980b9;
+}
+
+/* Bet Table Buttons - for 2-row layout */
+.bet-btn-table {
+    background: #3498db;
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.bet-btn-table:hover {
+    background: #2980b9;
+}
+
+/* Action Buttons Row */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.action-buttons .flip-button,
+.action-buttons .claim-button {
+    flex: 1;
+    max-width: 200px;
+    min-width: 120px;
+}
+
+/* Slot Machine Container - Full width with centered content */
+.slot-machine-container {
+    width: 100%; /* Fill the full width of the center column */
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the slot machine content within the full-width container */
+}
+
+/* Win animation effects */
+.win-animation {
+    animation: winPulseEnhanced 1.5s ease-out;
+    color: #ffaa00 !important;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes winPulseEnhanced {
+    0% {
+        transform: scale(1);
+        color: #ffaa00;
+    }
+    25% {
+        transform: scale(1.3);
+        color: #ffdd00;
+    }
+    50% {
+        transform: scale(1.1);
+        color: #ffff00;
+    }
+    75% {
+        transform: scale(1.2);
+        color: #ffcc00;
+    }
+    100% {
+        transform: scale(1);
+        color: #ffaa00;
+    }
+}
+
+/* Coin drop effects */
+.coin-effect {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    font-size: 20px;
+    animation: coinFall 1s ease-in forwards;
+}
+
+@keyframes coinFall {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Enhanced number display for better visibility */
+#last-win {
+    font-size: 2em;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s ease;
+}
+
+/* Pulse effect for balance updates */
+.balance-update {
+    animation: balancePulse 0.8s ease-out;
+}
+
+@keyframes balancePulse {
+    0% {
+        transform: scale(1);
+        color: inherit;
+    }
+    50% {
+        transform: scale(1.1);
+        color: #00ff00;
+    }
+    100% {
+        transform: scale(1);
+        color: inherit;
+    }
+}
+
+
+/* Claim Section - Horizontal Layout */
+.claim-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+/* Credits Display in Claim Section - Single Line */
+.credits-display {
+    display: flex;
+    align-items: center;
+    min-width: 120px;
+}
+
+.credits-display .control-label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ecf0f1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.credits-display .control-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #f1c40f;
+    text-shadow: 0 0 5px rgba(241, 196, 15, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* Claim Button */
+.claim-button {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+}
+
+.claim-button:hover:not(:disabled) {
+    background: #229954;
+}
+
+.claim-button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* Hide win overlay for now */
+.win-overlay {
+    display: none;
+}
+
+/* Enable flip button */
+.flip-button {
+    display: block;
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+/* Slot Machine Toggle Animation */
+.slot-machine {
+    position: relative;
+}
+
+.machine-front,
+.machine-back {
+    position: relative;
+    transition: opacity 0.3s ease;
+}
+
+.machine-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* When flipped, hide front and show back */
+.slot-machine.flipped .machine-front {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.slot-machine.flipped .machine-back {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Prize Display Container - Match sprite-reels-container exactly */
+.prize-display-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Same gap as sprite reels */
+    background: #1a1a1a; /* Same background */
+    padding: 20px; /* Same padding */
+    border-radius: 10px; /* Same border radius */
+    border: 2px solid #333; /* Same border */
+    width: 100%; /* Same width behavior - now fully responsive */
+    max-width: 534px; /* Same max width */
+    margin: 2px auto; /* Same margin */
+    box-sizing: border-box; /* Same box sizing */
+    position: relative; /* Same position */
+    /* Override flex direction to column for table layout */
+    flex-direction: column;
+}
+
+/* Prize Table Styles */
+.prize-table {
+    width: 100%;
+    background: #2c3e50;
+    color: white;
+    border-radius: 10px;
+    border-collapse: collapse;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.prize-table thead {
+    background: #34495e;
+}
+
+.prize-table th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: bold;
+    color: #ecf0f1;
+    font-size: 0.9rem;
+    border: none;
+}
+
+.prize-table tbody tr {
+    border-bottom: 1px solid #34495e;
+    transition: background-color 0.2s ease;
+}
+
+.prize-table tbody tr:hover {
+    background: rgba(52, 73, 94, 0.5);
+}
+
+.prize-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.prize-table td {
+    text-align: center;
+    border: none;
+}
+
+/* Prize Cell - Each winning combination cell */
+.prize-table .prize-cell {
+    padding: 10px;
+    vertical-align: middle;
+    width: 50%; /* Equal width columns */
+}
+
+/* Prize Images Container */
+.prize-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 5px;
+}
+
+/* Prize Symbol Images - All symbols use same styling */
+.prize-symbol {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px;
+}
+
+.prize-image {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.prize-label {
+    font-weight: bold;
+    color: #ecf0f1;
+    font-size: 0.9rem;
+}
+
+.prize-combo {
+    font-size: 1.2rem;
+    line-height: 1;
+    letter-spacing: 2px;
+}
+
+.prize-payout {
+    font-weight: bold;
+    color: #f1c40f;
+    font-size: 0.95rem;
+}
+
+/* Empty symbol styling for Bar-Bigwin combo */
+.empty-symbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #bdc3c7;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed #7f8c8d;
+    border-radius: 3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Flip Button Styles */
+.flip-button {
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.flip-button:hover {
+    background: #e67e22;
+}
+
+.flip-button:active {
+    transform: scale(0.98);
+}
+
+/* Desktop and tablet optimized - no mobile scaling */
+
+/* Let JavaScript handle all responsive reel sizing to avoid conflicts */

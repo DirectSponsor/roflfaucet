@@ -1,0 +1,520 @@
+<!-- Poker Dice - 5-die poker game with 3D animated dice -->
+<!-- TITLE=_Poker Dice - ROFLFaucet_ -->
+<!-- DESC=_5-die poker game with 3D animated dice showing poker hands like Royal Flush, Full House, and more_ -->
+<!-- KEYWORDS=_poker, dice, game, gambling, ROFLFaucet, 3D, animation, royal flush, full house_ -->
+<!-- STYLES=_css/dice.css,css/poker-dice.css_ -->
+<!-- SCRIPTS=_js/levels-system.js,js/poker-dice-game.js_ -->
+
+<!-- include start header.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Dice - ROFLFaucet</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
+    <meta name="description" content="5-die poker game with 3D animated dice showing poker hands like Royal Flush, Full House, and more">
+    
+    <!-- Base Layout CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <!-- Additional page-specific styles -->
+        <link rel="stylesheet" href="css/dice.css">
+        <link rel="stylesheet" href="css/poker-dice.css">
+
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
+    <script src="scripts/core/jwt-simple.js"></script>
+    
+    <!-- Unified Balance System -->
+    <script>console.log('🔧 Loading unified balance system...');</script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🤣 roflfaucet</h1>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Faucet</a>
+                
+                <!-- Games Dropdown -->
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Games ▼</a>
+                    <div class="dropdown-menu">
+                        <a href="slots.html" class="dropdown-item">🎰 Slots</a>
+                        <a href="dice.html" class="dropdown-item">🎲 Roll of Chance</a>
+                        <a href="poker-dice.html" class="dropdown-item">🃏 Poker Dice</a>
+                        <a href="wheel.html" class="dropdown-item">🎡 Wheel of Wealth</a>
+                    </div>
+                </div>
+                
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="header-auth">
+                <button id="login-btn" class="header-auth-btn">Login</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+<!-- include end header.html -->
+
+<!-- include start left-sidebar.html -->
+        <aside class="left-sidebar">
+            <!-- A-Ads placeholder - no min-width constraint for testing -->
+            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
+                <div>
+                    A-Ads Placeholder<br>
+                    300x250px<br>
+                    (scales to fit)
+                </div>
+            </div>
+        </aside>
+<!-- include end left-sidebar.html -->
+
+        <main class="main-content">
+<!-- UNIQUE PAGE CONTENT GOES HERE -->
+            <div class="content-container">
+                <div class="game-container">
+                    <h1 class="game-title">🃏 Poker Dice</h1>
+                    <p style="text-align: center; color: white; margin-bottom: 2rem; font-size: 1.1em;">
+                        Roll 5 poker dice and make the best hand! From pairs to royal flushes, every roll could be a winner!
+                    </p>
+                    
+                    <!-- Balance Display -->
+                    <div class="balance-display">
+                        <div class="balance-item">
+                            <span class="balance-label">Balance:</span>
+                            <span class="balance-value" id="playerBalance">0</span>
+                            <span class="currency-display">tokens</span>
+                        </div>
+                        <!-- Faucet Countdown Button -->
+                        <div class="balance-faucet" style="margin-top: 10px; text-align: center;">
+                            <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                <span class="btn-text">Faucet: Loading...</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Betting Panel (Simplified for Poker Dice) -->
+                    <div style="padding: 20px; background: rgba(0,0,0,0.05); border-radius: 8px; margin: 20px 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px; text-align: right; font-weight: bold; color: white;">Bet Amount:</td>
+                                <td style="padding: 8px;">
+                                    <button id="betDown" type="button" style="padding: 4px 8px; margin-right: 5px;">-</button>
+                                    <input type="number" id="betAmount" value="1" min="1" max="100" style="width: 80px; text-align: center;">
+                                    <button id="betUp" type="button" style="padding: 4px 8px; margin-left: 5px;">+</button>
+                                </td>
+                                <td style="padding: 8px; text-align: right; font-weight: bold; color: white;">Game Type:</td>
+                                <td style="padding: 8px; color: #28a745; font-weight: bold;">Fixed Payouts</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- 5 Poker Dice 3D Animation -->
+                    <div class="dice-container" id="diceContainer">
+                        <!-- Die 1 -->
+                        <div class="die-container">
+                            <div class="die" id="die1">
+                                <div class="die-face face-9" data-value="9">
+                                    <span class="value value-9">9</span>
+                                </div>
+                                <div class="die-face face-10" data-value="10">
+                                    <span class="value value-10">10</span>
+                                </div>
+                                <div class="die-face face-jack" data-value="J">
+                                    <span class="value value-jack">J</span>
+                                </div>
+                                <div class="die-face face-queen" data-value="Q">
+                                    <span class="value value-queen">Q</span>
+                                </div>
+                                <div class="die-face face-king" data-value="K">
+                                    <span class="value value-king">K</span>
+                                </div>
+                                <div class="die-face face-ace" data-value="A">
+                                    <span class="value value-ace">A</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Die 2 -->
+                        <div class="die-container">
+                            <div class="die" id="die2">
+                                <div class="die-face face-9" data-value="9">
+                                    <span class="value value-9">9</span>
+                                </div>
+                                <div class="die-face face-10" data-value="10">
+                                    <span class="value value-10">10</span>
+                                </div>
+                                <div class="die-face face-jack" data-value="J">
+                                    <span class="value value-jack">J</span>
+                                </div>
+                                <div class="die-face face-queen" data-value="Q">
+                                    <span class="value value-queen">Q</span>
+                                </div>
+                                <div class="die-face face-king" data-value="K">
+                                    <span class="value value-king">K</span>
+                                </div>
+                                <div class="die-face face-ace" data-value="A">
+                                    <span class="value value-ace">A</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Die 3 -->
+                        <div class="die-container">
+                            <div class="die" id="die3">
+                                <div class="die-face face-9" data-value="9">
+                                    <span class="value value-9">9</span>
+                                </div>
+                                <div class="die-face face-10" data-value="10">
+                                    <span class="value value-10">10</span>
+                                </div>
+                                <div class="die-face face-jack" data-value="J">
+                                    <span class="value value-jack">J</span>
+                                </div>
+                                <div class="die-face face-queen" data-value="Q">
+                                    <span class="value value-queen">Q</span>
+                                </div>
+                                <div class="die-face face-king" data-value="K">
+                                    <span class="value value-king">K</span>
+                                </div>
+                                <div class="die-face face-ace" data-value="A">
+                                    <span class="value value-ace">A</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Die 4 -->
+                        <div class="die-container">
+                            <div class="die" id="die4">
+                                <div class="die-face face-9" data-value="9">
+                                    <span class="value value-9">9</span>
+                                </div>
+                                <div class="die-face face-10" data-value="10">
+                                    <span class="value value-10">10</span>
+                                </div>
+                                <div class="die-face face-jack" data-value="J">
+                                    <span class="value value-jack">J</span>
+                                </div>
+                                <div class="die-face face-queen" data-value="Q">
+                                    <span class="value value-queen">Q</span>
+                                </div>
+                                <div class="die-face face-king" data-value="K">
+                                    <span class="value value-king">K</span>
+                                </div>
+                                <div class="die-face face-ace" data-value="A">
+                                    <span class="value value-ace">A</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Die 5 -->
+                        <div class="die-container">
+                            <div class="die" id="die5">
+                                <div class="die-face face-9" data-value="9">
+                                    <span class="value value-9">9</span>
+                                </div>
+                                <div class="die-face face-10" data-value="10">
+                                    <span class="value value-10">10</span>
+                                </div>
+                                <div class="die-face face-jack" data-value="J">
+                                    <span class="value value-jack">J</span>
+                                </div>
+                                <div class="die-face face-queen" data-value="Q">
+                                    <span class="value value-queen">Q</span>
+                                </div>
+                                <div class="die-face face-king" data-value="K">
+                                    <span class="value value-king">K</span>
+                                </div>
+                                <div class="die-face face-ace" data-value="A">
+                                    <span class="value value-ace">A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Hand Display -->
+                    <div class="current-hand" id="currentHand" style="display: none;">
+                        <div class="hand-name" id="handName">Ready to Roll</div>
+                        <div class="hand-payout" id="handPayout">Place your bet and roll!</div>
+                    </div>
+
+                    <!-- Roll Button -->
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button class="btn btn-success btn-lg roll-button" id="pokerDiceRollButton">
+                            🃏 ROLL POKER DICE
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Hand Rankings & Game Info -->
+                <div style="margin-top: 30px;">
+                    <!-- Tab Navigation -->
+                    <div class="tab-nav" style="display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px;">
+                        <button class="tab-btn active" onclick="showTab('handRankings')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid #007bff; font-weight: bold;">🏆 Hand Rankings</button>
+                        <button class="tab-btn" onclick="showTab('howToPlay')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid transparent;">📝 How to Play</button>
+                        <button class="tab-btn" onclick="showTab('gameStats')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid transparent;">📊 Game Stats</button>
+                    </div>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Hand Rankings Tab -->
+                        <div id="handRankings" class="tab-panel" style="display: block; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 8px; min-height: 300px;">
+                            <div class="hand-rankings">
+                                <h3>🏆 Hand Rankings & Payouts</h3>
+                                <table class="rankings-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Hand</th>
+                                            <th>Payout</th>
+                                            <th>Example</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="hand-rank">1st</td>
+                                            <td>Five of a Kind</td>
+                                            <td class="payout">400:1</td>
+                                            <td>K-K-K-K-K</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hand-rank">3rd</td>
+                                            <td>Four of a Kind</td>
+                                            <td class="payout">20:1</td>
+                                            <td>A-A-A-A-9</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hand-rank">4th</td>
+                                            <td>Full House</td>
+                                            <td class="payout">10:1</td>
+                                            <td>Q-Q-Q-10-10</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hand-rank">5th</td>
+                                            <td>Straight</td>
+                                            <td class="payout">15:1</td>
+                                            <td>9-10-J-Q-K or 10-J-Q-K-A</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hand-rank">6th</td>
+                                            <td>Flush</td>
+                                            <td class="payout">6:1</td>
+                                            <td>All same color</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hand-rank">7th</td>
+                                            <td>Three of a Kind</td>
+                                            <td class="payout">3:1</td>
+                                            <td>J-J-J-A-10</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hand-rank">8th</td>
+                                            <td>Two Pair</td>
+                                            <td class="payout">2:1</td>
+                                            <td>K-K-9-9-Q</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hand-rank">9th</td>
+                                            <td>One Pair</td>
+                                            <td class="payout">1:1</td>
+                                            <td>A-A-J-10-9</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196f3;">
+                                    <h6>💡 Color System</h6>
+                                    <p><strong>Red:</strong> 9, J, K &nbsp;&nbsp;&nbsp; <strong>Black:</strong> 10, Q, A</p>
+                                    <p>A "flush" means all 5 dice show the same color!</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- How to Play Tab -->
+                        <div id="howToPlay" class="tab-panel" style="display: none; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 8px; min-height: 300px;">
+                            <div style="margin-bottom: 10px;">
+                                <strong>1.</strong> Choose your bet amount (1-100 tokens)
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>2.</strong> Click "ROLL POKER DICE" to start the 3D animation
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>3.</strong> Watch as all 5 dice roll and land on poker values (9, 10, J, Q, K, A)
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <strong>4.</strong> Get paid based on your poker hand - even pairs pay 1:1!
+                            </div>
+
+                            <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #2196f3;">
+                                <h6>🎯 Strategy Tips</h6>
+                                <ul style="margin: 10px 0; padding-left: 20px;">
+                                    <li><strong>96% RTP</strong> - Fair and balanced gameplay</li>
+                                    <li><strong>Always a chance</strong> - Even pairs return your bet</li>
+                                    <li><strong>Big wins possible</strong> - Royal Flush pays 150:1!</li>
+                                    <li><strong>Visual excitement</strong> - Amazing 3D dice animations</li>
+                                    <li><strong>Easy to understand</strong> - Standard poker hand rankings</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Game Stats Tab -->
+                        <div id="gameStats" class="tab-panel" style="display: none; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 8px; min-height: 300px;">
+                            <div class="stat-item" style="margin-bottom: 8px;">
+                                <span class="stat-label">Total Rolls:</span>
+                                <span class="stat-value" id="totalRolls" style="font-weight: bold; float: right;">0</span>
+                                <div style="clear: both;"></div>
+                            </div>
+                            
+                            <div class="stat-item" style="margin-bottom: 8px;">
+                                <span class="stat-label">Total Wagered:</span>
+                                <span class="stat-value" id="totalWagered" style="font-weight: bold; float: right;">0</span>
+                                <div style="clear: both;"></div>
+                            </div>
+                            
+                            <div class="stat-item" style="margin-bottom: 8px;">
+                                <span class="stat-label">Total Won:</span>
+                                <span class="stat-value" id="totalWon" style="font-weight: bold; float: right;">0</span>
+                                <div style="clear: both;"></div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <span class="stat-label">Win Rate:</span>
+                                <span class="stat-value" id="winRate" style="font-weight: bold; float: right;">0%</span>
+                                <div style="clear: both;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!-- END UNIQUE PAGE CONTENT -->
+        </main>
+
+<!-- include start right-sidebar.html -->
+        <aside class="right-sidebar">
+            <!-- A-Ads placeholder -->
+            <div style="height: 600px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center;">
+                <div>
+                    A-Ads Placeholder<br>
+                    160x600px<br>
+                    (skyscraper)
+                </div>
+            </div>
+        </aside>
+<!-- include end right-sidebar.html -->
+
+    </div>
+
+<!-- include start footer.html -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>🤣 ROFLFaucet</h3>
+                <p>The funniest faucet on the internet! Claim free tokens and play engaging games.</p>
+                <div class="social-links">
+                    <span>Follow us: </span>
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📺</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">🚰 Faucet</a></li>
+                    <li><a href="dice.html">🎲 Roll of Chance</a></li>
+                    <li><a href="poker-dice.html">🃏 Poker Dice</a></li>
+                    <li><a href="slots.html">🎰 Slots</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="about.html">❓ About</a></li>
+                    <li><a href="profile.html">👤 Profile</a></li>
+                    <li><a href="#" onclick="alert('Coming soon!')">📧 Contact</a></li>
+                    <li><a href="#" onclick="alert('Coming soon!')">❓ FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Responsible Gaming</h4>
+                <p style="font-size: 0.9em; line-height: 1.4;">
+                    🎮 Play responsibly<br>
+                    🔞 18+ only<br>
+                    ⚖️ Fair gaming guaranteed
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 ROFLFaucet. Built with ❤️ and lots of ☕</p>
+        </div>
+    </footer>
+<!-- include end footer.html -->
+
+    <!-- Page-specific scripts -->
+    <script src="js/levels-system.js"></script>
+    <script src="js/poker-dice-game.js"></script>
+    
+    <!-- Tab switching functionality -->
+    <script>
+        function showTab(tabId) {
+            // Hide all tab panels
+            const panels = document.querySelectorAll('.tab-panel');
+            panels.forEach(panel => panel.style.display = 'none');
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.borderBottom = '3px solid transparent';
+            });
+            
+            // Show selected panel
+            const selectedPanel = document.getElementById(tabId);
+            if (selectedPanel) {
+                selectedPanel.style.display = 'block';
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            event.target.style.borderBottom = '3px solid #007bff';
+        }
+        
+        // Initialize poker dice game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🃏 Initializing Poker Dice page...');
+            
+            // Wait a moment for all scripts to load
+            setTimeout(() => {
+                if (typeof PokerDiceGame !== 'undefined') {
+                    window.pokerDiceGame = new PokerDiceGame();
+                    console.log('✅ Poker Dice game initialized');
+                } else {
+                    console.error('❌ PokerDiceGame class not found');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

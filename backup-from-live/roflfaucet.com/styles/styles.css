@@ -1,0 +1,708 @@
+/* ROFLFaucet Base Layout Styles */
+/* Flexbox responsive layout with staggered sidebar collapse */
+
+/* CSS Custom Properties for Beautiful Theming */
+:root {
+    --primary-color: #4A90E2;
+    --secondary-color: #7ED321;
+    --accent-color: #F5A623;
+    --danger-color: #D0021B;
+    --success-color: #50E3C2;
+    --warning-color: #F8E71C;
+    
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8F9FA;
+    --bg-accent: #E8F4FD;
+    --bg-dark: #2C3E50;
+    
+    --text-primary: #2C3E50;
+    --text-secondary: #7F8C8D;
+    --text-light: #BDC3C7;
+    --text-white: #FFFFFF;
+    
+    --border-color: #E1E8ED;
+    --border-radius: 12px;
+    --shadow: 0 4px 20px rgba(74, 144, 226, 0.1);
+    --shadow-hover: 0 8px 30px rgba(74, 144, 226, 0.2);
+    
+    --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+body {
+    font-family: var(--font-primary);
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header - Glass-morphism effect with responsive scaling */
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #E1E8ED;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(74, 144, 226, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 0.5em;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0.5rem 5%;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    color: #4A90E2;
+    margin: 0;
+    transition: transform 0.3s ease;
+}
+
+.nav {
+    display: flex;
+    gap: 2rem;
+    margin: 0 2rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #2C3E50;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #E8F4FD;
+    color: #4A90E2;
+}
+
+/* Dropdown Menu Styles */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle::after {
+    content: '';
+    transition: transform 0.3s ease;
+}
+
+.nav-dropdown:hover .dropdown-toggle::after {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    min-width: 200px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(74, 144, 226, 0.2);
+    border: 1px solid rgba(225, 232, 237, 0.6);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    padding: 0.5rem 0;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: #2C3E50;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 0;
+}
+
+.dropdown-item:hover {
+    background: #E8F4FD;
+    color: #4A90E2;
+    padding-left: 2rem;
+}
+
+.header-auth-btn {
+    background: #4A90E2;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.header-auth-btn:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+/* Hamburger Menu - Hidden by default */
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+}
+
+.hamburger-menu span {
+    width: 25px;
+    height: 3px;
+    background: #2C3E50;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: 1px;
+}
+
+.hamburger-menu.open span:first-child {
+    transform: rotate(45deg);
+}
+
+.hamburger-menu.open span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.hamburger-menu.open span:third-child {
+    transform: rotate(-45deg);
+}
+
+/* Mobile Navigation Overlay */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    z-index: 9;
+    padding-top: 80px;
+}
+
+.mobile-nav.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.mobile-nav a {
+    display: block;
+    padding: 20px;
+    text-decoration: none;
+    color: #2C3E50;
+    font-size: 1.2rem;
+    font-weight: 500;
+    border-bottom: 1px solid #E1E8ED;
+    width: 80%;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.mobile-nav a:hover {
+    background: #E8F4FD;
+    color: #4A90E2;
+}
+
+/* Main container - horizontal flexbox */
+.container {
+    display: flex;
+    min-height: calc(100vh - 60px); /* Account for header height */
+    align-items: flex-start;
+}
+
+.left-sidebar, 
+.right-sidebar {
+    width: 25%; /* Increased from 22% to 25% for more sidebar space */
+    background: #f0f0f0;
+    transition: width 0.3s ease;
+    padding: 0.5em;
+    box-sizing: border-box;
+}
+
+/* Elements that need padding from column edges */
+.padded {
+    padding: 0.5em;
+}
+
+/* Universal full-width class for any element (images, iframes, divs, etc.) */
+.full-width {
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+}
+
+.main-content {
+    flex: 1;
+    background: white;
+    /* CRITICAL: Small margins to respect sidebar content margins */
+    /* This fixes flexbox issue where child element margins get absorbed */
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    padding: 0.5em; /* Restore padding for text and other elements */
+    box-sizing: border-box;
+}
+
+/* Slots iframe container styles */
+.slots-iframe-container {
+    width: 100%;
+    max-width: 600px; /* Max width for the slot machine */
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.slots-iframe-container iframe {
+    width: 100%;
+    /* aspect-ratio: 4 / 5; -- Temporarily removed to test responsiveness */
+    height: 600px; /* Full height for desktop */
+    border: none;
+    border-radius: 8px;
+    display: block;
+    background: transparent;
+    overflow: hidden;
+}
+
+/* Responsive height scaling for mobile */
+@media (max-width: 650px) {
+    .slots-iframe-container iframe {
+        height: 450px; /* Reduced height when sidebar stacks */
+    }
+}
+
+@media (max-width: 480px) {
+    .slots-iframe-container iframe {
+        height: 400px; /* Even smaller for phones */
+    }
+}
+
+@media (max-width: 360px) {
+    .slots-iframe-container iframe {
+        height: 350px; /* Minimal height for very small phones */
+    }
+}
+
+.collapsed .left-sidebar, 
+.collapsed .right-sidebar {
+    width: 0;
+    padding: 0;
+}
+
+/* Responsive: Right sidebar collapses first */
+@media (max-width: 900px) { /* Right sidebar collapses at 900px */
+    .right-sidebar {
+        display: none;
+    }
+}
+
+/* Tablet adjustments */
+@media (max-width: 900px) {
+    .nav {
+        gap: 1.5rem;
+        margin: 0 1.5rem;
+    }
+}
+
+/* Mobile header adjustments - tablets and smaller */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 0.4rem 3%;
+    }
+    
+    .logo h1 {
+        font-size: 1.3rem;
+    }
+    
+    .nav {
+        gap: 1rem;
+        margin: 0 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+    }
+    
+    .header-auth-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Left sidebar stacks vertically on smaller screens */
+@media (max-width: 650px) { /* Left sidebar stacks at 650px */
+    .container {
+        flex-direction: column;
+    }
+    
+    .left-sidebar {
+        width: 100%;
+        order: 2; /* Left sidebar goes below main content */
+    }
+    
+    .main-content {
+        order: 1; /* Main content goes first */
+        margin: 0;
+    }
+    
+    /* Hide desktop navigation and show hamburger menu */
+    .nav {
+        display: none;
+    }
+    
+    .hamburger-menu {
+        display: flex;
+    }
+    
+    /* Mobile-specific dropdown adjustments */
+    .nav-dropdown:hover .dropdown-menu {
+        display: none; /* Disable hover on mobile */
+    }
+    
+    /* Mobile navigation overlay - keep hidden by default */
+    .mobile-nav {
+        display: none;
+    }
+    
+    /* Even smaller header for mobile phones - overrides tablet styles */
+    .header-content {
+        padding: 0.4rem 4%;
+    }
+    
+    .logo h1 {
+        font-size: 1.2rem;
+    }
+    
+    .header-auth-btn {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Hide emoji on mobile and tablet screens to save vertical space */
+@media (max-width: 768px) {
+    .emoji-desktop {
+        display: none;
+    }
+}
+
+/* =========================
+   BEAUTIFUL BUTTON SYSTEM
+   ========================= */
+
+.claim-button {
+    background: linear-gradient(135deg, var(--secondary-color), #66bb6a);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: var(--shadow);
+    min-width: 200px;
+}
+
+.claim-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #66bb6a, var(--secondary-color));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.claim-button:disabled {
+    background: var(--text-light);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.nav-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0.5rem;
+    box-shadow: var(--shadow);
+}
+
+.nav-button:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* =========================
+   FAUCET COUNTDOWN BUTTON STYLES
+   ========================= */
+
+.faucet-countdown-btn {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+    min-width: 160px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+}
+
+.faucet-countdown-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.faucet-countdown-btn.ready {
+    background: #27ae60;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.faucet-countdown-btn.ready:hover {
+    background: #219a52;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+}
+
+.faucet-countdown-btn .btn-text {
+    position: relative;
+    z-index: 2;
+}
+
+/* Progressive green fill */
+.faucet-countdown-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: #27ae60;
+    transition: width 1s ease;
+    z-index: 1;
+}
+
+@media (max-width: 600px) {
+    .faucet-countdown-btn {
+        min-width: 130px;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+}
+
+/* =========================
+   INFO BOX STYLING
+   ========================= */
+
+.info {
+    background: var(--bg-accent);
+    border: 1px solid #b3d7ff;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin: 15px 0;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow);
+}
+
+.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin: 15px 0;
+    border-left: 4px solid var(--secondary-color);
+    box-shadow: var(--shadow);
+}
+
+.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin: 15px 0;
+    border-left: 4px solid var(--warning-color);
+    box-shadow: var(--shadow);
+}
+
+.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin: 15px 0;
+    border-left: 4px solid var(--danger-color);
+    box-shadow: var(--shadow);
+}
+
+.highlight-box {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* =========================
+   BALANCE & TYPOGRAPHY
+   ========================= */
+
+.balance {
+    font-weight: bold;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    display: inline;
+}
+
+.stats-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    font-family: var(--font-mono);
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* =========================
+   CONTENT CONTAINERS
+   ========================= */
+
+.content-container {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    padding: 0; /* No padding for perfect image alignment */
+    margin: 0.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.content-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.content-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.result-display {
+    background: var(--bg-accent);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    margin: 2rem 0;
+    border: 1px solid var(--primary-color);
+}
+
+.result-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    font-family: var(--font-mono);
+}
+
+/* =========================
+   GALLERY IMAGE SIZING
+   ========================= */
+
+/* =========================
+   GALLERY IMAGE SIZING - By Gallery Type
+   ========================= */
+
+/* VGY Gallery (landscape images) - used on index page */
+[data-gallery="vgy"] img {
+    max-height: 350px;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* PostImg Gallery (animated GIFs) - used on faucet-result page */
+[data-gallery="postimg"] img {
+    height: 200px;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Giphy Gallery (sidebar GIFs) - used in sidebars */
+[data-gallery="giphy"] img {
+    max-width: 100%;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive: Scale down main gallery images on smaller screens */
+@media (max-width: 768px) {
+    .gallery-postimg,
+    .gallery-vgy {
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-postimg,
+    .gallery-vgy {
+        max-width: 250px;
+    }
+}

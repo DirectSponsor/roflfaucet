@@ -61,8 +61,8 @@ class DiceGame {
         document.getElementById('betAmount')?.addEventListener('input', (e) => this.setBet(e.target.value));
         
         // Payout multiplier controls
-        document.getElementById('payoutUp')?.addEventListener('click', () => this.changePayout(1));
-        document.getElementById('payoutDown')?.addEventListener('click', () => this.changePayout(-1));
+        document.getElementById('payoutUp')?.addEventListener('click', () => this.changePayout(0.1));
+        document.getElementById('payoutDown')?.addEventListener('click', () => this.changePayout(-0.1));
         document.getElementById('payoutMultiplier')?.addEventListener('input', (e) => this.setPayout(e.target.value));
         
         // High/Low toggle
@@ -118,16 +118,16 @@ class DiceGame {
         const payoutInput = document.getElementById('payoutMultiplier');
         if (!payoutInput) return;
         
-        const currentPayout = parseInt(payoutInput.value) || 2;
-        const newPayout = Math.max(2, Math.min(1000, currentPayout + delta));
+        const currentPayout = parseFloat(payoutInput.value) || 2;
+        const newPayout = Math.max(1.01, Math.min(1000, currentPayout + delta));
         
-        payoutInput.value = newPayout;
+        payoutInput.value = newPayout.toFixed(2);
         this.setPayout(newPayout);
     }
     
     setPayout(amount) {
-        const payout = Math.max(2, Math.min(1000, parseInt(amount) || 2));
-        document.getElementById('payoutMultiplier').value = payout;
+        const payout = Math.max(1.01, Math.min(1000, parseFloat(amount) || 2));
+        document.getElementById('payoutMultiplier').value = payout.toFixed(2);
         this.updateProbability();
     }
     
