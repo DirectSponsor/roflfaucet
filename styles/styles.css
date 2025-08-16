@@ -69,18 +69,18 @@ body {
 }
 
 .nav {
-    display: flex;
-    gap: 2rem;
     margin: 0 2rem;
 }
 
 .nav-link {
+    display: inline-block;
     text-decoration: none;
     color: #2C3E50;
     font-weight: 500;
     padding: 0.5rem 1rem;
     border-radius: 12px;
     transition: all 0.3s ease;
+    margin-right: 2rem;
 }
 
 .nav-link:hover,
@@ -89,18 +89,22 @@ body {
     color: #4A90E2;
 }
 
-/* Dropdown Menu Styles */
-.nav-dropdown {
-    position: relative;
-    display: inline-block;
+/* Dropdown Menu Styles - No wrapper div approach */
+.nav {
+    position: relative; /* Allow positioning context for dropdown */
+}
+
+.dropdown-toggle {
+    position: relative; /* Allow positioning context for dropdown */
 }
 
 .dropdown-toggle::after {
-    content: '';
+    content: ' ▼';
+    font-size: 0.8em;
     transition: transform 0.3s ease;
 }
 
-.nav-dropdown:hover .dropdown-toggle::after {
+.dropdown-toggle:hover::after {
     transform: rotate(180deg);
 }
 
@@ -116,16 +120,17 @@ body {
     border: 1px solid rgba(225, 232, 237, 0.6);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
     transition: all 0.3s ease;
     z-index: 1000;
     padding: 0.5rem 0;
+    /* Position relative to the Games link */
+    margin-top: 0.5rem;
 }
 
-.nav-dropdown:hover .dropdown-menu {
+.dropdown-toggle:hover + .dropdown-menu,
+.dropdown-menu:hover {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
 }
 
 .dropdown-item {
