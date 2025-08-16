@@ -1,10 +1,10 @@
-<!-- ℹ️ About ROFLFaucet Page -->
-<!-- TITLE=_About ROFLFaucet_ -->
-<!-- DESC=_Learn about our mission, technology, and the ecosystem we're building_ -->
-<!-- KEYWORDS=_about, mission, crypto, charity, ecosystem_ -->
+<!-- 🎮 Games Overview Page -->
+<!-- TITLE=_Games - ROFLFaucet_ -->
+<!-- DESC=_Discover all our exciting games: Slots, Roll of Chance, and Wheel of Wealth. Choose your favorite way to win UselessCoins!_ -->
+<!-- KEYWORDS=_games, casino, slots, dice, wheel, gambling, ROFLFaucet, play, win, coins_ -->
 <!-- STYLES=_ _ -->
 <!-- SCRIPTS=_ _ -->
-<!-- HEADING=_ℹ️ About ROFLFaucet_ -->
+<!-- HEADING=_🎮 Games Hub_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -12,9 +12,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About ROFLFaucet</title>
+    <title>Games - ROFLFaucet</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="Learn about our mission, technology, and the ecosystem we're building">
+    <meta name="description" content="Discover all our exciting games: Slots, Roll of Chance, and Wheel of Wealth. Choose your favorite way to win UselessCoins!">
     
     <!-- Base Layout CSS -->
     <link rel="stylesheet" href="styles/styles.css">
@@ -88,31 +88,72 @@
         <main class="main-content">
             <!-- Compact page header -->
             <div class="page-header">
-                <h1 class="page-title">ℹ️ About ROFLFaucet</h1>
+                <h1 class="page-title">🎮 Games Hub</h1>
             </div>
 <!-- include end main-content-start.html -->
-<!-- About Page Content -->
-                <p class="padded">Learn about our mission, technology, and the ecosystem we're building</p>
-                
-                <div class="padded">
-                    <h2>🎯 Our Mission</h2>
-                    <p>ROFLFaucet is more than just a cryptocurrency faucet - we're building an ecosystem that combines free crypto earning with meaningful charitable impact.</p>
-                    
-                    <h2 id="guest-vs-member">🔑 Guest vs. Member</h2>
-                    <p>ROFLFaucet offers two experiences:</p>
-                    <ul>
-                        <li><strong>🎮 Guest Access</strong> - Claim Pointless Tokens, play games, no registration required</li>
-                        <li><strong>👑 Member Benefits</strong> - Win real UselessCoins, level-ups, leaderboard, VIP memberships</li>
-                    </ul>
-                    
-                    <h2>🌐 The DirectSponsor Network</h2>
-                    <p>ROFLFaucet is part of the larger DirectSponsor ecosystem including ClickForCharity.net and DirectSponsor.net</p>
-                    
-                    <h2>📞 Contact & Support</h2>
-                    <p>Email us at: <a href="mailto:support@roflfaucet.com">support@roflfaucet.com</a></p>
-                </div>
-<!-- END About Page Content -->
-        </main>
+
+<!-- Games Overview Content -->
+<div class="padded">
+    <p>Choose from our exciting collection of games and start winning UselessCoins!</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0;">
+        
+        <!-- Slots Game -->
+        <div class="highlight-box">
+            <h3>🎰 Casino Slots</h3>
+            <p>Classic slot machine with beautiful animations and multiple winning combinations. Spin the reels and hit the jackpot!</p>
+            <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                <li>Multiple paylines</li>
+                <li>Bonus features</li>
+                <li>Progressive gameplay</li>
+            </ul>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="slots.html" class="nav-button">🎰 Play Slots</a>
+            </div>
+        </div>
+        
+        <!-- Roll of Chance -->
+        <div class="highlight-box">
+            <h3>🎲 Roll of Chance</h3>
+            <p>Intelligent dice game with dynamic probability calculations. Choose High/Low and test your luck with strategic gameplay!</p>
+            <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                <li>High/Low mechanics</li>
+                <li>Dynamic multipliers</li>
+                <li>Probability-based strategy</li>
+            </ul>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="roll.html" class="nav-button">🎲 Play Roll of Chance</a>
+            </div>
+        </div>
+        
+        <!-- Wheel of Wealth -->
+        <div class="highlight-box">
+            <h3>🎡 Wheel of Wealth</h3>
+            <p>Spin the colorful wheel and see where fortune takes you! Multiple prize segments with varying odds and rewards.</p>
+            <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                <li>Colorful spinning wheel</li>
+                <li>Multiple prize tiers</li>
+                <li>Exciting animations</li>
+            </ul>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="wheel.html" class="nav-button">🎡 Spin the Wheel</a>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="info" style="margin-top: 2rem;">
+        <h4>🎯 How to Play</h4>
+        <p>All games use your UselessCoins balance. Start with the faucet to earn your initial coins, then choose your favorite game to multiply your winnings!</p>
+        <p><strong>💰 Balance:</strong> <span class="stats-number balance" id="balance">0</span> <span class="currency-full">tokens</span></p>
+    </div>
+    
+    <div style="text-align: center; margin: 2rem 0;">
+        <a href="index.html" class="nav-button">🚰 Get More Coins from Faucet</a>
+    </div>
+</div>
+
+<!-- END Games Overview Content -->
 
 <!-- include start right-sidebar.html -->
         <aside class="right-sidebar">
