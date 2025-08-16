@@ -8,17 +8,17 @@ class LevelsSystem {
         // Level definitions with exponential pricing (halved for better balance with 10 token faucet)
         this.levels = [
             { id: 1, name: "Worker", title: "Worker", cost: 0, maxBet: 1, description: "Starting level - learn the ropes" },
-            { id: 2, name: "Chancellor", title: "Chancellor", cost: 1000, maxBet: 2, description: "First step up the ladder" },
-            { id: 3, name: "Dictator", title: "Dictator", cost: 1500, maxBet: 3, description: "Take control of your destiny" },
-            { id: 4, name: "Mage", title: "Mage", cost: 4000, maxBet: 4, description: "Harness magical betting powers" },
-            { id: 5, name: "Royal Mentor", title: "Royal Mentor", cost: 7500, maxBet: 5, description: "Guide others to victory" },
-            { id: 6, name: "Archseer", title: "Archseer", cost: 12500, maxBet: 6, description: "See the future of fortune" },
-            { id: 7, name: "Beta", title: "Beta", cost: 25000, maxBet: 7, description: "Elite testing grounds" },
-            { id: 8, name: "Congressman", title: "Congressman", cost: 50000, maxBet: 8, description: "Political power player" },
-            { id: 9, name: "Hand of the King", title: "Hand of the King", cost: 100000, maxBet: 9, description: "Right hand of royalty" },
-            { id: 10, name: "Ranger", title: "Ranger", cost: 175000, maxBet: 10, description: "Master of the wilderness" },
-            { id: 11, name: "King", title: "King", cost: 250000, maxBet: 11, description: "Rule your domain" },
-            { id: 12, name: "Emperor", title: "Emperor", cost: 500000, maxBet: 12, description: "Ultimate power achieved" }
+            { id: 2, name: "Chancellor", title: "Chancellor", cost: 500, maxBet: 2, description: "First step up the ladder" },
+            { id: 3, name: "Dictator", title: "Dictator", cost: 1000, maxBet: 3, description: "Take control of your destiny" },
+            { id: 4, name: "Mage", title: "Mage", cost: 2000, maxBet: 4, description: "Harness magical betting powers" },
+            { id: 5, name: "Royal Mentor", title: "Royal Mentor", cost: 4500, maxBet: 5, description: "Guide others to victory" },
+            { id: 6, name: "Archseer", title: "Archseer", cost: 7000, maxBet: 6, description: "See the future of fortune" },
+            { id: 7, name: "Beta", title: "Beta", cost: 10000, maxBet: 7, description: "Elite testing grounds" },
+            { id: 8, name: "Congressman", title: "Congressman", cost: 20000, maxBet: 8, description: "Political power player" },
+            { id: 9, name: "Hand of the King", title: "Hand of the King", cost: 50000, maxBet: 9, description: "Right hand of royalty" },
+            { id: 10, name: "Ranger", title: "Ranger", cost: 75000, maxBet: 10, description: "Master of the wilderness" },
+            { id: 11, name: "King", title: "King", cost: 150000, maxBet: 11, description: "Rule your domain" },
+            { id: 12, name: "Emperor", title: "Emperor", cost: 300000, maxBet: 12, description: "Ultimate power achieved" }
         ];
         
         // Non-member restrictions
