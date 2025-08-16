@@ -1,8 +1,8 @@
-# Lightweight HTML Include System
+# ROFLFaucet Include System Documentation
 
-**BBEdit-Style Includes for Modern Web Development**
+**Lightweight HTML Include & Placeholder System**
 
-A simple, lightweight alternative to WordPress and complex frameworks that brings back the simplicity of BBEdit's include system while maintaining modern deployment workflows.
+A simple, lightweight build system that processes HTML includes and placeholders without complex frameworks. Each page becomes its own "template" with comment-based directives that tell the build script where to inject shared components and how to process metadata.
 
 ## 🎯 Overview
 
@@ -440,6 +440,132 @@ Each site can have:
 - **DirectSponsor**: Documentation, marketing pages
 
 Each implementation shows how the same system adapts to different content types while maintaining consistency.
+
+## 🛠️ ROFLFaucet Implementation Details
+
+The ROFLFaucet project uses a **hybrid approach** that differs from traditional template systems:
+
+### How It Actually Works
+
+1. **No Separate Template Directory**: Pages like `about.html`, `games.html` exist directly in the root
+2. **Pages ARE Templates**: Each `.html` file contains both:
+   - **Comment directives** that tell the build script what to do
+   - **The final built content** after processing
+3. **In-Place Building**: The build script processes files in-place, replacing include comments with actual content
+
+### File Structure (ROFLFaucet)
+```
+roflfaucet/
+├── includes/                   # Shared components
+│   ├── header.html            # Site navigation
+│   ├── left-sidebar.html      # Left sidebar with ads
+│   ├── right-sidebar.html     # Right sidebar
+│   ├── main-content-start.html # Main content wrapper start
+│   ├── footer.html            # Site footer
+│   └── basic-page.tmpl        # Initial template for new pages
+├── build.sh                   # Include & placeholder processor
+├── deploy-roflfaucet-secure.sh # Deployment script
+├── about.html                 # Built page (contains includes)
+├── games.html                 # Built page (contains includes)
+├── index.html                 # Built page (contains includes)
+└── styles/
+    └── styles.css             # Single comprehensive CSS file
+```
+
+### Creating New Pages (ROFLFaucet Method)
+
+1. **Copy Template**:
+   ```bash
+   cp includes/basic-page.tmpl newpage.html
+   ```
+
+2. **Edit Metadata Comments** (at top of file):
+   ```html
+   <!-- 🎮 New Page -->
+   <!-- TITLE=_Page Title Here_ -->
+   <!-- DESC=_Page description for SEO_ -->
+   <!-- KEYWORDS=_keywords, separated, by, commas_ -->
+   <!-- STYLES=_ _ -->  <!-- Empty if no extra styles -->
+   <!-- SCRIPTS=_ _ --> <!-- Empty if no extra scripts -->
+   <!-- HEADING=_🎮 Page Heading_ -->
+   ```
+
+3. **Add Content Between Include Comments**:
+   ```html
+   <!-- include start main-content-start.html -->
+   <!-- include end main-content-start.html -->
+   
+   <!-- Your unique page content here -->
+   <div class="padded">
+       <h2>Your Content</h2>
+       <p>Page content goes here...</p>
+   </div>
+   <!-- END your content -->
+           </main>
+   ```
+
+4. **Build and Deploy**:
+   ```bash
+   ./build.sh                    # Processes includes & placeholders
+   ./deploy-roflfaucet-secure.sh # Deploys to production
+   ```
+
+### Include Syntax (ROFLFaucet)
+
+The build script looks for these comment patterns:
+
+```html
+<!-- include start filename.html -->
+<!-- include end filename.html -->
+```
+
+**NOT** the `<!--#include file="path" -->` syntax shown in the generic examples above.
+
+### Placeholder System (ROFLFaucet)
+
+Metadata placeholders in comments:
+- `<!-- TITLE=_Page Title_ -->` → Updates `<title>` tag
+- `<!-- DESC=_Description_ -->` → Updates `<meta description>` 
+- `<!-- KEYWORDS=_keywords_ -->` → Updates `<meta keywords>`
+- `<!-- STYLES=_style1.css,style2.css_ -->` → Adds `<link>` tags
+- `<!-- SCRIPTS=_script1.js,script2.js_ -->` → Adds `<script>` tags  
+- `<!-- HEADING=_Page Heading_ -->` → Updates page header
+
+### Why This Approach?
+
+**Advantages of ROFLFaucet's "Pages as Templates" System:**
+
+✅ **Direct Editing**: Edit the actual page file, see exactly what includes are used
+✅ **No Template Confusion**: No separate template directory to manage
+✅ **Version Control Friendly**: Final built content is in git, easy to diff changes
+✅ **Backup Safety**: Built pages contain all content, even if build system breaks
+✅ **Fast Development**: No copying between template and output directories
+
+**Trade-offs:**
+⚠️ **File Size**: Built pages contain full HTML (includes are expanded)
+⚠️ **Build Required**: Must run build script after changing includes
+⚠️ **Git Diffs**: Include changes appear in every page file
+
+### Maintenance Workflow
+
+**Editing Shared Components:**
+1. Edit `includes/header.html` (or other include)
+2. Run `./build.sh` - updates ALL pages using that include
+3. Deploy changes
+
+**Adding New Pages:**
+1. `cp includes/basic-page.tmpl mynewpage.html`
+2. Edit metadata comments and content
+3. `./build.sh` - processes the new page
+4. Deploy
+
+**Modifying Existing Pages:**
+1. Edit content between include comments in the page file
+2. Update metadata comments if needed
+3. `./build.sh` - reprocesses the page
+4. Deploy
+
+This system is **perfect for small-to-medium sites** that need the maintainability of includes without the complexity of a full CMS or modern build pipeline.
 
 ---
 

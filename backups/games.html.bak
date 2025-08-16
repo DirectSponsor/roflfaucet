@@ -7,17 +7,94 @@
 <!-- HEADING=_🎮 Games Hub_ -->
 
 <!-- include start header.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games - ROFLFaucet</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
+    <meta name="description" content="Discover all our exciting games: Slots, Roll of Chance, and Wheel of Wealth. Choose your favorite way to win UselessCoins!">
+    
+    <!-- Base Layout CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <!-- Additional page-specific styles -->
+    
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/core/unified-balance.js"></script>
+    <script src="scripts/core/site-utils.js"></script>
+    <script src="scripts/core/gallery-system-simple.js"></script>
+    <script src="scripts/core/jwt-simple.js"></script>
+    
+    <!-- Unified Balance System -->
+    <script>console.log('🔧 Loading unified balance system...');</script>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🤣 roflfaucet</h1>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Faucet</a>
+                
+                <!-- Games Dropdown - No wrapper div -->
+                <a href="games.html" class="nav-link dropdown-toggle">Games</a>
+                <div class="dropdown-menu">
+                    <a href="games.html" class="dropdown-item">🎮 All Games</a>
+                    <a href="slots.html" class="dropdown-item">🎰 Slots</a>
+                    <a href="roll.html" class="dropdown-item">🎲 Roll of Chance</a>
+                    <a href="wheel.html" class="dropdown-item">🎡 Wheel of Wealth</a>
+                </div>
+                
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <button class="hamburger-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="header-auth">
+                <button id="login-btn" class="header-auth-btn">Login</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
 <!-- include end header.html -->
 
 <!-- include start left-sidebar.html -->
+        <aside class="left-sidebar">
+            <!-- A-Ads placeholder - no min-width constraint for testing -->
+            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
+                <div>
+                    A-Ads Placeholder<br>
+                    300x250px<br>
+                    (scales to fit)
+                </div>
+            </div>
+        </aside>
 <!-- include end left-sidebar.html -->
 
 <!-- include start main-content-start.html -->
+        <main class="main-content">
+            <!-- Compact page header -->
+            <div class="page-header">
+                <h1 class="page-title">🎮 Games Hub</h1>
+            </div>
 <!-- include end main-content-start.html -->
 
 <!-- Games Overview Content -->
 <div class="padded">
-    <p>Choose from our exciting collection of games and start winning UselessCoins!</p>
+    <p>Choose from our exciting collection of games and start winning <span class="currency-full">UselessCoins</span>!</p>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0;">
         
@@ -67,19 +144,31 @@
     
     <div class="info" style="margin-top: 2rem;">
         <h4>🎯 How to Play</h4>
-        <p>All games use your UselessCoins balance. Start with the faucet to earn your initial coins, then choose your favorite game to multiply your winnings!</p>
+        <p>All games use your <span class="currency-full">UselessCoins</span> balance. Start with the faucet to earn your initial <span class="currency">coins</span>, then choose your favorite game to multiply your winnings!</p>
         <p><strong>💰 Balance:</strong> <span class="stats-number balance" id="balance">0</span> <span class="currency-full">tokens</span></p>
     </div>
     
     <div style="text-align: center; margin: 2rem 0;">
-        <a href="index.html" class="nav-button">🚰 Get More Coins from Faucet</a>
+        <a href="index.html" class="nav-button">🚰 Get More <span class="currency">Coins</span> from Faucet</a>
     </div>
 </div>
 <!-- END Games Overview Content -->
         </main>
 
 <!-- include start right-sidebar.html -->
+        <aside class="right-sidebar">
+            <!-- Random Giphy Image Container - TEMPORARILY DISABLED FOR TESTING -->
+            <div id="sidebar-giphy-gallery-disabled" class="full-width" style="text-align: center; margin: 0; padding: 0;">
+                <p style="color: #666; font-size: 14px; margin: 10px;">Gallery disabled during testing</p>
+            </div>
+        </aside>
 <!-- include end right-sidebar.html -->
 
 <!-- include start footer.html -->
+    </div>
+    
+    <!-- Additional page-specific scripts -->
+    
+</body>
+</html>
 <!-- include end footer.html -->
