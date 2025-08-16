@@ -2,8 +2,8 @@
 <!-- TITLE=_Roll of Chance - ROFLFaucet_ -->
 <!-- DESC=_Intelligent dice game with dynamic probability calculations and High/Low mechanics_ -->
 <!-- KEYWORDS=_dice, game, gambling, ROFLFaucet, roll, chance, probability, high, low, multiplier_ -->
-<!-- STYLES=_css/dice.css_ -->
-<!-- SCRIPTS=_js/levels-system.js,js/dice-game.js_ -->
+<!-- STYLES=_css/roll.css_ -->
+<!-- SCRIPTS=_js/levels-system.js,js/roll-game.js_ -->
 <!-- HEADING=_🎲 Roll of Chance_ -->
 
 <!-- include start header.html -->
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="css/dice.css">
+        <link rel="stylesheet" href="css/roll.css">
 
     
     <!-- Site-wide scripts -->
@@ -48,7 +48,7 @@
                     <a href="#" class="nav-link dropdown-toggle">Games ▼</a>
                     <div class="dropdown-menu">
                         <a href="slots.html" class="dropdown-item">🎰 Slots</a>
-                        <a href="dice.html" class="dropdown-item">🎲 Roll of Chance</a>
+                        <a href="roll.html" class="dropdown-item">🎲 Roll of Chance</a>
                         <a href="wheel.html" class="dropdown-item">🎡 Wheel of Wealth</a>
                     </div>
                 </div>
@@ -126,7 +126,6 @@
                                 <td style="padding: 8px; text-align: right; font-weight: bold;">Multiplier:</td>
                                 <td style="padding: 8px; text-align: center;">
                                     <input type="number" id="payoutMultiplier" value="2" min="2" max="1000" step="1" placeholder="2-1000" style="width: 80px; text-align: center; font-size: 1.1em; font-weight: bold; padding: 8px;">
-                                    <span style="margin-left: 8px; font-weight: bold;">x</span>
                                 </td>
                                 <td style="padding: 8px; text-align: right; font-weight: bold;">Potential Win:</td>
                                 <td style="padding: 8px; color: #007bff; font-weight: bold;">
@@ -191,7 +190,7 @@
                                     <li><strong>10x multiplier</strong> = ~9.9% win chance (medium risk)</li>
                                     <li><strong>100x multiplier</strong> = ~0.99% win chance (high risk)</li>
                                     <li><strong>1000x multiplier</strong> = ~0.099% win chance (EXTREME!)</li>
-                                    <li>🎯 <strong>99% RTP</strong> - One of the fairest dice games online!</li>
+                                    <li>🎯 <strong>100% RTP</strong> - The fairest dice game online!</li>
                                 </ul>
                             </div>
                         </div>
@@ -275,16 +274,16 @@
                     }
                 }
                 
-                // Initialize dice game when page loads
+                // Initialize roll game when page loads
                 document.addEventListener('DOMContentLoaded', function() {
-                    // Initialize dice game
-                    if (typeof DiceGame !== 'undefined') {
-                        window.diceGame = new DiceGame();
+                    // Initialize roll game
+                    if (typeof RollGame !== 'undefined') {
+                        window.rollGame = new RollGame();
                     } else {
-                        console.log('⏳ Waiting for DiceGame class to load...');
+                        console.log('⏳ Waiting for RollGame class to load...');
                         setTimeout(function() {
-                            if (typeof DiceGame !== 'undefined') {
-                                window.diceGame = new DiceGame();
+                            if (typeof RollGame !== 'undefined') {
+                                window.rollGame = new RollGame();
                             }
                         }, 1000);
                     }
@@ -307,7 +306,7 @@
     
     <!-- Additional page-specific scripts -->
         <script src="js/levels-system.js"></script>
-    <script src="js/dice-game.js"></script>
+    <script src="js/roll-game.js"></script>
 
 </body>
 </html>

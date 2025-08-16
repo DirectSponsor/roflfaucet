@@ -1,14 +1,14 @@
 /**
- * ROFLFaucet Dice Game - "Roll of Chance"
- * Intelligent dice game with dynamic probability calculations and High/Low mechanics
+ * ROFLFaucet Roll Game - "Roll of Chance"
+ * Intelligent roll game with dynamic probability calculations and High/Low mechanics
  */
 
-class DiceGame {
+class RollGame {
     constructor() {
         // Game state
         this.isRolling = false;
         this.isLowMode = true; // true = roll under to win, false = roll over to win
-        this.houseEdge = 1.0; // 1% house edge (99% RTP - competitive for dice games)
+        // Game provides 100% RTP - no house edge in probability calculations
         
         // Game statistics
         this.gameStats = {
@@ -34,7 +34,7 @@ class DiceGame {
     }
     
     init() {
-        console.log('🎲 Initializing Dice Game...');
+        console.log('🎲 Initializing Roll Game...');
         
         // Wait for UnifiedBalanceSystem to be available
         const initBalance = () => {
@@ -44,7 +44,7 @@ class DiceGame {
                 this.loadGameStats();
                 this.updateDisplay();
                 this.updateProbability();
-                console.log('✅ Dice Game initialized successfully');
+                console.log('✅ Roll Game initialized successfully');
             } else {
                 console.log('⏳ Waiting for UnifiedBalanceSystem...');
                 setTimeout(initBalance, 100);
@@ -61,8 +61,6 @@ class DiceGame {
         document.getElementById('betAmount')?.addEventListener('input', (e) => this.setBet(e.target.value));
         
         // Payout multiplier controls
-        document.getElementById('payoutUp')?.addEventListener('click', () => this.changePayout(1));
-        document.getElementById('payoutDown')?.addEventListener('click', () => this.changePayout(-1));
         document.getElementById('payoutMultiplier')?.addEventListener('input', (e) => this.setPayout(e.target.value));
         
         // High/Low toggle
@@ -119,16 +117,99 @@ class DiceGame {
         if (!payoutInput) return;
         
         const currentPayout = parseInt(payoutInput.value) || 2;
-        const newPayout = Math.max(2, Math.min(1000, currentPayout + delta));
         
+        // Determine step size based on current range
+        let stepSize = 1;
+        if (currentPayout >= 500) {
+            stepSize = 25;  // 500x-1000x: step by 25x
+        } else if (currentPayout >= 200) {
+            stepSize = 10;  // 200x-499x: step by 10x
+        } else if (currentPayout >= 100) {
+            stepSize = 5;   // 100x-199x: step by 5x
+        } else {
+            stepSize = 1;   // 2x-99x: step by 1x
+        }
+        
+        // For transitions, handle them specially
+        let newPayout;
+        if (delta > 0) {
+            // Going up
+            if (currentPayout === 99) {
+                newPayout = 100; // 99 -> 100
+            } else if (currentPayout === 195) {
+                newPayout = 200; // 195 -> 200
+            } else if (currentPayout === 490) {
+                newPayout = 500; // 490 -> 500
+            } else {
+                newPayout = currentPayout + stepSize;
+            }
+        } else {
+            // Going down
+            if (currentPayout === 100) {
+                newPayout = 99; // 100 -> 99
+            } else if (currentPayout === 200) {
+                newPayout = 195; // 200 -> 195
+            } else if (currentPayout === 500) {
+                newPayout = 490; // 500 -> 490
+            } else {
+                newPayout = currentPayout - stepSize;
+            }
+        }
+        
+        // Apply min/max limits
+        newPayout = Math.max(2, Math.min(1000, newPayout));
+        
+        // Update the input directly and recalculate
         payoutInput.value = newPayout;
-        this.setPayout(newPayout);
+        this.updateProbability();
+        
+        console.log(`🎲 Payout changed: ${currentPayout}x → ${newPayout}x (step: ${stepSize}x)`);
     }
     
     setPayout(amount) {
-        const payout = Math.max(2, Math.min(1000, parseInt(amount) || 2));
-        document.getElementById('payoutMultiplier').value = payout;
+        let payout = Math.max(2, Math.min(1000, parseInt(amount) || 2));
+        
+        // Apply dynamic step boundaries - snap to valid multipliers for manual input
+        if (payout >= 500) {
+            // For 500+, snap to nearest 25
+            payout = Math.round(payout / 25) * 25;
+        } else if (payout >= 200) {
+            // For 200-499, snap to nearest 10
+            payout = Math.round(payout / 10) * 10;
+        } else if (payout >= 100) {
+            // For 100-199, snap to nearest 5
+            payout = Math.round(payout / 5) * 5;
+        }
+        // 2x-99x stays as-is (1x stepping)
+        
+        const payoutInput = document.getElementById('payoutMultiplier');
+        payoutInput.value = payout;
+        
         this.updateProbability();
+        
+        console.log(`🎲 setPayout: ${amount} → ${payout}`);
+    }
+    
+    updatePayoutStep(currentPayout) {
+        const payoutInput = document.getElementById('payoutMultiplier');
+        if (!payoutInput) return;
+        
+        // Set the step attribute based on the current range to match our snapping logic
+        let stepSize = 1; // Default
+        if (currentPayout >= 500) {
+            stepSize = 25;  // 500x-1000x: step by 25x
+        } else if (currentPayout >= 200) {
+            stepSize = 10;  // 200x-499x: step by 10x
+        } else if (currentPayout >= 100) {
+            stepSize = 5;   // 100x-199x: step by 5x
+        } else {
+            stepSize = 1;   // 2x-99x: step by 1x
+        }
+        
+        // Update the step attribute so native spinners work correctly
+        payoutInput.setAttribute('step', stepSize.toString());
+        
+        console.log(`🎲 Updated payout step to ${stepSize}x for value ${currentPayout}x`);
     }
     
     toggleHighLow() {
@@ -139,44 +220,55 @@ class DiceGame {
         const condition = document.getElementById('rollCondition');
         
         if (this.isLowMode) {
-            toggle.innerHTML = '<i class="fas fa-exchange-alt"></i> Switch to HIGH';
-            condition.textContent = 'Roll UNDER to win';
+            toggle.textContent = 'Switch to HIGH';
+            condition.textContent = 'Roll UNDER';
         } else {
-            toggle.innerHTML = '<i class="fas fa-exchange-alt"></i> Switch to LOW';
-            condition.textContent = 'Roll OVER to win';
+            toggle.textContent = 'Switch to LOW';
+            condition.textContent = 'Roll OVER';
         }
         
         this.playSound('roll');
     }
     
     updateProbability() {
-        const payoutMultiplier = parseFloat(document.getElementById('payoutMultiplier')?.value) || 2;
+        const payoutMultiplier = parseInt(document.getElementById('payoutMultiplier')?.value) || 2;
         const betAmount = parseInt(document.getElementById('betAmount')?.value) || 1;
         
-        // Calculate win chance based on payout multiplier and house edge
-        // Formula: winChance = (100 - houseEdge) / payoutMultiplier
-        const winChance = (100 - this.houseEdge) / payoutMultiplier;
+        // NEW INTEGER-BASED SYSTEM: Roll range 1-1000, no decimals, pure integer division
+        // Simple and clean - no rounding to avoid duplicate multiplier issues
+        const winningNumbers = Math.floor(1000 / payoutMultiplier);
         
-        // Calculate the correct roll threshold based on mode
-        let rollThreshold;
+        // Calculate exact win chance and thresholds
+        const winChance = (winningNumbers / 1000) * 100;
+        
+        // Calculate roll thresholds for display
+        let displayThreshold;
         if (this.isLowMode) {
-            // LOW mode: roll UNDER this number to win
-            rollThreshold = winChance;
+            // Roll UNDER or EQUAL to winningNumbers to win
+            displayThreshold = winningNumbers;
         } else {
-            // HIGH mode: roll OVER this number to win
-            rollThreshold = 100 - winChance;
+            // Roll OVER (1000 - winningNumbers) to win
+            displayThreshold = 1000 - winningNumbers;
         }
         
-        // Update display
-        document.getElementById('winChance').textContent = winChance.toFixed(2) + '%';
-        document.getElementById('rollThreshold').textContent = rollThreshold.toFixed(2);
-        document.getElementById('potentialPayout').textContent = (betAmount * payoutMultiplier).toFixed(0);
+        // Store for roll processing
+        this.currentWinningNumbers = winningNumbers;
+        
+        // Update display with integer precision
+        document.getElementById('winChance').textContent = winChance.toFixed(1) + '%';
+        document.getElementById('rollThreshold').textContent = displayThreshold.toString();
+        document.getElementById('potentialPayout').textContent = (betAmount * payoutMultiplier).toString();
+        
+        // Update the step attribute for native spinners based on current multiplier
+        this.updatePayoutStep(payoutMultiplier);
         
         // Update roll button state
         this.updateRollButton();
         
         // Debug logging
-        console.log(`🎲 Mode: ${this.isLowMode ? 'LOW' : 'HIGH'}, WinChance: ${winChance.toFixed(2)}%, Threshold: ${rollThreshold.toFixed(2)}, Balance: ${this.balanceSystem ? this.balanceSystem.getBalance() : 'N/A'}`);
+        const rtp = ((winningNumbers / 1000) * payoutMultiplier * 100).toFixed(1);
+        console.log(`🎲 Integer System: ${payoutMultiplier}x → ${winningNumbers}/1000 winning numbers (${winChance.toFixed(1)}%, RTP: ${rtp}%)`);
+        console.log(`🎲 Mode: ${this.isLowMode ? 'LOW' : 'HIGH'}, Threshold: ${displayThreshold}`);
     }
     
     
@@ -291,8 +383,8 @@ class DiceGame {
         
         const animateNumbers = () => {
             if (animationCount < totalAnimations && this.isRolling) {
-                // Generate random roll value
-                const randomRoll = (Math.random() * 99.99 + 0.01).toFixed(2);
+                // Generate random roll value from 1-1000 range
+                const randomRoll = Math.floor(Math.random() * 1000) + 1;
                 rollValue.textContent = randomRoll;
                 
                 // Add a slight bounce effect every few frames
@@ -342,24 +434,24 @@ class DiceGame {
     }
     
     processRoll(betAmount, payoutMultiplier) {
-        // Generate the actual roll result (0.01 to 99.99)
-        const rollResult = Math.random() * 99.98 + 0.01;
+        // Generate integer roll result from 1-1000 (no decimals!)
+        const rollResult = Math.floor(Math.random() * 1000) + 1;
         
-        // Calculate win threshold
-        const winChance = (100 - this.houseEdge) / payoutMultiplier;
+        // Use the pre-calculated winning numbers from updateProbability
+        const winningNumbers = this.currentWinningNumbers;
         
-        // Determine if it's a win
+        // Determine win based on integer thresholds
         let isWin = false;
         if (this.isLowMode) {
-            // Roll under to win
-            isWin = rollResult <= winChance;
+            // Roll UNDER or EQUAL to winningNumbers to win
+            isWin = rollResult <= winningNumbers;
         } else {
-            // Roll over to win
-            isWin = rollResult >= (100 - winChance);
+            // Roll OVER (1000 - winningNumbers) to win
+            isWin = rollResult > (1000 - winningNumbers);
         }
         
-        // Calculate payout
-        const winAmount = isWin ? Math.floor(betAmount * payoutMultiplier) : 0;
+        // Calculate payout - ALWAYS INTEGER (bet × multiplier)
+        const winAmount = isWin ? (betAmount * payoutMultiplier) : 0;
         
         // Update display with final result
         this.showRollResult(rollResult, isWin, winAmount, betAmount);
@@ -377,6 +469,9 @@ class DiceGame {
         
         this.isRolling = false;
         this.updateRollButton();
+        
+        // Debug logging for verification
+        console.log(`🎲 Roll: ${rollResult}, WinningNumbers: ${winningNumbers}, Mode: ${this.isLowMode ? 'LOW' : 'HIGH'}, Win: ${isWin}`);
     }
     
     showRollResult(rollResult, isWin, winAmount, betAmount) {
@@ -386,7 +481,7 @@ class DiceGame {
         const rollPayout = document.getElementById('rollPayout');
         
         // Set final roll value
-        rollValue.textContent = rollResult.toFixed(2);
+        rollValue.textContent = Math.floor(rollResult);
         
         // Set win/lose status
         if (isWin) {
@@ -404,7 +499,7 @@ class DiceGame {
         // Auto-clear result after 5 seconds
         setTimeout(() => {
             resultContainer.className = 'roll-result';
-            rollValue.textContent = '0.00';
+            rollValue.textContent = '0';
             rollStatus.textContent = 'Roll result';
             rollPayout.textContent = '';
         }, 5000);
@@ -437,7 +532,7 @@ class DiceGame {
     addRecentRoll(rollValue, betAmount, winAmount, isWin) {
         const roll = {
             timestamp: Date.now(),
-            rollValue: rollValue.toFixed(2),
+            rollValue: Math.floor(rollValue),
             betAmount,
             winAmount,
             isWin,
@@ -589,5 +684,8 @@ class DiceGame {
     }
 }
 
-// Make DiceGame available globally
-window.DiceGame = DiceGame;
+// Make RollGame available globally
+window.RollGame = RollGame;
+
+// Backward compatibility - can be removed later
+window.DiceGame = RollGame;

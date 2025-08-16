@@ -4,6 +4,7 @@
 <!-- KEYWORDS=_profile, account, settings, user, faucet, coins_ -->
 <!-- STYLES=_styles/guest-base.css, styles/member-base.css_ -->
 <!-- SCRIPTS=_js/levels-system.js_ -->
+<!-- HEADING=_👤 User Profile_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -86,7 +87,13 @@
         </aside>
 <!-- include end left-sidebar.html -->
 
+<!-- include start main-content-start.html -->
         <main class="main-content">
+            <!-- Compact page header -->
+            <div class="page-header">
+                <h1 class="page-title">👤 User Profile</h1>
+            </div>
+<!-- include end main-content-start.html -->
             <div class="profile-container">
                 
                 <!-- Guest Notice -->

@@ -40,6 +40,10 @@ process_placeholders() {
             local placeholder_name="SCRIPTS"
             local placeholder_value="${line#*SCRIPTS=_}"
             placeholder_value="${placeholder_value%_*}"
+        elif [[ "$line" == *"HEADING=_"* ]]; then
+            local placeholder_name="HEADING"
+            local placeholder_value="${line#*HEADING=_}"
+            placeholder_value="${placeholder_value%_*}"
         else
             continue
         fi

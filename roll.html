@@ -2,8 +2,9 @@
 <!-- TITLE=_Roll of Chance - ROFLFaucet_ -->
 <!-- DESC=_Intelligent dice game with dynamic probability calculations and High/Low mechanics_ -->
 <!-- KEYWORDS=_dice, game, gambling, ROFLFaucet, roll, chance, probability, high, low, multiplier_ -->
-<!-- STYLES=_css/dice.css_ -->
-<!-- SCRIPTS=_js/levels-system.js,js/dice-game.js_ -->
+<!-- STYLES=_css/roll.css_ -->
+<!-- SCRIPTS=_js/levels-system.js,js/roll-game.js_ -->
+<!-- HEADING=_🎲 Roll of Chance_ -->
 
 <!-- include start header.html -->
 <!DOCTYPE html>
@@ -19,7 +20,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="css/dice.css">
+        <link rel="stylesheet" href="css/roll.css">
 
     
     <!-- Site-wide scripts -->
@@ -47,7 +48,7 @@
                     <a href="#" class="nav-link dropdown-toggle">Games ▼</a>
                     <div class="dropdown-menu">
                         <a href="slots.html" class="dropdown-item">🎰 Slots</a>
-                        <a href="dice.html" class="dropdown-item">🎲 Roll of Chance</a>
+                        <a href="roll.html" class="dropdown-item">🎲 Roll of Chance</a>
                         <a href="wheel.html" class="dropdown-item">🎡 Wheel of Wealth</a>
                     </div>
                 </div>
@@ -70,8 +71,6 @@
     </header>
     
     <div class="container">
-<!-- include end header.html -->
-
 <!-- include start left-sidebar.html -->
         <aside class="left-sidebar">
             <!-- A-Ads placeholder - no min-width constraint for testing -->
@@ -85,14 +84,20 @@
         </aside>
 <!-- include end left-sidebar.html -->
 
+<!-- include start main-content-start.html -->
         <main class="main-content">
-<!-- UNIQUE PAGE CONTENT GOES HERE -->
+            <!-- Compact page header -->
+            <div class="page-header">
+                <h1 class="page-title">🎲 Roll of Chance</h1>
+            </div>
+<!-- include end main-content-start.html -->
+
             <div class="content-container">
                 <div class="game-container">
-                    <h1 class="game-title">🎲 Roll of Chance</h1>
                     
+                    <!-- Unified Game Section - Balance, Controls, and Result -->
                     <!-- Balance Display -->
-                    <div class="balance-display">
+                    <div class="dice-balance-section" style="margin-bottom: 0;">
                         <div class="balance-item">
                             <span class="balance-label">Balance:</span>
                             <span class="balance-value" id="playerBalance">0</span>
@@ -105,58 +110,48 @@
                             </button>
                         </div>
                     </div>
-
-                    <!-- Table-based Betting Panel -->
-                    <div style="padding: 20px; background: rgba(0,0,0,0.05); border-radius: 8px; margin: 20px 0;">
+                    <!-- Unified Game Control Panel -->
+                    <div class="dice-control-section">
+                        <!-- Unified Control Table -->
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
-                                <td style="padding: 8px; text-align: right; font-weight: bold;">Bet Amount:</td>
-                                <td style="padding: 8px;">
-                                    <button id="betDown" type="button" style="padding: 4px 8px; margin-right: 5px;">-</button>
-                                    <input type="number" id="betAmount" value="1" min="1" max="100" style="width: 80px; text-align: center;">
-                                    <button id="betUp" type="button" style="padding: 4px 8px; margin-left: 5px;">+</button>
+                                <td style="padding: 8px; text-align: right; font-weight: bold; width: 20%;">Bet Amount:</td>
+                                <td style="padding: 8px; width: 30%; text-align: center;">
+                                    <input type="number" id="betAmount" value="1" min="1" max="100">
                                 </td>
-                                <td style="padding: 8px; text-align: right; font-weight: bold;">Win Chance:</td>
-                                <td style="padding: 8px; color: #28a745; font-weight: bold;" id="winChance">49.50%</td>
+                                <td style="padding: 8px; text-align: right; font-weight: bold; width: 20%;">Win Chance:</td>
+                                <td style="padding: 8px; color: #28a745; font-weight: bold; width: 30%;"><span class="key-number" id="winChance">49.50%</span></td>
                             </tr>
                             <tr>
                                 <td style="padding: 8px; text-align: right; font-weight: bold;">Multiplier:</td>
-                                <td style="padding: 8px;">
-                                    <button id="payoutDown" type="button" style="padding: 4px 8px; margin-right: 5px;">-</button>
-                                    <input type="number" id="payoutMultiplier" value="2" min="1.01" max="1000" step="0.01" style="width: 80px; text-align: center;">
-                                    <button id="payoutUp" type="button" style="padding: 4px 8px; margin-left: 5px;">+</button>
-                                    <span style="margin-left: 5px;">x</span>
+                                <td style="padding: 8px; text-align: center;">
+                                    <input type="number" id="payoutMultiplier" value="2" min="2" max="1000" step="1" placeholder="2-1000" style="width: 80px; text-align: center; font-size: 1.1em; font-weight: bold; padding: 8px;">
                                 </td>
                                 <td style="padding: 8px; text-align: right; font-weight: bold;">Potential Win:</td>
                                 <td style="padding: 8px; color: #007bff; font-weight: bold;">
-                                    <span id="potentialPayout">2</span> <span style="font-size: 0.9em;">tokens</span>
+                                    <span class="key-number" id="potentialPayout">2</span> <span style="font-size: 0.9em;">tokens</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" style="padding: 15px; text-align: center;">
+                                    <div style="margin-bottom: 15px;">
+                                        <span id="rollCondition" style="font-weight: bold; margin-right: 10px;">Roll UNDER</span>
+                                        <span class="key-number" id="rollThreshold" style="color: #007bff; font-weight: bold; margin-right: 10px;">50</span>
+                                        <span style="margin-right: 15px;">to win</span>
+                                        <button class="btn btn-primary highlow-toggle" id="highlowToggle" style="padding: 6px 12px; font-size: 0.9em;">
+                                            Switch to HIGH
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-success btn-lg roll-button" id="rollButton" style="padding: 12px 24px;">🎲 ROLL DICE</button>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
-
-                    <!-- High/Low Toggle -->
-                    <div class="highlow-controls" style="text-align: center; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 15px;">
-                        <div class="highlow-label" style="margin-bottom: 10px;">
-                            <span id="rollCondition">Roll UNDER to win</span>
-                        </div>
-                        <div class="highlow-threshold" style="margin-bottom: 15px;">
-                            <span>Target: </span>
-                            <span id="rollThreshold">49.50</span>
-                        </div>
-                        <button class="btn btn-primary highlow-toggle" id="highlowToggle" style="padding: 8px 16px;">
-                            Switch to HIGH
-                        </button>
-                    </div>
-
-                    <!-- Roll Button -->
-                    <div style="text-align: center; margin: 20px 0;">
-                        <button class="btn btn-success btn-lg roll-button" id="rollButton">🎲 ROLL DICE</button>
-                    </div>
-
                     <!-- Roll Result -->
-                    <div class="roll-result" id="rollResult" style="text-align: center; padding: 20px;">
-                        <div class="result-number" id="rollValue">0.00</div>
+                    <div class="dice-result-section" id="rollResult" style="text-align: center; margin-top: 0;">
+                        <div class="result-number" id="rollValue">0</div>
                         <div class="result-status" id="rollStatus">Roll result</div>
                         <div class="result-payout" id="rollPayout"></div>
                     </div>
@@ -195,7 +190,7 @@
                                     <li><strong>10x multiplier</strong> = ~9.9% win chance (medium risk)</li>
                                     <li><strong>100x multiplier</strong> = ~0.99% win chance (high risk)</li>
                                     <li><strong>1000x multiplier</strong> = ~0.099% win chance (EXTREME!)</li>
-                                    <li>🎯 <strong>99% RTP</strong> - One of the fairest dice games online!</li>
+                                    <li>🎯 <strong>100% RTP</strong> - The fairest dice game online!</li>
                                 </ul>
                             </div>
                         </div>
@@ -279,16 +274,16 @@
                     }
                 }
                 
-                // Initialize dice game when page loads
+                // Initialize roll game when page loads
                 document.addEventListener('DOMContentLoaded', function() {
-                    // Initialize dice game
-                    if (typeof DiceGame !== 'undefined') {
-                        window.diceGame = new DiceGame();
+                    // Initialize roll game
+                    if (typeof RollGame !== 'undefined') {
+                        window.rollGame = new RollGame();
                     } else {
-                        console.log('⏳ Waiting for DiceGame class to load...');
+                        console.log('⏳ Waiting for RollGame class to load...');
                         setTimeout(function() {
-                            if (typeof DiceGame !== 'undefined') {
-                                window.diceGame = new DiceGame();
+                            if (typeof RollGame !== 'undefined') {
+                                window.rollGame = new RollGame();
                             }
                         }, 1000);
                     }
@@ -311,7 +306,7 @@
     
     <!-- Additional page-specific scripts -->
         <script src="js/levels-system.js"></script>
-    <script src="js/dice-game.js"></script>
+    <script src="js/roll-game.js"></script>
 
 </body>
 </html>
