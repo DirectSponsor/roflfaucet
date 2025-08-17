@@ -58,16 +58,12 @@ class LevelsSystem {
         try {
             // Get user data from the unified balance system
             if (this.isLoggedIn) {
-                // For logged-in users, fetch from server
-                const response = await fetch('/api/user-data.php', {
-                    method: 'POST',
+                // For logged-in users, fetch from server using GET request
+                const response = await fetch('/api/user-data.php?action=profile', {
+                    method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
-                    },
-                    body: JSON.stringify({
-                        action: 'get_profile'
-                    })
+                    }
                 });
                 
                 if (response.ok) {
@@ -91,32 +87,33 @@ class LevelsSystem {
         
         try {
             if (this.isLoggedIn) {
-                // For logged-in users, save to server
-                const response = await fetch('/api/user-data.php', {
+                // For logged-in users, use simple PHP script to write directly to file
+                const response = await fetch('/save-level.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
                     },
                     body: JSON.stringify({
-                        action: 'update_profile',
-                        profile: {
-                            level: this.currentUserLevel
-                        }
+                        level: this.currentUserLevel
                     })
                 });
                 
-                if (!response.ok) {
-                    console.error('Failed to save level to server');
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    console.error('Failed to save level to server:', result.error);
+                    throw new Error(result.error || 'Save failed');
                 }
+                
+                console.log(`🏆 User level saved successfully: ${this.currentUserLevel}`);
             } else {
                 // For guests, save to localStorage
                 localStorage.setItem('guest_level', this.currentUserLevel.toString());
+                console.log(`🏆 Guest level saved: ${this.currentUserLevel}`);
             }
-            
-            console.log(`🏆 User level saved: ${this.currentUserLevel}`);
         } catch (error) {
             console.error('Error saving user level:', error);
+            throw error; // Re-throw so purchaseUpgrade can handle it
         }
     }
     
@@ -163,7 +160,7 @@ class LevelsSystem {
     async upgradeLevelModal() {
         const nextLevel = this.getNextLevel();
         if (!nextLevel) {
-            alert('🏆 Congratulations! You\'re already at the maximum level!');
+            this.createMaxLevelModal();
             return;
         }
         
@@ -171,21 +168,7 @@ class LevelsSystem {
         const canAfford = currentBalance >= nextLevel.cost;
         const currency = this.isLoggedIn ? 'coins' : 'tokens';
         
-        const message = `🏆 Level Up Available!\\n\\n` +
-                       `Current Level: ${this.getCurrentLevel().name} (Max bet: ${this.getMaxBet()})\\n` +
-                       `Next Level: ${nextLevel.name} (Max bet: ${nextLevel.maxBet})\\n\\n` +
-                       `Cost: ${nextLevel.cost.toLocaleString()} ${currency}\\n` +
-                       `Your Balance: ${currentBalance.toLocaleString()} ${currency}\\n\\n` +
-                       `${nextLevel.description}\\n\\n` +
-                       (canAfford 
-                           ? 'Do you want to upgrade to the next level?' 
-                           : `You need ${(nextLevel.cost - currentBalance).toLocaleString()} more ${currency} to upgrade.`);
-        
-        if (canAfford && confirm(message)) {
-            await this.purchaseUpgrade();
-        } else if (!canAfford) {
-            alert(message);
-        }
+        this.createUpgradeModal(nextLevel, currentBalance, canAfford, currency);
     }
     
     async purchaseUpgrade() {
@@ -202,7 +185,7 @@ class LevelsSystem {
             
             // Show success message
             const currency = this.isLoggedIn ? 'coins' : 'tokens';
-            alert(`🎉 Level Up Successful!\\n\\nYou are now a ${nextLevel.name}!\\nMax bet increased to ${nextLevel.maxBet} ${currency}\\n\\n${nextLevel.description}`);
+            this.createSuccessModal(nextLevel, currency);
             
             // Trigger any UI updates
             this.onLevelChanged();
@@ -210,7 +193,7 @@ class LevelsSystem {
             return true;
         } catch (error) {
             console.error('Error purchasing upgrade:', error);
-            alert('❌ Upgrade failed. Please try again.');
+            this.createErrorModal('❌ Upgrade failed. Please try again.');
             return false;
         }
     }
@@ -324,6 +307,276 @@ class LevelsSystem {
         this.createLevelsModal();
     }
     
+    createMaxLevelModal() {
+        // Remove existing modal if present
+        const existingModal = document.getElementById('max-level-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modal = document.createElement('div');
+        modal.id = 'max-level-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        `;
+        
+        modalContent.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 10px;">🏆</div>
+                <h2 style="color: #28a745; margin-bottom: 10px;">Congratulations!</h2>
+                <p style="color: #666; margin-bottom: 20px;">You're already at the maximum level!</p>
+                
+                <div style="padding: 15px; background: #d4edda; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 20px;">
+                    <strong>Current Level: ${this.getCurrentLevel().name}</strong><br>
+                    <span style="color: #666;">Max Bet: ${this.getMaxBet()} ${this.isLoggedIn ? 'coins' : 'tokens'}</span>
+                </div>
+                
+                <button onclick="document.getElementById('max-level-modal').remove()" 
+                        style="background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer;">Close</button>
+            </div>
+        `;
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+    
+    createUpgradeModal(nextLevel, currentBalance, canAfford, currency) {
+        // Remove existing modal if present
+        const existingModal = document.getElementById('upgrade-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modal = document.createElement('div');
+        modal.id = 'upgrade-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        `;
+        
+        let content = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 10px;">🏆</div>
+                <h2 style="color: #007bff; margin-bottom: 10px;">Level Up Available!</h2>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <div style="text-align: left; flex: 1; margin-right: 10px;">
+                        <strong>Current Level:</strong><br>
+                        <span style="color: #666;">${this.getCurrentLevel().name}</span><br>
+                        <span style="font-size: 14px; color: #999;">Max bet: ${this.getMaxBet()} ${currency}</span>
+                    </div>
+                    <div style="text-align: right; flex: 1; margin-left: 10px;">
+                        <strong>Next Level:</strong><br>
+                        <span style="color: #007bff;">${nextLevel.name}</span><br>
+                        <span style="font-size: 14px; color: #999;">Max bet: ${nextLevel.maxBet} ${currency}</span>
+                    </div>
+                </div>
+                
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span><strong>Cost:</strong> ${nextLevel.cost.toLocaleString()} ${currency}</span>
+                        <span><strong>Your Balance:</strong> ${currentBalance.toLocaleString()} ${currency}</span>
+                    </div>
+                </div>
+                
+                <p style="color: #666; margin-bottom: 20px; font-style: italic;">${nextLevel.description}</p>
+        `;
+        
+        if (canAfford) {
+            content += `
+                <p style="color: #28a745; margin-bottom: 20px;">✅ You can afford this upgrade!</p>
+                
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="document.getElementById('upgrade-modal').remove()" 
+                            style="background: #6c757d; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer;">Cancel</button>
+                    <button onclick="window.levelsSystem.purchaseUpgrade(); document.getElementById('upgrade-modal').remove();" 
+                            style="background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Upgrade Now!</button>
+                </div>
+            `;
+        } else {
+            const shortfall = nextLevel.cost - currentBalance;
+            content += `
+                <div style="padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #856404;">⚠️ You need <strong>${shortfall.toLocaleString()} more ${currency}</strong> to upgrade.</p>
+                </div>
+                
+                <button onclick="document.getElementById('upgrade-modal').remove()" 
+                        style="background: #6c757d; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer;">Close</button>
+            `;
+        }
+        
+        content += `</div>`;
+        
+        modalContent.innerHTML = content;
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+    
+    createSuccessModal(nextLevel, currency) {
+        // Remove existing modal if present
+        const existingModal = document.getElementById('success-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modal = document.createElement('div');
+        modal.id = 'success-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        `;
+        
+        modalContent.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+                <h2 style="color: #28a745; margin-bottom: 10px;">Level Up Successful!</h2>
+                
+                <div style="padding: 15px; background: #d4edda; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #155724;"><strong>You are now a ${nextLevel.name}!</strong></p>
+                    <p style="margin: 5px 0 0 0; color: #666;">Max bet increased to ${nextLevel.maxBet} ${currency}</p>
+                </div>
+                
+                <p style="color: #666; margin-bottom: 20px; font-style: italic;">${nextLevel.description}</p>
+                
+                <button onclick="document.getElementById('success-modal').remove()" 
+                        style="background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Awesome!</button>
+            </div>
+        `;
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+    
+    createErrorModal(message) {
+        // Remove existing modal if present
+        const existingModal = document.getElementById('error-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modal = document.createElement('div');
+        modal.id = 'error-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        `;
+        
+        modalContent.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                <h2 style="color: #dc3545; margin-bottom: 10px;">Error</h2>
+                <p style="color: #666; margin-bottom: 20px;">${message}</p>
+                
+                <button onclick="document.getElementById('error-modal').remove()" 
+                        style="background: #dc3545; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer;">Close</button>
+            </div>
+        `;
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+    
     createLevelsModal() {
         // Remove existing modal if present
         const existingModal = document.getElementById('levels-modal');
@@ -384,7 +637,7 @@ class LevelsSystem {
                 <span style="color: #666;">Max Bet: ${this.getMaxBet()} ${currency}</span>
             </div>
             
-            <div style="max-height: 400px; overflow-y: auto;">
+            <div>
         `;
         
         this.levels.forEach(level => {
@@ -484,14 +737,6 @@ class LevelsSystem {
         });
     }
     
-    // Helper method for games to validate bets
-    validateBet(amount, gameName = 'game') {
-        if (!this.canBet(amount)) {
-            this.showInsufficientLevelModal(amount, this.getMaxBet());
-            return false;
-        }
-        return true;
-    }
 }
 
 // Create global instance

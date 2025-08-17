@@ -143,6 +143,7 @@ class UserDataManager {
                     'total_games_played' => 0,
                     'total_won' => 0
                 ],
+                'level' => 1,  // Default starting level
                 'created_at' => time(),
                 'last_profile_update' => time()
             ];

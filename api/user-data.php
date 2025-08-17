@@ -242,16 +242,26 @@ function handlePostRequest($userManager, $action) {
             break;
             
         case 'update_profile':
+            // DEBUG: Log what we're receiving
+            error_log("UPDATE_PROFILE DEBUG: Full input: " . json_encode($input));
+            
             // Accept both direct format and nested format for flexibility
             $profileUpdates = $input['profile_updates'] ?? $input;
             
+            // Remove action from profileUpdates to avoid confusion
+            unset($profileUpdates['action']);
+            
+            error_log("UPDATE_PROFILE DEBUG: Profile updates after processing: " . json_encode($profileUpdates));
+            
             if (!is_array($profileUpdates)) {
+                error_log("UPDATE_PROFILE DEBUG: profileUpdates is not array, type: " . gettype($profileUpdates));
                 http_response_code(400);
                 echo json_encode(['error' => 'Invalid profile data']);
                 return;
             }
             
             $success = $userManager->updateProfile($userId, $profileUpdates);
+            error_log("UPDATE_PROFILE DEBUG: Update result: " . ($success ? 'SUCCESS' : 'FAILED'));
             
             if ($success) {
                 echo json_encode([

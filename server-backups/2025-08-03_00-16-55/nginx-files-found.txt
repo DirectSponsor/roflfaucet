@@ -1,7 +1,0 @@
-/etc/nginx/conf.d/data.directsponsor.org.conf
-/etc/nginx/conf.d/data.directsponsor.org.conf.backup
-/etc/nginx/conf.d/auth.directsponsor.org.conf.backup-20250617-231532
-/etc/nginx/conf.d/auth.directsponsor.org.conf
-/etc/nginx/conf.d/auth.directsponsor.org.conf.backup
-/etc/nginx/conf.d/data.directsponsor.org.conf.backup-20250619-220243
-/etc/nginx/conf.d/users.directsponsor.org.conf

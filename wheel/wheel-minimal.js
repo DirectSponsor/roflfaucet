@@ -281,15 +281,23 @@ class WheelAnimation {
     }
 
     async increaseBet() {
-        // Check level-based betting limit
-        const maxBet = await getUserBettingLimit();
+        // Check level-based betting limit using direct approach
+        if (!window.levelsSystem) {
+            console.error('🎡 ❌ Levels system not available!');
+            return;
+        }
         
-        if (this.currentBet < maxBet) {
-            this.currentBet += 1;
+        const maxBet = window.levelsSystem.getMaxBet();
+        const newBet = this.currentBet + 1;
+        
+        if (newBet <= maxBet) {
+            this.currentBet = newBet;
             this.updateBetDisplay();
+            console.log(`🎡 Bet increased to ${this.currentBet}`);
         } else {
             // Show level restriction modal
-            showLevelUpgradeModal(maxBet, this.currentBet + 1);
+            window.levelsSystem.showInsufficientLevelModal(newBet, maxBet);
+            console.log(`🎡 Bet blocked: ${newBet} exceeds max bet ${maxBet}`);
         }
     }
 

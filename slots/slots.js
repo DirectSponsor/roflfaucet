@@ -961,18 +961,28 @@ function increaseBet() {
     if (slotMachine && !slotMachine.isSpinning) {
         const newBet = slotMachine.currentBet + 1;
         
-        // Check levels system first if available
-        if (window.levelsSystem) {
-            if (!window.levelsSystem.validateBet(newBet, 'slots')) {
-                return; // Level system will show appropriate modal
-            }
+        // Check levels system using direct approach
+        if (!window.levelsSystem) {
+            console.error('🎰 ❌ Levels system not available!');
+            return;
         }
         
-        const maxBet = Math.min(10, slotMachine.credits); // Max bet is 10 or current credits
-        if (slotMachine.currentBet < maxBet) {
+        const maxLevelBet = window.levelsSystem.getMaxBet();
+        if (newBet > maxLevelBet) {
+            // Show level restriction modal
+            window.levelsSystem.showInsufficientLevelModal(newBet, maxLevelBet);
+            console.log(`🎰 Bet blocked: ${newBet} exceeds max level bet ${maxLevelBet}`);
+            return;
+        }
+        
+        // Also check against available credits
+        const maxAffordableBet = Math.min(10, slotMachine.credits); // Max bet is 10 or current credits
+        if (slotMachine.currentBet < maxAffordableBet) {
             slotMachine.currentBet++;
             slotMachine.updateDisplay();
             console.log(`🎰 Bet increased to ${slotMachine.currentBet}`);
+        } else {
+            console.log(`🎰 Cannot increase bet: insufficient credits (${slotMachine.credits})`);
         }
     }
 }
