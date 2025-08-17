@@ -32,7 +32,6 @@
     <script src="scripts/core/image-preloader.js"></script>
     
     <!-- Unified Balance System -->
-    <script>console.log('🔧 Loading unified balance system...');</script>
 </head>
 <body>
     <!-- Header Navigation -->

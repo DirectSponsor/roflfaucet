@@ -32,7 +32,6 @@
     <script src="scripts/core/image-preloader.js"></script>
     
     <!-- Unified Balance System -->
-    <script>console.log('🔧 Loading unified balance system...');</script>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -126,7 +125,7 @@
                                                 <span class="control-value" id="last-win">0</span>
                                             </td>
                                             <td>
-                                                <span class="control-label">COINS</span><br>
+                                                <span class="control-label currency-upper">COINS</span><br>
                                                 <span class="control-value" id="current-balance">100</span>
                                             </td>
                                             <td>
