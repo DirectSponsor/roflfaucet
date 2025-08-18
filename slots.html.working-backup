@@ -121,7 +121,7 @@
                                 </div>
 
                                 <!-- Control Panel -->
-                                <div class="control-panel">
+                                <div class="slots-panel">
                                     <table class="control-table">
                                         <tr>
                                             <td>
@@ -251,7 +251,7 @@
                                 </div>
                                 
                                 <!-- Back Control Panel - Same as front but with disabled SPIN -->
-                                <div class="control-panel">
+                                <div class="slots-panel">
                                     <table class="control-table">
                                         <tr>
                                             <td>

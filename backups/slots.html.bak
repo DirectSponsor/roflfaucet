@@ -2,8 +2,8 @@
 <!-- TITLE=_ROFLFaucet - Casino Slots_ -->
 <!-- DESC=_Play casino slots and win UselessCoins on ROFLFaucet_ -->
 <!-- KEYWORDS=_slots, casino, faucet, coins, gambling, game_ -->
-<!-- STYLES=_slots/slots.css,slots/slots-direct.css_ -->
-<!-- SCRIPTS=_js/levels-system.js,scripts/core/insufficient-balance-dialog.js,slots/slots.js,slots/slots-direct.js_ -->
+<!-- STYLES=_slots/slots-direct.css_ -->
+<!-- SCRIPTS=_scripts/core/insufficient-balance-dialog.js,slots/slots.js_ -->
 <!-- HEADING=_🎰 Casino Slots_ -->
 
 <!-- include start header.html -->
@@ -20,8 +20,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="slots/slots.css">
-    <link rel="stylesheet" href="slots/slots-direct.css">
+        <link rel="stylesheet" href="slots/slots-direct.css">
 
     
     <!-- Site-wide scripts -->
@@ -29,7 +28,6 @@
     <script src="scripts/core/site-utils.js"></script>
     <script src="scripts/core/gallery-system-simple.js"></script>
     <script src="scripts/core/jwt-simple.js"></script>
-    <script src="scripts/core/image-preloader.js"></script>
     
     <!-- Unified Balance System -->
 </head>
@@ -123,7 +121,7 @@
                                 </div>
 
                                 <!-- Control Panel -->
-                                <div class="control-panel">
+                                <div class="slots-panel">
                                     <table class="control-table">
                                         <tr>
                                             <td>
@@ -253,7 +251,7 @@
                                 </div>
                                 
                                 <!-- Back Control Panel - Same as front but with disabled SPIN -->
-                                <div class="control-panel">
+                                <div class="slots-panel">
                                     <table class="control-table">
                                         <tr>
                                             <td>
@@ -309,10 +307,8 @@
     </div>
     
     <!-- Additional page-specific scripts -->
-        <script src="js/levels-system.js"></script>
-    <script src="scripts/core/insufficient-balance-dialog.js"></script>
+        <script src="scripts/core/insufficient-balance-dialog.js"></script>
     <script src="slots/slots.js"></script>
-    <script src="slots/slots-direct.js"></script>
 
 </body>
 </html>

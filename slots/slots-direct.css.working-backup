@@ -163,7 +163,7 @@
     border-radius: 8px;
     margin: 0 auto;
     width: var(--reels-container-width, 394px);
-    padding: 0;
+    padding: 8px;
 }
 
 .slot-direct .control-table {
@@ -226,15 +226,16 @@
     background: #3498db;
     color: white;
     border: none;
-    width: 28px;
-    height: 20px;
+    width: calc(32px * var(--scale-factor, 1));
+    height: calc(26px * var(--scale-factor, 1));
     border-radius: 2px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: calc(0.9rem * var(--scale-factor, 1));
     transition: background 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: -0.5em 0;
 }
 
 .slot-direct .bet-btn-inline:hover {
@@ -247,7 +248,7 @@
 }
 
 .slot-direct .action-cell {
-    padding: 6px 4px;
+    padding: calc(8px * var(--scale-factor, 1)) calc(4px * var(--scale-factor, 1)) !important; /* More padding for buttons */
     vertical-align: middle;
     border-right: 2px solid #304357;
 }
