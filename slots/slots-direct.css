@@ -419,3 +419,31 @@
     color: #95a5a6;
     font-size: calc(1rem * var(--scale-factor, 1));
 }
+
+/* Ultra-small screen optimizations - 290px support */
+@media (max-width: 360px) {
+    .slot-direct .control-label {
+        font-size: 0.65rem !important; /* Smaller labels on tiny screens */
+    }
+    
+    .slot-direct .control-value {
+        font-size: 1.1rem !important; /* Smaller values on tiny screens */
+    }
+    
+    .slot-direct .spin-button {
+        font-size: 0.9rem !important; /* Smaller spin button text */
+        padding: 0 10px !important; /* Less horizontal padding */
+    }
+    
+    .slot-direct .bet-btn-inline {
+        width: 16px !important; /* Smaller bet buttons */
+        height: 12px !important;
+        font-size: 0.5rem !important;
+    }
+    
+    .slot-direct .action-cell .flip-button,
+    .slot-direct .action-cell .faucet-countdown-btn {
+        font-size: 0.8rem !important;
+        padding: 0 8px !important;
+    }
+}

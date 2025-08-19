@@ -288,8 +288,8 @@ class CasinoSlotMachine {
             padding = 5;
         }
         
-        // Ensure minimum container width
-        containerWidth = Math.max(300, containerWidth);
+        // Ensure minimum container width - reduced for ultra-narrow support
+        containerWidth = Math.max(270, containerWidth);
         
         // Calculate available width for reels
         const usedSpace = (2 * gap) + (3 * 4); // gaps + borders (2px each reel)
@@ -313,8 +313,15 @@ class CasinoSlotMachine {
             // Medium tablet: ensure adequate size with mobile-style layout
             reelWidth = Math.max(95, Math.min(105, calculatedReelWidth));
         } else {
-            // Mobile/small screens: use calculated width with reasonable limits
-            reelWidth = Math.max(80, Math.min(120, calculatedReelWidth));
+            // Mobile/small screens: use calculated width with aggressive scaling like mobile version
+            if (calculatedReelWidth >= 80) {
+                reelWidth = 80;
+            } else if (calculatedReelWidth >= 65) {
+                reelWidth = 65;
+            } else {
+                // Very tight: minimum viable size (matches mobile version)
+                reelWidth = 55;
+            }
         }
         
         // Maintain 3:1 aspect ratio (3 symbols high)

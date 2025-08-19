@@ -2,7 +2,7 @@
 <!-- TITLE=_ROFLFaucet - Casino Slots (Mobile)_ -->
 <!-- DESC=_Play casino slots and win UselessCoins on ROFLFaucet - Mobile optimized_ -->
 <!-- KEYWORDS=_slots, casino, faucet, coins, gambling, game, mobile_ -->
-<!-- STYLES=_slots/slots.css,mobile-layout.css_ -->
+<!-- STYLES=_slots/slots-mobile.css,mobile-layout.css_ -->
 <!-- SCRIPTS=_scripts/core/insufficient-balance-dialog.js,slots/slots-mobile.js_ -->
 
 <!-- include start header-mobile.html -->
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-    _    <link rel="stylesheet" href="slots/slots.css">
+    _    <link rel="stylesheet" href="slots/slots-mobile.css">
     <link rel="stylesheet" href="mobile-layout.css">
 _
 
@@ -84,29 +84,30 @@ _
             <!-- Control Panel -->
             <div class="control-panel">
                 <table class="control-table">
-                    <tr class="control-row">
-                        <td class="control-cell">
-                            <span class="control-label">WIN</span><br>
-                            <span class="control-value" id="last-win">0</span>
+                    <!-- Row 1: Labels -->
+                    <tr class="label-row">
+                        <td class="control-cell label-cell">WIN</td>
+                        <td class="control-cell label-cell">COINS</td>
+                        <td class="control-cell label-cell">BET</td>
+                        <td class="control-cell arrow-cell">
+                            <button class="arrow-btn" onclick="increaseBet()">▲</button>
                         </td>
-                        <td class="control-cell">
-                            <span class="control-label currency-upper">COINS</span><br>
-                            <span class="control-value balance" id="current-balance">100</span>
-                        </td>
-                        <td class="control-cell bet-cell">
-                            <span class="control-label">BET</span><br>
-                            <span class="control-value" id="current-bet">1</span>
-                        </td>
-                        <td class="control-cell narrow-arrow-cell">
-                            <button class="bet-btn-inline" onclick="increaseBet()">▲</button><br>
-                            <button class="bet-btn-inline" onclick="decreaseBet()">▼</button>
-                        </td>
-                        <td class="control-cell spin-cell">
+                        <td class="control-cell spin-cell" rowspan="2">
                             <button class="spin-button" onclick="spinReels()" id="spin-btn">
                                 SPIN
                             </button>
                         </td>
                     </tr>
+                    <!-- Row 2: Values -->
+                    <tr class="value-row">
+                        <td class="control-cell value-cell" id="last-win">0</td>
+                        <td class="control-cell value-cell balance" id="current-balance">100</td>
+                        <td class="control-cell value-cell" id="current-bet">1</td>
+                        <td class="control-cell arrow-cell">
+                            <button class="arrow-btn" onclick="decreaseBet()">▼</button>
+                        </td>
+                    </tr>
+                    <!-- Row 3: Action buttons -->
                     <tr class="action-row">
                         <td class="control-cell action-cell" colspan="2">
                             <button class="flip-button" onclick="flipMachine()" id="flip-btn">
