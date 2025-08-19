@@ -11,8 +11,22 @@ class UnifiedBalanceSystem {
         
         console.log(`💰 Unified Balance System initialized for ${this.isLoggedIn ? 'member' : 'guest'} user`);
         
+        // Apply appropriate body class for styling
+        this.applyUserModeClass();
+        
         // Update currency display immediately
         this.updateCurrencyDisplay();
+    }
+    
+    applyUserModeClass() {
+        // Remove any existing mode classes
+        document.body.classList.remove('member-mode', 'guest-mode');
+        
+        // Apply the appropriate class based on login status
+        const modeClass = this.isLoggedIn ? 'member-mode' : 'guest-mode';
+        document.body.classList.add(modeClass);
+        
+        console.log(`🎨 Applied body class: ${modeClass}`);
     }
     
     updateCurrencyDisplay() {
@@ -234,6 +248,8 @@ class UnifiedBalanceSystem {
         
         if (wasLoggedIn !== this.isLoggedIn) {
             console.log(`💰 Login status changed: ${wasLoggedIn ? 'member' : 'guest'} → ${this.isLoggedIn ? 'member' : 'guest'}`);
+            // Update body class for new login status
+            this.applyUserModeClass();
             // Note: This is mainly used for logout, as login triggers a page refresh
             this.updateCurrencyDisplay();
             setTimeout(updateBalanceDisplays, 100);
