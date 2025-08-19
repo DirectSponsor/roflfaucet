@@ -1,6 +1,23 @@
 /* Member Base Styles */
 /* Enhanced styling for logged-in users */
 
+/* SUPER OBVIOUS TEST STYLING */
+body.member-mode {
+    background: lime !important;
+    color: blue !important;
+}
+
+body.member-mode * {
+    font-size: 28px !important;
+    font-weight: bold !important;
+}
+
+body.member-mode .header {
+    background: orange !important;
+    color: black !important;
+}
+/* END TEST STYLING */
+
 body.member-mode {
     --member-primary: #28a745;
     --member-secondary: #20c997;
