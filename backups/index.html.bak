@@ -2,7 +2,6 @@
 <!-- TITLE=_ROFLFaucet - Earn UselessCoins_ -->
 <!-- DESC=_Earn UselessCoins every 5 minutes with our secure faucet system_ -->
 <!-- KEYWORDS=_crypto faucet, free tokens, cryptocurrency, uselesscoins_ -->
-<!-- STYLES=_styles/guest-base.css, styles/member-base.css_ -->
 <!-- SCRIPTS=_scripts/core/faucet-bridge.js_ -->
 
 <!-- include start header.html -->
@@ -19,8 +18,6 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="styles/guest-base.css">
-    <link rel="stylesheet" href="styles/member-base.css">
 
     
     <!-- Site-wide scripts -->
