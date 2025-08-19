@@ -125,11 +125,3 @@ body.guest-mode {
     background: #357abd;
 }
 
-/* Simplified styling for low bandwidth */
-.guest-mode .no-gradients {
-    background: var(--guest-primary) !important;
-}
-
-.guest-mode .minimal-shadows {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-}

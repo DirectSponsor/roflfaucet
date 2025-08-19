@@ -536,14 +536,14 @@
     -moz-appearance: textfield;
 }
 
-/* Show spinners on all devices */
+/* Show spinners on all devices - let browser decide what's appropriate */
 #betAmount::-webkit-outer-spin-button,
 #betAmount::-webkit-inner-spin-button,
 #payoutMultiplier::-webkit-outer-spin-button,
 #payoutMultiplier::-webkit-inner-spin-button {
-    -webkit-appearance: inner-spin-button !important;
-    opacity: 1 !important;
-    height: 40px !important;
+    -webkit-appearance: inner-spin-button;
+    opacity: 1;
+    height: 40px;
     cursor: pointer;
 }
 

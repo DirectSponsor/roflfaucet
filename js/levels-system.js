@@ -275,7 +275,7 @@ class LevelsSystem {
                 <div style="display: flex; gap: 10px; justify-content: center;">
                     <button onclick="document.getElementById('insufficient-level-modal').remove()" 
                             style="background: #6c757d; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer;">Close</button>
-                    <button onclick="window.location.href='profile.html'" 
+                    <button onclick="window.location.href='https://auth.directsponsor.org/auth/authorize?client_id=roflfaucet&redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/callback')" 
                             style="background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Sign Up Free</button>
                 </div>
             `;
