@@ -19,12 +19,23 @@ class UnifiedBalanceSystem {
     }
     
     applyUserModeClass() {
+        console.log('🚨 DEBUG: applyUserModeClass() called!');
+        console.log('🚨 DEBUG: this.isLoggedIn =', this.isLoggedIn);
+        console.log('🚨 DEBUG: document.body =', document.body);
+        
         // Remove any existing mode classes
         document.body.classList.remove('member-mode', 'guest-mode');
+        console.log('🚨 DEBUG: Removed existing classes');
         
         // Apply the appropriate class based on login status
         const modeClass = this.isLoggedIn ? 'member-mode' : 'guest-mode';
         document.body.classList.add(modeClass);
+        
+        console.log(`🚨 DEBUG: Added class: ${modeClass}`);
+        console.log('🚨 DEBUG: body.classList =', Array.from(document.body.classList));
+        
+        // Force style recalculation
+        document.body.offsetHeight;
         
         console.log(`🎨 Applied body class: ${modeClass}`);
     }
