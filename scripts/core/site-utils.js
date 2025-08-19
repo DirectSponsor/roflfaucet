@@ -197,17 +197,7 @@ function isMobileDevice() {
     return isMobileUA || (isTouchDevice && isSmallScreen);
 }
 
-// Check for mobile redirect on slots pages
-function checkMobileRedirect() {
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    // Only redirect from desktop slots to mobile slots
-    if (currentPage === 'slots.html' && isMobileDevice()) {
-        console.log('📱 Mobile device detected, redirecting to mobile slots...');
-        window.location.href = 'slots-mobile.html';
-    }
-    // Don't redirect from mobile slots to desktop (user might want desktop version)
-}
+// Mobile redirect removed - now using single responsive slots.html for all devices
 
 // ====================================
 // MOBILE MENU SYSTEM

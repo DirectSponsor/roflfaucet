@@ -1004,10 +1004,7 @@ function claimWinnings() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🎰 DOM loaded, initializing slot machine...');
     
-    // Check for mobile redirect first
-    if (typeof checkMobileRedirect === 'function') {
-        checkMobileRedirect();
-    }
+    // Mobile redirect removed - now using single responsive slots.html for all devices
     
     console.log('🎰 Checking global functions availability...');
     console.log('  - getBalance:', typeof getBalance);
