@@ -1,0 +1,28 @@
+# Sensitive files - never commit
+config.php
+debug-*.php
+test-*.php
+jwt-debug.php
+*backup*
+CREDENTIAL*
+*SECURITY*
+DATABASE_PASSWORD*
+deploy*.sh
+
+# User data files - never commit
+userdata/balances/*.txt
+userdata/profiles/*.txt
+userdata/avatars/*
+
+# Development files
+*.log
+*.tmp
+.htaccess.backup
+index.html.backup
+
+# Old backup directories
+duckdns-full-backup/
+duckdns/
+
+# Documentation (optional - you might want to keep some)
+*.md

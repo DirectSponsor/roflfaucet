@@ -1,0 +1,820 @@
+/* STANDALONE SLOTS PAGE CSS - Complete and Self-Contained */
+
+/* Basic reset and page structure */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* PAGE WRAPPER */
+.page-wrapper {
+    max-width: 1366px;
+    margin: 0 auto;
+    background: white;
+}
+
+/* HEADER STYLES */
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.5rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-center {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo {
+    color: #4A90E2;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.logo:hover {
+    color: #357abd;
+}
+
+/* Desktop navigation - default */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.nav-button {
+    background: #4A90E2;
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+.nav-button:hover {
+    background: #357abd;
+}
+
+/* Simple Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 999;
+    border-radius: 5px;
+    padding: 0.5rem 0;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    display: block;
+    transition: background 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* SPONSORS SECTION */
+.sponsors {
+    background: #f8f8f8;
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+}
+
+.sponsors h3 {
+    color: #333;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+}
+
+.sponsor-logos {
+    text-align: center;
+}
+
+.sponsor-logos a,
+.sponsor-logos .sponsor-placeholder {
+    display: inline-block;
+    margin: 0.5rem 1rem;
+    vertical-align: middle;
+}
+
+.sponsor-logo {
+    max-height: 60px;
+    max-width: 200px;
+    transition: opacity 0.3s ease;
+}
+
+.sponsor-logo:hover {
+    opacity: 0.8;
+}
+
+.sponsor-placeholder {
+    width: 150px;
+    height: 50px;
+    background: #e0e0e0;
+    border: 2px dashed #999;
+    text-align: center;
+    line-height: 50px;
+    font-size: 12px;
+    color: #666;
+    border-radius: 3px;
+}
+
+/* HAMBURGER MENU */
+.hamburger {
+    display: none;
+    background: #4A90E2;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin: 0.25rem;
+    transition: background 0.3s ease;
+}
+
+.hamburger:hover {
+    background: #357abd;
+}
+
+/* SLOT MACHINE SPECIFIC STYLES */
+.slot-direct {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+}
+
+/* Minimal container - let JS control everything else */
+.slot-direct .slot-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 0.1em;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Reels container - dark background for game area */
+.slot-direct .reels-container {
+    background: #1a1a1a;
+    border-radius: 10px;
+    border: 2px solid #333;
+    position: relative;
+    padding: 15px;
+}
+
+/* Reels row - horizontal layout for 3 reels */
+.slot-direct .reels-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Individual reel - fixed dimensions */
+.slot-direct .reel {
+    overflow: hidden;
+    background: #333;
+    border-radius: 3px;
+    position: relative;
+    border: 2px solid #222;
+    background-image: url('images/sprite_reel_vertical_120px.png');
+    background-repeat: repeat-y;
+    background-position: 0 0;
+    width: 120px;
+    height: 360px;
+    background-size: 120px 1200px;
+}
+
+/* Reel effects */
+.slot-direct .reel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+    background: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.3) 15%,
+        rgba(0, 0, 0, 0.08) 30%,
+        rgba(0, 0, 0, 0) 40%,
+        rgba(0, 0, 0, 0) 60%,
+        rgba(0, 0, 0, 0.08) 70%,
+        rgba(0, 0, 0, 0.3) 85%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    box-shadow: 
+        inset 8px 0 12px -8px rgba(0, 0, 0, 0.4),
+        inset -8px 0 12px -8px rgba(0, 0, 0, 0.4);
+}
+
+/* Glass overlay */
+.slot-direct .glass-overlay {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 10;
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.08) 20%,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(255, 255, 255, 0.08) 80%,
+        rgba(255, 255, 255, 0.15) 100%
+    );
+    border-top: 2px solid rgba(255, 255, 255, 0.6);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+    /* Height set by JS based on reel width */
+    height: var(--reel-width, 120px);
+}
+
+.slot-direct .center-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.4);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 11;
+    pointer-events: none;
+}
+
+/* Spinning animations */
+.slot-direct .reel.spinning {
+    animation: spinReel 0.5s linear infinite;
+}
+
+.slot-direct #reel-1.spinning { animation: spinReel1 0.5s linear infinite; }
+.slot-direct #reel-2.spinning { animation: spinReel2 0.55s linear infinite; }
+.slot-direct #reel-3.spinning { animation: spinReel3 0.6s linear infinite; }
+
+@keyframes spinReel { 0% { background-position: 0 0; } 100% { background-position: 0 -1200px; } }
+@keyframes spinReel1 { 0% { background-position: 0 0; } 100% { background-position: 0 -1200px; } }
+@keyframes spinReel2 { 0% { background-position: 0 0; } 100% { background-position: 0 -1200px; } }
+@keyframes spinReel3 { 0% { background-position: 0 0; } 100% { background-position: 0 -1200px; } }
+
+.slot-direct .reel:not(.spinning) {
+    transition: background-position 0.3s ease-out;
+}
+
+/* Progress indicator - width controlled by JS */
+.slot-direct .progress-indicator {
+    height: 8px;
+    background: #4a5568; /* Lighter grey background */
+    border-radius: 4px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #2d3748; /* Darker grey border */
+    width: 100%; /* Match table column width */
+}
+
+.slot-direct .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3CE74C 0%, #2DD93C 50%, #3CE74C 100%); /* Custom green gradient */
+    border-radius: 3px;
+    transition: width 0.3s ease-out;
+}
+
+/* Control panel cell now handles all the styling directly */
+
+.slot-direct .control-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.slot-direct .control-table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: calc(4px * var(--scale-factor, 1)) calc(6px * var(--scale-factor, 1));
+    border-right: 2px solid #304357;
+    background: #1a1a1a;
+}
+
+.slot-direct .control-table td:last-child {
+    border-right: none;
+}
+
+.slot-direct .control-label {
+    font-size: var(--control-label-size, 0.8rem);
+    font-weight: bold;
+    color: #ecf0f1;
+    line-height: 1;
+}
+
+.slot-direct .control-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #f1c40f;
+    transition: all 0.3s ease;
+}
+
+.slot-direct .spin-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.slot-direct .spin-button:hover {
+    background: #c0392b;
+}
+
+.slot-direct .spin-button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+.slot-direct .bet-btn-inline {
+    background: #3498db;
+    color: white;
+    border: none;
+    width: calc(32px * var(--scale-factor, 1));
+    height: calc(26px * var(--scale-factor, 1));
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: calc(0.9rem * var(--scale-factor, 1));
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0; /* Remove negative margin */
+}
+
+.slot-direct .bet-btn-inline:hover {
+    background: #2980b9;
+}
+
+/* Action row styling - second row in control table */
+.slot-direct .action-row {
+    border-top: 2px solid #304357; /* Separator line above action buttons */
+}
+
+.slot-direct .action-cell {
+    padding: calc(8px * var(--scale-factor, 1)) calc(4px * var(--scale-factor, 1)) !important; /* More padding for buttons */
+    vertical-align: middle;
+    border-right: 2px solid #304357;
+}
+
+.slot-direct .action-cell:last-child {
+    border-right: none;
+}
+
+/* Style buttons in action cells */
+.slot-direct .action-cell .flip-button,
+.slot-direct .action-cell .faucet-countdown-btn {
+    width: 100%;
+    height: calc(40px * var(--scale-factor, 1));
+    margin: 0;
+    font-size: calc(0.9rem * var(--scale-factor, 1));
+    padding: 0 calc(10px * var(--scale-factor, 1));
+}
+
+/* Action buttons - scaled */
+.slot-direct .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: calc(20px * var(--scale-factor, 1));
+    margin: calc(20px * var(--scale-factor, 1)) 0;
+}
+
+.slot-direct .flip-button, .slot-direct .faucet-btn {
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: calc(10px * var(--scale-factor, 1)) calc(20px * var(--scale-factor, 1));
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: calc(1rem * var(--scale-factor, 1));
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.slot-direct .flip-button:hover, .slot-direct .faucet-btn:hover {
+    background: #e67e22;
+}
+
+.slot-direct .faucet-btn {
+    background: #27ae60;
+}
+
+.slot-direct .faucet-btn:hover {
+    background: #229954;
+}
+
+/* Faucet countdown button styles - matches progress bar theme */
+.slot-direct .faucet-countdown-btn {
+    background: #4a5568; /* Match progress bar background */
+    color: #e2e8f0; /* Light grey text for good contrast */
+    border: none;
+    padding: calc(10px * var(--scale-factor, 1)) calc(20px * var(--scale-factor, 1));
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: calc(1rem * var(--scale-factor, 1));
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 1px solid #2d3748; /* Match progress bar border */
+}
+
+.slot-direct .faucet-countdown-btn:not(:disabled) {
+    background: linear-gradient(90deg, #3CE74C 0%, #2DD93C 50%, #3CE74C 100%); /* Match progress fill */
+    border: 1px solid #2ABB38;
+    color: #1a202c; /* Dark text on green for good contrast */
+}
+
+.slot-direct .faucet-countdown-btn:not(:disabled):hover {
+    background: linear-gradient(90deg, #4FED5C 0%, #3FE64F 50%, #4FED5C 100%); /* Lighter green on hover */
+}
+
+.slot-direct .faucet-countdown-btn:disabled {
+    cursor: not-allowed;
+}
+
+.slot-direct .faucet-countdown-btn:disabled:hover {
+    background: #718096; /* Slightly lighter on hover even when disabled */
+}
+
+.slot-direct .faucet-countdown-btn .btn-text {
+    font-weight: bold;
+}
+
+/* Fade Machine Styles */
+.slot-direct .slot-machine {
+    position: relative;
+}
+
+.slot-direct .machine-front, .slot-direct .machine-back {
+    transition: opacity 0.5s ease-in-out;
+}
+
+.slot-direct .machine-front {
+    opacity: 1;
+}
+
+.slot-direct .machine-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.slot-direct .slot-machine.flipped .machine-front {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.slot-direct .slot-machine.flipped .machine-back {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Prize Display Styles */
+.slot-direct .prize-display-container {
+    background: #2c3e50;
+    border-radius: 8px;
+    padding: calc(10px * var(--scale-factor, 1));
+    margin: calc(5px * var(--scale-factor, 1)) auto;
+    max-width: 100%;
+}
+
+.slot-direct .prize-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: calc(0.9rem * var(--scale-factor, 1));
+}
+
+.slot-direct .prize-cell {
+    padding: calc(8px * var(--scale-factor, 1));
+    text-align: center;
+    border: 1px solid #34495e;
+    background: #1a1a1a;
+    vertical-align: middle;
+}
+
+.slot-direct .prize-images {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: calc(4px * var(--scale-factor, 1));
+    margin-bottom: calc(5px * var(--scale-factor, 1));
+}
+
+.slot-direct .prize-symbol {
+    width: calc(40px * var(--scale-factor, 1));
+    height: calc(40px * var(--scale-factor, 1));
+    object-fit: contain;
+}
+
+.slot-direct .prize-payout {
+    font-weight: bold;
+    color: #f1c40f;
+    font-size: calc(1.1rem * var(--scale-factor, 1));
+}
+
+.slot-direct .empty-symbol {
+    display: inline-block;
+    width: calc(40px * var(--scale-factor, 1));
+    height: calc(40px * var(--scale-factor, 1));
+    line-height: calc(40px * var(--scale-factor, 1));
+    text-align: center;
+    font-weight: bold;
+    color: #95a5a6;
+    font-size: calc(1rem * var(--scale-factor, 1));
+}
+
+/* ===== TABLE LAYOUT STYLES ===== */
+/* HTML Table Structure for Slots Page Layout */
+
+.slot-direct .slot-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+/* Light sidebar cells - subtle blue tint to show gradient */
+.slot-direct .left-bar,
+.slot-direct .right-bar {
+    text-align: center;
+    vertical-align: top;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.85); /* More transparent to show gradient */
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(242, 247, 255, 0.9) 50%, 
+        rgba(235, 245, 255, 0.85) 100%
+    ); /* Subtle blue-white gradient */
+    border: 1px solid rgba(74, 144, 226, 0.3); /* Slightly stronger blue border */
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* Soft shadow for definition */
+}
+
+/* Make sidebar images responsive */
+.slot-direct .left-bar img,
+.slot-direct .right-bar img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Main content cell - dark theme for game area only */
+.slot-direct .slot-reel-cell {
+    vertical-align: top;
+    padding: 20px 20px 0 20px; /* Zero bottom padding */
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    border-radius: 15px 15px 0 0; /* Rounded top corners only */
+}
+
+/* Progress cell - unified with game area */
+.slot-direct .slot-progress-cell {
+    vertical-align: top;
+    padding: 0 20px; /* Zero top and bottom padding */
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+}
+
+/* Control panel cell - unified with game area */
+.slot-direct .slot-controls-cell {
+    vertical-align: top;
+    padding: 0 20px 5px 20px; /* Zero top padding */
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    border-radius: 0 0 15px 15px; /* Rounded bottom corners only */
+}
+
+.slot-direct .slot-banner-row {
+    vertical-align: top;
+    padding: 5px 20px; /* Reduced top padding to close gap */
+    text-align: center;
+}
+
+.slot-direct .horizontal-banner-in-table {
+    width: 100%;
+    max-width: 468px;
+    height: 60px;
+    background: #e0e0e0;
+    border: 2px dashed #999;
+    text-align: center;
+    line-height: 60px;
+    color: #666;
+    margin: 10px auto;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+/* ===== RESPONSIVE LAYOUT ===== */
+/* Default 3-column layout: 30% - 40% - 30% */
+.slot-direct .left-bar {
+    width: 30%;
+}
+
+.slot-direct .slot-reel-cell,
+.slot-direct .slot-progress-cell,
+.slot-direct .slot-controls-cell,
+.slot-direct .slot-banner-row {
+    width: 40%;
+}
+
+.slot-direct .right-bar {
+    width: 30%;
+}
+
+/* Hide right sidebar first (keep left for ads) */
+@media (max-width: 950px) and (min-width: 601px) {
+    .slot-direct .right-bar {
+        display: none;
+    }
+    .slot-direct .slot-reel-cell,
+    .slot-direct .slot-progress-cell,
+    .slot-direct .slot-controls-cell,
+    .slot-direct .slot-banner-row {
+        width: 55%; /* Expand main content */
+    }
+    .slot-direct .left-bar {
+        width: 45%; /* Keep left sidebar larger */
+    }
+}
+
+/* Hide both sidebars on mobile */
+@media (max-width: 600px) {
+    .slot-direct .left-bar,
+    .slot-direct .right-bar {
+        display: none;
+    }
+    .slot-direct .slot-reel-cell,
+    .slot-direct .slot-progress-cell,
+    .slot-direct .slot-controls-cell,
+    .slot-direct .slot-banner-row {
+        width: 100%;
+    }
+}
+
+/* Desktop navigation compression - squeeze buttons before mobile */
+@media (max-width: 1000px) and (min-width: 701px) {
+    .nav-button {
+        padding: 0.4rem 0.8rem; /* Reduce padding slightly */
+        margin: 0.2rem; /* Reduce margins */
+        font-size: 0.85rem; /* Slightly smaller text */
+    }
+}
+
+@media (max-width: 850px) and (min-width: 701px) {
+    .nav-button {
+        padding: 0.35rem 0.6rem; /* Compress more */
+        margin: 0.15rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile navigation */
+@media (max-width: 700px) {
+    /* Show hamburger menu on mobile */
+    .hamburger {
+        display: block;
+        position: relative;
+        z-index: 1001;
+    }
+    
+    /* Header needs relative positioning for nav overlay */
+    .header {
+        position: relative;
+    }
+    
+    /* Hide navigation by default on mobile - overlay style */
+    nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(74, 144, 226, 0.2);
+        border-top: 2px solid #4A90E2;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        padding: 1rem 0.5rem;
+        text-align: center;
+        z-index: 1000;
+        transform: translateY(-10px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    /* Show navigation when hamburger is clicked */
+    nav.mobile-nav-open {
+        display: block;
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    /* Mobile navigation buttons - compact and narrow */
+    .nav-button {
+        display: block;
+        margin: 0.2rem auto;
+        max-width: 160px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Dropdown positioning on mobile */
+    .dropdown-content {
+        position: static;
+        display: block;
+        box-shadow: none;
+        background: none;
+        padding: 0;
+        margin-top: 0.2rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .dropdown-content a {
+        background: rgba(74, 144, 226, 0.1); /* Light blue background */
+        border-left: 3px solid #4A90E2; /* Blue left border for submenu indication */
+        margin: 0.1rem auto 0.1rem 20px; /* Left margin for indentation */
+        max-width: 140px;
+        border-radius: 0 3px 3px 0; /* Rounded on right only */
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem 0.3rem 0.8rem; /* Extra left padding */
+        color: #2c5282; /* Darker blue text */
+        position: relative;
+    }
+    
+    .dropdown-content a:hover {
+        background: rgba(74, 144, 226, 0.2);
+        border-left-color: #357abd;
+        color: #1a365d;
+    }
+    
+    .dropdown-content a::before {
+        content: '→';
+        position: absolute;
+        left: -15px;
+        color: #4A90E2;
+        font-size: 0.7rem;
+    }
+}

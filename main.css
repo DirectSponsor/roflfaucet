@@ -1,0 +1,736 @@
+/* FAUCET PAGES CSS - Dedicated styling for index.html, faucet-claim.html, faucet-result.html */
+
+/* Basic reset and page structure */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* PAGE WRAPPER */
+.page-wrapper {
+    max-width: 1366px;
+    margin: 0 auto;
+    background: white;
+}
+
+/* HEADER STYLES */
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.5rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-center {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo {
+    color: #4A90E2;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.logo:hover {
+    color: #357abd;
+}
+
+/* Desktop navigation - default */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.nav-button {
+    background: #4A90E2;
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+.nav-button:hover {
+    background: #357abd;
+}
+
+/* Simple Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 999;
+    border-radius: 5px;
+    padding: 0.5rem 0;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    display: block;
+    transition: background 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* HAMBURGER MENU */
+.hamburger {
+    display: none;
+    background: #4A90E2;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin: 0.25rem;
+    transition: background 0.3s ease;
+}
+
+.hamburger:hover {
+    background: #357abd;
+}
+
+/* SPONSORS SECTION */
+.sponsors {
+    background: #f8f8f8;
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+}
+
+.sponsors h3 {
+    color: #333;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+}
+
+.sponsor-logos {
+    text-align: center;
+}
+
+.sponsor-logos a,
+.sponsor-logos .sponsor-placeholder {
+    display: inline-block;
+    margin: 0.5rem 1rem;
+    vertical-align: middle;
+}
+
+.sponsor-logo {
+    max-height: 60px;
+    max-width: 200px;
+    transition: opacity 0.3s ease;
+}
+
+.sponsor-logo:hover {
+    opacity: 0.8;
+}
+
+.sponsor-placeholder {
+    width: 150px;
+    height: 50px;
+    background: #e0e0e0;
+    border: 2px dashed #999;
+    text-align: center;
+    line-height: 50px;
+    font-size: 12px;
+    color: #666;
+    border-radius: 3px;
+}
+
+/* ===== FAUCET LAYOUT STYLES ===== */
+.slot-direct {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+}
+
+/* ===== TABLE LAYOUT FOR FAUCET PAGES ===== */
+.slot-machine-container .slot-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+/* Sidebar cells - light background */
+.left-bar,
+.right-bar {
+    text-align: center;
+    vertical-align: top;
+    padding: 0.5em;
+    background: rgba(255, 255, 255, 0.85);
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(242, 247, 255, 0.9) 50%, 
+        rgba(235, 245, 255, 0.85) 100%
+    );
+    border: 1px solid rgba(74, 144, 226, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Make sidebar images responsive */
+.left-bar img,
+.right-bar img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Main content cell - light theme for faucet pages */
+.faucet-content-cell {
+    vertical-align: top;
+    padding: 0.25em;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(248, 252, 255, 0.95) 50%, 
+        rgba(240, 248, 255, 0.9) 100%
+    );
+    color: #333;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Page title styling */
+.page-title {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Balance display */
+.balance {
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.currency-full {
+    color: #7f8c8d;
+    font-weight: normal;
+}
+
+/* Faucet button styling */
+.faucet-countdown-btn {
+    /* background removed - JavaScript controls this */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* box-shadow removed - let JavaScript handle colors */
+}
+
+.faucet-countdown-btn:hover:not(:disabled) {
+    /* background removed - JavaScript controls this */
+    transform: translateY(-2px);
+    /* box-shadow removed - JavaScript controls colors */
+}
+
+/* Default disabled state - will be overridden by JavaScript for countdown/ready states */
+.faucet-countdown-btn:disabled {
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    /* background color removed - let JavaScript control it */
+}
+
+/* Game links styling */
+.game-links a {
+    display: inline-block;
+    padding: 10px 16px;
+    margin: 8px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+.game-links a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Individual game colors */
+.game-links a[href="slots.html"] {
+    background: #4CAF50; /* Green for slots */
+}
+
+.game-links a[href="roll.html"] {
+    background: #2196F3; /* Blue for dice */
+}
+
+.game-links a[href="wheel.html"] {
+    background: #FF9800; /* Orange for wheel */
+}
+
+/* ===== RESPONSIVE LAYOUT ===== */
+/* Default 3-column layout: 30% - 40% - 30% */
+.left-bar {
+    width: 30%;
+}
+
+.faucet-content-cell {
+    width: 40%;
+}
+
+.right-bar {
+    width: 30%;
+}
+
+/* Hide right sidebar first (keep left for ads) */
+@media (max-width: 950px) and (min-width: 601px) {
+    .right-bar {
+        display: none;
+    }
+    .faucet-content-cell {
+        width: 55%;
+    }
+    .left-bar {
+        width: 45%;
+    }
+}
+
+/* Hide both sidebars on mobile */
+@media (max-width: 600px) {
+    .left-bar,
+    .right-bar {
+        display: none;
+    }
+    .faucet-content-cell {
+        width: 100%;
+    }
+}
+
+/* Desktop navigation compression */
+@media (max-width: 1000px) and (min-width: 701px) {
+    .nav-button {
+        padding: 0.4rem 0.8rem;
+        margin: 0.2rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 850px) and (min-width: 701px) {
+    .nav-button {
+        padding: 0.35rem 0.6rem;
+        margin: 0.15rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile navigation - completely redefine nav behavior */
+@media (max-width: 700px) {
+    /* Stack header elements on mobile */
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .header-left {
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .header-right {
+        order: 3;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+    
+    /* Redefine nav as hidden by default on mobile */
+    nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 0 0 10px 10px;
+        padding: 1rem 0;
+        margin: 0;
+        z-index: 1000;
+        animation: slideDown 0.3s ease;
+        flex-direction: column;
+        order: 2;
+    }
+    
+    /* Show hamburger button */
+    .hamburger {
+        display: inline-block;
+    }
+    
+    /* When mobile menu is open */
+    nav.mobile-nav-open {
+        display: block;
+    }
+    
+    /* Mobile menu animation */
+    @keyframes slideDown {
+        from {
+            transform: translateY(-10px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    /* Mobile nav buttons */
+    nav .nav-button {
+        display: block;
+        margin: 0.5rem auto;
+        width: 90%;
+        text-align: center;
+    }
+    
+    /* Mobile dropdowns */
+    nav .dropdown {
+        display: block;
+        width: 100%;
+    }
+    
+    nav .dropdown-content {
+        position: static;
+        display: block;
+        box-shadow: none;
+        background: rgba(240, 248, 255, 0.9);
+        margin-top: 0.5rem;
+        border-radius: 5px;
+    }
+    
+    nav .dropdown-content a {
+        padding: 0.5rem 1rem;
+        margin: 0 10%;
+        border-radius: 3px;
+        color: #4A90E2;
+        font-weight: bold;
+    }
+    
+    nav .dropdown-content a:hover {
+        background: rgba(74, 144, 226, 0.1);
+    }
+}
+
+/* ===== PADDED CONTENT STYLING ===== */
+.padded {
+    padding: 20px;
+}
+
+.padded h3 {
+    color: #2c3e50;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.padded p {
+    color: #34495e;
+    line-height: 1.5;
+    margin: 1rem 0;
+}
+
+/* Note: Removed .padded a rule that was conflicting with nav-button styling.
+   Demo mode links should use nav-button class for consistency. */
+
+/* ===== CARD STYLING SYSTEM ===== */
+/* Base card styling - shared by all card types */
+.card {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Blue cards - for informational content like games, features, tips */
+.card-info {
+    background: #e3f2fd;
+    border-left-color: #2196f3;
+}
+
+/* Additional card colors for future use */
+/* Green cards - for success, money, positive outcomes */
+.card-success {
+    background: #e8f5e8;
+    border-left-color: #4caf50;
+}
+
+/* Yellow cards - for instructions, how-to guides, helpful tips */
+.card-instruction {
+    background: #fffde7;
+    border-left-color: #ffc107;
+}
+
+/* Orange cards - for highlights, attention, warnings */
+.card-warning {
+    background: #fff3e0;
+    border-left-color: #ff9800;
+}
+
+/* Red cards - for errors, critical warnings */
+.card-error {
+    background: #ffebee;
+    border-left-color: #f44336;
+}
+
+/* Purple cards - for premium, special content */
+.card-premium {
+    background: #f3e5f5;
+    border-left-color: #9c27b0;
+}
+
+/* Gray cards - for neutral, secondary information */
+.card-neutral {
+    background: #f5f5f5;
+    border-left-color: #757575;
+}
+
+/* ===== FAUCET CLAIM STYLING ===== */
+/* Styling for faucet claim amounts - always green/success color */
+.claim-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #27ae60; /* Green for successful claims */
+    transition: all 0.3s ease;
+}
+
+/* ===== DICE ROLL RESULT STYLING ===== */
+/* Base styling for dice roll numbers */
+.roll-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 0.25rem;
+    transition: all 0.5s ease;
+}
+
+/* Win state for dice rolls */
+.dice-result-section.win .roll-number {
+    color: #ffeb3b; /* Yellow for wins */
+    animation: glow 1s ease-in-out;
+}
+
+/* Lose state for dice rolls */
+.dice-result-section.lose .roll-number {
+    color: #ffcdd2; /* Light red for losses */
+}
+
+/* Glow animation for wins */
+@keyframes glow {
+    0% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    50% { text-shadow: 0 0 20px #ffeb3b, 2px 2px 4px rgba(0,0,0,0.5); }
+    100% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+}
+
+/* Additional dice game result classes */
+.result-status {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.25rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    transition: all 0.5s ease;
+}
+
+.result-payout {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Dice result section states */
+.dice-result-section {
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.dice-result-section.win {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+}
+
+.dice-result-section.lose {
+    background: linear-gradient(135deg, #f44336, #c62828);
+    box-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
+}
+
+.dice-result-section.rolling {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+}
+
+/* Key number styling for game stats */
+.key-number {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    display: inline-block;
+}
+
+/* Stats number styling - larger numbers for balance displays */
+.stats-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4A90E2;
+    font-family: monospace;
+}
+
+/* ===== DICE GAME BUTTON STYLING ===== */
+/* High/Low toggle button */
+.highlow-toggle {
+    background: linear-gradient(45deg, #ee5a24, #c8102e);
+    border: none;
+    border-radius: 25px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+}
+
+.highlow-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+    background: linear-gradient(45deg, #ff5252, #d32f2f);
+}
+
+/* Roll button */
+.roll-button {
+    background: linear-gradient(45deg, #4caf50, #2e7d32);
+    border: none;
+    border-radius: 50px;
+    padding: 15px 40px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.roll-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(45deg, #43a047, #1b5e20);
+}
+
+.roll-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.roll-button.rolling {
+    animation: pulse 1s infinite;
+    background: linear-gradient(45deg, #ff9800, #f57c00);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive sizing for mobile */
+@media (max-width: 768px) {
+    .claim-amount {
+        font-size: 1.5rem;
+    }
+    
+    .roll-number {
+        font-size: 2.5rem;
+    }
+    
+    .stats-number {
+        font-size: 1.2rem;
+    }
+    
+    .key-number {
+        font-size: 0.9rem;
+        padding: 3px 6px;
+    }
+}
