@@ -1,0 +1,65 @@
+# Staging environment
+staging/
+
+# User data and sensitive files
+userdata/
+config.php
+*.log
+*.txt
+
+# Backups and archives
+backups/
+backup-from-live/
+server-backups/
+SENSITIVE_BACKUPS/
+*.backup
+*.bak
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Server-specific files
+.htaccess.local
+nginx.conf
+apache.conf
+
+# Chat database files (if using file-based storage)
+chat_data/
+*.db
+*.sqlite
+
+# Development files
+*.test
+test-*
+debug.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if any)
+node_modules/
+
+# PHP temporary files
+*.php~
+
+# Image uploads (if they contain user content)
+uploads/user-avatars/
+uploads/user-images/
+
+# Session files
+sessions/
+
+# Error logs
+error.log
+access.log
+php_errors.log
