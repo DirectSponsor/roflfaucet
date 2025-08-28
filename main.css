@@ -386,54 +386,50 @@ nav {
     }
 }
 
-/* Mobile navigation - completely redefine nav behavior */
+/* CSS-only Mobile Menu with Checkbox */
+/* Hide the checkbox input */
+.mobile-menu-toggle {
+    display: none;
+}
+
+/* Mobile navigation styles */
+.mobile-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    padding: 1rem 0;
+    margin: 0;
+    z-index: 1000;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Show mobile nav when checkbox is checked */
+.mobile-menu-toggle:checked ~ .mobile-nav {
+    display: flex !important;
+    animation: slideDown 0.3s ease;
+}
+
+/* Mobile navigation - responsive behavior */
 @media (max-width: 700px) {
-    /* Stack header elements on mobile */
-    .header {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
-    }
-    
-    .header-left {
-        justify-content: space-between;
-        width: 100%;
-        margin-bottom: 0.5rem;
+    /* Hide the desktop nav completely on mobile */
+    .header-center {
+        display: none !important;
     }
     
     .header-right {
-        order: 3;
-        justify-content: center;
-        margin-top: 0.5rem;
-    }
-    
-    /* Redefine nav as hidden by default on mobile */
-    nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        border-radius: 0 0 10px 10px;
-        padding: 1rem 0;
-        margin: 0;
-        z-index: 1000;
-        animation: slideDown 0.3s ease;
-        flex-direction: column;
-        order: 2;
+        display: none !important;
     }
     
     /* Show hamburger button */
     .hamburger {
-        display: inline-block;
-    }
-    
-    /* When mobile menu is open */
-    nav.mobile-nav-open {
-        display: block;
+        display: inline-block !important;
     }
     
     /* Mobile menu animation */

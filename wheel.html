@@ -22,11 +22,14 @@
 <body>
     <div class="page-wrapper">
         <div class="header">
+            <!-- Mobile menu checkbox (hidden) -->
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            
             <!-- Left: Logo -->
             <div class="header-left">
                 <a href="index.html" class="logo">🤣 roflfaucet</a>
                 <!-- Mobile hamburger button (hidden on desktop) -->
-                <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
             </div>
             
             <!-- Center: Main Navigation -->
@@ -52,6 +55,23 @@
             <div class="header-right">
                 <button id="login-btn" class="nav-button">🚪 Login</button>
             </div>
+            
+            <!-- Mobile navigation menu -->
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                    </div>
+                </div>
+                <a href="profile.html" class="nav-button">👤 Profile</a>
+                <a href="about.html" class="nav-button">ℹ️ About</a>
+                <button id="login-btn-mobile" class="nav-button">🚪 Login</button>
+            </nav>
         </div>
         
         <div class="slot-direct">
@@ -59,8 +79,9 @@
                 <div class="machine-front">
                     <div class="slot-machine-container">
                         <table class="slot-table" role="presentation">
+                            <!-- ROW 1: WHEEL DISPLAY -->
                             <tr>
-                                <td class="left-bar">
+                                <td class="left-bar" rowspan="2">
                                     <img src="https://placehold.co/300x250/4A90E2/FFFFFF?text=Ad+Banner+1" alt="Advertisement Banner 300x250" width="300" loading="lazy">
                                     
                                     <!-- Collapsible Chat Widget -->
@@ -96,63 +117,59 @@
                                     <img src="https://placehold.co/300x200/667eea/FFFFFF?text=Ad+Banner+2" alt="Advertisement Banner 300x200" width="300" loading="lazy" style="margin-top: 1em;">
                                 </td>
 
-                                <!-- 🎯 WHEEL GAME CONTENT -->
-                                <td class="faucet-content-cell">
-                                    <!-- Page Header -->
-                                    <div class="page-header" style="text-align: center; margin-bottom: 20px;">
-                                        <h1 class="page-title">🎡 Wheel of Wealth</h1>
+                                <!-- 🎯 WHEEL DISPLAY CELL -->
+                                <td class="wheel-display-cell">
+                                    <h1 style="text-align: center; margin-bottom: 20px; color: white;">🎡 Wheel of Wealth</h1>
+                                    
+                                    <!-- Wheel Display - minimal wrapper -->
+                                    <div class="wheel-display">
+                                        <img src="wheel/images/wofbase.png" alt="Wheel" class="wheel-image" id="wheel-image">
+                                        <img src="wheel/images/arrow.png" alt="Arrow" class="wheel-arrow">
                                     </div>
                                     
-                                    <!-- Main Content Area -->
-                                    <div class="padded">
-            <div class="wheel-game">
-                <!-- Wheel Display -->
-                <div class="wheel-display">
-                    <img src="wheel/images/wofbase.png" alt="Wheel" class="wheel-image" id="wheel-image">
-                    <img src="wheel/images/arrow.png" alt="Arrow" class="wheel-arrow">
-                </div>
-                
-                <!-- Game Status -->
-                <div class="game-status">
-                    <div class="status-text" id="status-text">Ready to Spin!</div>
-                </div>
-                
-                <!-- Game Controls -->
-                <div class="game-controls">
-                    <div class="control-row">
-                        <div class="control-item">
-                            <span class="control-label">WIN</span>
-                            <span class="control-value" id="last-win">0</span>
-                        </div>
-                        <div class="control-item">
-                            <span class="control-label currency-upper">COINS</span>
-                            <span class="control-value" id="current-balance">100</span>
-                        </div>
-                        <div class="control-item">
-                            <span class="control-label">BET</span>
-                            <span class="control-value" id="current-bet">1</span>
-                        </div>
-                        <div class="control-item bet-controls">
-                            <button class="bet-btn" onclick="increaseBet()">▲</button>
-                            <button class="bet-btn" onclick="decreaseBet()">▼</button>
-                        </div>
-                        <div class="control-item">
-                            <button class="spin-btn" onclick="spinWheel()" id="spin-btn">SPIN</button>
-                        </div>
-                    </div>
-                    
-                        <div class="faucet-row">
-                            <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
-                                <span class="btn-text">Faucet: 300</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                                    </div>
+                                    <!-- Game Status -->
+                                    <div class="status-text" id="status-text" style="text-align: center; color: white; font-weight: bold; margin-top: 15px;">Ready to Spin!</div>
                                 </td>
 
-                                <td class="right-bar">
+                                <td class="right-bar" rowspan="2">
                                     <img src="https://placehold.co/300x400/764ba2/FFFFFF?text=Gallery+Content" alt="Gallery Content 300x400" width="300" loading="lazy">
+                                </td>
+                            </tr>
+                            
+                            <!-- ROW 2: CONTROL PANEL -->
+                            <tr>
+                                <td class="wheel-controls-cell">
+                                    <!-- Direct table - no wrapper divs -->
+                                    <table style="width: 100%; border-collapse: collapse; background: rgba(0, 0, 0, 0.3); border-radius: 10px; margin: 10px auto;">
+                                        <tr>
+                                            <td class="control-item">
+                                                <span class="control-label">WIN</span><br>
+                                                <span class="control-value" id="last-win">0</span>
+                                            </td>
+                                            <td class="control-item">
+                                                <span class="control-label currency-upper">COINS</span><br>
+                                                <span class="control-value" id="current-balance">100</span>
+                                            </td>
+                                            <td class="control-item">
+                                                <span class="control-label">BET</span><br>
+                                                <span class="control-value" id="current-bet">1</span>
+                                            </td>
+                                            <td class="control-item">
+                                                <button class="bet-btn" onclick="increaseBet()">▲</button><br>
+                                                <button class="bet-btn" onclick="decreaseBet()">▼</button>
+                                            </td>
+                                            <td class="control-item">
+                                                <button class="spin-btn" onclick="spinWheel()" id="spin-btn">🎡 SPIN</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    
+                                    <!-- Faucet button - centered -->
+                                    <div style="text-align: center; margin-top: 15px;">
+                                        <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                            <span class="btn-text">Faucet: 300</span>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
@@ -178,6 +195,8 @@
     
     <!-- Scripts -->
     <script src="scripts/insufficient-balance-dialog.js"></script>
+    <script src="js/levels-system.js"></script>
+    <script src="scripts/dynamic-wins.js"></script>
     <script src="wheel/wheel-minimal.js"></script>
 </body>
 </html>

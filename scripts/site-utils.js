@@ -137,13 +137,13 @@ function toggleMobileNav() {
 }
 
 // Login functionality
-function showLoginDialog() {
+function showLoginDialog(clickedButton = null) {
     // Check if already logged in (has JWT token)
     const jwtToken = localStorage.getItem('jwt_token');
     
     if (jwtToken) {
         // Already logged in - show user menu or redirect to profile
-        showUserMenu();
+        showUserMenu(clickedButton);
         return;
     }
     
@@ -153,7 +153,7 @@ function showLoginDialog() {
     window.location.href = authUrl;
 }
 
-function showUserMenu() {
+function showUserMenu(clickedButton = null) {
     // Simple user menu for logged in users
     const existingMenu = document.getElementById('user-menu-dropdown');
     
@@ -167,9 +167,7 @@ function showUserMenu() {
     const menu = document.createElement('div');
     menu.id = 'user-menu-dropdown';
     menu.style.cssText = `
-        position: absolute;
-        top: 100%;
-        right: 0;
+        position: fixed;
         background: white;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -206,20 +204,42 @@ function showUserMenu() {
         </div>
     `;
     
-    // Position relative to login button
-    const loginBtn = document.getElementById('login-btn');
-    const btnRect = loginBtn.getBoundingClientRect();
+    // Determine which login button to position relative to
+    let referenceBtn = clickedButton;
+    if (!referenceBtn) {
+        // Try desktop button first, then mobile button
+        referenceBtn = document.getElementById('login-btn') || document.getElementById('login-btn-mobile');
+    }
     
-    menu.style.position = 'fixed';
-    menu.style.top = (btnRect.bottom + window.scrollY) + 'px';
-    menu.style.right = (window.innerWidth - btnRect.right) + 'px';
+    if (referenceBtn) {
+        const btnRect = referenceBtn.getBoundingClientRect();
+        
+        // Check if this is a mobile button (inside mobile nav)
+        const isMobileButton = referenceBtn.id === 'login-btn-mobile';
+        
+        if (isMobileButton) {
+            // Position for mobile - center horizontally, below the button
+            menu.style.top = (btnRect.bottom + window.scrollY + 5) + 'px';
+            menu.style.left = '50%';
+            menu.style.transform = 'translateX(-50%)';
+        } else {
+            // Position for desktop - align to right edge
+            menu.style.top = (btnRect.bottom + window.scrollY + 5) + 'px';
+            menu.style.right = (window.innerWidth - btnRect.right) + 'px';
+        }
+    } else {
+        // Fallback positioning - center of screen
+        menu.style.top = '20%';
+        menu.style.left = '50%';
+        menu.style.transform = 'translateX(-50%)';
+    }
     
     document.body.appendChild(menu);
     
     // Close menu when clicking outside
     setTimeout(() => {
         document.addEventListener('click', function closeMenu(e) {
-            if (!loginBtn.contains(e.target)) {
+            if (referenceBtn && !referenceBtn.contains(e.target) && !menu.contains(e.target)) {
                 menu.style.display = 'none';
                 document.removeEventListener('click', closeMenu);
             }
@@ -268,6 +288,31 @@ function updateLoginButton() {
     }
 }
 
+// Update mobile login button based on auth state
+function updateMobileLoginButton() {
+    const mobileLoginBtn = document.getElementById('login-btn-mobile');
+    if (!mobileLoginBtn) return;
+    
+    const jwtToken = localStorage.getItem('jwt_token');
+    
+    if (jwtToken) {
+        // Get username from JWT token
+        let username = 'User';
+        try {
+            const payload = JSON.parse(atob(jwtToken.split('.')[1]));
+            username = payload.username || payload.sub || 'User';
+        } catch (e) {
+            console.warn('Could not decode JWT token for username');
+        }
+        
+        mobileLoginBtn.textContent = `👤 ${username}`;
+        mobileLoginBtn.style.background = '#27ae60'; // Green for logged in
+    } else {
+        mobileLoginBtn.textContent = '🚪 Login';
+        mobileLoginBtn.style.background = '#4A90E2'; // Blue for login
+    }
+}
+
 // Process JWT token from URL parameters
 function processJwtFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -303,8 +348,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up login button functionality
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
-        loginBtn.addEventListener('click', showLoginDialog);
+        loginBtn.addEventListener('click', function() {
+            showLoginDialog(loginBtn);
+        });
         updateLoginButton();
+    }
+    
+    // Set up mobile login button functionality
+    const mobileLoginBtn = document.getElementById('login-btn-mobile');
+    if (mobileLoginBtn) {
+        mobileLoginBtn.addEventListener('click', function() {
+            showLoginDialog(mobileLoginBtn);
+        });
+        // Also update mobile login button text/style
+        updateMobileLoginButton();
     }
     
     // Also update login button on any guest login buttons (like in profile page)

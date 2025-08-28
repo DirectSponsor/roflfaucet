@@ -363,6 +363,14 @@ nav {
     transition: all 0.3s ease;
 }
 
+/* Override for win display - make it green and bigger */
+.slot-direct #last-win,
+.slot-direct #last-win-back {
+    color: #00ff00 !important;
+    font-size: 2em !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
 .slot-direct .spin-button {
     background: #e74c3c;
     color: white;
@@ -730,55 +738,97 @@ nav {
     }
 }
 
-/* Mobile navigation */
-@media (max-width: 700px) {
-    /* Show hamburger menu on mobile */
-    .hamburger {
-        display: block;
-        position: relative;
-        z-index: 1001;
-    }
-    
-    /* Header needs relative positioning for nav overlay */
-    .header {
-        position: relative;
-    }
-    
-    /* Hide navigation by default on mobile - overlay style */
-    nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(74, 144, 226, 0.2);
-        border-top: 2px solid #4A90E2;
-        border-radius: 0 0 10px 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        padding: 1rem 0.5rem;
-        text-align: center;
-        z-index: 1000;
+/* CSS-only Mobile Menu with Checkbox */
+/* Hide the checkbox input */
+.mobile-menu-toggle {
+    display: none;
+}
+
+/* Mobile navigation styles */
+.mobile-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    padding: 1rem 0;
+    margin: 0;
+    z-index: 1000;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Show mobile nav when checkbox is checked */
+.mobile-menu-toggle:checked ~ .mobile-nav {
+    display: flex !important;
+    animation: slideDown 0.3s ease;
+}
+
+/* Mobile menu animation */
+@keyframes slideDown {
+    from {
         transform: translateY(-10px);
         opacity: 0;
-        transition: all 0.3s ease;
     }
-    
-    /* Show navigation when hamburger is clicked */
-    nav.mobile-nav-open {
-        display: block;
+    to {
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+/* Mobile navigation - responsive behavior */
+@media (max-width: 700px) {
+    /* Hide the desktop nav table completely on mobile */
+    .header-center {
+        display: none !important;
+    }
     
-    /* Mobile navigation buttons - compact and narrow */
-    .nav-button {
+    .header-right {
+        display: none !important;
+    }
+    
+    /* Show hamburger button */
+    .hamburger {
+        display: inline-block !important;
+    }
+    
+    /* Mobile nav buttons styling */
+    .mobile-nav .nav-button {
         display: block;
-        margin: 0.2rem auto;
-        max-width: 160px;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
+        margin: 0.5rem auto;
+        width: 90%;
+        text-align: center;
+    }
+    
+    /* Mobile dropdowns */
+    .mobile-nav .dropdown {
+        display: block;
+        width: 100%;
+    }
+    
+    .mobile-nav .dropdown-content {
+        position: static;
+        display: block;
+        box-shadow: none;
+        background: rgba(240, 248, 255, 0.9);
+        margin-top: 0.5rem;
+        border-radius: 5px;
+    }
+    
+    .mobile-nav .dropdown-content a {
+        padding: 0.5rem 1rem;
+        margin: 0 10%;
+        border-radius: 3px;
+        color: #4A90E2;
+        font-weight: bold;
+    }
+    
+    .mobile-nav .dropdown-content a:hover {
+        background: rgba(74, 144, 226, 0.1);
     }
     
     /* Dropdown positioning on mobile */
