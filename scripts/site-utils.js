@@ -288,6 +288,27 @@ function updateLoginButton() {
     }
 }
 
+// Update login-dependent content visibility (show/hide guest-only elements)
+function updateLoginDependentContent() {
+    const jwtToken = localStorage.getItem('jwt_token');
+    const isLoggedIn = !!jwtToken;
+    
+    // Find all elements with 'guest-only' class
+    const guestOnlyElements = document.querySelectorAll('.guest-only');
+    
+    guestOnlyElements.forEach(element => {
+        if (isLoggedIn) {
+            // Hide guest-only content when logged in
+            element.style.display = 'none';
+        } else {
+            // Show guest-only content when logged out
+            element.style.display = '';
+        }
+    });
+    
+    console.log(`👁️ Login-dependent content updated: ${guestOnlyElements.length} guest-only elements ${isLoggedIn ? 'hidden' : 'shown'}`);
+}
+
 // Update mobile login button based on auth state
 function updateMobileLoginButton() {
     const mobileLoginBtn = document.getElementById('login-btn-mobile');
@@ -354,6 +375,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLoginButton();
     }
     
+    // Update login-dependent content visibility on page load
+    updateLoginDependentContent();
+    
     // Set up mobile login button functionality
     const mobileLoginBtn = document.getElementById('login-btn-mobile');
     if (mobileLoginBtn) {
@@ -374,6 +398,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (tokenProcessed) {
         console.log('🔄 Token processed, refreshing login status...');
         updateLoginButton();
+        updateMobileLoginButton();
+        updateLoginDependentContent();
         
         // Refresh the unified balance system to recognize the new login
         if (window.unifiedBalance) {

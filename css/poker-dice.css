@@ -1,0 +1,430 @@
+/* 3D Poker Dice Animation System - Table-based Layout */
+
+/* Main poker dice cells - similar to wheel approach */
+.poker-dice-display-cell {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.poker-dice-controls-cell {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 15px;
+    vertical-align: top;
+}
+
+/* Container for all 5 dice - no flexbox, just centered */
+.dice-container {
+    text-align: center;
+    perspective: 1000px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+/* Individual die container */
+.die-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    perspective: 400px;
+    display: inline-block;
+    margin: 0 10px;
+    vertical-align: middle;
+}
+
+/* The actual 3D die */
+.die {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+/* Die faces - realistic borderless design like real dice */
+.die-face {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: #ffffff;  /* Pure white like real dice */
+    border: none;         /* No borders - real dice don't have edge lines */
+    border-radius: 12px;
+    box-shadow: 
+        inset 2px 2px 4px rgba(255,255,255,0.8),   /* Top-left inner highlight */
+        inset -2px -2px 4px rgba(0,0,0,0.15),      /* Bottom-right inner shadow */
+        0 3px 8px rgba(0,0,0,0.25),                /* Drop shadow for depth */
+        0 1px 2px rgba(0,0,0,0.1);                 /* Subtle close shadow */
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 76px;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Face positioning - clean white faces ready for PNG overlays */
+.face-9 {
+    transform: rotateY(0deg) translateZ(40px);
+    background-image: url('../images/dice/nine.png');
+}
+
+.face-10 {
+    transform: rotateY(-90deg) translateZ(40px);
+    background-image: url('../images/dice/ten.png');
+}
+
+.face-jack {
+    transform: rotateY(180deg) translateZ(40px);
+    background-image: url('../images/dice/jack-hearts.png');
+}
+
+.face-queen {
+    transform: rotateY(90deg) translateZ(40px);
+    background-image: url('../images/dice/queen-clubs.png');
+}
+
+.face-king {
+    transform: rotateX(-90deg) translateZ(40px);
+    background-image: url('../images/dice/king-hearts.png');
+}
+
+.face-ace {
+    transform: rotateX(90deg) translateZ(40px);
+    background-image: url('../images/dice/ace.png');
+}
+
+/* Individual die roll animations with different rotations */
+.die.roll-1 {
+    animation: diceRoll1 2s ease-out;
+}
+
+.die.roll-2 {
+    animation: diceRoll2 2s ease-out;
+}
+
+.die.roll-3 {
+    animation: diceRoll3 2s ease-out;
+}
+
+.die.roll-4 {
+    animation: diceRoll4 2s ease-out;
+}
+
+.die.roll-5 {
+    animation: diceRoll5 2s ease-out;
+}
+
+/* Animation keyframes for different dice - all end at clean 360deg multiples (equivalent to 0deg) */
+@keyframes diceRoll1 {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    25% { transform: rotateX(180deg) rotateY(90deg); }
+    50% { transform: rotateX(360deg) rotateY(180deg); }
+    75% { transform: rotateX(540deg) rotateY(270deg); }
+    100% { transform: rotateX(720deg) rotateY(360deg); }
+}
+
+@keyframes diceRoll2 {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    25% { transform: rotateX(90deg) rotateY(180deg); }
+    50% { transform: rotateX(270deg) rotateY(360deg); }
+    75% { transform: rotateX(450deg) rotateY(540deg); }
+    100% { transform: rotateX(720deg) rotateY(720deg); }
+}
+
+@keyframes diceRoll3 {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    25% { transform: rotateX(270deg) rotateY(90deg); }
+    50% { transform: rotateX(180deg) rotateY(270deg); }
+    75% { transform: rotateX(450deg) rotateY(540deg); }
+    100% { transform: rotateX(720deg) rotateY(720deg); }
+}
+
+@keyframes diceRoll4 {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    25% { transform: rotateX(180deg) rotateY(270deg); }
+    50% { transform: rotateX(90deg) rotateY(450deg); }
+    75% { transform: rotateX(540deg) rotateY(630deg); }
+    100% { transform: rotateX(720deg) rotateY(720deg); }
+}
+
+@keyframes diceRoll5 {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    25% { transform: rotateX(360deg) rotateY(180deg); }
+    50% { transform: rotateX(180deg) rotateY(450deg); }
+    75% { transform: rotateX(630deg) rotateY(540deg); }
+    100% { transform: rotateX(720deg) rotateY(720deg); }
+}
+
+/* Final face rotations for each value - with smooth transition */
+.show-9 { 
+    transform: rotateY(0deg) rotateX(0deg); 
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.show-10 { 
+    transform: rotateY(90deg) rotateX(0deg); 
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.show-jack { 
+    transform: rotateY(180deg) rotateX(0deg); 
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.show-queen { 
+    transform: rotateY(-90deg) rotateX(0deg); 
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.show-king { 
+    transform: rotateY(0deg) rotateX(90deg); 
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.show-ace { 
+    transform: rotateY(0deg) rotateX(-90deg); 
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Current hand display */
+.current-hand {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    display: none;
+}
+
+.hand-name {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+}
+
+.hand-payout {
+    font-size: 1.1em;
+    color: #ffc107;
+}
+
+/* Control table - similar to wheel approach */
+.poker-controls-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    margin: 10px auto;
+}
+
+.poker-control-item {
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px;
+}
+
+.control-label {
+    font-size: 11px;
+    color: #ccc;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.control-value {
+    font-size: 16px;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Hand rankings table - simplified for player vs house */
+.rankings-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.rankings-table th,
+.rankings-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.rankings-table th {
+    background: rgba(255,255,255,0.1);
+    font-weight: bold;
+}
+
+.rankings-table .hand-rank {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.rankings-table .payout {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* Hold checkbox styling */
+.hold-checkbox {
+    margin: 0;
+}
+
+.hold-label {
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    font-size: 0.7em;
+    font-weight: bold;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.hold-checkbox:checked + .hold-label {
+    background: #ffc107;
+    color: #000;
+    border-color: #ffc107;
+}
+
+.hold-label:hover {
+    background: rgba(255,193,7,0.3);
+}
+
+/* Dice values with colors for flush detection */
+.value-9, .value-jack, .value-king {
+    color: #dc3545 !important; /* Red suit */
+}
+
+.value-10, .value-queen, .value-ace {
+    color: #343a40 !important; /* Black suit */
+}
+
+/* Winning hand highlight effects */
+.winning-hand {
+    animation: winGlow 1s ease-in-out;
+}
+
+@keyframes winGlow {
+    0% { box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.6); }
+    100% { box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+}
+
+/* Button styling - similar to wheel */
+.poker-roll-btn {
+    background: linear-gradient(145deg, #28a745, #20c997);
+    border: 2px solid #1e7e34;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.poker-roll-btn:hover:not(:disabled) {
+    background: linear-gradient(145deg, #38b755, #30d9a7);
+    transform: translateY(-1px);
+}
+
+.poker-roll-btn:active {
+    transform: translateY(1px);
+}
+
+.poker-roll-btn:disabled {
+    background: #666 !important;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 1 !important;
+}
+
+.poker-roll-btn.rolling {
+    background: linear-gradient(145deg, #fd7e14, #e55a00);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.bet-controls {
+    margin: 10px 0;
+}
+
+.bet-btn {
+    background: #444;
+    border: 1px solid #666;
+    color: #fff;
+    font-size: 12px;
+    width: 30px;
+    height: 25px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 0 2px;
+}
+
+.bet-btn:hover {
+    background: #555;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .die-container,
+    .die,
+    .die-face {
+        width: 60px;
+        height: 60px;
+        margin: 0 5px;
+    }
+    
+    .die-face {
+        font-size: 18px;
+        line-height: 56px;
+    }
+    
+    .face-9 {
+        transform: rotateY(0deg) translateZ(30px);
+    }
+    
+    .face-10 {
+        transform: rotateY(-90deg) translateZ(30px);
+    }
+    
+    .face-jack {
+        transform: rotateY(180deg) translateZ(30px);
+    }
+    
+    .face-queen {
+        transform: rotateY(90deg) translateZ(30px);
+    }
+    
+    .face-king {
+        transform: rotateX(-90deg) translateZ(30px);
+    }
+    
+    .face-ace {
+        transform: rotateX(90deg) translateZ(30px);
+    }
+}
+
+/* Small screens - wrap dice */
+@media (max-width: 480px) {
+    .dice-container {
+        padding: 15px 5px;
+    }
+    
+    .die-container {
+        margin: 5px;
+    }
+}

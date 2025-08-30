@@ -369,6 +369,11 @@ class UnifiedBalanceSystem {
             // Note: This is mainly used for logout, as login triggers a page refresh
             this.updateCurrencyDisplay();
             setTimeout(updateBalanceDisplays, 100);
+            
+            // Update login-dependent content visibility
+            if (typeof updateLoginDependentContent === 'function') {
+                updateLoginDependentContent();
+            }
         }
     }
     

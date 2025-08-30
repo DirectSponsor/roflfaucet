@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Games - ROFLFaucet</title>
-    <meta name="description" content="Discover all our exciting games: Slots, Roll of Chance, and Wheel of Wealth. Choose your favorite way to win UselessCoins!">
+    <meta name="description" content="Discover all our exciting games: Slots, Roll of Chance, Wheel of Wealth, and Poker Dice. Choose your favorite way to win UselessCoins!">
     
     <!-- Main site CSS -->
     <link rel="stylesheet" href="main.css">
@@ -44,6 +44,7 @@
                         <a href="slots.html">🎰 Slots</a>
                         <a href="roll.html">🎲 Dice</a>
                         <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
                     </div>
                 </div>
                 
@@ -66,6 +67,7 @@
                         <a href="slots.html">🎰 Slots</a>
                         <a href="roll.html">🎲 Dice</a>
                         <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
                     </div>
                 </div>
                 <a href="profile.html" class="nav-button">👤 Profile</a>
@@ -173,6 +175,20 @@
                                                         </div>
                                                     </div>
                                                     
+                                                    <!-- Poker Dice -->
+                                                    <div class="card card-info">
+                                                        <h3>🃏 Poker Dice</h3>
+                                                        <p>Player vs House poker dice game! Roll 5 dice, choose which to hold, then compete against the house for the best poker hand.</p>
+                                                        <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                                                            <li>Hold and re-roll mechanics</li>
+                                                            <li>Player vs House gameplay</li>
+                                                            <li>Standard poker hand rankings</li>
+                                                        </ul>
+                                                        <div style="text-align: center; margin-top: 1.5rem;">
+                                                            <a href="poker-dice.html" class="nav-button">🃏 Play Poker Dice</a>
+                                                        </div>
+                                                    </div>
+                                                    
                                                 </div>
                                                 
                                                 <div class="card card-instruction" style="margin-top: 2rem;">
@@ -182,7 +198,9 @@
                                                 </div>
                                                 
                                                 <div style="text-align: center; margin: 2rem 0;">
-                                                    <a href="index.html" class="nav-button">🚰 Get More <span class="currency">Coins</span> from Faucet</a>
+                                                    <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                                        <span class="btn-text">Faucet: Loading...</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </td>
