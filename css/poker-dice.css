@@ -418,6 +418,47 @@
     }
 }
 
+/* Last result notice styling */
+.last-result-notice {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    margin: 15px 0;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.notice-header {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffc107;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.notice-content {
+    font-size: 13px;
+    color: #fff;
+    line-height: 1.4;
+}
+
+.notice-content .result-win {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.notice-content .result-lose {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.notice-content .result-tie {
+    color: #ffc107;
+    font-weight: bold;
+}
+
 /* Small screens - wrap dice */
 @media (max-width: 480px) {
     .dice-container {
@@ -426,5 +467,18 @@
     
     .die-container {
         margin: 5px;
+    }
+    
+    .last-result-notice {
+        margin: 10px 0;
+        padding: 10px;
+    }
+    
+    .notice-header {
+        font-size: 12px;
+    }
+    
+    .notice-content {
+        font-size: 11px;
     }
 }

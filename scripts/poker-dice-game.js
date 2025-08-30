@@ -92,6 +92,7 @@ class PokerDiceGame {
                 this.balanceSystem = new UnifiedBalanceSystem();
                 this.setupEventListeners();
                 this.loadGameStats();
+                this.updateLastResultNotice(); // Load any previous result
                 this.resetGame();
                 console.log('✅ Poker Dice Game initialized successfully');
             } else {
@@ -134,6 +135,9 @@ class PokerDiceGame {
                 break;
             case 'player_hold':
                 this.playerReroll();
+                break;
+            case 'complete':
+                this.resetGame(); // Reset when clicking PLAY AGAIN
                 break;
             default:
                 // Button should be disabled in other states
@@ -418,21 +422,41 @@ class PokerDiceGame {
         for (let i = 1; i <= 5; i++) {
             this.playerHolds[i - 1] = false;
             const die = document.getElementById(`playerDie${i}`);
-            if (die) {
-                // Add visual feedback for clickable state
-                die.style.cursor = 'pointer';
-                die.style.transition = 'filter 0.3s ease, transform 0.2s ease';
+            if (die && die.parentElement) {
+                // Create reliable click overlay
+                let clickOverlay = document.getElementById(`clickOverlay${i}`);
+                if (!clickOverlay) {
+                    clickOverlay = document.createElement('div');
+                    clickOverlay.id = `clickOverlay${i}`;
+                    clickOverlay.style.cssText = `
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                        z-index: 50;
+                        background: transparent;
+                    `;
+                    
+                    // Ensure parent is positioned
+                    die.parentElement.style.position = 'relative';
+                    die.parentElement.appendChild(clickOverlay);
+                }
                 
                 // Remove any existing click listeners
-                die.removeEventListener('click', die._holdClickHandler);
+                clickOverlay.removeEventListener('click', clickOverlay._holdClickHandler);
                 
-                // Add click handler
-                die._holdClickHandler = () => this.toggleDieHold(i);
-                die.addEventListener('click', die._holdClickHandler);
+                // Add reliable click handler to overlay
+                clickOverlay._holdClickHandler = (e) => {
+                    e.stopPropagation();
+                    this.toggleDieHold(i);
+                };
+                clickOverlay.addEventListener('click', clickOverlay._holdClickHandler);
                 
-                // Reset visual state
+                // Visual feedback for the actual die
+                die.style.transition = 'filter 0.3s ease';
                 die.style.filter = 'none';
-                die.style.transform = die.style.transform || '';
             }
         }
     }
@@ -457,9 +481,15 @@ class PokerDiceGame {
     
     disableDiceClickHandlers() {
         for (let i = 1; i <= 5; i++) {
+            // Remove click overlay
+            const clickOverlay = document.getElementById(`clickOverlay${i}`);
+            if (clickOverlay) {
+                clickOverlay.remove();
+            }
+            
             const die = document.getElementById(`playerDie${i}`);
             if (die) {
-                // Remove click handler
+                // Remove old click handler (if any)
                 die.removeEventListener('click', die._holdClickHandler);
                 die._holdClickHandler = null;
                 
@@ -482,6 +512,10 @@ class PokerDiceGame {
     }
     
     toggleDieHold(dieIndex) {
+        console.log(`🖱️ CLICK DEBUG: Die ${dieIndex} clicked`);
+        console.log(`   Current value: ${this.playerDice[dieIndex - 1]}`);
+        console.log(`   Current CSS class: ${document.getElementById(`playerDie${dieIndex}`)?.className}`);
+        
         const arrayIndex = dieIndex - 1;
         this.playerHolds[arrayIndex] = !this.playerHolds[arrayIndex];
         
@@ -797,12 +831,7 @@ class PokerDiceGame {
         
         this.gameState = 'complete';
         this.updateMainButton();
-        this.updateGameStatus('Game complete! Ready for next round');
-        
-        // Auto-reset after 5 seconds
-        setTimeout(() => {
-            this.resetGame();
-        }, 5000);
+        this.updateGameStatus('Game complete! Click to play again');
     }
     
     compareHighCards(dice1, dice2) {
@@ -840,6 +869,10 @@ class PokerDiceGame {
                 resultDiv.style.display = 'none';
             }, 5000);
         }
+        
+        // Save and display last result
+        this.saveLastResult(result, payout, bet, playerHand, houseHand);
+        this.updateLastResultNotice();
         
         console.log(`Player: ${playerHand} vs House: ${houseHand} = ${result}`);
     }
@@ -1040,6 +1073,60 @@ class PokerDiceGame {
         }
     }
     
+    saveLastResult(result, payout, bet, playerHand, houseHand) {
+        const lastResult = {
+            result,
+            payout,
+            bet,
+            playerHand,
+            houseHand,
+            timestamp: Date.now()
+        };
+        
+        try {
+            localStorage.setItem('pokerDiceLastResult', JSON.stringify(lastResult));
+        } catch (error) {
+            console.error('Error saving last result:', error);
+        }
+    }
+    
+    updateLastResultNotice() {
+        try {
+            const savedResult = localStorage.getItem('pokerDiceLastResult');
+            if (!savedResult) return;
+            
+            const lastResult = JSON.parse(savedResult);
+            const notice = document.getElementById('lastResultNotice');
+            const content = document.getElementById('lastResultContent');
+            
+            if (!notice || !content) return;
+            
+            // Determine result class for styling
+            let resultClass = '';
+            if (lastResult.payout > lastResult.bet) {
+                resultClass = 'result-win';
+            } else if (lastResult.payout === lastResult.bet) {
+                resultClass = 'result-tie';
+            } else {
+                resultClass = 'result-lose';
+            }
+            
+            // Format the content
+            content.innerHTML = `
+                <div class="${resultClass}">${lastResult.result}</div>
+                <div style="margin-top: 5px; font-size: 12px; color: #ccc;">
+                    You: ${lastResult.playerHand} vs House: ${lastResult.houseHand}<br>
+                    Bet: ${lastResult.bet} • ${lastResult.payout > lastResult.bet ? 'Won' : lastResult.payout === lastResult.bet ? 'Push' : 'Lost'}: ${lastResult.payout} tokens
+                </div>
+            `;
+            
+            // Show the notice
+            notice.style.display = 'block';
+        } catch (error) {
+            console.error('Error updating last result notice:', error);
+        }
+    }
+    
     // Debug function to test all face classes
     testAllFaces() {
         console.log('🧪 Testing all dice face classes...');
@@ -1070,3 +1157,4 @@ class PokerDiceGame {
 
 // Make available globally
 window.PokerDiceGame = PokerDiceGame;
+/* Test sync trigger */

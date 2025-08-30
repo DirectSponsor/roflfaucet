@@ -284,7 +284,6 @@ class RollGame {
         if (this.isRolling) {
             console.log('🎲 🎯 Button disabled: Rolling in progress');
             rollButton.disabled = true;
-            rollButton.innerHTML = '<div class="spinner"></div> ROLLING...';
             rollButton.classList.add('rolling');
         } else {
             // Get balance - handle async properly
@@ -307,7 +306,6 @@ class RollGame {
             console.log(`🎲 🎯 Button update: Balance=${currentBalance}, Bet=${betAmount}, CanAfford=${canAffordBet}`);
             
             rollButton.disabled = !canAffordBet;
-            rollButton.innerHTML = '<i class="fas fa-dice"></i> ROLL DICE';
             rollButton.classList.remove('rolling');
             
             if (!canAffordBet) {

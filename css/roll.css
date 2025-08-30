@@ -182,17 +182,26 @@
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+    }
+    50% { 
+        transform: scale(1.02);
+        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.5);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+    }
 }
 
 /* Roll Result Display */
-.result-number {
+.roll-number {
     font-size: 3rem;
     font-weight: bold;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    color: #2c3e50;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
     margin-bottom: 0.25rem;
     transition: all 0.5s ease;
 }
@@ -200,17 +209,27 @@
 .result-status {
     font-size: 1.2rem;
     font-weight: bold;
-    color: white;
+    color: #2c3e50;
     margin-bottom: 0.25rem;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
     transition: all 0.5s ease;
 }
 
 .result-payout {
     font-size: 1.1rem;
     font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    color: #2c3e50;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+/* Also support the correct CSS class names for consistency */
+.result-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #2c3e50;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    margin-bottom: 0.25rem;
+    transition: all 0.5s ease;
 }
 
 /* Win/Lose States */
@@ -219,9 +238,16 @@
     box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
 }
 
-.dice-result-section.win .result-number {
+.dice-result-section.win .result-number,
+.dice-result-section.win .roll-number {
     color: #ffeb3b;
     animation: glow 1s ease-in-out;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.dice-result-section.win .result-status {
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 
 .dice-result-section.lose {
@@ -229,8 +255,15 @@
     box-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
 }
 
-.dice-result-section.lose .result-number {
+.dice-result-section.lose .result-number,
+.dice-result-section.lose .roll-number {
     color: #ffcdd2;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.dice-result-section.lose .result-status {
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 
 .dice-result-section.rolling {

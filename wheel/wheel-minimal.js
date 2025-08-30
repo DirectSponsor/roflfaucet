@@ -122,6 +122,12 @@ async function spinWheel() {
     wheelAnimation.spinning = true;
     updateSpinButton();
     
+    // Update status to show spinning with animated dots
+    const statusElement = document.getElementById('status-text');
+    if (statusElement) {
+        statusElement.innerHTML = '<span class="spinning-dots"><span>•</span><span>•</span><span>•</span></span>';
+    }
+    
     const spinResult = wheelLogic.calculateSpin();
     const totalSpinDegrees = spinResult.totalSpinDegrees;
     const payout = wheelLogic.calculatePayout(spinResult.outcome, currentBet);
