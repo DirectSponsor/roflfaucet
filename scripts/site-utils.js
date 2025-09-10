@@ -136,221 +136,173 @@ function toggleMobileNav() {
     }
 }
 
-// Login functionality
-function showLoginDialog(clickedButton = null) {
-    // Check if already logged in (has JWT token)
-    const jwtToken = localStorage.getItem('jwt_token');
+// Simple login handler - dynamically builds redirect URL
+function handleLogin() {
+    // Get current page URL dynamically (works for staging, production, any domain)
+    const currentUrl = window.location.origin + window.location.pathname;
     
-    if (jwtToken) {
-        // Already logged in - show user menu or redirect to profile
-        showUserMenu(clickedButton);
-        return;
-    }
-    
-    // Redirect to external auth server
-    const currentUrl = window.location.href;
+    // Build auth URL with dynamic redirect
     const authUrl = `https://auth.directsponsor.org/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
+    
+    console.log('🚀 Redirecting to login:', authUrl);
+    
+    // Go to auth server
     window.location.href = authUrl;
 }
 
-function showUserMenu(clickedButton = null) {
-    // Simple user menu for logged in users
-    const existingMenu = document.getElementById('user-menu-dropdown');
-    
-    if (existingMenu) {
-        // Toggle existing menu
-        existingMenu.style.display = existingMenu.style.display === 'none' ? 'block' : 'none';
-        return;
-    }
-    
-    // Create user menu dropdown
-    const menu = document.createElement('div');
-    menu.id = 'user-menu-dropdown';
-    menu.style.cssText = `
-        position: fixed;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        min-width: 180px;
-        z-index: 1000;
-        display: block;
-    `;
-    
-    // Get username from JWT token
-    let username = 'User';
+// Helper function to get valid (non-expired) username
+function getValidUsername() {
     try {
-        const jwtToken = localStorage.getItem('jwt_token');
-        if (jwtToken) {
-            const payload = JSON.parse(atob(jwtToken.split('.')[1]));
-            username = payload.username || payload.sub || 'User';
-        }
-    } catch (e) {
-        console.warn('Could not decode JWT token for username');
-    }
-    
-    menu.innerHTML = `
-        <div style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #333;">
-            👤 ${username}
-        </div>
-        <a href="profile.html" style="display: block; padding: 10px; text-decoration: none; color: #333; border-bottom: 1px solid #eee;">
-            ✏️ Edit Profile
-        </a>
-        <a href="profile.html" style="display: block; padding: 10px; text-decoration: none; color: #333; border-bottom: 1px solid #eee;">
-            👁️ View Profile
-        </a>
-        <div onclick="handleLogout()" style="padding: 10px; cursor: pointer; color: #dc3545; border-bottom: none;">
-            🚪 Logout
-        </div>
-    `;
-    
-    // Determine which login button to position relative to
-    let referenceBtn = clickedButton;
-    if (!referenceBtn) {
-        // Try desktop button first, then mobile button
-        referenceBtn = document.getElementById('login-btn') || document.getElementById('login-btn-mobile');
-    }
-    
-    if (referenceBtn) {
-        const btnRect = referenceBtn.getBoundingClientRect();
-        
-        // Check if this is a mobile button (inside mobile nav)
-        const isMobileButton = referenceBtn.id === 'login-btn-mobile';
-        
-        if (isMobileButton) {
-            // Position for mobile - center horizontally, below the button
-            menu.style.top = (btnRect.bottom + window.scrollY + 5) + 'px';
-            menu.style.left = '50%';
-            menu.style.transform = 'translateX(-50%)';
-        } else {
-            // Position for desktop - align to right edge
-            menu.style.top = (btnRect.bottom + window.scrollY + 5) + 'px';
-            menu.style.right = (window.innerWidth - btnRect.right) + 'px';
-        }
-    } else {
-        // Fallback positioning - center of screen
-        menu.style.top = '20%';
-        menu.style.left = '50%';
-        menu.style.transform = 'translateX(-50%)';
-    }
-    
-    document.body.appendChild(menu);
-    
-    // Close menu when clicking outside
-    setTimeout(() => {
-        document.addEventListener('click', function closeMenu(e) {
-            if (referenceBtn && !referenceBtn.contains(e.target) && !menu.contains(e.target)) {
-                menu.style.display = 'none';
-                document.removeEventListener('click', closeMenu);
+        // Check the main session data first
+        const sessionData = localStorage.getItem('roflfaucet_session');
+        if (sessionData) {
+            const data = JSON.parse(sessionData);
+            // Check if session has expired
+            if (data.expires && Date.now() > data.expires) {
+                console.log('🔐 Session expired, logging out automatically');
+                handleLogout();
+                return null;
             }
-        });
-    }, 100);
+            return data.username;
+        }
+        
+        // Fallback to individual username item
+        return localStorage.getItem('username');
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        return localStorage.getItem('username'); // Fallback
+    }
 }
 
+// Helper function to get valid user ID
+function getValidUserId() {
+    try {
+        const sessionData = localStorage.getItem('roflfaucet_session');
+        if (sessionData) {
+            const data = JSON.parse(sessionData);
+            if (data.expires && Date.now() > data.expires) {
+                return null; // Expired
+            }
+            return data.user_id;
+        }
+        return localStorage.getItem('user_id');
+    } catch (error) {
+        return localStorage.getItem('user_id');
+    }
+}
+
+// Simple logout handler - clears session and refreshes page
 function handleLogout() {
     console.log('🚪 Logging out...');
     
-    // Clear JWT token
-    localStorage.removeItem('jwt_token');
+    // Clear all login storage
+    localStorage.removeItem('roflfaucet_session');
+    localStorage.removeItem('username');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('login_time');
     
-    // Close any open user menu
-    const existingMenu = document.getElementById('user-menu-dropdown');
-    if (existingMenu) {
-        existingMenu.remove();
+    // Refresh the unified balance system
+    if (window.unifiedBalance) {
+        window.unifiedBalance.refreshLoginStatus();
     }
     
-    // Force page refresh to reset all UI elements
-    window.location.reload();
+    // Update the UI
+    updateLoginButtons();
+    
+    // Update balance and currency displays
+    setTimeout(() => {
+        if (window.updateBalanceDisplays) window.updateBalanceDisplays();
+        if (window.updateCurrencyDisplays) window.updateCurrencyDisplays();
+    }, 100);
+    
+    console.log('✅ Logged out successfully');
 }
 
-// Update login button based on auth state
-function updateLoginButton() {
-    const loginBtn = document.getElementById('login-btn');
-    if (!loginBtn) return;
+// Simple login state management - just handle member elements and username display
+function updateLoginButtons() {
+    const username = getValidUsername();
+    const isLoggedIn = !!username;
     
-    const jwtToken = localStorage.getItem('jwt_token');
-    
-    if (jwtToken) {
-        // Get username from JWT token
-        let username = 'User';
-        try {
-            const payload = JSON.parse(atob(jwtToken.split('.')[1]));
-            username = payload.username || payload.sub || 'User';
-        } catch (e) {
-            console.warn('Could not decode JWT token for username');
-        }
-        
-        loginBtn.textContent = `👤 ${username}`;
-        loginBtn.style.background = '#27ae60'; // Green for logged in
-    } else {
-        loginBtn.textContent = '🚪 Login';
-        loginBtn.style.background = '#4A90E2'; // Blue for login
-    }
-}
-
-// Update login-dependent content visibility (show/hide guest-only elements)
-function updateLoginDependentContent() {
-    const jwtToken = localStorage.getItem('jwt_token');
-    const isLoggedIn = !!jwtToken;
-    
-    // Find all elements with 'guest-only' class
+    // Hide/show guest-only elements (this was already working)
     const guestOnlyElements = document.querySelectorAll('.guest-only');
-    
     guestOnlyElements.forEach(element => {
-        if (isLoggedIn) {
-            // Hide guest-only content when logged in
-            element.style.display = 'none';
-        } else {
-            // Show guest-only content when logged out
-            element.style.display = '';
-        }
+        element.style.display = isLoggedIn ? 'none' : '';
     });
     
-    console.log(`👁️ Login-dependent content updated: ${guestOnlyElements.length} guest-only elements ${isLoggedIn ? 'hidden' : 'shown'}`);
-}
-
-// Update mobile login button based on auth state
-function updateMobileLoginButton() {
-    const mobileLoginBtn = document.getElementById('login-btn-mobile');
-    if (!mobileLoginBtn) return;
+    // Show/hide member-only elements (new)
+    const memberOnlyElements = document.querySelectorAll('.member-only');
+    memberOnlyElements.forEach(element => {
+        element.style.display = isLoggedIn ? '' : 'none';
+    });
     
-    const jwtToken = localStorage.getItem('jwt_token');
-    
-    if (jwtToken) {
-        // Get username from JWT token
-        let username = 'User';
-        try {
-            const payload = JSON.parse(atob(jwtToken.split('.')[1]));
-            username = payload.username || payload.sub || 'User';
-        } catch (e) {
-            console.warn('Could not decode JWT token for username');
-        }
-        
-        mobileLoginBtn.textContent = `👤 ${username}`;
-        mobileLoginBtn.style.background = '#27ae60'; // Green for logged in
-    } else {
-        mobileLoginBtn.textContent = '🚪 Login';
-        mobileLoginBtn.style.background = '#4A90E2'; // Blue for login
+    // Update username in dropdown button
+    const userMenuButton = document.getElementById('user-menu-button');
+    if (userMenuButton && isLoggedIn) {
+        userMenuButton.textContent = `👤 ${username}`;
     }
+    
+    console.log(`👁️ Login state: ${isLoggedIn ? `Logged in as ${username}` : 'Guest'}`);
 }
 
-// Process JWT token from URL parameters
+// One-time JWT processing - extract username then discard token
 function processJwtFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     const jwtParam = urlParams.get('jwt');
     
     if (jwtParam) {
-        console.log('🔑 JWT token found in URL, storing in localStorage...');
+        console.log('🔑 Processing login token...');
         
-        // Store the token in localStorage
-        localStorage.setItem('jwt_token', jwtParam);
-        
-        // Clean up the URL by removing JWT parameters
-        const cleanUrl = window.location.pathname + window.location.hash;
-        window.history.replaceState({}, document.title, cleanUrl);
-        
-        console.log('✅ JWT token stored successfully');
-        return true;
+        try {
+            // Extract username from JWT token
+            const payload = JSON.parse(atob(jwtParam.split('.')[1]));
+            
+            // DEBUG: Log the full JWT payload to see what data we have
+            console.log('🔍 Full JWT Payload:', JSON.stringify(payload, null, 2));
+            console.log('🔍 Email from JWT:', payload.email || 'NOT IN JWT');
+            
+            const username = payload.username || payload.sub || 'User';
+            const userId = payload.sub || 'unknown';
+            
+            // Store login data in localStorage with expiration for cross-tab compatibility
+            const loginData = {
+                username: username,
+                user_id: userId,
+                login_time: Date.now(),
+                expires: Date.now() + (30 * 60 * 60 * 1000) // Expire after 30 hours
+            };
+            localStorage.setItem('roflfaucet_session', JSON.stringify(loginData));
+            
+            // Also set individual items for backward compatibility
+            localStorage.setItem('username', username);
+            localStorage.setItem('user_id', userId);
+            localStorage.setItem('login_time', Date.now().toString());
+            
+            console.log(`✅ Logged in as: ${username}`);
+            
+            // CRITICAL: Ensure user files exist (balance and profile)
+            ensureUserFilesExist(userId, username, payload.email || '');
+            
+            // Clean up the URL by removing JWT parameters
+            const cleanUrl = window.location.pathname + window.location.hash;
+            window.history.replaceState({}, document.title, cleanUrl);
+            
+            // Update UI to show logged in state
+            updateLoginButtons();
+            
+            // Refresh the unified balance system to detect new login status
+            if (window.unifiedBalance) {
+                window.unifiedBalance.refreshLoginStatus();
+                // Update displays immediately
+                setTimeout(() => {
+                    if (window.updateBalanceDisplays) window.updateBalanceDisplays();
+                    if (window.updateCurrencyDisplays) window.updateCurrencyDisplays();
+                }, 100);
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to process login token:', error);
+        }
     }
     
     return false;
@@ -358,54 +310,57 @@ function processJwtFromUrl() {
 
 // Initialize countdown when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // First, process any JWT token from URL
-    const tokenProcessed = processJwtFromUrl();
+    // Process any JWT token from login redirect
+    processJwtFromUrl();
+    
+    // Update login buttons based on current login state
+    updateLoginButtons();
     
     const faucetBtn = document.getElementById('faucet-countdown-btn');
     if (faucetBtn) {
         startFaucetCountdown();
     }
-    
-    // Set up login button functionality
-    const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', function() {
-            showLoginDialog(loginBtn);
-        });
-        updateLoginButton();
-    }
-    
-    // Update login-dependent content visibility on page load
-    updateLoginDependentContent();
-    
-    // Set up mobile login button functionality
-    const mobileLoginBtn = document.getElementById('login-btn-mobile');
-    if (mobileLoginBtn) {
-        mobileLoginBtn.addEventListener('click', function() {
-            showLoginDialog(mobileLoginBtn);
-        });
-        // Also update mobile login button text/style
-        updateMobileLoginButton();
-    }
-    
-    // Also update login button on any guest login buttons (like in profile page)
-    const guestLoginBtn = document.getElementById('login-btn-guest');
-    if (guestLoginBtn) {
-        guestLoginBtn.addEventListener('click', showLoginDialog);
-    }
-    
-    // If we processed a token, refresh login status and balance
-    if (tokenProcessed) {
-        console.log('🔄 Token processed, refreshing login status...');
-        updateLoginButton();
-        updateMobileLoginButton();
-        updateLoginDependentContent();
-        
-        // Refresh the unified balance system to recognize the new login
-        if (window.unifiedBalance) {
-            window.unifiedBalance.refreshLoginStatus();
-            // Trigger balance display update
-            setTimeout(() => window.updateBalanceDisplays(), 100);
-        }
-    }
 });
+
+/**
+ * Ensure user files exist when logging in
+ * This fixes the issue where users lose their level/profile data
+ * @param {string} userId - User ID from JWT
+ * @param {string} username - Username from JWT
+ * @param {string} email - Email from JWT
+ */
+async function ensureUserFilesExist(userId, username, email) {
+    console.log(`📁 Ensuring user files exist for ${username} (ID: ${userId})`);
+    
+    try {
+        // Call a simple API to create/ensure both balance and profile files exist
+        const response = await fetch('api/ensure-user-files.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                username: username,
+                email: email
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+                console.log(`✅ User files ensured:`, result.message);
+                if (result.created_files && result.created_files.length > 0) {
+                    console.log(`🎉 Created new files: ${result.created_files.join(', ')}`);
+                }
+            } else {
+                console.error('❌ Failed to ensure user files:', result.error);
+            }
+        } else {
+            console.error('❌ API call failed:', response.status);
+        }
+    } catch (error) {
+        console.error('🚑 Error ensuring user files:', error);
+        // Don't block login if file creation fails
+    }
+}

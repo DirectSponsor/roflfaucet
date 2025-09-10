@@ -36,11 +36,16 @@ class LevelsSystem {
     async init() {
         console.log('🏆 Initializing Levels System...');
         
-        // Wait for UnifiedBalanceSystem
+        // Wait for UnifiedBalanceSystem and login state
         const initBalance = () => {
             if (typeof UnifiedBalanceSystem !== 'undefined') {
                 this.unifiedBalance = new UnifiedBalanceSystem();
+                // Refresh login status to ensure it's current
+                this.unifiedBalance.refreshLoginStatus();
                 this.isLoggedIn = this.unifiedBalance.isLoggedIn;
+                
+                console.log(`🏆 Levels System: isLoggedIn = ${this.isLoggedIn}`);
+                
                 this.loadUserLevel();
                 console.log('✅ Levels System initialized');
             } else {
@@ -56,28 +61,48 @@ class LevelsSystem {
         if (!this.unifiedBalance) return;
         
         try {
+            console.log(`🔎 [DEBUG] Loading user level... isLoggedIn: ${this.isLoggedIn}`);
+            
             // Get user data from the unified balance system
             if (this.isLoggedIn) {
-                // For logged-in users, fetch from server using GET request
-                const response = await fetch('api/user-data.php?action=profile', {
+                // For logged-in users, fetch from server using new simple profile API
+                const userId = localStorage.getItem('user_id');
+                console.log(`🔎 [DEBUG] User ID from sessionStorage: ${userId}`);
+                
+                const response = await fetch(`api/simple-profile.php?action=profile&user_id=${userId}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Content-Type': 'application/json'
                     }
                 });
                 
+                console.log(`🔎 [DEBUG] Profile API response status: ${response.status}`);
+                
                 if (response.ok) {
                     const userData = await response.json();
+                    console.log(`🔎 [DEBUG] Profile data received:`, userData);
+                    const previousLevel = this.currentUserLevel;
                     this.currentUserLevel = userData.profile?.level || 1;
+                    
+                    if (previousLevel !== this.currentUserLevel) {
+                        console.log(`🔎 [LEVEL CHANGE] Level changed from ${previousLevel} to ${this.currentUserLevel}`);
+                    }
+                } else {
+                    console.error(`🔎 [DEBUG] Profile API failed: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error(`🔎 [DEBUG] Error response:`, errorText);
                 }
             } else {
                 // For guests, use localStorage
-                this.currentUserLevel = parseInt(localStorage.getItem('guest_level')) || 1;
+                const savedLevel = localStorage.getItem('guest_level');
+                console.log(`🔎 [DEBUG] Guest level from localStorage: ${savedLevel}`);
+                this.currentUserLevel = parseInt(savedLevel) || 1;
             }
             
             console.log(`🏆 User level loaded: ${this.currentUserLevel} (${this.getCurrentLevel().name})`);
         } catch (error) {
-            console.error('Error loading user level:', error);
+            console.error('🔎 [DEBUG] Error loading user level:', error);
+            console.error('🔎 [DEBUG] Error stack:', error.stack);
             this.currentUserLevel = 1;
         }
     }
@@ -86,22 +111,34 @@ class LevelsSystem {
         if (!this.unifiedBalance) return;
         
         try {
+            console.log(`🔎 [DEBUG] Saving user level ${this.currentUserLevel}, isLoggedIn: ${this.isLoggedIn}`);
+            
             if (this.isLoggedIn) {
-                // For logged-in users, use the existing user-data API
-                const response = await fetch('api/user-data.php?action=update_profile', {
+                // For logged-in users, use the new simple profile API
+                const userId = localStorage.getItem('user_id');
+                console.log(`🔎 [DEBUG] Saving for user ID: ${userId}`);
+                
+                const requestBody = {
+                    user_id: userId,
+                    level: this.currentUserLevel
+                };
+                console.log(`🔎 [DEBUG] Request body:`, requestBody);
+                
+                const response = await fetch('api/simple-profile.php?action=update_level', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        level: this.currentUserLevel
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
+                console.log(`🔎 [DEBUG] Save level API response status: ${response.status}`);
+                
                 const result = await response.json();
+                console.log(`🔎 [DEBUG] Save level API result:`, result);
+                
                 if (!response.ok || !result.success) {
-                    console.error('Failed to save level to server:', result.error);
+                    console.error('🔎 [DEBUG] Failed to save level to server:', result.error);
                     throw new Error(result.error || 'Save failed');
                 }
                 
@@ -112,7 +149,8 @@ class LevelsSystem {
                 console.log(`🏆 Guest level saved: ${this.currentUserLevel}`);
             }
         } catch (error) {
-            console.error('Error saving user level:', error);
+            console.error('🔎 [DEBUG] Error saving user level:', error);
+            console.error('🔎 [DEBUG] Error stack:', error.stack);
             throw error; // Re-throw so purchaseUpgrade can handle it
         }
     }
@@ -153,7 +191,7 @@ class LevelsSystem {
         const nextLevel = this.getNextLevel();
         if (!nextLevel) return false;
         
-        const currentBalance = await this.unifiedBalance.getBalance();
+        const currentBalance = await getBalance();
         return currentBalance >= nextLevel.cost;
     }
     
@@ -164,7 +202,7 @@ class LevelsSystem {
             return;
         }
         
-        const currentBalance = await this.unifiedBalance.getBalance();
+        const currentBalance = await getBalance();
         const canAfford = currentBalance >= nextLevel.cost;
         const currency = this.isLoggedIn ? 'coins' : 'tokens';
         
@@ -176,21 +214,55 @@ class LevelsSystem {
         if (!nextLevel) return false;
         
         try {
-            // Deduct the cost
-            await this.unifiedBalance.subtractBalance(nextLevel.cost, 'level_upgrade');
+            // Use global unified balance system
+            const subtractResult = await subtractBalance(nextLevel.cost, 'level_upgrade', `Upgraded to level ${nextLevel.id}: ${nextLevel.name}`);
             
-            // Upgrade the level
-            this.currentUserLevel = nextLevel.id;
-            await this.saveUserLevel();
+            if (!subtractResult.success) {
+                console.error('Failed to subtract balance:', subtractResult.error);
+                if (subtractResult.error === 'Insufficient balance') {
+                    const currentBalance = await getBalance();
+                    showInsufficientBalanceDialog(nextLevel.cost, currentBalance);
+                }
+                return false;
+            }
             
-            // Show success message
-            const currency = this.isLoggedIn ? 'coins' : 'tokens';
-            this.createSuccessModal(nextLevel, currency);
+            // Use simple-profile API to update level
+            const userId = localStorage.getItem('user_id');
+            const response = await fetch('api/simple-profile.php?action=update_level', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    level: nextLevel.id
+                })
+            });
             
-            // Trigger any UI updates
-            this.onLevelChanged();
-            
-            return true;
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Update current level
+                    this.currentUserLevel = nextLevel.id;
+                    
+                    // Show success message
+                    const currency = this.isLoggedIn ? 'coins' : 'tokens';
+                    this.createSuccessModal(nextLevel, currency);
+                    
+                    // Trigger any UI updates
+                    this.onLevelChanged();
+                    
+                    return true;
+                } else {
+                    console.error('Level update failed:', result.error);
+                    this.createErrorModal('❌ Level upgrade failed. Please try again.');
+                    return false;
+                }
+            } else {
+                console.error('API call failed:', response.status);
+                this.createErrorModal('❌ Level upgrade failed. Please try again.');
+                return false;
+            }
         } catch (error) {
             console.error('Error purchasing upgrade:', error);
             this.createErrorModal('❌ Upgrade failed. Please try again.');
@@ -362,6 +434,79 @@ class LevelsSystem {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.remove();
+            }
+        });
+    }
+    
+    createUpgradeConfirmModal(targetLevel, currentBalance, currency, confirmCallback) {
+        // Remove existing modal if present
+        const existingModal = document.getElementById('upgrade-confirm-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modal = document.createElement('div');
+        modal.id = 'upgrade-confirm-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        `;
+        
+        modalContent.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 10px;">🏆</div>
+                <h2 style="color: #007bff; margin-bottom: 10px;">Upgrade to ${targetLevel.name}?</h2>
+                
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span><strong>Cost:</strong> ${targetLevel.cost.toLocaleString()} ${currency}</span>
+                        <span><strong>Your Balance:</strong> ${currentBalance.toLocaleString()} ${currency}</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <strong>New Max Bet:</strong> ${targetLevel.maxBet} ${currency}
+                    </div>
+                </div>
+                
+                <p style="color: #666; margin-bottom: 20px; font-style: italic;">${targetLevel.description}</p>
+                
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="document.getElementById('upgrade-confirm-modal').remove()" 
+                            style="background: #6c757d; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer;">Cancel</button>
+                    <button onclick="window.confirmUpgradeCallback(); document.getElementById('upgrade-confirm-modal').remove();" 
+                            style="background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Upgrade Now!</button>
+                </div>
+            </div>
+        `;
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Store callback globally for the onclick handler
+        window.confirmUpgradeCallback = confirmCallback;
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                window.confirmUpgradeCallback = null;
             }
         });
     }

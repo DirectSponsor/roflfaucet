@@ -1,162 +1,201 @@
-<!-- ROFLFaucet Levels System - Upgrade Your Betting Limits -->
-<!-- TITLE=_Levels - ROFLFaucet_ -->
-<!-- DESC=_Upgrade your level to unlock higher betting limits and access exclusive features_ -->
-<!-- KEYWORDS=_levels, upgrade, betting limits, progression, coins, tokens_ -->
-<!-- STYLES=_ -->
-<!-- SCRIPTS=_js/levels-system.js,js/levels-page.js_ -->
+<!-- 🏆 ROFLFaucet Levels Page -->
+<!-- View and upgrade your levels to unlock higher betting limits -->
 
-<!-- include start header.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Levels - ROFLFaucet</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
-    <meta name="description" content="Upgrade your level to unlock higher betting limits and access exclusive features">
+    <meta name="description" content="View ROFLFaucet levels and upgrade to unlock higher betting limits">
     
-    <!-- Base Layout CSS -->
-    <link rel="stylesheet" href="styles/styles.css">
-    
-    <!-- Additional page-specific styles -->
-        <link rel="stylesheet" href="-->">
-
+    <!-- Main site CSS -->
+    <link rel="stylesheet" href="main.css">
     
     <!-- Site-wide scripts -->
-    <script src="scripts/core/unified-balance.js"></script>
-    <script src="scripts/core/site-utils.js"></script>
-    <script src="scripts/core/gallery-system-simple.js"></script>
-    <script src="scripts/core/jwt-simple.js"></script>
-    
-    <!-- Unified Balance System -->
+    <script src="scripts/unified-balance.js"></script>
+    <script src="scripts/site-utils.js"></script>
+    <script src="js/levels-system.js"></script>
 </head>
 <body>
-    <!-- Header Navigation -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <h1>🤣 roflfaucet</h1>
+    <div class="page-wrapper">
+        <div class="header">
+            <!-- Mobile menu checkbox (hidden) -->
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            
+            <!-- Left: Logo -->
+            <div class="header-left">
+                <a href="index.html" class="logo">🤣 roflfaucet</a>
+                <!-- Mobile hamburger button (hidden on desktop) -->
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
             </div>
             
-            <nav class="nav">
-                <a href="index.html" class="nav-link">Faucet</a>
+            <!-- Center: Main Navigation -->
+            <nav id="main-nav" class="header-center">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
                 
-                <!-- Games Dropdown - No wrapper div -->
-                <a href="games.html" class="nav-link dropdown-toggle">Games</a>
-                <div class="dropdown-menu">
-                    <a href="games.html" class="dropdown-item">🎮 All Games</a>
-                    <a href="slots.html" class="dropdown-item">🎰 Slots</a>
-                    <a href="roll.html" class="dropdown-item">🎲 Roll of Chance</a>
-                    <a href="wheel.html" class="dropdown-item">🎡 Wheel of Wealth</a>
-                    <a href="poker-dice.html" class="dropdown-item">🃏 Poker Dice</a>
+                <!-- Simple Games Dropdown -->
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
                 </div>
                 
-                <a href="profile.html" class="nav-link">Profile</a>
-                <a href="about.html" class="nav-link">About</a>
+                <a href="profile.html" class="nav-button">👤 Profile</a>
+                <a href="about.html" class="nav-button">ℹ️ About</a>
             </nav>
             
-            <!-- Hamburger Menu for Mobile -->
-            <button class="hamburger-menu" id="mobile-menu-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <!-- Right: Account Menu -->
+            <div class="header-right">
+                <!-- Guest Login (shown when logged out) -->
+                <div class="guest-only">
+                    <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+                </div>
+                
+                <!-- Member Menu (shown when logged in) -->
+                <div class="member-only" style="display: none;">
+                    <div class="dropdown">
+                        <a href="profile.html" class="nav-button" id="user-menu-button">👤 User</a>
+                        <div class="dropdown-content">
+                            <a href="profile.html">👤 Profile</a>
+                            <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            <div class="header-auth">
-                <button id="login-btn" class="header-auth-btn">Login</button>
+            <!-- Mobile navigation menu -->
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <a href="profile.html" class="nav-button">👤 Profile</a>
+                <a href="about.html" class="nav-button">ℹ️ About</a>
+                <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+            </nav>
+        </div>
+        
+        <div class="slot-direct">
+            <div class="slot-machine" id="slot-machine">
+                <div class="machine-front">
+                    <div class="slot-machine-container">
+                        <table class="slot-table" role="presentation">
+                            <tr>
+                                <td class="left-bar">
+                                    <img src="https://placehold.co/300x250/4A90E2/FFFFFF?text=Ad+Banner+1" alt="Advertisement Banner 300x250" width="300" loading="lazy">
+                                    <img src="https://placehold.co/300x200/667eea/FFFFFF?text=Ad+Banner+2" alt="Advertisement Banner 300x200" width="300" loading="lazy" style="margin-top: 1em;">
+                                </td>
+
+                                <!-- 🎯 LEVELS PAGE CONTENT -->
+                                <td class="faucet-content-cell">
+                                    <!-- Page Header -->
+                                    <div class="page-header" style="text-align: center; margin-bottom: 20px;">
+                                        <h1 class="page-title">🏆 ROFLFaucet Levels</h1>
+                                        <p style="color: #666; font-size: 16px; margin: 0;">Upgrade your level to unlock higher betting limits!</p>
+                                    </div>
+                                    
+                                    <!-- Main Content Area -->
+                                    <div class="padded">
+                                        <!-- Messages -->
+                                        <div id="message" class="message"></div>
+                                        
+                                        <!-- Current Status Card -->
+                                        <div id="current-status-card" class="card card-info" style="text-align: center; margin-bottom: 20px;">
+                                            <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Your Current Level</h3>
+                                            <div style="font-size: 24px; font-weight: bold; margin: 10px 0;" id="current-level-display">
+                                                <span id="current-level-name">Loading...</span>
+                                            </div>
+                                            <div style="color: #666; margin: 10px 0;" id="current-level-description">Loading level information...</div>
+                                            
+                                            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                                                <div style="text-align: center;">
+                                                    <div style="font-weight: bold; color: #4A90E2;">Max Bet</div>
+                                                    <div id="current-max-bet" style="font-size: 18px; color: #2c3e50;">-</div>
+                                                </div>
+                                                <div style="text-align: center;">
+                                                    <div style="font-weight: bold; color: #27ae60;">Your Balance</div>
+                                                    <div id="current-balance" style="font-size: 18px; color: #2c3e50;">Loading...</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Guest Notice (shown when not logged in) -->
+                                        <div id="guest-notice-levels" class="card card-warning" style="display: none; text-align: center;">
+                                            <h3>🚀 Unlock All Levels!</h3>
+                                            <p>Sign up for a free member account to access all 12 levels with betting limits up to 12 coins!</p>
+                                            <p style="color: #666; font-size: 14px;">Demo mode only shows guest level - full levels system available after login.</p>
+                                            <div style="margin-top: 20px;">
+                                                <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button" style="font-size: 16px;">Sign Up Now - It's Free!</a>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Levels List Container -->
+                                        <div id="levels-container" style="margin: 20px 0;">
+                                            <div style="text-align: center; padding: 40px; color: #666;">
+                                                <p>🔄 Loading levels...</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Information Card -->
+                                        <div class="card card-instruction">
+                                            <h3 style="color: #333; margin: 0 0 15px 0;">💡 Why Level Up?</h3>
+                                            <ul style="color: #666; margin: 0; padding-left: 20px; line-height: 1.6;">
+                                                <li><strong>Higher Betting Limits:</strong> Bet more coins per game</li>
+                                                <li><strong>Bigger Potential Wins:</strong> Higher bets = larger payouts</li>
+                                                <li><strong>Exclusive Access:</strong> Some features require higher levels</li>
+                                                <li><strong>Prestige:</strong> Show off your progression to other players</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <!-- Navigation Links -->
+                                        <div style="text-align: center; margin-top: 30px;">
+                                            <a href="profile.html" class="nav-button" style="margin: 0 10px;">👤 Back to Profile</a>
+                                            <a href="games.html" class="nav-button" style="margin: 0 10px;">🎮 Play Games</a>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="right-bar">
+                                    <img src="https://placehold.co/300x400/764ba2/FFFFFF?text=Gallery+Content" alt="Gallery Content 300x400" width="300" loading="lazy">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
-    
-    <div class="container">
-<!-- include end header.html -->
-
-<!-- include start left-sidebar.html -->
-        <aside class="left-sidebar">
-            <!-- A-Ads placeholder - no min-width constraint for testing -->
-            <div style="height: 250px; background: #e0e0e0; border: 2px dashed #999; display: flex; align-items: center; justify-content: center; text-align: center; max-width: 100%; box-sizing: border-box;">
-                <div>
-                    A-Ads Placeholder<br>
-                    300x250px<br>
-                    (scales to fit)
+        
+        <!-- Sponsors Section -->
+        <div class="sponsors">
+            <h3>Our Supporters</h3>
+            <div class="sponsor-logos">
+                <a href="https://satoshihost.com" target="_blank" class="sponsor-link">
+                    <img src="images/satoshihost-banner.png" alt="SatoshiHost - Bitcoin Hosting" class="sponsor-logo">
+                </a>
+                <div class="sponsor-placeholder">
+                    [Sponsor Logo 2]
                 </div>
             </div>
-            
-            <!-- Test image for loading performance (242KB) -->
-            <div style="margin-top: 20px; text-align: center;">
-                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Loading Test (242KB image):</p>
-                <img src="test-image.jpg" alt="Test Image Loading Performance" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 5px;" loading="lazy">
-            </div>
-        </aside>
-<!-- include end left-sidebar.html -->
-
-        <main class="main-content">
-<!-- UNIQUE PAGE CONTENT GOES HERE -->
-            <div class="content-container">
-                <div style="max-width: 800px; margin: 0 auto;">
-                    <!-- Page Header -->
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #333; margin-bottom: 15px;">🏆 ROFLFaucet Levels</h1>
-                        <p style="color: #666; font-size: 18px; margin-bottom: 10px;">Upgrade your level to unlock higher betting limits!</p>
-                        <p style="color: #888; font-size: 14px;">Level up by spending your tokens/coins to access bigger bets and better rewards.</p>
-                    </div>
-                    
-                    <!-- Current Status Card -->
-                    <div id="current-status" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; margin-bottom: 30px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
-                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">
-                            <span id="current-level-name">Loading...</span>
-                        </div>
-                        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 15px;">
-                            <span id="current-level-description">Please wait...</span>
-                        </div>
-                        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
-                            <div>
-                                <div style="font-size: 14px; opacity: 0.8;">Max Bet</div>
-                                <div style="font-size: 20px; font-weight: bold;" id="current-max-bet">-</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 14px; opacity: 0.8;">Your Balance</div>
-                                <div style="font-size: 20px; font-weight: bold;" id="current-balance">Loading...</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Levels List -->
-                    <div id="levels-container" style="margin-bottom: 30px;">
-                        <!-- Levels will be populated here by JavaScript -->
-                    </div>
-                    
-                    <!-- Level Benefits Info -->
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #007bff;">
-                        <h3 style="color: #333; margin-bottom: 15px;">💡 Why Level Up?</h3>
-                        <ul style="color: #666; margin: 0; padding-left: 20px;">
-                            <li style="margin-bottom: 8px;"><strong>Higher Betting Limits:</strong> Bet more tokens/coins per game</li>
-                            <li style="margin-bottom: 8px;"><strong>Bigger Potential Wins:</strong> Higher bets = bigger payouts</li>
-                            <li style="margin-bottom: 8px;"><strong>Exclusive Access:</strong> Some features require higher levels</li>
-                            <li style="margin-bottom: 8px;"><strong>Prestige:</strong> Show off your progression to other players</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-<!-- END UNIQUE PAGE CONTENT -->
-        </main>
-
-<!-- include start right-sidebar.html -->
-        <aside class="right-sidebar">
-            <!-- Random Giphy Image Container - TEMPORARILY DISABLED FOR TESTING -->
-            <div id="sidebar-giphy-gallery-disabled" class="full-width" style="text-align: center; margin: 0; padding: 0;">
-                <p style="color: #666; font-size: 14px; margin: 10px;">Gallery disabled during testing</p>
-            </div>
-        </aside>
-<!-- include end right-sidebar.html -->
-
-<!-- include start footer.html -->
+            <p>&copy; 2024 ROFLFaucet - Progressive Responsive Layout</p>
+        </div>
     </div>
     
-    <!-- Additional page-specific scripts -->
-        <script src="js/levels-system.js"></script>
+    <!-- Scripts -->
+    <script src="scripts/faucet-bridge.js"></script>
+    <script src="scripts/insufficient-balance-dialog.js"></script>
     <script src="js/levels-page.js"></script>
-
 </body>
 </html>
-<!-- include end footer.html -->

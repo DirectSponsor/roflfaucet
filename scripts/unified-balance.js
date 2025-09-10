@@ -3,10 +3,10 @@
 
 class UnifiedBalanceSystem {
     constructor() {
-        // Use simple JWT token detection
-        this.isLoggedIn = !!localStorage.getItem('jwt_token');
+        // Use simple username detection with localStorage (with expiration check)
+        this.isLoggedIn = !!this.getValidUsername();
         this.userId = this.isLoggedIn ? this.getUserIdFromToken() : 'guest';
-        this.accessToken = localStorage.getItem('jwt_token');
+        this.accessToken = null; // No longer needed
         this.balance = 0;
         
         // Smart sync system properties
@@ -88,46 +88,9 @@ class UnifiedBalanceSystem {
     }
     
     async checkIfSyncNeeded() {
-        if (!this.isLoggedIn || this.syncInProgress) {
-            return false;
-        }
-        
-        try {
-            const response = await fetch('api/user-data.php?action=balance_timestamp&_t=' + Date.now(), {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                cache: 'no-cache'
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success) {
-                    const serverTimestamp = data.last_updated;
-                    
-                    // If we don't have a timestamp yet, or server timestamp is newer
-                    const needsSync = !this.lastServerTimestamp || serverTimestamp > this.lastServerTimestamp;
-                    
-                    if (needsSync) {
-                        console.log(`🔄 Smart sync: Server timestamp changed (${this.lastServerTimestamp} -> ${serverTimestamp})`);
-                        return true;
-                    }
-                    
-                    return false;
-                } else {
-                    console.warn('⚠️ Smart sync: Timestamp check failed:', data.error);
-                    return false;
-                }
-            } else {
-                console.warn('⚠️ Smart sync: Timestamp API request failed');
-                return false;
-            }
-        } catch (error) {
-            console.warn('⚠️ Smart sync: Timestamp check error:', error);
-            return false;
-        }
+        // Simple file-based system doesn't need complex sync checking
+        // Each API call reads/writes directly to files
+        return false;
     }
     
     async syncIfNeeded(trigger = 'manual') {
@@ -149,17 +112,36 @@ class UnifiedBalanceSystem {
         }
     }
     
-    getUserIdFromToken() {
+    getValidUsername() {
         try {
-            const token = localStorage.getItem('jwt_token');
-            if (!token) return 'guest';
-            
-            // Decode JWT token to get user ID (simple base64 decode)
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return payload.sub || payload.user_id || 'guest';
-        } catch (e) {
-            console.warn('Could not decode JWT token, using guest');
-            return 'guest';
+            const sessionData = localStorage.getItem('roflfaucet_session');
+            if (sessionData) {
+                const data = JSON.parse(sessionData);
+                if (data.expires && Date.now() > data.expires) {
+                    return null; // Expired
+                }
+                return data.username;
+            }
+            return localStorage.getItem('username');
+        } catch (error) {
+            return localStorage.getItem('username');
+        }
+    }
+    
+    getUserIdFromToken() {
+        // Use simple localStorage user_id with expiration check
+        try {
+            const sessionData = localStorage.getItem('roflfaucet_session');
+            if (sessionData) {
+                const data = JSON.parse(sessionData);
+                if (data.expires && Date.now() > data.expires) {
+                    return 'guest'; // Expired
+                }
+                return data.user_id || 'guest';
+            }
+            return localStorage.getItem('user_id') || 'guest';
+        } catch (error) {
+            return localStorage.getItem('user_id') || 'guest';
         }
     }
     
@@ -173,10 +155,14 @@ class UnifiedBalanceSystem {
     
     async getRealBalance() {
         try {
-            const response = await fetch('api/user-data.php?action=balance&_t=' + Date.now(), {
+            const userId = this.getUserIdFromToken();
+            if (userId === 'guest') {
+                return this.getGuestBalance();
+            }
+            
+            const response = await fetch(`api/simple-balance-enhanced.php?action=balance&user_id=${userId}&_t=` + Date.now(), {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
                     'Content-Type': 'application/json'
                 },
                 cache: 'no-cache'
@@ -186,11 +172,7 @@ class UnifiedBalanceSystem {
                 const data = await response.json();
                 if (data.success) {
                     this.balance = parseFloat(data.balance) || 0;
-                    // Update our timestamp tracking
-                    if (data.last_updated) {
-                        this.lastServerTimestamp = data.last_updated;
-                    }
-                    console.log('✅ Real balance loaded from flat-file:', this.balance);
+                    console.log('✅ Simple balance loaded:', this.balance);
                     return this.balance;
                 } else {
                     throw new Error(data.error || 'API returned error');
@@ -199,11 +181,19 @@ class UnifiedBalanceSystem {
                 throw new Error('API request failed');
             }
         } catch (error) {
-            console.error('💥 Balance loading error:', error);
-            // Don't reset login status - just use a fallback balance
-            this.balance = 0;
-            return this.balance;
+            console.error('💥 Balance fetch error:', error);
+            throw error;
         }
+    }
+    
+    getLocalBalance() {
+        const transactions = this.getLocalTransactions();
+        this.balance = transactions.reduce((total, tx) => {
+            return total + (tx.type === 'spend' ? -tx.amount : tx.amount);
+        }, 0);
+        
+        console.log(`💰 ${this.isLoggedIn ? 'Member' : 'Guest'} balance calculated:`, this.balance);
+        return this.balance;
     }
     
     getGuestBalance() {
@@ -212,7 +202,7 @@ class UnifiedBalanceSystem {
             return total + (tx.type === 'spend' ? -tx.amount : tx.amount);
         }, 0);
         
-        // console.log('👤 Guest balance calculated:', this.balance);
+        console.log('👤 Guest balance calculated:', this.balance);
         return this.balance;
     }
     
@@ -252,13 +242,18 @@ class UnifiedBalanceSystem {
         await this.syncIfNeeded('before_balance_change');
         
         try {
-            const response = await fetch('api/user-data.php?action=update_balance', {
+            const userId = this.getUserIdFromToken();
+            if (userId === 'guest') {
+                return this.addGuestBalance(amount, source, description);
+            }
+            
+            const response = await fetch('api/simple-balance-enhanced.php?action=update_balance', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    user_id: userId,
                     amount: amount,
                     source: `${source}: ${description}`
                 })
@@ -280,7 +275,7 @@ class UnifiedBalanceSystem {
             }
         } catch (error) {
             console.error('💥 Add balance error:', error);
-            return this.addGuestBalance(amount, source, description);
+            throw error; // Don't fall back for logged-in users
         }
     }
     
@@ -305,13 +300,18 @@ class UnifiedBalanceSystem {
         await this.syncIfNeeded('before_balance_change');
         
         try {
-            const response = await fetch('api/user-data.php?action=update_balance', {
+            const userId = this.getUserIdFromToken();
+            if (userId === 'guest') {
+                return this.subtractGuestBalance(amount, source, description);
+            }
+            
+            const response = await fetch('api/simple-balance-enhanced.php?action=update_balance', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    user_id: userId,
                     amount: -amount, // Negative amount for subtraction
                     source: `${source}: ${description}`
                 })
@@ -333,7 +333,7 @@ class UnifiedBalanceSystem {
             }
         } catch (error) {
             console.error('💥 Subtract balance error:', error);
-            return this.subtractGuestBalance(amount, source, description);
+            throw error; // Don't fall back for logged-in users
         }
     }
     
@@ -360,9 +360,9 @@ class UnifiedBalanceSystem {
     
     refreshLoginStatus() {
         const wasLoggedIn = this.isLoggedIn;
-        this.isLoggedIn = !!localStorage.getItem('jwt_token');
+        this.isLoggedIn = !!this.getValidUsername();
         this.userId = this.isLoggedIn ? this.getUserIdFromToken() : 'guest';
-        this.accessToken = localStorage.getItem('jwt_token');
+        this.accessToken = null; // No longer needed
         
         if (wasLoggedIn !== this.isLoggedIn) {
             console.log(`💰 Login status changed: ${wasLoggedIn ? 'member' : 'guest'} → ${this.isLoggedIn ? 'member' : 'guest'}`);
