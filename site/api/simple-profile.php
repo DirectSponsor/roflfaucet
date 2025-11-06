@@ -104,6 +104,54 @@ function findProfileByUsername($username) {
 }
 
 /**
+ * Search for profiles matching a partial username
+ * @param string $query Partial username to search for
+ * @param int $limit Maximum number of results (default 10)
+ * @return array Array of matching profiles
+ */
+function searchProfiles($query, $limit = 10) {
+    $profilesDir = USERDATA_DIR . '/profiles';
+    if (!is_dir($profilesDir)) {
+        return [];
+    }
+    
+    $query = strtolower(trim($query));
+    if (empty($query)) {
+        return [];
+    }
+    
+    $files = glob($profilesDir . '/*.txt');
+    $matches = [];
+    
+    foreach ($files as $file) {
+        $data = json_decode(file_get_contents($file), true);
+        if (!$data || !isset($data['username'])) {
+            continue;
+        }
+        
+        $username = strtolower($data['username']);
+        $userId = $data['user_id'] ?? '';
+        
+        // Check if query matches username or user_id
+        if (str_contains($username, $query) || str_contains(strtolower($userId), $query)) {
+            $matches[] = [
+                'user_id' => $data['user_id'],
+                'username' => $data['username'],
+                'display_name' => $data['display_name'] ?? $data['username'],
+                'avatar' => $data['avatar'] ?? '👤',
+                'roles' => $data['roles'] ?? ['member']
+            ];
+            
+            if (count($matches) >= $limit) {
+                break;
+            }
+        }
+    }
+    
+    return $matches;
+}
+
+/**
  * Load user profile data with default structure
  * @param string $profileFile Path to profile file
  * @param string $userId User ID for default data
@@ -400,8 +448,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'profile') {
         'role_checks' => $hasRoles
     ]);
     
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
+    // SEARCH USERS - Find users by partial username (admin only)
+    // For search, userId comes from query param but we don't need auth
+    // Check if requester is admin
+    $requesterId = getUserId();
+    if (!$requesterId) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Authentication required']);
+        exit;
+    }
+    
+    $requesterFile = USERDATA_DIR . "/profiles/{$requesterId}.txt";
+    $requesterData = loadProfileData($requesterFile, $requesterId);
+    
+    if (!in_array('admin', $requesterData['roles'] ?? [])) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Admin access required']);
+        exit;
+    }
+    
+    $query = $_GET['query'] ?? '';
+    $limit = intval($_GET['limit'] ?? 10);
+    
+    $results = searchProfiles($query, $limit);
+    
+    echo json_encode([
+        'success' => true,
+        'query' => $query,
+        'results' => $results,
+        'count' => count($results)
+    ]);
+    
 } else {
     http_response_code(400);
-    echo json_encode(['error' => 'Invalid request - Use GET ?action=profile|check_roles or POST ?action=update_profile|update_level|update_stats|manage_roles']);
+    echo json_encode(['error' => 'Invalid request - Use GET ?action=profile|check_roles|search or POST ?action=update_profile|update_level|update_stats|manage_roles']);
 }
 ?>

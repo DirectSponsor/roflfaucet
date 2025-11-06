@@ -305,8 +305,11 @@
                             <!-- Search User -->
                             <div class="role-search">
                                 <h3>🔍 Search User</h3>
-                                <input type="text" id="user-search" placeholder="Enter username or user ID (e.g., andytest1 or 1-andytest1)">
+                                <input type="text" id="user-search" placeholder="Enter username or user ID (e.g., andytest1 or 1-andytest1)" oninput="searchSuggestions()">
                                 <button onclick="searchUser()" class="faucet-countdown-btn" style="margin-top: 10px; width: auto; padding: 12px 24px;">Search</button>
+                                
+                                <!-- Search Suggestions -->
+                                <div id="search-suggestions" style="display: none; background: white; border: 2px solid #4A90E2; border-radius: 6px; margin-top: 10px; max-height: 300px; overflow-y: auto;"></div>
                             </div>
                             
                             <!-- Loading Indicator -->
@@ -500,6 +503,77 @@
                 showMessage('❌ Error: ' + error.message, 'error');
                 console.error('Error:', error);
             }
+        }
+        
+        // Search suggestions with debounce
+        let suggestionTimeout = null;
+        async function searchSuggestions() {
+            const searchInput = document.getElementById('user-search');
+            const query = searchInput.value.trim();
+            const suggestionsDiv = document.getElementById('search-suggestions');
+            
+            // Clear previous timeout
+            if (suggestionTimeout) {
+                clearTimeout(suggestionTimeout);
+            }
+            
+            // Hide suggestions if query is too short
+            if (query.length < 2) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+            
+            // Debounce: wait 300ms after user stops typing
+            suggestionTimeout = setTimeout(async () => {
+                try {
+                    const currentUserId = getCombinedUserId();
+                    const response = await fetch(`api/simple-profile.php?action=search&query=${encodeURIComponent(query)}&limit=10&user_id=${currentUserId}`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.results.length > 0) {
+                        let html = '<div style="padding: 10px;">';
+                        html += '<strong style="color: #666; font-size: 12px;">Suggestions (' + data.count + '):</strong>';
+                        
+                        data.results.forEach(user => {
+                            const rolesBadges = user.roles.map(role => {
+                                let color = '#6c757d';
+                                if (role === 'admin') color = '#dc3545';
+                                else if (role === 'recipient') color = '#28a745';
+                                else if (role === 'moderator') color = '#fd7e14';
+                                return `<span style="background: ${color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px;">${role}</span>`;
+                            }).join('');
+                            
+                            html += `
+                                <div onclick="selectUser('${user.user_id}')" style="
+                                    padding: 8px;
+                                    margin: 5px 0;
+                                    cursor: pointer;
+                                    border-radius: 4px;
+                                    transition: background 0.2s;
+                                " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">
+                                    ${user.avatar} <strong>${user.display_name}</strong> (${user.username})
+                                    ${rolesBadges}
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div>';
+                        suggestionsDiv.innerHTML = html;
+                        suggestionsDiv.style.display = 'block';
+                    } else {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Suggestion search error:', error);
+                    suggestionsDiv.style.display = 'none';
+                }
+            }, 300);
+        }
+        
+        function selectUser(userId) {
+            document.getElementById('user-search').value = userId;
+            document.getElementById('search-suggestions').style.display = 'none';
+            searchUser();
         }
         
         // Allow search on Enter key
