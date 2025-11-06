@@ -80,6 +80,30 @@ function getUserId() {
 }
 
 /**
+ * Find profile file by username (searches all profile files)
+ * @param string $username Username to search for
+ * @return string|null Path to profile file, or null if not found
+ */
+function findProfileByUsername($username) {
+    $profilesDir = USERDATA_DIR . '/profiles';
+    if (!is_dir($profilesDir)) {
+        return null;
+    }
+    
+    // Get all profile files
+    $files = glob($profilesDir . '/*.txt');
+    
+    foreach ($files as $file) {
+        $data = json_decode(file_get_contents($file), true);
+        if ($data && isset($data['username']) && $data['username'] === $username) {
+            return $file;
+        }
+    }
+    
+    return null;
+}
+
+/**
  * Load user profile data with default structure
  * @param string $profileFile Path to profile file
  * @param string $userId User ID for default data
@@ -173,8 +197,22 @@ if (!$userId) {
 }
 
 $action = $_GET['action'] ?? '';
-// Use absolute path to match other new APIs
-$profileFile = USERDATA_DIR . "/profiles/{$userId}.txt";
+
+// Determine profile file path
+// If userId doesn't contain a dash, try to find by username
+if (!str_contains($userId, '-')) {
+    $foundFile = findProfileByUsername($userId);
+    if ($foundFile) {
+        $profileFile = $foundFile;
+        // Extract the actual combined user_id from the found profile
+        $data = json_decode(file_get_contents($foundFile), true);
+        $userId = $data['user_id'] ?? $userId;
+    } else {
+        $profileFile = USERDATA_DIR . "/profiles/{$userId}.txt";
+    }
+} else {
+    $profileFile = USERDATA_DIR . "/profiles/{$userId}.txt";
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'profile') {
     // GET PROFILE - Return user profile data
