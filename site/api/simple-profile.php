@@ -216,6 +216,16 @@ if (!str_contains($userId, '-')) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'profile') {
     // GET PROFILE - Return user profile data
+    // Check if profile file actually exists
+    if (!file_exists($profileFile)) {
+        http_response_code(404);
+        echo json_encode([
+            'success' => false,
+            'error' => 'User profile not found'
+        ]);
+        exit;
+    }
+    
     $data = loadProfileData($profileFile, $userId);
     
     echo json_encode([
