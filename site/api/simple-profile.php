@@ -132,8 +132,8 @@ function searchProfiles($query, $limit = 10) {
         $username = strtolower($data['username']);
         $userId = $data['user_id'] ?? '';
         
-        // Check if query matches username or user_id
-        if (str_contains($username, $query) || str_contains(strtolower($userId), $query)) {
+        // Check if query matches username or user_id (PHP 7.4 compatible)
+        if (strpos($username, $query) !== false || strpos(strtolower($userId), $query) !== false) {
             $matches[] = [
                 'user_id' => $data['user_id'],
                 'username' => $data['username'],
@@ -249,8 +249,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
         exit;
     }
     
-    // Determine requester's profile file
-    if (!str_contains($requesterId, '-')) {
+    // Determine requester's profile file (PHP 7.4 compatible)
+    if (strpos($requesterId, '-') === false) {
         $foundFile = findProfileByUsername($requesterId);
         if ($foundFile) {
             $requesterFile = $foundFile;
@@ -292,8 +292,8 @@ if (!$userId) {
 }
 
 // Determine profile file path
-// If userId doesn't contain a dash, try to find by username
-if (!str_contains($userId, '-')) {
+// If userId doesn't contain a dash, try to find by username (PHP 7.4 compatible)
+if (strpos($userId, '-') === false) {
     $foundFile = findProfileByUsername($userId);
     if ($foundFile) {
         $profileFile = $foundFile;
