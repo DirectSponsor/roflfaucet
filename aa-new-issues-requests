@@ -1,0 +1,18 @@
+# ROFLFAUCET - New Issues & Requests
+
+*Add your notes here - AI will process and clear them automatically*
+*Just write naturally, no formatting required*
+
+---
+
+==========================================================================
+
+https://jigsaw.build/waitlist  has a leaderboard with a point per second added, presumable just for time sepnt on site. Soes time spent on site still count for SEO and value to advertisers? If so can we implement this, but not as prominently, just a samll, unobtrusive -- can we put a counter in the user menu? with a link to the leaderboard? This is just a to-do we have other stuff to do first. /home/andy/work/projects/roflfaucet/TODO.md
+We can also make it monthly starting from zero each month so new users can also be involved, and rewards could be badges, coins, or bonus % added to all taskd. 
+We still dont have a leaderboard but i think its documented somewhere, with details on a way to make it more interestign by realtime updates. The points could be another currency that is awarded for sone things, maybe a way to aggregate all the tasks and dites into one leaderboard, e.g points given for coins earned that month, would save having to "pointify" each task, and we could separate out the sources of points, like which game the coins are from, or which site... a lot of possiblities, it needs more thought and discussion.
+
+Some questions... 
+Guests can be in local storage, but members, is there an efficient way to keep their counter up to date on the server without constant connections to the site? Polling or whatever, can we avoide that? Is there another way of knowing ther balance, or would a 10 second interval be ok? Or do we know when they close the last tab? That could be a way. I see in the stats someties we see how long they spent on a page, can we use that to add to their points balance on the server instead? 
+
+==========================================================================
+

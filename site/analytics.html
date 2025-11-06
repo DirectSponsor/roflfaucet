@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Analytics - ROFLFaucet</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .stats-card { 
+            background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .big-number { font-size: 2em; font-weight: bold; color: #4CAF50; }
+        .game-breakdown { margin-top: 20px; }
+        .game-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px; margin: 5px 0; background: #f9f9f9; border-radius: 4px;
+        }
+        button { 
+            background: #4CAF50; color: white; border: none; padding: 10px 20px; 
+            border-radius: 4px; cursor: pointer; margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        .loading { opacity: 0.6; }
+        .error { color: #f44336; background: #ffebee; padding: 10px; border-radius: 4px; }
+        .success { color: #4CAF50; background: #e8f5e8; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Ultra-Fast Analytics Dashboard</h1>
+    <p><strong>Filesystem-based</strong> - No database, ultra-low server costs, <50ms load times</p>
+    
+    <div style="margin-bottom: 20px;">
+        <button onclick="loadDashboard(1)">Today</button>
+        <button onclick="loadDashboard(7)">Week</button>
+        <button onclick="loadDashboard(30)">Month</button>
+        <button onclick="clearData()">Clear All Data</button>
+    </div>
+    
+    <div id="status"></div>
+    
+    <div id="dashboard" class="loading">
+        <div class="stats-grid">
+            <!-- Total Games -->
+            <div class="stats-card">
+                <h3>🎮 Total Games</h3>
+                <div class="big-number" id="total-games">0</div>
+                <div style="color: #666;">Games played</div>
+            </div>
+            
+            <!-- Net Result -->
+            <div class="stats-card">
+                <h3>💰 Net Result</h3>
+                <div class="big-number" id="net-result">+0</div>
+                <div style="color: #666;">House edge</div>
+            </div>
+            
+            <!-- Biggest Win -->
+            <div class="stats-card">
+                <h3>🏆 Biggest Win</h3>
+                <div class="big-number" id="biggest-win">0</div>
+                <div style="color: #666;">Single payout</div>
+            </div>
+            
+            <!-- Total Volume -->
+            <div class="stats-card">
+                <h3>📊 Total Volume</h3>
+                <div class="big-number" id="total-volume">0</div>
+                <div style="color: #666;">Coins wagered</div>
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <h3>🎯 Game Breakdown</h3>
+            <div id="game-breakdown" class="game-breakdown">
+                <div class="game-item">No data yet</div>
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <h3>🏅 Top Players</h3>
+            <div id="leaderboard">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        let currentDays = 7;
+        
+        async function loadDashboard(days = 7) {
+            currentDays = days;
+            document.getElementById('dashboard').classList.add('loading');
+            document.getElementById('status').innerHTML = '';
+            
+            try {
+                // Load dashboard stats
+                const response = await fetch(`scripts/analytics.php?action=dashboard&days=${days}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateDashboard(result.data);
+                    showStatus('Dashboard loaded successfully', 'success');
+                } else {
+                    showStatus('Error loading dashboard: ' + result.error, 'error');
+                }
+                
+                // Load leaderboard
+                await loadLeaderboard();
+                
+            } catch (error) {
+                showStatus('Error loading dashboard: ' + error.message, 'error');
+            }
+            
+            document.getElementById('dashboard').classList.remove('loading');
+        }
+        
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch(`scripts/analytics.php?action=leaderboard&days=${currentDays}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateLeaderboard(result.data);
+                }
+            } catch (error) {
+                console.warn('Error loading leaderboard:', error);
+            }
+        }
+        
+        function updateDashboard(data) {
+            document.getElementById('total-games').textContent = data.total_games.toLocaleString();
+            document.getElementById('net-result').textContent = formatCurrency(data.net_result);
+            document.getElementById('biggest-win').textContent = data.biggest_win.toLocaleString();
+            document.getElementById('total-volume').textContent = data.total_bet.toLocaleString();
+            
+            // Color net result based on value
+            const netElement = document.getElementById('net-result');
+            netElement.style.color = data.net_result >= 0 ? '#4CAF50' : '#f44336';
+            
+            // Game breakdown
+            const gameBreakdown = document.getElementById('game-breakdown');
+            if (Object.keys(data.game_breakdown).length > 0) {
+                gameBreakdown.innerHTML = '';
+                Object.entries(data.game_breakdown).forEach(([game, stats]) => {
+                    const gameDiv = document.createElement('div');
+                    gameDiv.className = 'game-item';
+                    gameDiv.innerHTML = `
+                        <span><strong>${game}</strong> (${stats.games} games)</span>
+                        <span>Net: ${formatCurrency(stats.net)}</span>
+                    `;
+                    gameBreakdown.appendChild(gameDiv);
+                });
+            } else {
+                gameBreakdown.innerHTML = '<div class="game-item">No games played yet</div>';
+            }
+        }
+        
+        function updateLeaderboard(data) {
+            const leaderboard = document.getElementById('leaderboard');
+            if (data.length > 0) {
+                leaderboard.innerHTML = data.slice(0, 10).map((user, index) => `
+                    <div class="game-item">
+                        <span><strong>#${index + 1} ${user.user_id}</strong> (${user.games} games)</span>
+                        <span>Net: ${formatCurrency(user.net_result)}</span>
+                    </div>
+                `).join('');
+            } else {
+                leaderboard.innerHTML = '<div class="game-item">No players yet</div>';
+            }
+        }
+        
+        function formatCurrency(amount) {
+            const sign = amount >= 0 ? '+' : '';
+            return sign + amount.toLocaleString();
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => status.innerHTML = '', 3000);
+        }
+        
+        async function clearData() {
+            if (confirm('Clear all analytics data? This cannot be undone.')) {
+                showStatus('Data cleared (feature not implemented yet)', 'error');
+            }
+        }
+        
+        // Load initial dashboard
+        loadDashboard();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => loadDashboard(currentDays), 30000);
+    </script>
+</body>

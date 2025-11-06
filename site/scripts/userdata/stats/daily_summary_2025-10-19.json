@@ -1,0 +1,16 @@
+{
+    "date": "2025-10-19",
+    "games": 12,
+    "total_bet": 12,
+    "total_won": 8,
+    "net_result": -4,
+    "biggest_win": 2,
+    "game_breakdown": {
+        "poker-dice": {
+            "games": 12,
+            "total_bet": 12,
+            "total_won": 8,
+            "net": -4
+        }
+    }
+}

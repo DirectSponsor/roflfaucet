@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support ROFLFaucet - Lightning Donations</title>
+    <style>
+        /* Clean minimal CSS following ROFLFaucet design principles */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0.5em auto;
+            padding: 0.5em;
+            background: #f5f5f5;
+        }
+
+        .donate-card {
+            background: white;
+            padding: 1em;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: #ff6b35;
+            margin: 0 0 12px 0;
+            font-size: 1.6em;
+        }
+
+        /* Currency Display */
+        .currency-display {
+            margin: 0.2em 0;
+            min-height: 120px;
+        }
+
+        .primary-amount {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .primary-amount:hover {
+            color: #ff6b35;
+        }
+
+        .secondary-amount {
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+
+        .secondary-amount:hover {
+            background: #f0f0f0;
+            color: #ff6b35;
+        }
+
+        /* Calculator Keypad */
+        .calculator {
+            margin: 16px 0;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 12px;
+            max-width: 240px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .key {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .key:hover {
+            border-color: #ff6b35;
+            background: #fff8f5;
+        }
+
+        .key.wide {
+            grid-column: span 2;
+        }
+
+        .key.action {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+
+        .key.action:hover {
+            background: #e55a2b;
+        }
+
+        /* Currency Toggle Info */
+        .currency-info {
+            font-size: 12px;
+            color: #666;
+            margin: 8px 0;
+        }
+
+        /* Continue button */
+        .continue-btn {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 16px auto;
+            transition: all 0.3s;
+            display: none;
+            text-align: center;
+        }
+
+        .continue-btn:hover {
+            background: #e55a2b;
+            transform: translateY(-1px);
+        }
+
+        .continue-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Donor name input */
+        .donor-input {
+            margin: 16px 0;
+            display: none;
+        }
+
+        .donor-input input {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .donor-input input:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        .username-btn {
+            background: #f8f9fa;
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px 0;
+        }
+
+        .username-btn:hover {
+            background: #ff6b35;
+            color: white;
+        }
+
+        /* Payment interface (hidden initially) */
+        .payment-interface {
+            display: none;
+            margin: 16px 0;
+        }
+
+        .qr-section {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .qr-code {
+            max-width: 200px;
+            margin: 12px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .payment-address {
+            font-family: monospace;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 8px 0;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        /* Status section */
+        .status-section {
+            margin: 16px 0;
+            display: none;
+        }
+
+        .status-waiting {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .status-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            color: #155724;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #856404;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error display */
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            body {
+                margin: 10px;
+                padding: 10px;
+            }
+            
+            .primary-amount {
+                font-size: 36px;
+            }
+            
+            .keypad {
+                max-width: 200px;
+            }
+            
+            .key {
+                width: 50px;
+                height: 50px;
+                font-size: 18px;
+            }
+        }
+        
+        /* Very small screens */
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.1em;
+            }
+            
+            .continue-btn {
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+            
+            .primary-amount {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="donate-card">
+        <h1>⚡ Support ROFLFaucet</h1>
+        <div style="margin-bottom: 16px; text-align: center;">
+            <div style="font-size: 14px; color: #666;">
+                Every sat helps keep the faucet running and supports charitable projects
+            </div>
+        </div>
+        
+        <!-- Amount Entry Section -->
+        <div id="amountSection">
+            <!-- Currency Display -->
+            <div class="currency-display">
+                <div class="primary-amount" id="primaryAmount">
+                    $0.00
+                </div>
+                <div class="secondary-amount" id="secondaryAmount">
+                    ⚡ 0 sats
+                </div>
+                <div class="currency-info">
+                    Click to switch between USD and sats
+                </div>
+            </div>
+
+            <!-- Calculator Keypad -->
+            <div class="calculator">
+                <div class="keypad">
+                    <div class="key" data-key="1">1</div>
+                    <div class="key" data-key="2">2</div>
+                    <div class="key" data-key="3">3</div>
+                    <div class="key" data-key="4">4</div>
+                    <div class="key" data-key="5">5</div>
+                    <div class="key" data-key="6">6</div>
+                    <div class="key" data-key="7">7</div>
+                    <div class="key" data-key="8">8</div>
+                    <div class="key" data-key="9">9</div>
+                    <div class="key wide" data-key="0">0</div>
+                    <div class="key" data-key="backspace">←</div>
+                </div>
+            </div>
+
+            <!-- Donor Name Input (shown after amount selected) -->
+        <div class="donor-input" id="donorInput">
+            <!-- For logged-in users: show username button with option to change -->
+            <div id="loggedInDonor" style="display: none;">
+                <div style="margin: 8px 0; color: #666; font-size: 14px;">
+                    Donating as:
+                </div>
+                <button id="usernameBtn" class="username-btn">
+                    <span id="currentUsername"></span>
+                </button>
+                <div style="margin: 4px 0; font-size: 12px; color: #999;">
+                    Click to use different name or donate anonymously
+                </div>
+            </div>
+            
+            <!-- For guests or when custom name is selected -->
+            <div id="customDonor">
+                <input type="text" id="donorName" placeholder="Your name (optional - leave blank for anonymous)" maxlength="50">
+                <div style="margin: 4px 0; font-size: 12px; color: #666;">
+                    💡 <strong>Members:</strong> <a href="#" onclick="handleLogin(); return false;" style="color: #ff6b35;">Login</a> to use your username automatically
+                </div>
+            </div>
+            
+            <!-- Optional message field -->
+            <div style="margin: 16px 0;">
+                <textarea id="donorMessage" placeholder="Optional message (URLs clickable for donations ≥1000 sats)" 
+                         maxlength="500" rows="2" 
+                         style="width: 80%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; font-family: Arial, sans-serif;"></textarea>
+                <div style="margin: 4px 0; font-size: 11px; color: #666;">
+                    💡 Share a message, project idea, or URL • Large donations (≥1000 sats) get clickable links
+                </div>
+            </div>
+        </div>
+
+            <div style="text-align: center;">
+                <button class="continue-btn" id="continueBtn">
+                    Continue to Payment →
+                </button>
+            </div>
+        </div>
+
+        <!-- Payment Interface -->
+        <div id="paymentSection" class="payment-interface">
+            <h3>⚡ Lightning Payment</h3>
+            <p>Amount: <strong id="paymentAmount"></strong></p>
+
+            <div class="qr-section">
+                <img id="paymentQR" class="qr-code" src="" alt="Payment QR Code">
+                <div id="paymentAddress" class="payment-address"></div>
+                <button class="copy-btn" id="copyBtn">📋 Copy Invoice</button>
+            </div>
+
+            <p style="font-size: 14px; color: #666; margin-top: 15px;">
+                Scan QR code or copy invoice to your Lightning wallet
+            </p>
+        </div>
+
+        <!-- Status Section -->
+        <div id="statusSection" class="status-section">
+            <div id="waitingStatus" class="status-waiting">
+                <div class="spinner"></div>
+                <strong>Waiting for payment...</strong><br>
+                <small>Send the exact amount to complete your donation</small><br>
+                <div style="margin: 10px 0; font-size: 12px; color: #856404;">
+                    💡 <strong>Payment detection is automatic</strong><br>
+                    We check every 5 seconds for your payment
+                </div>
+            </div>
+            
+            <div id="successStatus" class="status-success" style="display:none;">
+                <h3 style="font-size: 1.4em; margin-bottom: 15px;">🎉 Payment Received!</h3>
+                <p style="font-size: 1.1em; margin-bottom: 12px;"><strong>Thank you for your donation!</strong></p>
+                <p style="font-size: 1.05em; margin-bottom: 15px;">Your contribution helps keep ROFLFaucet running and supports charitable projects.</p>
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="/transparency.html" target="_blank" 
+                       style="color: #ff6b35; font-size: 16px; text-decoration: none; border: 2px solid #ff6b35; padding: 8px 16px; border-radius: 20px; display: inline-block; transition: all 0.3s; font-weight: bold;">
+                        🔍 View Your Donation in Our Transparency Records
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="errorContainer"></div>
+    </div>
+
+    <script>
+        // Include the login detection function from site-utils
+        function getValidUsername() {
+            try {
+                const sessionData = localStorage.getItem('roflfaucet_session');
+                if (sessionData) {
+                    const data = JSON.parse(sessionData);
+                    if (data.expires && Date.now() > data.expires) {
+                        return null;
+                    }
+                    return data.username;
+                }
+                return localStorage.getItem('username');
+            } catch (error) {
+                return localStorage.getItem('username');
+            }
+        }
+
+        function handleLogin() {
+            const currentUrl = window.location.origin + window.location.pathname;
+            const authUrl = `https://auth.directsponsor.org/jwt-login.php?redirect_uri=${encodeURIComponent(currentUrl)}`;
+            window.location.href = authUrl;
+        }
+
+        class DonationSystem {
+            constructor() {
+                this.currentAmount = {
+                    usd: 0,
+                    sats: 0,
+                    primaryCurrency: 'sats' // Start with sats to avoid USD conversion issues
+                };
+                this.btcPrice = null; // No fallback price
+                this.priceLastFetched = 0;
+                this.currentDonationId = null;
+                this.statusCheckInterval = null;
+                this.API_BASE = '/payments/api';
+                this.useUsername = false;
+                
+                // Check for fundraiser parameters
+                this.fundraiserInfo = this.extractFundraiserInfo();
+                
+                this.init();
+            }
+
+            extractFundraiserInfo() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const info = {
+                    recipient: urlParams.get('recipient'),
+                    fundraiser: urlParams.get('fundraiser'), 
+                    title: urlParams.get('title')
+                };
+                
+                if (info.fundraiser || info.recipient) {
+                    console.log('🎯 Fundraiser context detected:', info);
+                    // If we have recipient but no specific fundraiser, get their current one
+                    if (info.recipient && !info.fundraiser) {
+                        this.fetchCurrentFundraiser(info.recipient).then(fundraiser => {
+                            if (fundraiser) {
+                                info.fundraiser = fundraiser.id;
+                                info.title = fundraiser.title;
+                                console.log('🎨 Auto-loaded current fundraiser:', fundraiser.title);
+                            }
+                            this.updatePageForFundraiser(info);
+                        });
+                    } else {
+                        this.updatePageForFundraiser(info);
+                    }
+                }
+                
+                return info;
+            }
+            
+            async fetchCurrentFundraiser(recipient) {
+                try {
+                    const response = await fetch(`/api/fundraiser-api.php?action=current&recipient=${encodeURIComponent(recipient)}`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.fundraiser) {
+                        return data.fundraiser;
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch current fundraiser:', error);
+                }
+                return null;
+            }
+            
+            updatePageForFundraiser(info) {
+                // Update page title and header
+                if (info.title) {
+                    document.title = `Donate to ${info.title} - ROFLFaucet`;
+                    const header = document.querySelector('h1');
+                    if (header) {
+                        header.textContent = `💝 Support: ${info.title}`;
+                    }
+                }
+                
+                // Add fundraiser context info after the header
+                setTimeout(() => {
+                    const donateCard = document.querySelector('.donate-card');
+                    if (donateCard && info.recipient && !document.getElementById('fundraiser-context')) {
+                        const contextDiv = document.createElement('div');
+                        contextDiv.id = 'fundraiser-context';
+                        contextDiv.style.cssText = 'background: #f0f8ff; border: 1px solid #4A90E2; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: left;';
+                        contextDiv.innerHTML = `
+                            <div style="font-weight: bold; color: #333; margin-bottom: 8px;">🎯 Fundraiser Context</div>
+                            <div style="color: #666; font-size: 0.9rem;">
+                                <div><strong>Recipient:</strong> ${info.recipient}</div>
+                                ${info.title ? `<div><strong>Project:</strong> ${info.title}</div>` : ''}
+                                <div style="margin-top: 8px; font-size: 0.8rem; font-style: italic;">
+                                    📊 Your donation will be tracked for transparency and credited to this fundraiser.
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Insert after the title but before currency display
+                        const title = donateCard.querySelector('h1');
+                        if (title && title.nextSibling) {
+                            donateCard.insertBefore(contextDiv, title.nextSibling);
+                        } else {
+                            donateCard.appendChild(contextDiv);
+                        }
+                    }
+                }, 100);
+            }
+            
+            async init() {
+                // Set up UI immediately, don't wait for BTC price
+                this.setupDonorInput();
+                this.bindEvents();
+                // Fetch BTC price in background (non-blocking)
+                this.fetchBTCPrice();
+            }
+
+            setupDonorInput() {
+                const username = getValidUsername();
+                const loggedInDiv = document.getElementById('loggedInDonor');
+                const customDiv = document.getElementById('customDonor');
+                const currentUsernameSpan = document.getElementById('currentUsername');
+                
+                if (username) {
+                    // User is logged in - show username button
+                    currentUsernameSpan.textContent = username;
+                    loggedInDiv.style.display = 'block';
+                    customDiv.style.display = 'none';
+                    this.useUsername = true;
+                } else {
+                    // User is not logged in - show custom input
+                    loggedInDiv.style.display = 'none';
+                    customDiv.style.display = 'block';
+                    this.useUsername = false;
+                }
+            }
+
+            async fetchBTCPrice() {
+                // Cache price for 60 seconds to avoid hitting rate limits
+                const now = Date.now();
+                if (this.btcPrice && (now - this.priceLastFetched) < 60000) {
+                    return;
+                }
+                
+                try {
+                    // Try CoinGecko first (free tier: 10-50 requests/minute)
+                    let response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+                    let data = await response.json();
+                    
+                    if (data.bitcoin && data.bitcoin.usd) {
+                        this.btcPrice = data.bitcoin.usd;
+                        this.priceLastFetched = now;
+                        console.log(`BTC price from CoinGecko: $${this.btcPrice.toLocaleString()}`);
+                        this.updateDisplay();
+                        return;
+                    }
+                } catch (error) {
+                    console.log('CoinGecko failed:', error.message);
+                }
+                
+                try {
+                    // Fallback to Coinos API
+                    const response = await fetch('https://coinos.io/api/rate/USD');
+                    const rate = await response.json();
+                    
+                    if (rate && typeof rate === 'number') {
+                        this.btcPrice = rate;
+                        this.priceLastFetched = now;
+                        console.log(`BTC price from Coinos: $${this.btcPrice.toLocaleString()}`);
+                        this.updateDisplay();
+                        return;
+                    }
+                } catch (error) {
+                    console.log('Coinos API also failed:', error.message);
+                }
+                
+                // Both APIs failed - leave btcPrice as null
+                console.log('All BTC price sources failed - USD conversion disabled');
+                this.updateDisplay();
+            }
+
+            bindEvents() {
+                // Keypad events
+                document.querySelectorAll('.key').forEach(key => {
+                    key.addEventListener('click', (e) => {
+                        const keyValue = e.target.dataset.key;
+                        if (keyValue === 'backspace') {
+                            this.backspace();
+                        } else {
+                            this.inputNumber(parseInt(keyValue));
+                        }
+                    });
+                });
+
+                // Currency toggle
+                document.getElementById('primaryAmount').addEventListener('click', () => this.toggleCurrency());
+                document.getElementById('secondaryAmount').addEventListener('click', () => this.toggleCurrency());
+
+                // Continue button
+                document.getElementById('continueBtn').addEventListener('click', () => this.proceedToPayment());
+
+                // Copy button
+                document.getElementById('copyBtn').addEventListener('click', () => this.copyPaymentAddress());
+
+                // Username button (for logged-in users)
+                const usernameBtn = document.getElementById('usernameBtn');
+                if (usernameBtn) {
+                    usernameBtn.addEventListener('click', () => this.toggleDonorInput());
+                }
+            }
+
+            usdToSats(usd) {
+                return Math.round((usd / this.btcPrice) * 100000000);
+            }
+
+            satsToUsd(sats) {
+                return (sats / 100000000) * this.btcPrice;
+            }
+
+            updateDisplay() {
+                const primaryEl = document.getElementById('primaryAmount');
+                const secondaryEl = document.getElementById('secondaryAmount');
+                
+                if (this.currentAmount.primaryCurrency === 'usd') {
+                    if (this.btcPrice) {
+                        primaryEl.textContent = `$${this.currentAmount.usd.toFixed(2)}`;
+                        secondaryEl.textContent = `⚡ ${this.currentAmount.sats.toLocaleString()} sats`;
+                    } else {
+                        primaryEl.textContent = `$${this.currentAmount.usd.toFixed(2)}`;
+                        secondaryEl.textContent = `⚡ ??? sats (price unavailable)`;
+                    }
+                } else {
+                    primaryEl.textContent = `${this.currentAmount.sats.toLocaleString()} sats`;
+                    if (this.btcPrice) {
+                        secondaryEl.textContent = `$${this.currentAmount.usd.toFixed(2)}`;
+                    } else {
+                        secondaryEl.textContent = `$??? (price unavailable)`;
+                    }
+                }
+                
+                // Show continue button and donor input if any amount > 0
+                const continueBtn = document.getElementById('continueBtn');
+                const donorInput = document.getElementById('donorInput');
+                
+                if (this.currentAmount.sats > 0) {
+                    continueBtn.style.display = 'block';
+                    donorInput.style.display = 'block';
+                } else {
+                    continueBtn.style.display = 'none';
+                    donorInput.style.display = 'none';
+                }
+            }
+
+            toggleCurrency() {
+                // Only allow USD mode if we have a valid BTC price
+                if (this.currentAmount.primaryCurrency === 'sats' && !this.btcPrice) {
+                    alert('USD conversion unavailable - Bitcoin price could not be fetched. Please use sats.');
+                    return;
+                }
+                
+                this.currentAmount.primaryCurrency = this.currentAmount.primaryCurrency === 'usd' ? 'sats' : 'usd';
+                this.updateDisplay();
+            }
+
+            inputNumber(digit) {
+                const primary = this.currentAmount.primaryCurrency;
+                
+                if (primary === 'usd') {
+                    // Build USD amount in cents, then convert to dollars
+                    let currentCents = Math.round(this.currentAmount.usd * 100);
+                    let currentStr = currentCents.toString();
+                    let newCents = parseInt((currentStr + digit.toString()).replace(/^0+/, '') || '0');
+                    if (newCents <= 99999) { // Max $999.99
+                        this.currentAmount.usd = newCents / 100;
+                        this.currentAmount.sats = this.usdToSats(this.currentAmount.usd);
+                    }
+                } else {
+                    let currentStr = this.currentAmount.sats.toString();
+                    let newSats = parseInt((currentStr + digit.toString()).replace(/^0+/, '') || '0');
+                    if (newSats <= 10000000) {
+                        this.currentAmount.sats = newSats;
+                        this.currentAmount.usd = this.satsToUsd(newSats);
+                    }
+                }
+                
+                this.updateDisplay();
+            }
+
+            backspace() {
+                const primary = this.currentAmount.primaryCurrency;
+                
+                if (primary === 'usd') {
+                    let usdStr = Math.round(this.currentAmount.usd * 100).toString();
+                    usdStr = usdStr.slice(0, -1) || '0';
+                    this.currentAmount.usd = parseInt(usdStr) / 100;
+                    this.currentAmount.sats = this.usdToSats(this.currentAmount.usd);
+                } else {
+                    let satsStr = this.currentAmount.sats.toString();
+                    satsStr = satsStr.slice(0, -1) || '0';
+                    this.currentAmount.sats = parseInt(satsStr);
+                    this.currentAmount.usd = this.satsToUsd(this.currentAmount.sats);
+                }
+                
+                this.updateDisplay();
+            }
+
+            toggleDonorInput() {
+                const loggedInDiv = document.getElementById('loggedInDonor');
+                const customDiv = document.getElementById('customDonor');
+                
+                if (this.useUsername) {
+                    // Switch to custom input
+                    loggedInDiv.style.display = 'none';
+                    customDiv.style.display = 'block';
+                    this.useUsername = false;
+                    document.getElementById('donorName').focus();
+                } else {
+                    // Switch back to username
+                    loggedInDiv.style.display = 'block';
+                    customDiv.style.display = 'none';
+                    this.useUsername = true;
+                    document.getElementById('donorName').value = '';
+                }
+            }
+
+            async proceedToPayment() {
+                if (this.currentAmount.sats < 1) {
+                    this.showError('Please enter a donation amount');
+                    return;
+                }
+
+                this.clearError();
+
+                try {
+                    let donorName = 'Anonymous';
+                    
+                    if (this.useUsername) {
+                        // Use the logged-in username
+                        donorName = getValidUsername() || 'Anonymous';
+                    } else {
+                        // Use custom input or anonymous
+                        donorName = document.getElementById('donorName').value.trim() || 'Anonymous';
+                    }
+                    
+                    // Get donor message from textarea
+                    const customMessage = document.getElementById('donorMessage').value.trim();
+                    let donorMessage;
+                    
+                    if (customMessage) {
+                        // Use custom message if provided
+                        donorMessage = customMessage;
+                    } else {
+                        // Default message with amount info
+                        donorMessage = `Donation of ${this.currentAmount.sats.toLocaleString()} sats ($${this.currentAmount.usd.toFixed(2)})`;
+                    }
+                    
+                    const data = {
+                        donor_name: donorName,
+                        amount_sats: this.currentAmount.sats,
+                        donor_message: donorMessage
+                    };
+
+                    const response = await fetch(`${this.API_BASE}/donate.php`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.error || 'Failed to create invoice');
+                    }
+
+                    this.showPayment(result.data);
+                    this.startStatusCheck();
+
+                } catch (error) {
+                    console.error('Payment creation error:', error);
+                    this.showError(error.message);
+                }
+            }
+
+            showPayment(data) {
+                this.currentDonationId = data.donation_id;
+
+                // Update payment display
+                document.getElementById('paymentAmount').textContent = 
+                    `${this.currentAmount.sats.toLocaleString()} sats ($${this.currentAmount.usd.toFixed(2)})`;
+                document.getElementById('paymentQR').src = data.qr_code;
+                document.getElementById('paymentAddress').textContent = data.invoice;
+
+                // Hide amount section, show payment section
+                document.getElementById('amountSection').style.display = 'none';
+                document.getElementById('paymentSection').style.display = 'block';
+                document.getElementById('statusSection').style.display = 'block';
+            }
+
+            async checkPaymentStatus() {
+                if (!this.currentDonationId) return;
+
+                try {
+                    const response = await fetch(
+                        `${this.API_BASE}/donate.php?donation_id=${encodeURIComponent(this.currentDonationId)}`
+                    );
+                    const result = await response.json();
+
+                    if (result.success && result.data.status === 'paid') {
+                        this.showPaymentSuccess();
+                        this.stopStatusCheck();
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                }
+            }
+
+            showPaymentSuccess() {
+                document.getElementById('waitingStatus').style.display = 'none';
+                document.getElementById('successStatus').style.display = 'block';
+            }
+
+            showPaymentTimeout() {
+                document.getElementById('waitingStatus').innerHTML = `
+                    <div style="text-align: center; padding: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+                        <h3 style="color: #856404;">⏰ Payment Timeout</h3>
+                        <p>Payment confirmation is taking longer than expected.</p>
+                        <p>If you paid, your payment may still be processing. Check your Lightning wallet.</p>
+                        <button onclick="window.location.reload()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+
+            startStatusCheck() {
+                // Webhook-first approach with smart exponential backoff
+                this.pollAttempts = 0;
+                this.maxPollAttempts = 8; // ~15 minutes total
+                
+                // Start polling after initial webhook wait period
+                setTimeout(() => {
+                    this.smartStatusCheck();
+                }, 20000); // Wait 20 seconds for webhook first
+            }
+
+            smartStatusCheck() {
+                if (this.pollAttempts >= this.maxPollAttempts) {
+                    this.showPaymentTimeout();
+                    return;
+                }
+                
+                this.checkPaymentStatus();
+                this.pollAttempts++;
+                
+                // Exponential backoff: 15s, 30s, 60s, 120s, etc.
+                const nextInterval = Math.min(15 * Math.pow(2, this.pollAttempts - 1), 300) * 1000;
+                
+                this.statusCheckInterval = setTimeout(() => {
+                    this.smartStatusCheck();
+                }, nextInterval);
+            }
+
+            stopStatusCheck() {
+                if (this.statusCheckInterval) {
+                    clearTimeout(this.statusCheckInterval);
+                    this.statusCheckInterval = null;
+                }
+                this.pollAttempts = 0;
+            }
+
+            copyPaymentAddress() {
+                const address = document.getElementById('paymentAddress').textContent;
+                
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(address).then(() => {
+                        const btn = document.getElementById('copyBtn');
+                        const originalText = btn.textContent;
+                        btn.textContent = '✅ Copied!';
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                        }, 2000);
+                    });
+                } else {
+                    // Fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = address;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+            }
+
+            showError(message) {
+                const container = document.getElementById('errorContainer');
+                container.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${message}
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 10000);
+            }
+
+            clearError() {
+                document.getElementById('errorContainer').innerHTML = '';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new DonationSystem();
+        });
+    </script>
+</body>
+</html>

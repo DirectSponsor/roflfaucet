@@ -1,0 +1,15 @@
+user manus
+pass XvBrt5FUbDFfVzio
+
+prompt:
+
+"Please set up a daily task to 
+
+1. visit https://roflfaucet.com/chat.html, 
+2. check login state, top right menu item will say Manus if you're logged in, and login i you're not. If logged in proceed to 4
+3. The login link sends to our auth server, auth.directsponsor.org . log in with username manus and password XvBrt5FUbDFfVzio, the auth server will return you to the chat page
+4. post the message Hello from Manus! This is my daily check-in." in the chat. 
+
+Please ensure the task is scheduled to run daily at 1:00 PM UTC and report back in the chat if there are any issues." Please also report if you were logged in already or had to login. I set the timeout to 25 hours so it should not ask you to login after the first time.
+
+

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROFLFaucet - Financial Transparency</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header .subtitle {
+            margin-top: 10px;
+            opacity: 0.9;
+            font-size: 1.2em;
+        }
+        
+        .balance-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .balance-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .balance-card h3 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .balance-card .amount {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        
+        .balance-card .sub-amount {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .section {
+            padding: 30px;
+        }
+        
+        .section h2 {
+            margin: 0 0 20px 0;
+            color: #333;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 10px;
+        }
+        
+        .donations-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .donation-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #4CAF50;
+            position: relative;
+        }
+        
+        .donation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .donor-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .donation-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .donation-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .donation-message {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .donation-message.expandable {
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            border-color: #2196F3;
+        }
+        
+        .donation-message.expanded {
+            background: #f0f8ff;
+        }
+        
+        .message-text {
+            line-height: 1.4;
+        }
+        
+        .message-preview {
+            color: #666;
+        }
+        
+        .message-full {
+            display: none;
+            color: #333;
+        }
+        
+        .message-toggle {
+            color: #2196F3;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        
+        .url-link {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .url-link:hover {
+            text-decoration: underline;
+        }
+        
+        .premium-donor {
+            position: relative;
+            border-left-color: #FF9800;
+        }
+        
+        .premium-donor::before {
+            content: "⭐";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.2em;
+        }
+        
+        .distribution-item {
+            background: #fff3e0;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #FF9800;
+            margin-bottom: 15px;
+        }
+        
+        .distribution-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .distribution-month {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #FF9800;
+        }
+        
+        .distribution-total {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #e65100;
+        }
+        
+        .charity-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .charity-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .charity-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .charity-amount {
+            color: #FF9800;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .balance-summary {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .donation-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Financial Transparency</h1>
+            <div class="subtitle">Custodial Flow • 100% Pass-Through • Zero Retention</div>
+        </div>
+        
+        <div id="balanceSection" class="balance-summary">
+            <div class="loading">Loading financial data...</div>
+        </div>
+        
+        <div class="section">
+            <h2>💝 Donations Received</h2>
+            <div id="donationsSection" class="loading">Loading donation history...</div>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Charitable Distributions</h2>
+            <div id="distributionsSection" class="loading">Loading distribution history...</div>
+        </div>
+    </div>
+    
+    <script>
+        class TransparencyPage {
+            constructor() {
+                this.apiBase = '/payments/api/accounts.php';
+                this.minAmountForLinks = 1000; // sats threshold for active URLs
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    await this.loadData();
+                } catch (error) {
+                    this.showError('Failed to load transparency data: ' + error.message);
+                }
+            }
+            
+            async loadData() {
+                const response = await fetch(`${this.apiBase}?action=summary`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+                
+                this.renderBalance(data.balance);
+                await this.loadDonations();
+                this.renderDistributions(data.recent_distributions);
+            }
+            
+            async loadDonations() {
+                const response = await fetch(`${this.apiBase}?action=inflows`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.renderDonations(data.monthly_inflows);
+                }
+            }
+            
+            renderBalance(balance) {
+                const section = document.getElementById('balanceSection');
+                section.innerHTML = `
+                    <div class="balance-card">
+                        <h3>Current Balance</h3>
+                        <div class="amount">${balance.current_balance_sats.toLocaleString()} sats</div>
+                        <div class="sub-amount">Hot Wallet</div>
+                    </div>
+                    <div class="balance-card">
+                        <h3>Total Received</h3>
+                        <div class="amount">${balance.total_inflows_sats.toLocaleString()} sats</div>
+                        <div class="sub-amount">All Time</div>
+                    </div>
+                    <div class="balance-card">
+                        <h3>Total Distributed</h3>
+                        <div class="amount">${balance.total_outflows_sats.toLocaleString()} sats</div>
+                        <div class="sub-amount">To Charity</div>
+                    </div>
+                    <div class="balance-card">
+                        <h3>Next Distribution</h3>
+                        <div class="amount">${balance.days_until_distribution} days</div>
+                        <div class="sub-amount">${balance.next_distribution_date}</div>
+                    </div>
+                `;
+            }
+            
+            renderDonations(monthlyInflows) {
+                const section = document.getElementById('donationsSection');
+                
+                if (!monthlyInflows.length) {
+                    section.innerHTML = '<div class="loading">No donations yet</div>';
+                    return;
+                }
+                
+                let html = '';
+                monthlyInflows.forEach(month => {
+                    html += `<h3>📅 ${month.month} - ${month.total_sats.toLocaleString()} sats (${month.total_donations} donations)</h3>`;
+                    html += '<div class="donations-list">';
+                    
+                    month.donations.forEach(donation => {
+                        const isPremium = donation.amount_sats >= this.minAmountForLinks;
+                        const messageHtml = this.formatMessage(donation.message, isPremium);
+                        
+                        html += `
+                            <div class="donation-item ${isPremium ? 'premium-donor' : ''}">
+                                <div class="donation-header">
+                                    <div class="donor-name">${this.escapeHtml(donation.donor_name || 'Anonymous')}</div>
+                                    <div class="donation-amount">${donation.amount_sats.toLocaleString()} sats</div>
+                                </div>
+                                <div class="donation-date">${new Date(donation.date).toLocaleString()}</div>
+                                ${messageHtml}
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                });
+                
+                section.innerHTML = html;
+                this.attachMessageHandlers();
+            }
+            
+            formatMessage(message, allowLinks) {
+                if (!message || message.trim() === '') return '';
+                
+                const text = this.escapeHtml(message);
+                const isLong = text.length > 80;
+                
+                let messageHtml = '<div class="donation-message';
+                if (isLong) messageHtml += ' expandable';
+                messageHtml += '">';
+                
+                if (isLong) {
+                    const preview = text.substring(0, 77) + '...';
+                    messageHtml += `
+                        <div class="message-text">
+                            <div class="message-preview">${this.linkify(preview, allowLinks)}</div>
+                            <div class="message-full">${this.linkify(text, allowLinks)}</div>
+                        </div>
+                        <div class="message-toggle">Click to expand</div>
+                    `;
+                } else {
+                    messageHtml += `<div class="message-text">${this.linkify(text, allowLinks)}</div>`;
+                }
+                
+                messageHtml += '</div>';
+                return messageHtml;
+            }
+            
+            linkify(text, allowLinks) {
+                if (!allowLinks) return text;
+                
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                return text.replace(urlRegex, '<a href="$1" class="url-link" target="_blank" rel="noopener">$1</a>');
+            }
+            
+            attachMessageHandlers() {
+                document.querySelectorAll('.donation-message.expandable').forEach(msg => {
+                    msg.addEventListener('click', (e) => {
+                        const preview = msg.querySelector('.message-preview');
+                        const full = msg.querySelector('.message-full');
+                        const toggle = msg.querySelector('.message-toggle');
+                        
+                        if (msg.classList.contains('expanded')) {
+                            preview.style.display = 'block';
+                            full.style.display = 'none';
+                            toggle.textContent = 'Click to expand';
+                            msg.classList.remove('expanded');
+                        } else {
+                            preview.style.display = 'none';
+                            full.style.display = 'block';
+                            toggle.textContent = 'Click to collapse';
+                            msg.classList.add('expanded');
+                        }
+                    });
+                });
+            }
+            
+            renderDistributions(distributions) {
+                const section = document.getElementById('distributionsSection');
+                
+                if (!distributions.length) {
+                    section.innerHTML = '<div class="loading">No distributions yet - first distribution at end of month</div>';
+                    return;
+                }
+                
+                let html = '';
+                distributions.forEach(dist => {
+                    html += `
+                        <div class="distribution-item">
+                            <div class="distribution-header">
+                                <div class="distribution-month">Distribution: ${dist.month}</div>
+                                <div class="distribution-total">${dist.total_distributed_sats.toLocaleString()} sats</div>
+                            </div>
+                            <div class="charity-list">
+                    `;
+                    
+                    dist.distributions.forEach(charity => {
+                        html += `
+                            <div class="charity-item">
+                                <div class="charity-name">${this.escapeHtml(charity.recipient)}</div>
+                                <div class="charity-amount">${charity.amount_sats.toLocaleString()} sats</div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                            <div class="donation-date">Distributed: ${new Date(dist.distribution_date).toLocaleString()}</div>
+                        </div>
+                    `;
+                });
+                
+                section.innerHTML = html;
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            showError(message) {
+                document.querySelector('.container').innerHTML += 
+                    `<div class="error">Error: ${message}</div>`;
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TransparencyPage();
+        });
+    </script>
+</body>

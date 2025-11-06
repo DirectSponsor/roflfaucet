@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Fundraisers - ROFLFaucet</title>
+    <meta name="description" content="Support Bitcoin community projects and initiatives through Lightning-powered fundraisers on ROFLFaucet">
+    
+    <!-- Main site CSS -->
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="chat/chat-widget.css">
+    
+    <!-- Fundraisers listing styles -->
+    <style>
+        .fundraisers-header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #e1d00e 0%, #BFB00B 100%);
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .fundraisers-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .fundraisers-header p {
+            font-size: 1.2rem;
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .fundraisers-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .fundraisers-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-button {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .filter-button.active {
+            background: #e1d00e;
+            border-color: #e1d00e;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .fundraisers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .fundraiser-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .fundraiser-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .fundraiser-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .fundraiser-content {
+            padding: 20px;
+        }
+
+        .fundraiser-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .fundraiser-tagline {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .fundraiser-progress-container {
+            margin: 15px 0;
+        }
+
+        .fundraiser-progress {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .fundraiser-progress-bar {
+            height: 100%;
+            background: #4caf50;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .fundraiser-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-raised {
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        .stat-goal {
+            color: #666;
+        }
+
+        .fundraiser-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .fundraiser-type {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .fundraiser-type.recurring {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .verification-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+        }
+
+        .verified {
+            color: #4caf50;
+        }
+
+        .pending {
+            color: #ff9800;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .fundraisers-header h1 {
+                font-size: 2rem;
+            }
+            
+            .fundraisers-header p {
+                font-size: 1rem;
+            }
+            
+            .fundraisers-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/unified-balance.js"></script>
+    <script src="scripts/site-utils.js"></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <div class="header">
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            <div class="header-left">
+                <a href="index.html" class="logo">🤣 roflfaucet</a>
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
+            </div>
+            <nav id="main-nav" class="header-center">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <a href="fundraisers.html" class="nav-button active">💝 Fundraisers</a>
+                <a href="about.html" class="nav-button">ℹ️ About</a>
+            </nav>
+            <div class="header-right">
+                <a href="payments/donate.html" class="nav-button" title="Support ROFLFaucet">⚡ Donate</a>
+                <div class="guest-only">
+                    <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+                </div>
+                <div class="member-only" style="display: none;">
+                    <div class="dropdown">
+                        <a href="profile.html" class="nav-button" id="user-menu-button">👤 User</a>
+                        <div class="dropdown-content">
+                            <a href="profile.html">👤 Profile</a>
+                            <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox</a>
+                            <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <a href="fundraisers.html" class="nav-button active">💝 Fundraisers</a>
+                <a href="about.html" class="nav-button">ℹ️ About</a>
+                <a href="payments/donate.html" class="nav-button">⚡ Donate</a>
+            </nav>
+        </div>
+
+        <!-- Header Section -->
+        <div class="fundraisers-header">
+            <h1>💝 Community Fundraisers</h1>
+            <p>Support Bitcoin education, infrastructure, and community projects with Lightning-powered donations</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="fundraisers-container">
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-state">
+                <div>Loading fundraisers...</div>
+            </div>
+
+            <!-- Filters -->
+            <div id="fundraisers-filters" class="fundraisers-filters" style="display: none;">
+                <div style="font-weight: bold; color: #666;">Filter:</div>
+                <button class="filter-button active" data-filter="all">All</button>
+                <button class="filter-button" data-filter="one-time">One-time</button>
+                <button class="filter-button" data-filter="recurring">Monthly</button>
+                <button class="filter-button" data-filter="featured">Featured</button>
+                <button class="filter-button" data-filter="education">Education</button>
+                <button class="filter-button" data-filter="infrastructure">Infrastructure</button>
+            </div>
+
+            <!-- Fundraisers Grid -->
+            <div id="fundraisers-grid" class="fundraisers-grid" style="display: none;">
+                <!-- Fundraiser cards will be inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <h3>No fundraisers found</h3>
+                <p>Try adjusting your filters or check back later for new fundraising campaigns.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Fundraisers JavaScript -->
+    <script>
+        let allFundraisers = [];
+        let currentFilter = 'all';
+
+        // Load all fundraisers
+        async function loadFundraisers() {
+            try {
+                const response = await fetch('api/fundraiser-api.php?action=list');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allFundraisers = data.fundraisers || [];
+                    setupFilters();
+                    displayFundraisers(allFundraisers);
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading fundraisers:', error);
+                showEmptyState();
+            } finally {
+                document.getElementById('loading-state').style.display = 'none';
+            }
+        }
+
+        // Setup filter buttons
+        function setupFilters() {
+            const filtersContainer = document.getElementById('fundraisers-filters');
+            const filterButtons = filtersContainer.querySelectorAll('.filter-button');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active filter
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Apply filter
+                    currentFilter = this.dataset.filter;
+                    const filteredFundraisers = filterFundraisers(allFundraisers, currentFilter);
+                    displayFundraisers(filteredFundraisers);
+                });
+            });
+            
+            filtersContainer.style.display = 'flex';
+        }
+
+        // Filter fundraisers based on criteria
+        function filterFundraisers(fundraisers, filter) {
+            if (filter === 'all') return fundraisers;
+            
+            return fundraisers.filter(fundraiser => {
+                switch (filter) {
+                    case 'one-time':
+                        return fundraiser.type === 'one-time';
+                    case 'recurring':
+                        return fundraiser.type === 'recurring';
+                    case 'featured':
+                        return fundraiser.featured === true;
+                    case 'education':
+                        return fundraiser.category === 'education';
+                    case 'infrastructure':
+                        return fundraiser.category === 'infrastructure';
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // Display fundraisers grid
+        function displayFundraisers(fundraisers) {
+            const grid = document.getElementById('fundraisers-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (fundraisers.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            grid.style.display = 'grid';
+            
+            grid.innerHTML = fundraisers.map(fundraiser => createFundraiserCard(fundraiser)).join('');
+        }
+
+        // Create individual fundraiser card
+        function createFundraiserCard(fundraiser) {
+            const progressPercentage = fundraiser.goal_amount > 0 ? 
+                (fundraiser.current_amount / fundraiser.goal_amount) * 100 : 0;
+            
+            const isVerified = fundraiser.verification && fundraiser.verification.verified;
+            const verificationIcon = isVerified ? '✅' : '⏳';
+            const verificationClass = isVerified ? 'verified' : 'pending';
+            const verificationText = isVerified ? 'Verified' : 'Pending';
+            
+            const heroImage = fundraiser.hero_image ? 
+                `<img src="images/fundraisers/${fundraiser.hero_image}" alt="${fundraiser.title}" class="fundraiser-image">` :
+                `<div class="fundraiser-image">📸 Image coming soon</div>`;
+                
+            const projectUrl = fundraiser.url || `fundraiser.html?id=${fundraiser.id}`; // Use direct URL if available, fallback to old format
+            
+            return `
+                <div class="fundraiser-card" onclick="window.location.href='${projectUrl}'">
+                    ${heroImage}
+                    <div class="fundraiser-content">
+                        <h3 class="fundraiser-title">${fundraiser.title}</h3>
+                        <p class="fundraiser-tagline">${fundraiser.tagline}</p>
+                        
+                        <div class="fundraiser-progress-container">
+                            <div class="fundraiser-progress">
+                                <div class="fundraiser-progress-bar" style="width: ${Math.min(progressPercentage, 100)}%"></div>
+                            </div>
+                            <div class="fundraiser-stats">
+                                <div class="stat-raised">
+                                    ${fundraiser.current_amount.toLocaleString()} ${fundraiser.currency === 'sats' ? 'sats' : fundraiser.currency} raised
+                                </div>
+                                <div class="stat-goal">
+                                    of ${fundraiser.goal_amount.toLocaleString()} ${fundraiser.currency === 'sats' ? 'sats' : fundraiser.currency} ${fundraiser.type === 'recurring' ? '/month' : 'goal'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="fundraiser-meta">
+                            <div class="fundraiser-type ${fundraiser.type}">
+                                ${fundraiser.type === 'one-time' ? '🎯 One-time' : '🔄 Monthly'}
+                            </div>
+                            <div class="verification-status ${verificationClass}">
+                                ${verificationIcon} ${verificationText}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'block';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFundraisers();
+        });
+    </script>
+</body>

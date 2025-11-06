@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support ROFLFaucet - Simple Donations</title>
+    <style>
+        /* Minimal CSS following ROFLFaucet design principles */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .donate-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff6b35;
+            margin: 0 0 15px 0;
+        }
+
+        .amount-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .amount-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .amount-btn:hover {
+            border-color: #ff6b35;
+            background: #ff6b35;
+            color: white;
+        }
+
+        .payment-info {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .qr-code {
+            max-width: 200px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .address {
+            font-family: monospace;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin: 10px 0;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .transparency {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .custom-amount {
+            margin: 15px 0;
+        }
+
+        .custom-amount input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            body {
+                margin: 10px;
+                padding: 10px;
+            }
+            
+            .amount-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="donate-card">
+        <h1>🎲 Support ROFLFaucet</h1>
+        <p>Help keep the games running and support our transparency initiative!</p>
+
+        <!-- Amount Selection -->
+        <div class="amount-buttons">
+            <button class="amount-btn" onclick="showPayment(5)">$5</button>
+            <button class="amount-btn" onclick="showPayment(10)">$10</button>
+            <button class="amount-btn" onclick="showPayment(25)">$25</button>
+            <button class="amount-btn" onclick="showPayment(50)">$50</button>
+        </div>
+
+        <div class="custom-amount">
+            <input type="number" id="customAmount" placeholder="Or enter custom amount..." 
+                   min="1" max="500" onchange="showCustomPayment()">
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-info">
+            <h3>⚡ Bitcoin Payment</h3>
+            <p style="color: #666;">Works with any Bitcoin wallet - Lightning or on-chain</p>
+            
+            <img id="qrCode" class="qr-code" 
+                 src="https://coinos.io/qr/clickforcharity%40coinos.io/raw" 
+                 alt="Bitcoin Payment QR Code">
+            
+            <div class="address">clickforcharity@coinos.io</div>
+            
+            <button class="copy-btn" onclick="copyAddress()">📋 Copy Address</button>
+            
+            <p style="margin: 15px 0 0 0; font-size: 13px; color: #888;">
+                ⚡ Lightning payments are instant<br>
+                ₿ On-chain works with any Bitcoin wallet
+            </p>
+            
+            <div id="amountNote" style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 3px; font-size: 14px; display: none;">
+                <strong>Donation Amount:</strong> <span id="selectedAmount"></span><br>
+                <small>Send this amount to clickforcharity@coinos.io</small>
+            </div>
+        </div>
+
+        <!-- Transparency Promise -->
+        <div class="transparency">
+            <strong>💎 100% Transparency</strong><br>
+            All donations are tracked and allocated monthly to verified recipients.<br>
+            <a href="#" style="color: #ff6b35;">View donation transparency →</a>
+        </div>
+
+        <!-- DirectSponsor Network Info -->
+        <div style="margin-top: 20px; font-size: 13px; color: #666;">
+            <strong>Part of the DirectSponsor Network</strong><br>
+            ROFLFaucet and ClickForCharity work together to enable 100% direct value transfer.<br>
+            <a href="#more-info" style="color: #ff6b35;">Learn more about our mission →</a>
+        </div>
+    </div>
+
+    <script>
+        let currentAmount = 0;
+
+        function showPayment(amount) {
+            currentAmount = amount;
+            document.getElementById('selectedAmount').textContent = '$' + amount;
+            document.getElementById('amountNote').style.display = 'block';
+            
+            // Highlight selected button
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.style.background = 'white');
+            event.target.style.background = '#ff6b35';
+            event.target.style.color = 'white';
+            
+            // Clear custom input
+            document.getElementById('customAmount').value = '';
+            
+            // Log for analytics (could be sent to server)
+            console.log('Donation amount selected:', amount);
+            
+            // Future: Could create specific invoice via PHP API
+            // recordDonationAttempt(amount);
+        }
+
+        function showCustomPayment() {
+            const customAmount = parseFloat(document.getElementById('customAmount').value);
+            
+            if (customAmount > 0 && customAmount <= 500) {
+                currentAmount = customAmount;
+                document.getElementById('selectedAmount').textContent = '$' + customAmount;
+                document.getElementById('amountNote').style.display = 'block';
+                
+                // Clear button selections
+                document.querySelectorAll('.amount-btn').forEach(btn => {
+                    btn.style.background = 'white';
+                    btn.style.color = 'black';
+                });
+                
+                console.log('Custom donation amount:', customAmount);
+            } else {
+                document.getElementById('amountNote').style.display = 'none';
+            }
+        }
+
+        function copyAddress() {
+            const address = 'clickforcharity@coinos.io';
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(address).then(() => {
+                    showCopyFeedback();
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = address;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyFeedback();
+            }
+        }
+
+        function showCopyFeedback() {
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Copied!';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Future: Function to record donation attempt in PHP
+        function recordDonationAttempt(amount) {
+            fetch('/payments/donate.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'create',
+                    amount: amount,
+                    donor: { name: 'Anonymous' }
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  console.log('Donation intent recorded:', data);
+              }).catch(error => {
+                  console.log('Could not record donation intent');
+              });
+        }
+
+        // Future: Check for completed payments and update UI
+        function checkForCompletedDonations() {
+            fetch('/payments/donate.php?action=stats')
+                .then(response => response.json())
+                .then(stats => {
+                    // Update transparency info with real stats
+                    console.log('Current donation stats:', stats);
+                })
+                .catch(error => {
+                    console.log('Could not load donation stats');
+                });
+        }
+
+        // Load current stats on page load
+        // checkForCompletedDonations();
+    </script>
+</body>
+</html>

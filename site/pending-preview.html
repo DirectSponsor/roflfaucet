@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Preview - ROFLFaucet</title>
+    
+    <!-- Use existing CSS files from server -->
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="chat/chat-widget.css">
+    
+    <!-- Required JavaScript for navigation -->
+    <script src="scripts/unified-balance.js"></script>
+    <script src="scripts/site-utils.js"></script>
+    
+    <style>
+        .preview-banner {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
+        }
+        
+        .preview-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        
+        .preview-btn {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .preview-btn:hover {
+            background: #357abd;
+        }
+        
+        .edit-btn {
+            background: #f39c12;
+        }
+        
+        .edit-btn:hover {
+            background: #e67e22;
+        }
+        
+        .access-denied {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            margin: 40px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        #project-content {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <!-- include nav.html -->
+        <div class="header">
+            <!-- Mobile menu checkbox (hidden) -->
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            
+            <!-- Left: Logo -->
+            <div class="header-left">
+                <a href="index.html" class="logo">🤣 roflfaucet</a>
+                <!-- Mobile hamburger button (hidden on desktop) -->
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
+            </div>
+            
+            <!-- Center: Main Navigation -->
+            <nav id="main-nav" class="header-center">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                
+                <!-- Simple Games Dropdown -->
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Right: Account Menu -->
+            <div class="header-right">
+                <!-- Donate Button (subtle, always visible) -->
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button" title="Support ROFLFaucet">⚡ Donate</a>
+                
+                <!-- Guest Login (shown when logged out) -->
+                <div class="guest-only">
+                    <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+                </div>
+                
+                <!-- Member Menu (shown when logged in) -->
+                <div class="member-only" style="display: none;">
+                    <div class="dropdown">
+                        <a href="profile.html" class="nav-button" id="user-menu-button">👤 User</a>
+                        <div class="dropdown-content">
+                            <a href="profile.html">👤 Profile</a>
+                            <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox <span id="notification-badge" class="notification-badge" style="background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7em; margin-left: 5px; display: none;">3</span></a>
+                            <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile navigation menu -->
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button">⚡ Donate</a>
+                <!-- Auth button will be added dynamically by JavaScript -->
+            </nav>
+        </div>
+    <!-- end include nav.html -->
+    
+    <div class="page-wrapper">
+        <div id="loading" class="loading">
+            <p>🔄 Loading project preview...</p>
+        </div>
+        
+        <div id="access-denied" class="access-denied" style="display: none;">
+            <h2>⚠️ Access Denied</h2>
+            <p>You can only preview your own pending projects.</p>
+            <p><a href="profile.html" class="preview-btn">← Back to Profile</a></p>
+        </div>
+        
+        <div id="preview-banner" class="preview-banner" style="display: none;">
+            <h3>🔍 Project Preview</h3>
+            <p>This is a preview of your pending project. It's not live yet and awaiting admin approval.</p>
+        </div>
+        
+        <div id="project-content">
+            <!-- Project content will be loaded here -->
+        </div>
+        
+        <div id="preview-controls" class="preview-controls" style="display: none;">
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem;">Preview Mode</p>
+            <a href="#" id="edit-link" class="preview-btn edit-btn">✏️ Edit Project</a>
+            <a href="profile.html" class="preview-btn">← Back to Profile</a>
+        </div>
+    </div>
+    
+    <script>
+        class PendingPreview {
+            constructor() {
+                this.projectId = null;
+                this.filename = null;
+                this.currentUser = null;
+                this.init();
+            }
+            
+            async init() {
+                // Get URL parameters
+                const params = new URLSearchParams(window.location.search);
+                this.projectId = params.get('id');
+                this.filename = params.get('file');
+                
+                if (!this.projectId || !this.filename) {
+                    this.showError('Invalid preview URL');
+                    return;
+                }
+                
+                // Check authentication
+                this.currentUser = getValidUsername();
+                if (!this.currentUser) {
+                    window.location.href = 'profile.html';
+                    return;
+                }
+                
+                // Load and verify project
+                await this.loadProject();
+            }
+            
+            async loadProject() {
+                try {
+                    // Fetch the pending project file via API
+                    const response = await fetch(`/api/pending-project-viewer.php?id=${this.projectId}&file=${this.filename}&user=${this.currentUser}`);
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        if (data.error === 'Access denied') {
+                            this.showAccessDenied();
+                        } else {
+                            this.showError(data.error || 'Failed to load project');
+                        }
+                        return;
+                    }
+                    
+                    // Show preview content
+                    this.showPreview(data.content);
+                    
+                } catch (error) {
+                    console.error('Failed to load project:', error);
+                    this.showError('Failed to load project preview');
+                }
+            }
+            
+            showPreview(content) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('preview-banner').style.display = 'block';
+                document.getElementById('preview-controls').style.display = 'block';
+                document.getElementById('project-content').innerHTML = content;
+                
+                // Set edit link
+                document.getElementById('edit-link').href = `edit-project-v2.html?project=${this.projectId}`;
+            }
+            
+            showAccessDenied() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('access-denied').style.display = 'block';
+            }
+            
+            showError(message) {
+                document.getElementById('loading').innerHTML = `<p style="color: #e74c3c;">❌ ${message}</p>`;
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new PendingPreview();
+        });
+    </script>
+</body>

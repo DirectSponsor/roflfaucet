@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Not Found - ROFLFaucet</title>
+    <link rel="stylesheet" href="/main.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            background: #f5f6fa;
+        }
+        
+        .error-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            margin-top: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .error-title {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .error-message {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .suggestion-box {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .suggestion-title {
+            color: #155724;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 0.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">📂</div>
+        <h1 class="error-title">Project Not Found</h1>
+        <p class="error-message">The project you're looking for isn't available at this location.</p>
+        
+        <div id="suggestion" style="display: none;" class="suggestion-box">
+            <div class="suggestion-title">✅ Found it!</div>
+            <p>This project may have been completed and moved to our archives.</p>
+            <a href="#" id="completedLink" class="btn">View Completed Project</a>
+        </div>
+        
+        <div class="suggestion-box">
+            <div class="suggestion-title">💡 What you can do:</div>
+            <p>• Check if the project has been completed<br>
+               • Browse all active projects<br>
+               • Return to the main site</p>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <a href="/fundraisers.html" class="btn">Browse Active Projects</a>
+            <a href="/index.html" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+    
+    <script>
+        // Extract project ID from URL
+        const path = window.location.pathname;
+        const matches = path.match(/\/projects\/([^\/]+)$/);
+        
+        if (matches) {
+            const filename = matches[1];
+            // Check if this looks like a project file
+            if (filename.match(/^\d+\.html$/) || filename.match(/^project-\d+\.html$/) || filename.match(/^\d+-.*\.html$/)) {
+                // Try to check if it exists in completed directory
+                checkCompletedProject(filename);
+            }
+        }
+        
+        async function checkCompletedProject(filename) {
+            try {
+                const completedUrl = `/projects/completed/${filename}`;
+                const response = await fetch(completedUrl, { method: 'HEAD' });
+                
+                if (response.ok) {
+                    // Found in completed directory
+                    document.getElementById('completedLink').href = completedUrl;
+                    document.getElementById('suggestion').style.display = 'block';
+                }
+            } catch (error) {
+                console.log('Project not found in completed directory');
+            }
+        }
+    </script>
+</body>
+</html>

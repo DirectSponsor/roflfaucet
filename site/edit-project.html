@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Project - ROFLFaucet</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="chat/chat-widget.css">
+    
+    <style>
+        .edit-project-container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .project-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .current-stats {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .project-form {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-help {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .image-upload-section {
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        
+        .image-upload-section:hover {
+            border-color: #667eea;
+        }
+        
+        .current-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .image-placeholder {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 40px 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .warning-box h4 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .recipient-only {
+            display: none;
+        }
+    </style>
+    
+    <script src="scripts/unified-balance.js"></script>
+    <script src="scripts/site-utils.js"></script>
+    <script src="chat/chat-widget.js"></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- include nav.html -->
+        <div class="header">
+            <!-- Mobile menu checkbox (hidden) -->
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            
+            <!-- Left: Logo -->
+            <div class="header-left">
+                <a href="index.html" class="logo">🤣 roflfaucet</a>
+                <!-- Mobile hamburger button (hidden on desktop) -->
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
+            </div>
+            
+            <!-- Center: Main Navigation -->
+            <nav id="main-nav" class="header-center">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                
+                <!-- Simple Games Dropdown -->
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Right: Account Menu -->
+            <div class="header-right">
+                <!-- Donate Button (subtle, always visible) -->
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button" title="Support ROFLFaucet">⚡ Donate</a>
+                
+                <!-- Guest Login (shown when logged out) -->
+                <div class="guest-only">
+                    <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+                </div>
+                
+                <!-- Member Menu (shown when logged in) -->
+                <div class="member-only" style="display: none;">
+                    <div class="dropdown">
+                        <a href="profile.html" class="nav-button" id="user-menu-button">👤 User</a>
+                        <div class="dropdown-content">
+                            <a href="profile.html">👤 Profile</a>
+                            <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox <span id="notification-badge" class="notification-badge" style="background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7em; margin-left: 5px; display: none;">3</span></a>
+                            <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile navigation menu -->
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button">⚡ Donate</a>
+                <!-- Auth button will be added dynamically by JavaScript -->
+            </nav>
+        </div>
+        <!-- end include nav.html -->
+        
+        <div class="edit-project-container recipient-only">
+            <div class="project-header">
+                <h1>✏️ Edit Your Project</h1>
+                <p id="projectSubtitle">Update project details and information</p>
+            </div>
+            
+            <!-- Current Project Statistics -->
+            <div class="current-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="currentRaised">0</div>
+                    <div class="stat-label">Sats Raised</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalDonors">0</div>
+                    <div class="stat-label">Supporters</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="progressPercent">0%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="daysActive">0</div>
+                    <div class="stat-label">Days Active</div>
+                </div>
+            </div>
+            
+            <div class="project-form">
+                <form id="editProjectForm">
+                    <div class="warning-box">
+                        <h4>⚠️ Important Notes</h4>
+                        <ul>
+                            <li><strong>Existing donations stay with your project</strong> - all current progress is preserved</li>
+                            <li><strong>Lightning address changes</strong> will apply to new donations only</li>
+                            <li><strong>Goal changes</strong> affect progress percentage calculation</li>
+                            <li>Changes are saved immediately when you click "Save Changes"</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectTitle">Project Title</label>
+                        <input type="text" id="projectTitle" name="title" required maxlength="100">
+                        <div class="form-help">Update your project title (appears in listings and donation page)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mainImage">Main Project Image</label>
+                        <div class="image-upload-section">
+                            <div id="currentImageContainer"></div>
+                            <input type="file" id="mainImage" accept="image/*" style="display: none;">
+                            <button type="button" onclick="document.getElementById('mainImage').click()" class="btn-secondary">
+                                📷 Update Project Image
+                            </button>
+                            <div class="form-help" style="margin-top: 10px;">
+                                Upload a compelling image that represents your project (max 2MB)<br>
+                                <strong>💡 Tip:</strong> Landscape (wide) images work best. Images are cropped to 400px height.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="shortDescription">Short Description</label>
+                        <textarea id="shortDescription" name="description" required maxlength="200"></textarea>
+                        <div class="form-help">Brief description shown in project listings and donation page header</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullDescription">Full Description</label>
+                        <textarea id="fullDescription" name="full_description" required></textarea>
+                        <div class="form-help">
+                            Detailed project information, goals, and impact. You can include progress updates here.<br>
+                            <strong>💡 Tip:</strong> Press Enter twice to create new paragraphs.
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetAmount">Funding Goal (sats)</label>
+                        <input type="number" id="targetAmount" name="target_amount" required min="1000">
+                        <div class="form-help">
+                            <strong>Current: <span id="currentTarget">0</span> sats</strong><br>
+                            Adjust your funding goal if project scope has changed
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="recipientName">Recipient Name</label>
+                        <input type="text" id="recipientName" name="recipient_name" required maxlength="100">
+                        <div class="form-help">The name shown publicly as the project recipient</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lightningAddress">Lightning Address</label>
+                        <input type="email" id="lightningAddress" name="lightning_address" required>
+                        <div class="form-help">⚠️ <strong>Important:</strong> Changing this affects NEW donations only. Existing funds already went to your current address.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="websiteUrl">Website/Social Media</label>
+                        <input type="url" id="websiteUrl" name="website_url">
+                        <div class="form-help">Link to project website, social media, or additional information</div>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <div>
+                            <button type="button" class="btn-secondary" onclick="window.location.href='profile.html'">← Back to Profile</button>
+                            <button type="button" class="btn-secondary" id="previewBtn" onclick="previewProject()">👁️ Preview</button>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn-primary">💾 Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <!-- Access denied message -->
+        <div id="accessDenied" class="edit-project-container" style="display: none;">
+            <div class="project-header">
+                <h1>⚠️ Access Required</h1>
+                <p>You can only edit projects you created</p>
+            </div>
+            
+            <div class="project-form" style="text-align: center;">
+                <p>This project belongs to another user, or you don't have the required permissions.</p>
+                <br>
+                <a href="profile.html" class="btn-secondary">← Back to Profile</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- include footer.html -->
+        <!-- Sponsors Section -->
+        <div class="sponsors">
+            <h3>Our Supporters</h3>
+            <div class="sponsor-logos">
+                <a href="https://satoshihost.com" target="_blank" class="sponsor-link">
+                    <img src="images/satoshihost-banner.png" alt="SatoshiHost - Bitcoin Hosting" class="sponsor-logo">
+                </a>
+                <div class="sponsor-placeholder">
+                    [Sponsor Logo 2]
+                </div>
+            </div>
+            <p>&copy; 2024 ROFLFaucet - Progressive Responsive Layout | Integrated Sync ✓</p>
+    <!-- end include footer.html -->
+    
+    <script>
+        class EditProjectForm {
+            constructor() {
+                this.currentUser = null;
+                this.projectId = null;
+                this.projectData = null;
+                this.init();
+            }
+            
+            async init() {
+                // Get project ID from URL params
+                const params = new URLSearchParams(window.location.search);
+                this.projectId = params.get('project') || '001'; // Default to project 001 for lightninglova
+                
+                // Check authentication
+                this.currentUser = getValidUsername();
+                if (!this.currentUser) {
+                    window.location.href = 'profile.html';
+                    return;
+                }
+                
+                // Load project data and check permissions
+                await this.loadProjectData();
+            }
+            
+            async loadProjectData() {
+                try {
+                    const response = await fetch('/api/project-management-api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            action: 'get_project', 
+                            project_id: this.projectId,
+                            username: this.currentUser
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.projectData = result.data;
+                        
+                        // Show form and populate data
+                        document.querySelector('.recipient-only').style.display = 'block';
+                        this.populateForm();
+                        this.setupFormHandlers();
+                        
+                    } else {
+                        // Check if it's an access denied error
+                        if (result.error === 'Access denied') {
+                            document.getElementById('accessDenied').style.display = 'block';
+                        } else {
+                            this.showStatus('❌ ' + (result.error || 'Project not found'), 'error');
+                            setTimeout(() => window.location.href = 'profile.html', 2000);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load project:', error);
+                    this.showStatus('❌ Failed to load project data', 'error');
+                }
+            }
+            
+            async canEditProject() {
+                // Simple ownership check - users can edit their own projects
+                // Project 001 belongs to lightninglova
+                if (this.currentUser === 'lightninglova' && this.projectId === '001') {
+                    return true;
+                }
+                
+                // Project 002 belongs to andytest1 (for testing)
+                if (this.currentUser === 'andytest1' && this.projectId === '002') {
+                    return true;
+                }
+                
+                // In the future, we'd check a project ownership database/file
+                // For now, just allow the specific project owners
+                return false;
+            }
+            
+            populateForm() {
+                // Update page title
+                document.getElementById('projectSubtitle').textContent = `Editing: ${this.projectData.title}`;
+                
+                // Update stats
+                document.getElementById('currentRaised').textContent = (this.projectData.current_amount || 0).toLocaleString();
+                document.getElementById('totalDonors').textContent = this.projectData.supporters_count || 0;
+                document.getElementById('progressPercent').textContent = 
+                    Math.round(((this.projectData.current_amount || 0) / (this.projectData.target_amount || 1)) * 100) + '%';
+                
+                // Calculate days active (mock for now)
+                document.getElementById('daysActive').textContent = '15'; 
+                
+                // Populate form fields
+                document.getElementById('projectTitle').value = this.projectData.title || '';
+                document.getElementById('shortDescription').value = this.projectData.description || '';
+                document.getElementById('fullDescription').value = this.projectData.full_description || '';
+                document.getElementById('targetAmount').value = this.projectData.target_amount || '';
+                document.getElementById('recipientName').value = this.projectData.recipient_name || '';
+                document.getElementById('lightningAddress').value = this.projectData.lightning_address || '';
+                document.getElementById('websiteUrl').value = this.projectData.website_url || '';
+                
+                // Update current target display
+                document.getElementById('currentTarget').textContent = (this.projectData.target_amount || 0).toLocaleString();
+                
+                // Handle project image
+                this.displayCurrentImage();
+            }
+            
+            displayCurrentImage() {
+                const container = document.getElementById('currentImageContainer');
+                if (this.projectData.main_image) {
+                    container.innerHTML = `
+                        <img src="${this.projectData.main_image}" alt="Current project image" class="current-image">
+                        <p style="font-size: 0.9em; color: #666;">Current project image</p>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="image-placeholder">
+                            📷 No project image set<br>
+                            <small>Upload an image to make your project more appealing</small>
+                        </div>
+                    `;
+                }
+            }
+            
+            setupFormHandlers() {
+                document.getElementById('editProjectForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.saveChanges();
+                });
+                
+                document.getElementById('mainImage').addEventListener('change', (e) => {
+                    this.handleImageUpload(e);
+                });
+            }
+            
+            async handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    // Validate file size (max 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Image must be smaller than 2MB');
+                        return;
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        alert('Please select a valid image file');
+                        return;
+                    }
+                    
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const container = document.getElementById('currentImageContainer');
+                        container.innerHTML = `
+                            <img src="${e.target.result}" alt="New project image" class="current-image">
+                            <p style="font-size: 0.9em; color: #667eea;">✨ New image ready to save</p>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Store file for upload when saving
+                    this.pendingImageUpload = file;
+                }
+            }
+            
+            async saveChanges() {
+                const form = document.getElementById('editProjectForm');
+                const formData = new FormData(form);
+                
+                // Handle image upload first if there is one
+                let imageUrl = '';
+                if (this.pendingImageUpload) {
+                    this.showStatus('📎 Uploading image...', 'info');
+                    imageUrl = await this.uploadImage(this.pendingImageUpload);
+                    if (!imageUrl) {
+                        this.showStatus('❌ Image upload failed', 'error');
+                        return;
+                    }
+                }
+                
+                // Debug: Log form data to help troubleshoot field mapping
+                console.log('Form fields:', {
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    full_description: formData.get('full_description'),
+                    target_amount: formData.get('target_amount'),
+                    recipient_name: formData.get('recipient_name'),
+                    lightning_address: formData.get('lightning_address'),
+                    website_url: formData.get('website_url')
+                });
+                
+                console.log('Target amount from form:', formData.get('target_amount'));
+                console.log('Target amount parsed:', parseInt(formData.get('target_amount')));
+                
+                const updateData = {
+                    action: 'update_project',
+                    project_id: this.projectId,
+                    username: this.currentUser, // Send current username for ownership check
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    full_description: this.formatParagraphs(formData.get('full_description')),
+                    target_amount: parseInt(formData.get('target_amount')),
+                    recipient_name: formData.get('recipient_name'),
+                    lightning_address: formData.get('lightning_address'),
+                    website_url: formData.get('website_url'),
+                    main_image: imageUrl // Include uploaded image URL
+                };
+                
+                this.showStatus('💾 Saving changes...', 'info');
+                
+                try {
+                    const response = await fetch('/api/project-management-api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showStatus('✅ Project updated successfully!', 'success');
+                        setTimeout(() => {
+                            window.location.href = `project-${this.projectId}.html`;
+                        }, 2000);
+                    } else {
+                        this.showStatus('❌ Error: ' + (result.error || 'Unknown error'), 'error');
+                    }
+                } catch (error) {
+                    console.error('Save error:', error);
+                    this.showStatus('❌ Failed to save changes. Please try again.', 'error');
+                }
+            }
+            
+            // Convert plain text with double line breaks to HTML paragraphs
+            formatParagraphs(text) {
+                if (!text || text.trim() === '') return '';
+                
+                console.log('Input text:', text);
+                
+                // Split on double line breaks and create paragraphs
+                const result = text.split('\n\n')
+                    .map(paragraph => paragraph.trim())
+                    .filter(paragraph => paragraph.length > 0)
+                    .map(paragraph => `<p>${paragraph.replace(/\n/g, ' ')}</p>`)
+                    .join('');
+                    
+                console.log('Formatted result:', result);
+                return result;
+            }
+            
+            // Convert HTML paragraphs back to plain text for editing
+            htmlToPlainText(html) {
+                if (!html) return '';
+                
+                // Convert <p> tags to double line breaks
+                return html
+                    .replace(/<p>/g, '')
+                    .replace(/<\/p>/g, '\n\n')
+                    .trim();
+            }
+            
+            // Upload image to server
+            async uploadImage(file) {
+                try {
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('image', file);
+                    uploadFormData.append('project_id', this.projectId);
+                    
+                    const response = await fetch('/api/upload-project-image.php', {
+                        method: 'POST',
+                        body: uploadFormData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        return result.image_url;
+                    } else {
+                        console.error('Upload error:', result.error);
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('Upload failed:', error);
+                    return null;
+                }
+            }
+            
+            showStatus(message, type) {
+                const statusEl = document.getElementById('statusMessage');
+                statusEl.textContent = message;
+                statusEl.className = `status-message status-${type}`;
+                statusEl.style.display = 'block';
+                
+                if (type !== 'info') {
+                    setTimeout(() => {
+                        statusEl.style.display = 'none';
+                    }, 5000);
+                }
+            }
+        }
+        
+        function previewProject() {
+            // Get current project ID from the form instance
+            const projectId = new URLSearchParams(window.location.search).get('id') || '001';
+            
+            // Open the project page for preview
+            window.open(`project-${projectId}.html`, '_blank');
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new EditProjectForm();
+        });
+    </script>
+</body>

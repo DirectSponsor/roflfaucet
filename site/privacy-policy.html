@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - ROFLFaucet</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1, h2 { color: #4CAF50; }
+        .highlight { background: #f0f8f0; padding: 15px; border-left: 4px solid #4CAF50; margin: 20px 0; }
+        .footer-notice-code { background: #f5f5f5; padding: 15px; border: 1px solid #ddd; font-family: monospace; font-size: 12px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>ROFLFaucet Privacy Policy</h1>
+    
+    <div class="highlight">
+        <strong>TL;DR:</strong> We don't care about your privacy, but if you do, read on. We collect minimal data (just usernames for game stats) and don't need any real information from you.
+    </div>
+
+    <h2>What We Collect</h2>
+    <ul>
+        <li><strong>Usernames:</strong> For game statistics, leaderboards, and personal progress tracking</li>
+        <li><strong>Game Data:</strong> Your game results, bet amounts, winnings (tied to your username)</li>
+        <li><strong>Browser Data:</strong> Standard web server logs (IP addresses, browser types, page visits)</li>
+    </ul>
+
+    <h2>What We DON'T Collect</h2>
+    <ul>
+        <li>Real names, addresses, phone numbers, or any personal information</li>
+        <li>Email addresses (unless you voluntarily provide them)</li>
+        <li>Financial information or payment details</li>
+        <li>Tracking cookies for advertising purposes</li>
+    </ul>
+
+    <h2>How We Use Your Data</h2>
+    <ul>
+        <li><strong>Game Statistics:</strong> Show your personal stats, create leaderboards, track achievements</li>
+        <li><strong>Site Analytics:</strong> Understand which games are popular, optimize user experience</li>
+        <li><strong>Public Display:</strong> Usernames may appear in leaderboards and high scores (they're meant to be public!)</li>
+    </ul>
+
+    <h2>Your Choices</h2>
+    <ul>
+        <li><strong>Play as Guest:</strong> Don't create an account - your stats will be tracked as "guest" only</li>
+        <li><strong>Use a Pseudonym:</strong> Pick any username you want - we don't verify identities</li>
+        <li><strong>Clear Your Data:</strong> Contact us to remove your game statistics</li>
+    </ul>
+
+    <h2>Real Privacy Protection</h2>
+    <p>Want actual privacy protection? Here's what really matters:</p>
+    <ul>
+        <li><strong>Use a VPN:</strong> Hide your real IP address from everyone</li>
+        <li><strong>Tor Browser:</strong> Maximum anonymity for web browsing</li>
+        <li><strong>Ad Blockers:</strong> Block tracking scripts from major tech companies</li>
+        <li><strong>Fake Info:</strong> Use made-up names, emails, and details on sites that ask for them</li>
+        <li><strong>Multiple Browsers:</strong> Separate browsing contexts prevent cross-site tracking</li>
+    </ul>
+
+    <h2>The Real Privacy Violators</h2>
+    <p>The irony is thick: The same governments forcing us to show cookie notices are running massive surveillance programs. The same tech giants advocating for "privacy legislation" collect thousands of data points about you every day.</p>
+    
+    <p>We're just a small gaming site. Google, Facebook, Amazon, and your government know more about you in one day than we'll learn in a lifetime.</p>
+
+    <h2>Technical Details</h2>
+    <ul>
+        <li><strong>Data Storage:</strong> Your game data is stored in JSON files on our servers</li>
+        <li><strong>Data Retention:</strong> Game statistics are kept indefinitely unless you request deletion</li>
+        <li><strong>Third Parties:</strong> We don't sell or share your data with advertisers or data brokers</li>
+        <li><strong>Security:</strong> Standard web security measures, but don't put sensitive info in your username!</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy? Want your data deleted? Contact us at [your-contact-info]</p>
+
+    <h2>Changes</h2>
+    <p>We'll update this policy if needed. Check back occasionally, or just assume nothing important changed.</p>
+
+    <hr>
+
+    <h2>Privacy Notice Implementation</h2>
+    <p>Here's the code for our minimal privacy notice that won't interfere with PTC site display:</p>
+    
+    <div class="footer-notice-code">
+&lt;!-- Minimal Privacy Notice - Place before closing &lt;/body&gt; tag --&gt;
+&lt;div id="privacy-notice" style="position: fixed; bottom: 0; left: 0; right: 0; 
+                                background: rgba(0,0,0,0.9); color: #ccc; padding: 3px; 
+                                font-size: 10px; text-align: center; z-index: 1000; 
+                                border-top: 1px solid #333;"&gt;
+    We store usernames for game stats. No personal data collected. 
+    &lt;a href="/privacy-policy.html" style="color: #4CAF50; text-decoration: none;"&gt;Privacy Policy&lt;/a&gt; | 
+    &lt;a href="#real-privacy" style="color: #4CAF50; text-decoration: none;"&gt;Real Privacy Tips&lt;/a&gt;
+    &lt;span onclick="document.getElementById('privacy-notice').style.display='none'" 
+          style="float: right; cursor: pointer; color: #f44336; padding: 0 10px;"&gt;×&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+// Auto-hide after 30 seconds if user doesn't interact
+setTimeout(function() {
+    const notice = document.getElementById('privacy-notice');
+    if (notice && notice.style.display !== 'none') {
+        notice.style.opacity = '0.3';
+    }
+}, 30000);
+&lt;/script&gt;
+    </div>
+
+    <div class="highlight">
+        <strong>Note:</strong> This notice is designed to be EU-compliant while taking up minimal screen space, especially important for PTC (Paid-to-Click) site integration where screen real estate is precious.
+    </div>
+
+    <p><em>Last updated: [Date] - Because apparently we have to tell you when we change things you probably won't read anyway.</em></p>
+
+</body>

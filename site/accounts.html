@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROFLFaucet Complete Financial Accounts</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="chat/chat-widget.css">
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/unified-balance.js"></script>
+    <script src="scripts/site-utils.js"></script>
+    <style>
+        /* Full-width layout for accounts */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .accounts-container {
+            max-width: none;
+            width: 95%;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .accounts-header {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .accounts-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .accounts-header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .transparency-notes {
+            background: #e8f4fd;
+            border: 1px solid #b3d9f2;
+            border-radius: 8px;
+            margin: 20px 30px;
+            overflow: hidden;
+        }
+        
+        .transparency-notes summary {
+            background: #d1ecf1;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #0c5460;
+            border-bottom: 1px solid #b3d9f2;
+            user-select: none;
+        }
+        
+        .transparency-notes summary:hover {
+            background: #bee5eb;
+        }
+        
+        .transparency-notes-content {
+            padding: 20px;
+            color: #155724;
+            line-height: 1.6;
+        }
+        
+        .transparency-notes-content ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        
+        .transparency-notes-content li {
+            margin-bottom: 8px;
+        }
+        
+        .transparency-notes a {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        
+        .transparency-notes a:hover {
+            color: #004085;
+        }
+        
+        .accounts-controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .download-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: #218838;
+        }
+        
+        .pagination-info {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .accounts-table-container {
+            overflow-x: auto;
+            padding: 0 30px 30px 30px;
+        }
+        
+        .accounts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .accounts-table th {
+            background: #f8f9fa;
+            padding: 15px 10px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .accounts-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+        
+        .accounts-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .amount-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #28a745;
+            text-align: right;
+        }
+        
+        .date-cell {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .type-cell {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+        
+        .type-project {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .type-distribution {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .recipient-cell {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #5a6268;
+        }
+        
+        .pagination button:disabled {
+            background: #dee2e6;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .pagination .current {
+            background: #007bff;
+        }
+        
+        @media (max-width: 768px) {
+            .accounts-container {
+                width: 98%;
+                margin: 10px auto;
+            }
+            
+            .accounts-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .accounts-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .accounts-table th,
+            .accounts-table td {
+                padding: 8px 5px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- include nav.html -->
+        <div class="header">
+            <!-- Mobile menu checkbox (hidden) -->
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            
+            <!-- Left: Logo -->
+            <div class="header-left">
+                <a href="index.html" class="logo">🤣 roflfaucet</a>
+                <!-- Mobile hamburger button (hidden on desktop) -->
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
+            </div>
+            
+            <!-- Center: Main Navigation -->
+            <nav id="main-nav" class="header-center">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                
+                <!-- Simple Games Dropdown -->
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Right: Account Menu -->
+            <div class="header-right">
+                <!-- Donate Button (subtle, always visible) -->
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button" title="Support ROFLFaucet">⚡ Donate</a>
+                
+                <!-- Guest Login (shown when logged out) -->
+                <div class="guest-only">
+                    <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+                </div>
+                
+                <!-- Member Menu (shown when logged in) -->
+                <div class="member-only" style="display: none;">
+                    <div class="dropdown">
+                        <a href="profile.html" class="nav-button" id="user-menu-button">👤 User</a>
+                        <div class="dropdown-content">
+                            <a href="profile.html">👤 Profile</a>
+                            <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox <span id="notification-badge" class="notification-badge" style="background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7em; margin-left: 5px; display: none;">3</span></a>
+                            <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile navigation menu -->
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button">⚡ Donate</a>
+                <!-- Auth button will be added dynamically by JavaScript -->
+            </nav>
+        </div>
+        <!-- end include nav.html -->
+        
+    <div class="accounts-container">
+        <div class="accounts-header">
+            <h1>📊 Complete Financial Accounts</h1>
+            <p>Recipient payments and project donations - Complete transparency</p>
+        </div>
+        
+        <details class="transparency-notes">
+            <summary>🔍 How to Verify Account Accuracy</summary>
+            <div class="transparency-notes-content">
+                <p><strong>Want to verify these accounts are accurate?</strong> Here's how you can independently confirm our transparency:</p>
+                
+                <ol>
+                    <li><strong>Make a test donation:</strong> Visit our <a href="/projects.html">projects overview page</a> and make a small donation to any active project.</li>
+                    <li><strong>Download the data:</strong> Use the CSV or JSON download buttons below to get the complete transaction history.</li>
+                    <li><strong>Use privacy tools:</strong> For maximum verification independence, download the data using a VPN or Tor browser from a different IP address.</li>
+                    <li><strong>Check your donation:</strong> Your test donation should appear in the downloaded data with accurate timestamps and amounts.</li>
+                </ol>
+                
+                <p><strong>What you'll find in the data:</strong></p>
+                <ul>
+                    <li>✅ All confirmed project donations (directly to recipients)</li>
+                    <li>✅ All monthly distribution payments (site income → recipients)</li>
+                    <li>✅ Exact satoshi amounts, timestamps, and project details</li>
+                    <li>✅ Complete donor and recipient information</li>
+                </ul>
+                
+                <p><em>Note: Site income donations (the "kitty") are tracked separately on the <a href="/site-income.html">Site Income page</a> until they're distributed to recipients.</em></p>
+            </div>
+        </details>
+        
+        <div class="accounts-controls">
+            <div class="download-section">
+                <a href="/api/accounts-download.php?format=csv" class="download-btn">
+                    📥 Download CSV
+                </a>
+                <a href="/api/accounts-download.php?format=json" class="download-btn">
+                    📊 Download JSON
+                </a>
+            </div>
+            <div class="pagination-info" id="pagination-info">
+                Loading accounts...
+            </div>
+        </div>
+        
+        <div class="accounts-table-container">
+            <table class="accounts-table" id="accounts-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Project</th>
+                        <th>Donor</th>
+                        <th>Recipient</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="accounts-tbody">
+                    <!-- Dynamic content loaded here -->
+                </tbody>
+            </table>
+            
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <h3>🔍 No Recipient Transactions Yet</h3>
+                <p>This page shows actual payments to recipients. Currently there are no completed recipient payments to display.</p>
+                <p><strong>What gets logged here:</strong></p>
+                <ul style="text-align: left; display: inline-block; margin-top: 20px;">
+                    <li>✅ Direct project donations (paid directly to recipients)</li>
+                    <li>✅ Monthly distributions (site income → recipients)</li>
+                    <li>❌ Site income donations (stay in "kitty" until distributed)</li>
+                </ul>
+                <p style="margin-top: 20px; font-style: italic;">
+                    Site income donations are visible on the <a href="/site-income.html">Site Income page</a>.
+                </p>
+            </div>
+        </div>
+        
+        <div class="pagination" id="pagination" style="display: none;">
+            <!-- Pagination buttons loaded here -->
+        </div>
+    </div>
+    
+        <!-- include footer.html -->
+        <!-- Sponsors Section -->
+        <div class="sponsors">
+            <h3>Our Supporters</h3>
+            <div class="sponsor-logos">
+                <a href="https://satoshihost.com" target="_blank" class="sponsor-link">
+                    <img src="images/satoshihost-banner.png" alt="SatoshiHost - Bitcoin Hosting" class="sponsor-logo">
+                </a>
+                <div class="sponsor-placeholder">
+                    [Sponsor Logo 2]
+                </div>
+            </div>
+            <p>&copy; 2024 ROFLFaucet - Progressive Responsive Layout | Integrated Sync ✓</p>
+        <!-- end include footer.html -->
+    </div>
+
+    <script>
+        // Accounts page JavaScript
+        let currentPage = 1;
+        let totalPages = 1;
+        const itemsPerPage = 50;
+        
+        async function loadAccounts(page = 1) {
+            try {
+                const response = await fetch(`/api/accounts.php?page=${page}&limit=${itemsPerPage}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayAccounts(data.transactions);
+                    updatePagination(data.pagination);
+                    document.getElementById('pagination-info').textContent = 
+                        `Showing ${data.pagination.start}-${data.pagination.end} of ${data.pagination.total} transactions`;
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Failed to load accounts:', error);
+                showEmptyState();
+            }
+        }
+        
+        function displayAccounts(transactions) {
+            const tbody = document.getElementById('accounts-tbody');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (!transactions || transactions.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            tbody.innerHTML = '';
+            
+            transactions.forEach(tx => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="date-cell">${formatDate(tx.timestamp)}</td>
+                    <td><span class="type-cell type-${tx.type.includes('project') ? 'project' : 'distribution'}">${tx.type.replace('_', ' ')}</span></td>
+                    <td class="amount-cell">${tx.amount_sats.toLocaleString()} sats</td>
+                    <td>${tx.project_id || '-'}</td>
+                    <td>${tx.donor_name || '-'}</td>
+                    <td class="recipient-cell">${tx.recipient_name || '-'}</td>
+                    <td>${tx.notes || ''}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function showEmptyState() {
+            document.getElementById('accounts-table').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('pagination').style.display = 'none';
+            document.getElementById('pagination-info').textContent = 'No transactions to display';
+        }
+        
+        function updatePagination(pagination) {
+            if (pagination.total_pages <= 1) {
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+            
+            const paginationDiv = document.getElementById('pagination');
+            paginationDiv.style.display = 'flex';
+            paginationDiv.innerHTML = '';
+            
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '« Previous';
+            prevBtn.disabled = pagination.current_page <= 1;
+            prevBtn.onclick = () => loadAccounts(pagination.current_page - 1);
+            paginationDiv.appendChild(prevBtn);
+            
+            // Page numbers
+            for (let i = Math.max(1, pagination.current_page - 2); 
+                 i <= Math.min(pagination.total_pages, pagination.current_page + 2); 
+                 i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.className = i === pagination.current_page ? 'current' : '';
+                pageBtn.onclick = () => loadAccounts(i);
+                paginationDiv.appendChild(pageBtn);
+            }
+            
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next »';
+            nextBtn.disabled = pagination.current_page >= pagination.total_pages;
+            nextBtn.onclick = () => loadAccounts(pagination.current_page + 1);
+            paginationDiv.appendChild(nextBtn);
+        }
+        
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAccounts(1);
+        });
+    </script>
+    
+    <!-- Site Scripts -->
+    <script src="scripts/faucet-bridge.js"></script>
+    <script src="scripts/mobile-chat-nav.js?v=1.5-all-buttons-left"></script>
+    <script src="chat/chat.js?v=2.6-notifications-coming-soon"></script>
+    
+</body>
+</html>

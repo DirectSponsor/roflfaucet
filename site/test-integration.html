@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Integration</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        button { padding: 10px 15px; margin: 5px; border-radius: 5px; border: 1px solid #ddd; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Fundraiser Integration Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Test API Endpoints</h3>
+        <button onclick="testListFundraisers()">Test List Fundraisers</button>
+        <button onclick="testCurrentFundraiser()">Test Current Fundraiser</button>
+        <button onclick="testSpecificFundraiser()">Test Get Specific Fundraiser</button>
+        <button onclick="testOverflowSystem()">Test Overflow System</button>
+        <div id="api-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Test Donate Page Links</h3>
+        <button onclick="openDonateWithRecipient()">Open Donate with Recipient</button>
+        <button onclick="openDonateWithFundraiser()">Open Donate with Fundraiser</button>
+        <button onclick="openFundraiserPage()">Open Fundraiser Page</button>
+        <button onclick="openTestOverflowPage()">Open Test Overflow Fundraiser</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Current System Status</h3>
+        <div id="system-status">Loading...</div>
+    </div>
+
+    <script>
+        async function testListFundraisers() {
+            const resultDiv = document.getElementById('api-results');
+            try {
+                const response = await fetch('/api/fundraiser-api.php?action=list');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ List API: Found ${data.count} fundraisers</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ List API failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ List API error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testCurrentFundraiser() {
+            const resultDiv = document.getElementById('api-results');
+            try {
+                const response = await fetch('/api/fundraiser-api.php?action=current&recipient=member-lightninglova-ghana');
+                const data = await response.json();
+                
+                if (data.success && data.fundraiser) {
+                    resultDiv.innerHTML = `<div class="success">✅ Current API: Found "${data.fundraiser.title}"</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Current API: No fundraiser found</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Current API error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testSpecificFundraiser() {
+            const resultDiv = document.getElementById('api-results');
+            try {
+                const response = await fetch('/api/fundraiser-api.php?action=get&id=modem-funding');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ Get API: "${data.fundraiser.title}"</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Get API failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Get API error: ${error.message}</div>`;
+            }
+        }
+        
+        function openDonateWithRecipient() {
+            window.open('payments/donate.html?recipient=member-lightninglova-ghana', '_blank');
+        }
+        
+        function openDonateWithFundraiser() {
+            window.open('payments/donate.html?recipient=member-lightninglova-ghana&fundraiser=bitcoin-ghana-workshops&title=Monthly%20Bitcoin%20Education%20Workshops', '_blank');
+        }
+        
+        function openFundraiserPage() {
+            window.open('fundraiser.html?id=modem-funding', '_blank');
+        }
+        
+        function openTestOverflowPage() {
+            window.open('fundraiser.html?id=test-overflow', '_blank');
+        }
+        
+        async function testOverflowSystem() {
+            const resultDiv = document.getElementById('api-results');
+            try {
+                // Test with a donation that will cause overflow
+                const response = await fetch('/api/fundraiser-api.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'donate',
+                        fundraiser_id: 'test-overflow',
+                        amount: 25,
+                        currency: 'USD',
+                        contributor: 'test-user',
+                        message: 'Testing overflow system'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    let message = `✅ Donation processed: $${data.amount_applied} applied`;
+                    if (data.fundraiser_completed) {
+                        message += `, fundraiser completed!`;
+                    }
+                    if (data.overflow_amount) {
+                        message += ` Overflow: $${data.overflow_amount} held for next fundraiser.`;
+                    }
+                    resultDiv.innerHTML = `<div class="success">${message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Donation failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Overflow test error: ${error.message}</div>`;
+            }
+        }
+        
+        async function checkSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            let status = [];
+            
+            // Check if fundraiser files exist
+            try {
+                const response = await fetch('/api/fundraiser-api.php?action=list');
+                const data = await response.json();
+                status.push(`📊 ${data.count || 0} fundraisers loaded`);
+            } catch (error) {
+                status.push(`❌ API connection failed`);
+            }
+            
+            // Check if pages exist
+            const pages = [
+                { name: 'Fundraiser List', url: 'fundraisers.html' },
+                { name: 'Fundraiser Page', url: 'fundraiser.html' },
+                { name: 'Donate Page', url: 'payments/donate.html' }
+            ];
+            
+            for (const page of pages) {
+                try {
+                    const response = await fetch(page.url, { method: 'HEAD' });
+                    status.push(response.ok ? `✅ ${page.name}` : `❌ ${page.name} (${response.status})`);
+                } catch (error) {
+                    status.push(`❌ ${page.name} (error)`);
+                }
+            }
+            
+            statusDiv.innerHTML = status.join('<br>');
+        }
+        
+        // Auto-run system status check
+        checkSystemStatus();
+    </script>
+</body>

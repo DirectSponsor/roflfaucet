@@ -1,0 +1,782 @@
+<!-- 🌊 ROFLFaucet Financial Transparency Page -->
+<!-- Table-based layout using browser defaults for accessibility -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROFLFaucet - Financial Transparency</title>
+    <meta name="description" content="Complete financial transparency - donations received and charitable distributions">
+    
+    <!-- Main site CSS -->
+    <link rel="stylesheet" href="main.css">
+    
+    <!-- Chat widget CSS -->
+    <link rel="stylesheet" href="chat/chat-widget.css">
+    
+    <!-- Minimal page-specific styles -->
+    <style>
+        /* Balance summary using simple table styling */
+        .balance-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        
+        .balance-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #ddd;
+        }
+        
+        .balance-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        
+        .balance-number {
+            font-weight: bold;
+            color: #2196F3;
+            font-size: 1.1em;
+        }
+        
+        /* Donations table */
+        .donations-table {
+            width: 100%;
+            margin: 10px 0;
+            border-collapse: collapse;
+        }
+        
+        .donations-table th {
+            background: #e8f5e8;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.9em;
+            border: 1px solid #ddd;
+        }
+        
+        .donations-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        
+        .donation-amount {
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: right;
+        }
+        
+        .donation-message {
+            max-width: 300px;
+            word-wrap: break-word;
+            font-size: 0.9em;
+        }
+        
+        .message-expandable {
+            cursor: pointer;
+            color: #2196F3;
+        }
+        
+        .message-preview {
+            color: #666;
+        }
+        
+        .message-full {
+            display: none;
+        }
+        
+        /* Distributions table */
+        .distributions-table {
+            width: 100%;
+            margin: 10px 0;
+            border-collapse: collapse;
+        }
+        
+        .distributions-table th {
+            background: #fff3e0;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.9em;
+            border: 1px solid #ddd;
+        }
+        
+        .distributions-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .distribution-amount {
+            font-weight: bold;
+            color: #FF9800;
+            text-align: right;
+        }
+        
+        /* URL links for premium donors */
+        .url-link {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .url-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Loading states */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Month headers */
+        .month-header {
+            background: #f0f8ff;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        /* Extra small mobile screens (390px and below) */
+        @media (max-width: 400px) {
+            .balance-table th,
+            .balance-table td,
+            .donations-table th,
+            .donations-table td,
+            .distributions-table th,
+            .distributions-table td {
+                padding: 6px;
+                font-size: 0.85em;
+            }
+            
+            .padded {
+                padding: 0.5em;
+            }
+            
+            .page-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/unified-balance.js"></script>
+    <script src="scripts/site-utils.js"></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- include nav.html -->
+        <div class="header">
+            <!-- Mobile menu checkbox (hidden) -->
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            
+            <!-- Left: Logo -->
+            <div class="header-left">
+                <a href="index.html" class="logo">🤣 roflfaucet</a>
+                <!-- Mobile hamburger button (hidden on desktop) -->
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
+            </div>
+            
+            <!-- Center: Main Navigation -->
+            <nav id="main-nav" class="header-center">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                
+                <!-- Simple Games Dropdown -->
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Right: Account Menu -->
+            <div class="header-right">
+                <!-- Donate Button (subtle, always visible) -->
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button" title="Support ROFLFaucet">⚡ Donate</a>
+                
+                <!-- Guest Login (shown when logged out) -->
+                <div class="guest-only">
+                    <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+                </div>
+                
+                <!-- Member Menu (shown when logged in) -->
+                <div class="member-only" style="display: none;">
+                    <div class="dropdown">
+                        <a href="profile.html" class="nav-button" id="user-menu-button">👤 User</a>
+                        <div class="dropdown-content">
+                            <a href="profile.html">👤 Profile</a>
+                            <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox <span id="notification-badge" class="notification-badge" style="background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7em; margin-left: 5px; display: none;">3</span></a>
+                            <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile navigation menu -->
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button">⚡ Donate</a>
+                <!-- Auth button will be added dynamically by JavaScript -->
+            </nav>
+        </div>
+        <!-- end include nav.html -->
+        
+        <div class="slot-direct">
+            <div class="slot-machine" id="slot-machine">
+                <div class="machine-front">
+                    <div class="slot-machine-container">
+                        <!-- Main Table Layout -->
+                        <table class="slot-table" role="presentation">
+                            <tr>
+                                <td class="left-bar">
+                                    <img src="https://placehold.co/300x250/4A90E2/FFFFFF?text=Ad+Banner+1" alt="Advertisement Banner 300x250" width="300" loading="lazy">
+                                    
+                                    <!-- include chat-sidebar.html -->
+<!-- Charity Pot Display -->
+<div style="margin-top: 1em; margin-bottom: 1em; padding: 12px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 8px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%); text-align: center;">
+    <div style="font-size: 0.9em; color: #4CAF50; font-weight: bold; margin-bottom: 6px;">🏆 Charity Pot</div>
+    <div style="font-size: 1.1em; color: #2E7D32; font-weight: bold;">
+        <span class="charity-current-total">0 sats</span>
+    </div>
+    <div style="font-size: 0.8em; color: #666; margin-top: 4px;">
+        Total: <span class="charity-received-total">0 sats</span> • 
+        Distributed: <span class="charity-distributed-total">0 sats</span>
+    </div>
+</div>
+
+<!-- Live Chat Widget -->
+<details open style="margin-top: 1em; border: 1px solid rgba(74, 144, 226, 0.3); border-radius: 8px; background: rgba(255, 255, 255, 0.9);">
+    <summary style="padding: 0.75em; background: linear-gradient(135deg, #4A90E2 0%, #357abd 100%); color: white; cursor: pointer; border-radius: 7px 7px 0 0; font-weight: bold; user-select: none;">
+        💬 Community Chat 🔽
+    </summary>
+    <div id="sidebar-chat-widget-container" style="width: 100%; height: 350px; border-radius: 0 0 8px 8px; overflow: hidden;">
+        <!-- Chat widget will be inserted here by JavaScript -->
+    </div>
+</details>
+
+<!-- Full Chat Link -->
+<div style="text-align: center; margin-top: 0.5em;">
+    <a href="chat.html" style="display: inline-block; background: #4A90E2; color: white; text-decoration: none; padding: 0.5em 1em; border-radius: 6px; font-size: 0.9em; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);" onmouseover="this.style.background='#357abd'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(74, 144, 226, 0.3)';" onmouseout="this.style.background='#4A90E2'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(74, 144, 226, 0.2)';">
+        💬 Open Full Chat →
+    </a>
+</div>
+                                    <!-- end include chat-sidebar.html -->
+                                    
+                                    <img src="https://placehold.co/300x200/667eea/FFFFFF?text=Ad+Banner+2" alt="Advertisement Banner 300x200" width="300" loading="lazy" style="margin-top: 1em;">
+                                </td>
+
+                                <!-- 🎯 MAIN CONTENT -->
+                                <td class="faucet-content-cell">
+                                    <div class="padded">
+                                        <h1 class="page-title">🌊 Financial Transparency</h1>
+                                        <p><strong>Custodial Flow • 100% Pass-Through • Zero Retention</strong></p>
+                                        <p style="font-size: 0.9em; color: #666; margin-bottom: 20px;">📋 <strong>Want detailed transaction data?</strong> View our <a href="accounts.html" style="color: #007bff; text-decoration: underline;">complete financial accounts</a> with full transaction history and CSV/JSON downloads.</p>
+                                        
+                                        <!-- Balance Summary Table -->
+                                        <h2>📊 Current Balance Summary</h2>
+                                        <div id="balanceSection">
+                                            <div class="loading">Loading financial data...</div>
+                                        </div>
+                                        
+                                        <!-- Donations Received -->
+                                        <h2>💝 Donations Received</h2>
+                                        <div id="donationsSection">
+                                            <div class="loading">Loading donation history...</div>
+                                        </div>
+                                        
+                                        <!-- Charitable Distributions -->
+                                        <h2>🎯 Charitable Distributions</h2>
+                                        <div id="distributionsSection">
+                                            <div class="loading">Loading distribution history...</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="right-bar">
+                                    <img src="https://placehold.co/300x400/764ba2/FFFFFF?text=Gallery+Content" alt="Gallery Content 300x400" width="300" loading="lazy">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- include footer.html -->
+        <!-- Sponsors Section -->
+        <div class="sponsors">
+            <h3>Our Supporters</h3>
+            <div class="sponsor-logos">
+                <a href="https://satoshihost.com" target="_blank" class="sponsor-link">
+                    <img src="images/satoshihost-banner.png" alt="SatoshiHost - Bitcoin Hosting" class="sponsor-logo">
+                </a>
+                <div class="sponsor-placeholder">
+                    [Sponsor Logo 2]
+                </div>
+            </div>
+            <p>&copy; 2024 ROFLFaucet - Progressive Responsive Layout | Integrated Sync ✓</p>
+        </div>        <!-- end include footer.html -->
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        class TransparencyPage {
+            constructor() {
+                this.apiBase = '/api/financial-totals.php';
+                this.minAmountForLinks = 1000; // sats threshold for active URLs
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    await this.loadData();
+                } catch (error) {
+                    this.showError('Failed to load transparency data: ' + error.message);
+                }
+            }
+            
+            async loadData() {
+                const response = await fetch(this.apiBase);
+                const data = await response.json();
+                
+                if (!data.charity_fund) {
+                    throw new Error('Invalid API response');
+                }
+                
+                // Load manual distributions first to adjust balance
+                const manualDistributions = await this.getManualDistributions();
+                this.renderBalance(data.charity_fund, manualDistributions);
+                await this.loadDonations();
+                await this.loadDistributions();
+                await this.loadManualDistributions();
+            }
+            
+            async loadDonations() {
+                const response = await fetch(`${this.apiBase}?action=donations`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.renderDonations(data.monthly_inflows);
+                }
+            }
+            
+            async loadDistributions() {
+                const response = await fetch(`${this.apiBase}?action=distributions`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.renderDistributions(data.recent_distributions);
+                }
+            }
+            
+            renderBalance(charityFund, manualDistributions) {
+                // Debug logging
+                console.log('Charity fund from API:', charityFund);
+                console.log('Manual distributions:', manualDistributions);
+                
+                // Current balance and total distributed come directly from API now
+                const currentBalance = charityFund.current_total_sats;
+                const totalDistributed = charityFund.total_distributed_sats;
+                
+                console.log('Current balance:', currentBalance);
+                console.log('Total distributed:', totalDistributed);
+                
+                const section = document.getElementById('balanceSection');
+                section.innerHTML = `
+                    <table class="balance-table">
+                        <tr>
+                            <th>Current Balance</th>
+                            <td class="balance-number">${Math.max(0, currentBalance).toLocaleString()} sats</td>
+                            <td>Hot Wallet</td>
+                        </tr>
+                        <tr>
+                            <th>Total Received</th>
+                            <td class="balance-number">${charityFund.total_received_sats.toLocaleString()} sats</td>
+                            <td>All Time</td>
+                        </tr>
+                        <tr>
+                            <th>Total Distributed</th>
+                            <td class="balance-number">${totalDistributed.toLocaleString()} sats</td>
+                            <td>To Charity</td>
+                        </tr>
+                    </table>
+                `;
+            }
+            
+            renderDonations(monthlyInflows) {
+                const section = document.getElementById('donationsSection');
+                
+                if (!monthlyInflows.length) {
+                    section.innerHTML = '<div class="loading">No donations yet</div>';
+                    return;
+                }
+                
+                let html = '';
+                monthlyInflows.forEach(month => {
+                    html += `
+                        <h3>📅 ${month.month} - ${month.total_sats.toLocaleString()} sats (${month.total_donations} donations)</h3>
+                        <table class="donations-table">
+                            <thead>
+                                <tr>
+                                    <th>Donor</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    // Reverse donations to show most recent first
+                    month.donations.slice().reverse().forEach((donation, index) => {
+                        const isPremium = donation.amount_sats >= this.minAmountForLinks;
+                        const messageHtml = this.formatMessage(donation.message, isPremium, `${month.month}-${index}`);
+                        const donorName = this.escapeHtml(donation.donor_name || 'Anonymous');
+                        const premiumStar = isPremium ? ' ⭐' : '';
+                        
+                        // Check if this is a system distribution
+                        const isSystemDistribution = donation.donor_name && donation.donor_name.toLowerCase().trim() === 'system';
+                        const donorDisplay = isSystemDistribution ? 
+                            '<strong style="color: #FF6B35;">🤖 System</strong>' : 
+                            `<strong>${donorName}${premiumStar}</strong>`;
+                        const rowStyle = isSystemDistribution ? ' style="background-color: #fff4f0;"' : '';
+                        
+                        html += `
+                            <tr${rowStyle}>
+                                <td>${donorDisplay}</td>
+                                <td class="donation-amount">${donation.amount_sats.toLocaleString()} sats</td>
+                                <td>${new Date(donation.date).toLocaleDateString()}</td>
+                                <td class="donation-message">${messageHtml}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `
+                            </tbody>
+                        </table>
+                    `;
+                });
+                
+                section.innerHTML = html;
+                this.attachMessageHandlers();
+            }
+            
+            formatMessage(message, allowLinks, id) {
+                if (!message || message.trim() === '') return '<em>No message</em>';
+                
+                const text = this.escapeHtml(message);
+                const isLong = text.length > 50;
+                
+                if (isLong) {
+                    const preview = text.substring(0, 47) + '...';
+                    return `
+                        <div class="message-expandable" data-id="${id}">
+                            <div class="message-preview">${this.linkify(preview, allowLinks)}</div>
+                            <div class="message-full">${this.linkify(text, allowLinks)}</div>
+                            <small style="color: #2196F3; cursor: pointer;">[Click to expand]</small>
+                        </div>
+                    `;
+                } else {
+                    return this.linkify(text, allowLinks);
+                }
+            }
+            
+            linkify(text, allowLinks) {
+                if (!allowLinks) return text;
+                
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                return text.replace(urlRegex, '<a href="$1" class="url-link" target="_blank" rel="noopener">$1</a>');
+            }
+            
+            attachMessageHandlers() {
+                document.querySelectorAll('.message-expandable').forEach(msg => {
+                    msg.addEventListener('click', (e) => {
+                        const preview = msg.querySelector('.message-preview');
+                        const full = msg.querySelector('.message-full');
+                        const toggle = msg.querySelector('small');
+                        
+                        if (full.style.display === 'block') {
+                            preview.style.display = 'block';
+                            full.style.display = 'none';
+                            toggle.textContent = '[Click to expand]';
+                        } else {
+                            preview.style.display = 'none';
+                            full.style.display = 'block';
+                            toggle.textContent = '[Click to collapse]';
+                        }
+                    });
+                });
+            }
+            
+            renderDistributions(distributions) {
+                const section = document.getElementById('distributionsSection');
+                
+                if (!distributions.length) {
+                    section.innerHTML = '<div class="loading">No distributions yet - first distribution at end of month</div>';
+                    return;
+                }
+                
+                let html = '';
+                distributions.forEach(dist => {
+                    html += `
+                        <h3>📅 Distribution: ${dist.month} - ${dist.total_distributed_sats.toLocaleString()} sats</h3>
+                        <table class="distributions-table">
+                            <thead>
+                                <tr>
+                                    <th>Recipient</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Proof</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    dist.distributions.forEach(charity => {
+                        // Extract just the name part (before dash)
+                        const recipientName = charity.recipient_name.split(' - ')[0].trim();
+                        const screenshotLink = charity.payment_screenshot ? 
+                            `<a href="uploads/payment_proof/${charity.payment_screenshot}" target="_blank" style="color: #2196F3; font-size: 0.9em;">📷 View</a>` : 
+                            '<span style="color: #999; font-size: 0.8em;">—</span>';
+                        
+                        html += `
+                            <tr>
+                                <td><strong>${this.escapeHtml(recipientName)}</strong></td>
+                                <td class="distribution-amount">${charity.amount_sats.toLocaleString()} sats</td>
+                                <td>${new Date(dist.distribution_date).toLocaleDateString()}</td>
+                                <td>${screenshotLink}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `
+                            </tbody>
+                        </table>
+                    `;
+                });
+                
+                section.innerHTML = html;
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            showError(message) {
+                document.querySelector('.faucet-content-cell').innerHTML += 
+                    `<div style="background: #ffebee; color: #c62828; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #f5c6cb;">Error: ${message}</div>`;
+            }
+            
+            // Manual Distributions Methods
+            async getManualDistributions() {
+                try {
+                    const response = await fetch('/api/get-manual-distributions.php');
+                    const data = await response.json();
+                    return data.success ? data.data : null;
+                } catch (error) {
+                    console.error('Failed to load manual distributions for balance:', error);
+                    return null;
+                }
+            }
+            
+            async loadManualDistributions() {
+                try {
+                    const response = await fetch('/api/get-manual-distributions.php');
+                    const data = await response.json();
+                    
+                    if (data.success && data.data.distributions.length > 0) {
+                        this.appendManualDistributions(data.data.distributions, data.data.summary);
+                    }
+                } catch (error) {
+                    console.error('Failed to load manual distributions:', error);
+                }
+            }
+            
+            appendManualDistributions(distributions, summary) {
+                const section = document.getElementById('distributionsSection');
+                
+                // Add manual distributions after existing content
+                let html = section.innerHTML;
+                html += `
+                    <div style="margin-top: 30px; padding: 15px; background: #e8f5e8; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                        <h3>🏦 Manual Distributions (External Wallet)</h3>
+                        <p><strong>Summary:</strong> ${summary.total_payments} payments • ${summary.total_amount_sats.toLocaleString()} sats • 
+                        ${summary.confirmed_payments} confirmed • ${summary.pending_payments} pending</p>
+                    </div>
+                `;
+                
+                // Group by month
+                const groupedByMonth = {};
+                distributions.forEach(payment => {
+                    if (!groupedByMonth[payment.month]) {
+                        groupedByMonth[payment.month] = [];
+                    }
+                    groupedByMonth[payment.month].push(payment);
+                });
+                
+                Object.keys(groupedByMonth).sort().reverse().forEach(month => {
+                    const monthPayments = groupedByMonth[month];
+                    const monthTotal = monthPayments.reduce((sum, p) => sum + p.amount_sats, 0);
+                    
+                    // Format month nicely: "2025-09" -> "Sep 2025"
+                    const [year, monthNum] = month.split('-');
+                    const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const monthName = monthNames[parseInt(monthNum)];
+                    
+                    html += `
+                        <div style="margin-top: 20px;">
+                            <h4 style="margin-bottom: 10px; color: #666;">💰 Operating Distributions</h4>
+                            <table class="distributions-table" style="width: 100%; font-size: 0.9em;">
+                                <thead>
+                                    <tr style="background: #f5f5f5;">
+                                        <th colspan="6" style="text-align: center; padding: 8px; font-size: 1.1em; color: #444;">${year}</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 20%;">To</th>
+                                        <th style="width: 15%;">Amount</th>
+                                        <th style="width: 30%;">Purpose</th>
+                                        <th style="width: 12%;">Month</th>
+                                        <th style="width: 8%;">✓</th>
+                                        <th style="width: 15%;">Proof</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    monthPayments.forEach((payment, index) => {
+                        const statusIcon = this.getManualStatusIcon(payment.confirmation_status);
+                        const statusText = this.getManualStatusText(payment.confirmation_status);
+                        const purposeText = payment.purpose + (payment.admin_notes ? ` (${payment.admin_notes})` : '');
+                        const purposeHtml = this.formatManualPurpose(purposeText, `manual-${month}-${index}`);
+                        
+                        const manualScreenshotLink = payment.screenshot_path ? 
+                            `<a href="uploads/payment_proof/${payment.screenshot_path}" target="_blank" style="color: #2196F3; font-size: 0.85em;">📷 Proof</a>` : 
+                            '<span style="color: #999; font-size: 0.8em;">—</span>';
+                        
+                        // Extract just first name from recipient
+                        const recipientName = payment.recipient_name.split(' -')[0].split(',')[0].trim();
+                        
+                        html += `
+                            <tr>
+                                <td><strong>${this.escapeHtml(recipientName)}</strong></td>
+                                <td style="text-align: right;">${payment.amount_sats.toLocaleString()}</td>
+                                <td style="font-size: 0.85em;">${purposeHtml}</td>
+                                <td style="text-align: center;">${monthName}</td>
+                                <td style="text-align: center; font-size: 1.1em;">${statusIcon}${statusText ? ' ' + statusText : ''}</td>
+                                <td style="text-align: center;">${manualScreenshotLink}</td>
+                            </tr>
+                        `;
+                        
+                        // Add recipient note if confirmed with note
+                        if (payment.confirmation_status === 'received' && payment.recipient_notes) {
+                            html += `
+                                <tr style="background-color: #f0f8ff;">
+                                    <td colspan="6">
+                                        <small><em>Recipient confirmed:</em> "${this.escapeHtml(payment.recipient_notes)}"</small>
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    });
+                    
+                    html += `
+                            </tbody>
+                        </table>
+                        </div>
+                    `;
+                });
+                
+                section.innerHTML = html;
+                this.attachMessageHandlers(); // Reattach handlers for new content
+            }
+            
+            getManualStatusIcon(status) {
+                switch (status) {
+                    case 'received': return '✅';
+                    case 'not_received': return '❌';
+                    case 'partial': return '⚠️';
+                    case 'pending': return '🔄';
+                    default: return '❓';
+                }
+            }
+            
+            getManualStatusText(status) {
+                switch (status) {
+                    case 'received': return ''; // Icon only for confirmed
+                    case 'not_received': return 'Failed';
+                    case 'partial': return 'Partial';
+                    case 'pending': return 'Pending';
+                    default: return 'Unknown';
+                }
+            }
+            
+            formatManualPurpose(text, id) {
+                const escaped = this.escapeHtml(text);
+                const isLong = escaped.length > 50;
+                
+                if (isLong) {
+                    const preview = escaped.substring(0, 47) + '...';
+                    return `
+                        <div class="message-expandable" data-id="${id}">
+                            <div class="message-preview">${preview}</div>
+                            <div class="message-full">${escaped}</div>
+                            <small style="color: #2196F3; cursor: pointer;">[Click to expand]</small>
+                        </div>
+                    `;
+                } else {
+                    return escaped;
+                }
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TransparencyPage();
+        });
+    </script>
+    
+    <!-- Chat widget script -->
+    <script src="chat/chat.js?v=2.6-notifications-coming-soon"></script>
+    
+    <!-- Simple mobile chat navigation -->
+    <script src="scripts/mobile-chat-nav.js?v=1.5-all-buttons-left"></script>
+</body>

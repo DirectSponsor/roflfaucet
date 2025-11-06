@@ -1,0 +1,550 @@
+<!-- 🎲 ROFLFaucet Poker Dice Game -->
+<!-- Complete standalone page - no templates or includes -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Dice - ROFLFaucet</title>
+    <meta name="description" content="5-dice poker game with 3D animations and poker hand rankings">
+    
+    <!-- Main site CSS -->
+    <link rel="stylesheet" href="main.css">
+    
+    <!-- Chat widget CSS -->
+    <link rel="stylesheet" href="chat/chat-widget.css">
+    
+    <!-- Additional page-specific styles -->
+    <link rel="stylesheet" href="css/poker-dice.css">
+    
+    <!-- Site-wide scripts -->
+    <script src="scripts/unified-balance.js?v=2.2-smart-sync"></script>
+    <script src="scripts/site-utils.js"></script>
+    <script src="scripts/gallery-system-simple.js"></script>
+</head>
+<body>
+    <div class="page-wrapper">
+                <!-- include nav.html -->
+        <div class="header">
+            <!-- Mobile menu checkbox (hidden) -->
+            <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+            
+            <!-- Left: Logo -->
+            <div class="header-left">
+                <a href="index.html" class="logo">🤣 roflfaucet</a>
+                <!-- Mobile hamburger button (hidden on desktop) -->
+                <label for="mobile-menu-toggle" class="hamburger" aria-label="Menu">☰</label>
+            </div>
+            
+            <!-- Center: Main Navigation -->
+            <nav id="main-nav" class="header-center">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                
+                <!-- Simple Games Dropdown -->
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Right: Account Menu -->
+            <div class="header-right">
+                <!-- Donate Button (subtle, always visible) -->
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button" title="Support ROFLFaucet">⚡ Donate</a>
+                
+                <!-- Guest Login (shown when logged out) -->
+                <div class="guest-only">
+                    <a href="javascript:void(0)" onclick="window.location.href='https://auth.directsponsor.org/jwt-login.php?redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);" class="nav-button">🚪 Login</a>
+                </div>
+                
+                <!-- Member Menu (shown when logged in) -->
+                <div class="member-only" style="display: none;">
+                    <div class="dropdown">
+                        <a href="profile.html" class="nav-button" id="user-menu-button">👤 User</a>
+                        <div class="dropdown-content">
+                            <a href="profile.html">👤 Profile</a>
+                            <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox <span id="notification-badge" class="notification-badge" style="background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7em; margin-left: 5px; display: none;">3</span></a>
+                            <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile navigation menu -->
+            <nav class="mobile-nav">
+                <a href="index.html" class="nav-button">🚰 Faucet</a>
+                <div class="dropdown">
+                    <a href="games.html" class="nav-button">🎮 Games</a>
+                    <div class="dropdown-content">
+                        <a href="games.html">🎮 All Games</a>
+                        <a href="slots.html">🎰 Slots</a>
+                        <a href="roll.html">🎲 Dice</a>
+                        <a href="wheel.html">🎡 Wheel</a>
+                        <a href="poker-dice.html">🃏 Poker Dice</a>
+                    </div>
+                </div>
+                <!-- About Dropdown -->
+                <div class="dropdown">
+                    <a href="about.html" class="nav-button">ℹ️ About</a>
+                    <div class="dropdown-content">
+                        <a href="about.html">ℹ️ About ROFLFaucet</a>
+                        <a href="transparency.html">💰 Financial Transparency</a>
+                    </div>
+                </div>
+                <a href="https://roflfaucet.com/site-income.html" class="nav-button">⚡ Donate</a>
+                <!-- Auth button will be added dynamically by JavaScript -->
+            </nav>
+        </div>
+        <!-- end include nav.html -->
+        
+        <div class="slot-direct">
+            <div class="slot-machine" id="slot-machine">
+                <div class="machine-front">
+                    <div class="slot-machine-container">
+                        <table class="slot-table" role="presentation">
+                            <!-- ROW 1: DICE DISPLAY -->
+                            <tr>
+                                <td class="left-bar" rowspan="2">
+                                    <img src="https://placehold.co/300x250/4A90E2/FFFFFF?text=Ad+Banner+1" alt="Advertisement Banner 300x250" width="300" loading="lazy">
+                                    
+                                    <!-- include chat-sidebar.html -->
+<!-- Charity Pot Display -->
+<div style="margin-top: 1em; margin-bottom: 1em; padding: 12px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 8px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%); text-align: center;">
+    <div style="font-size: 0.9em; color: #4CAF50; font-weight: bold; margin-bottom: 6px;">🏆 Charity Pot</div>
+    <div style="font-size: 1.1em; color: #2E7D32; font-weight: bold;">
+        <span class="charity-current-total">0 sats</span>
+    </div>
+    <div style="font-size: 0.8em; color: #666; margin-top: 4px;">
+        Total: <span class="charity-received-total">0 sats</span> • 
+        Distributed: <span class="charity-distributed-total">0 sats</span>
+    </div>
+</div>
+
+<!-- Live Chat Widget -->
+<details open style="margin-top: 1em; border: 1px solid rgba(74, 144, 226, 0.3); border-radius: 8px; background: rgba(255, 255, 255, 0.9);">
+    <summary style="padding: 0.75em; background: linear-gradient(135deg, #4A90E2 0%, #357abd 100%); color: white; cursor: pointer; border-radius: 7px 7px 0 0; font-weight: bold; user-select: none;">
+        💬 Community Chat 🔽
+    </summary>
+    <div id="sidebar-chat-widget-container" style="width: 100%; height: 350px; border-radius: 0 0 8px 8px; overflow: hidden;">
+        <!-- Chat widget will be inserted here by JavaScript -->
+    </div>
+</details>
+
+<!-- Full Chat Link -->
+<div style="text-align: center; margin-top: 0.5em;">
+    <a href="chat.html" style="display: inline-block; background: #4A90E2; color: white; text-decoration: none; padding: 0.5em 1em; border-radius: 6px; font-size: 0.9em; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);" onmouseover="this.style.background='#357abd'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(74, 144, 226, 0.3)';" onmouseout="this.style.background='#4A90E2'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(74, 144, 226, 0.2)';">
+        💬 Open Full Chat →
+    </a>
+</div>
+                                    <!-- end include chat-sidebar.html -->
+                                    
+                                    <img src="https://placehold.co/300x200/667eea/FFFFFF?text=Ad+Banner+2" alt="Advertisement Banner 300x200" width="300" loading="lazy" style="margin-top: 1em;">
+                                </td>
+
+                                <!-- 🎯 POKER DICE DISPLAY CELL -->
+                                <td class="poker-dice-display-cell">
+                                    <h1 style="text-align: center; margin-bottom: 20px; color: white;">🃏 Poker Dice vs House</h1>
+                                    
+                                    <!-- Game Status -->
+                                    <div id="gameStatus" style="text-align: center; color: #ffc107; font-weight: bold; margin-bottom: 15px;">Place your bet and roll to start!</div>
+                                    
+                                    <!-- Player Section -->
+                                    <div class="dice-section active" id="playerSection" style="margin-bottom: 20px;">
+                                        <h3 style="color: white; text-align: center; margin-bottom: 10px;">👤 You: <span id="playerHand" style="color: #4CAF50; font-weight: bold;">-</span></h3>
+                                        <!-- Player Dice Display -->
+                                        <div class="dice-container">
+                                            <!-- Player Die 1 -->
+                                            <div class="die-container">
+                                                <div id="playerDie1" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                                <div style="text-align: center; margin-top: 5px;">
+                                                    <input type="checkbox" id="holdPlayer1" class="hold-checkbox" style="display: none;">
+                                                    <label for="holdPlayer1" class="hold-label" style="color: white; font-size: 0.8em; display: none;">HOLD</label>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Player Die 2 -->
+                                            <div class="die-container">
+                                                <div id="playerDie2" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                                <div style="text-align: center; margin-top: 5px;">
+                                                    <input type="checkbox" id="holdPlayer2" class="hold-checkbox" style="display: none;">
+                                                    <label for="holdPlayer2" class="hold-label" style="color: white; font-size: 0.8em; display: none;">HOLD</label>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Player Die 3 -->
+                                            <div class="die-container">
+                                                <div id="playerDie3" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                                <div style="text-align: center; margin-top: 5px;">
+                                                    <input type="checkbox" id="holdPlayer3" class="hold-checkbox" style="display: none;">
+                                                    <label for="holdPlayer3" class="hold-label" style="color: white; font-size: 0.8em; display: none;">HOLD</label>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Player Die 4 -->
+                                            <div class="die-container">
+                                                <div id="playerDie4" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                                <div style="text-align: center; margin-top: 5px;">
+                                                    <input type="checkbox" id="holdPlayer4" class="hold-checkbox" style="display: none;">
+                                                    <label for="holdPlayer4" class="hold-label" style="color: white; font-size: 0.8em; display: none;">HOLD</label>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Player Die 5 -->
+                                            <div class="die-container">
+                                                <div id="playerDie5" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                                <div style="text-align: center; margin-top: 5px;">
+                                                    <input type="checkbox" id="holdPlayer5" class="hold-checkbox" style="display: none;">
+                                                    <label for="holdPlayer5" class="hold-label" style="color: white; font-size: 0.8em; display: none;">HOLD</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Strategic Choice Section -->
+                                    <div id="strategyChoice" class="strategy-choice" style="display: none; text-align: center; margin: 20px 0; padding: 15px; background: rgba(255, 193, 7, 0.1); border: 2px solid #ffc107; border-radius: 10px;">
+                                        <div style="color: #ffc107; font-weight: bold; margin-bottom: 10px; font-size: 1.1em;">⚡ Choose Your Strategy</div>
+                                        
+                                        <div class="strategy-options" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                                            <label class="strategy-option" style="display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 10px; border-radius: 8px; transition: all 0.2s ease; min-width: 80px;" title="Normal re-roll with current bet">
+                                                <input type="radio" name="playerStrategy" value="continue" style="margin-bottom: 5px;">
+                                                <div style="font-size: 1.5em; margin-bottom: 3px;">🎲</div>
+                                                <div style="color: white; font-size: 0.9em; font-weight: bold;">Continue</div>
+                                                <div style="color: #ccc; font-size: 0.7em;">Normal</div>
+                                            </label>
+                                            
+                                            <label class="strategy-option" style="display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 10px; border-radius: 8px; transition: all 0.2s ease; min-width: 80px;" title="Double your bet and re-roll">
+                                                <input type="radio" name="playerStrategy" value="double" style="margin-bottom: 5px;">
+                                                <div style="font-size: 1.5em; margin-bottom: 3px;">💰</div>
+                                                <div style="color: white; font-size: 0.9em; font-weight: bold;">Double</div>
+                                                <div style="color: #ccc; font-size: 0.7em;">2x bet</div>
+                                            </label>
+                                            
+                                            <label class="strategy-option" style="display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 10px; border-radius: 8px; transition: all 0.2s ease; min-width: 80px;" title="Keep current hand, house gets one roll only">
+                                                <input type="radio" name="playerStrategy" value="stand" style="margin-bottom: 5px;">
+                                                <div style="font-size: 1.5em; margin-bottom: 3px;">🛡️</div>
+                                                <div style="color: white; font-size: 0.9em; font-weight: bold;">Stand</div>
+                                                <div style="color: #ccc; font-size: 0.7em;">Lock in</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- House Section -->
+                                    <div class="dice-section inactive" id="houseSection" style="margin-top: 20px;">
+                                        <h3 style="color: white; text-align: center; margin-bottom: 10px;">🏠 House: <span id="houseHand" style="color: #f44336; font-weight: bold;">-</span></h3>
+                                        <!-- House Dice Display -->
+                                        <div class="dice-container">
+                                            <!-- House Die 1 -->
+                                            <div class="die-container">
+                                                <div id="houseDie1" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- House Die 2 -->
+                                            <div class="die-container">
+                                                <div id="houseDie2" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- House Die 3 -->
+                                            <div class="die-container">
+                                                <div id="houseDie3" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- House Die 4 -->
+                                            <div class="die-container">
+                                                <div id="houseDie4" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- House Die 5 -->
+                                            <div class="die-container">
+                                                <div id="houseDie5" class="die show-ace">
+                                                    <div class="die-face face-9">9</div>
+                                                    <div class="die-face face-10">10</div>
+                                                    <div class="die-face face-jack">J</div>
+                                                    <div class="die-face face-queen">Q</div>
+                                                    <div class="die-face face-king">K</div>
+                                                    <div class="die-face face-ace">A</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Game Result Display -->
+                                    <div id="gameResult" class="current-hand">
+                                        <div id="resultText" class="hand-name">-</div>
+                                        <div id="payoutText" class="hand-payout">-</div>
+                                    </div>
+                                </td>
+
+                                <td class="right-bar" rowspan="2">
+                                    <img src="https://placehold.co/300x400/764ba2/FFFFFF?text=Gallery+Content" alt="Gallery Content 300x400" width="300" loading="lazy">
+                                </td>
+                            </tr>
+                            
+                            <!-- ROW 2: CONTROL PANEL -->
+                            <tr>
+                                <td class="poker-dice-controls-cell">
+                                    <!-- Direct table - no wrapper divs -->
+                                    <table class="poker-controls-table">
+                                        <tr>
+                                            <td class="poker-control-item">
+                                                <span class="control-label">BALANCE</span><br>
+                                                <span class="control-value" id="playerBalance">0</span>
+                                            </td>
+                                            <td class="poker-control-item">
+                                                <span class="control-label">BET</span><br>
+                                                <span class="control-value" id="currentBet">1</span>
+                                            </td>
+                                            <td class="poker-control-item">
+                                                <button id="betUp" class="bet-btn-inline">▲</button><br>
+                                                <button id="betDown" class="bet-btn-inline">▼</button>
+                                            </td>
+                                            <td class="poker-control-item">
+                                                <button id="pokerDiceRollButton" class="poker-roll-btn">🎲 ROLL POKER DICE</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    
+                                    <!-- Last Result Notice -->
+                                    <div id="lastResultNotice" class="last-result-notice" style="display: none;">
+                                        <div class="notice-header">📊 Last Game Result</div>
+                                        <div id="lastResultContent" class="notice-content"></div>
+                                    </div>
+                                    
+                                    <!-- Tab System -->
+                                    <div style="margin-top: 20px;">
+                                        <!-- Tab Navigation -->
+                                        <div class="tab-nav" style="display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px;">
+                                            <button class="tab-btn active" onclick="showPokerTab('howToPlay')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid #007bff; font-weight: bold;">📋 How to Play</button>
+                                            <button class="tab-btn" onclick="showPokerTab('recentGames')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid transparent;">📈 Recent Games</button>
+                                            <button class="tab-btn" onclick="showPokerTab('gameStats')" style="flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; border-bottom: 3px solid transparent;">📉 Game Stats</button>
+                                        </div>
+                                        
+                                        <!-- Tab Content -->
+                                        <div class="tab-content">
+                                            <!-- How to Play Tab -->
+                                            <div id="howToPlay" class="tab-panel" style="display: block;">
+                                                <div style="margin-bottom: 15px;">
+                                                    <strong>1.</strong> Roll your 5 dice to start
+                                                </div>
+                                                <div style="margin-bottom: 15px;">
+                                                    <strong>2.</strong> Choose your strategy after first roll:
+                                                    <ul style="margin: 8px 0; padding-left: 25px; color: #666;">
+                                                        <li><strong>🎲 Continue:</strong> Normal re-roll (current bet)</li>
+                                                        <li><strong>💰 Double:</strong> Double your bet and re-roll</li>
+                                                        <li><strong>🛡️ Stand:</strong> Keep current hand, house gets one roll only</li>
+                                                    </ul>
+                                                </div>
+                                                <div style="margin-bottom: 15px;">
+                                                    <strong>3.</strong> Select which dice to hold, then re-roll (if Continue/Double)
+                                                </div>
+                                                <div style="margin-bottom: 15px;">
+                                                    <strong>4.</strong> House plays optimally against your hand
+                                                </div>
+                                                <div style="margin-bottom: 15px;">
+                                                    <strong>5.</strong> Best poker hand wins!
+                                                </div>
+
+                                                <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #28a745;">
+                                                    <h6>💰 Payouts</h6>
+                                                    <ul style="margin: 10px 0; padding-left: 20px;">
+                                                        <li><strong>🎉 You Win:</strong> 2:1 payout (double your bet!)</li>
+                                                        <li><strong>🤝 Tie:</strong> 1:1 push (get your bet back)</li>
+                                                        <li><strong>😞 You Lose:</strong> Lose your bet</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Recent Games Tab -->
+                                            <div id="recentGames" class="tab-panel" style="display: none;">
+                                                <div class="recent-games-list" id="recentGamesList" style="max-height: 230px; overflow-y: auto;">
+                                                    <div style="text-align: center; padding: 40px; color: #666;">
+                                                        <p>No recent games yet!</p>
+                                                        <p style="font-size: 0.9em;">Play a few games to see your history here.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Game Stats Tab -->
+                                            <div id="gameStats" class="tab-panel" style="display: none;">
+                                                <table style="width: 100%; border-collapse: collapse;">
+                                                    <tr>
+                                                        <td style="padding: 12px; border-bottom: 2px solid #eee; font-size: 16px;">Total Games:</td>
+                                                        <td style="padding: 12px; border-bottom: 2px solid #eee; font-weight: bold; text-align: right; font-size: 16px;" id="totalPokerDiceGames">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="padding: 12px; border-bottom: 2px solid #eee; font-size: 16px;">Total Wagered:</td>
+                                                        <td style="padding: 12px; border-bottom: 2px solid #eee; font-weight: bold; text-align: right; font-size: 16px;" id="totalPokerDiceWagered">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="padding: 12px; border-bottom: 2px solid #eee; font-size: 16px;">Total Won:</td>
+                                                        <td style="padding: 12px; border-bottom: 2px solid #eee; font-weight: bold; text-align: right; font-size: 16px;" id="totalPokerDiceWon">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="padding: 12px; font-size: 16px;">Win Rate:</td>
+                                                        <td style="padding: 12px; font-weight: bold; text-align: right; font-size: 16px;" id="pokerDiceWinRate">0%</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Faucet button - centered -->
+                                    <div style="text-align: center; margin-top: 15px;">
+                                        <button id="faucet-countdown-btn" class="faucet-countdown-btn" onclick="handleFaucetClaim()" disabled>
+                                            <span class="btn-text">Faucet: 300</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+                <!-- include footer.html -->
+        <!-- Sponsors Section -->
+        <div class="sponsors">
+            <h3>Our Supporters</h3>
+            <div class="sponsor-logos">
+                <a href="https://satoshihost.com" target="_blank" class="sponsor-link">
+                    <img src="images/satoshihost-banner.png" alt="SatoshiHost - Bitcoin Hosting" class="sponsor-logo">
+                </a>
+                <div class="sponsor-placeholder">
+                    [Sponsor Logo 2]
+                </div>
+            </div>
+            <p>&copy; 2024 ROFLFaucet - Progressive Responsive Layout | Integrated Sync ✓</p>
+        </div>        <!-- end include footer.html -->
+    </div>
+    
+    <!-- Scripts -->
+    <script src="scripts/insufficient-balance-dialog.js"></script>
+    <script src="js/levels-system.js"></script>
+    <script src="scripts/dynamic-wins.js"></script>
+    <script src="scripts/poker-dice-game.js?v=2.2-no-polling"></script>
+    <script>
+        // Tab switching function for poker dice
+        function showPokerTab(tabName) {
+            // Hide all tab panels
+            const panels = document.querySelectorAll('.tab-panel');
+            panels.forEach(panel => {
+                panel.style.display = 'none';
+            });
+            
+            // Remove active class from all tab buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+                button.style.borderBottomColor = 'transparent';
+                button.style.fontWeight = 'normal';
+            });
+            
+            // Show selected tab panel
+            const selectedPanel = document.getElementById(tabName);
+            if (selectedPanel) {
+                selectedPanel.style.display = 'block';
+            }
+            
+            // Add active class to clicked button
+            const activeButton = event ? event.target : document.querySelector(`[onclick="showPokerTab('${tabName}')"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+                activeButton.style.borderBottomColor = '#007bff';
+                activeButton.style.fontWeight = 'bold';
+            }
+        }
+        
+        // Initialize poker dice game when page loads
+        let pokerDiceGame;
+        document.addEventListener('DOMContentLoaded', function() {
+            pokerDiceGame = new PokerDiceGame();
+        });
+    </script>
+    
+    <!-- Chat widget script -->
+    <script src="chat/chat.js?v=2.6-notifications-coming-soon"></script>
+    
+    <!-- Simple mobile chat navigation -->
+    <script src="scripts/mobile-chat-nav.js?v=1.5-all-buttons-left"></script>
+    
+</body>
+</html>

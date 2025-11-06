@@ -1,0 +1,32 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Solid dice face background -->
+  <rect width="80" height="80" fill="#f8f8f8" stroke="none"/>
+  
+  <!-- Nine of Diamonds pattern - accurate to reference -->
+  <g fill="#c41e3a" stroke="none">
+    <!-- Top row: 3 diamonds -->
+    <path d="M16,16 L20,8 L24,16 L20,24 Z"/>
+    <path d="M36,16 L40,8 L44,16 L40,24 Z"/>
+    <path d="M56,16 L60,8 L64,16 L60,24 Z"/>
+    
+    <!-- Second row: 2 diamonds -->
+    <path d="M26,28 L30,20 L34,28 L30,36 Z"/>
+    <path d="M46,28 L50,20 L54,28 L50,36 Z"/>
+    
+    <!-- Center row: 3 diamonds -->
+    <path d="M16,40 L20,32 L24,40 L20,48 Z"/>
+    <path d="M36,40 L40,32 L44,40 L40,48 Z"/>
+    <path d="M56,40 L60,32 L64,40 L60,48 Z"/>
+    
+    <!-- Fourth row: 1 diamond -->
+    <path d="M36,52 L40,44 L44,52 L40,60 Z"/>
+  </g>
+  
+  <!-- Corner index markers -->
+  <g fill="#c41e3a" font-family="Times, serif" font-weight="bold">
+    <text x="6" y="14" font-size="12">9</text>
+    <text x="6" y="24" font-size="10">♦</text>
+    <text x="74" y="66" font-size="12" transform="rotate(180 74 66)">9</text>
+    <text x="74" y="56" font-size="10" transform="rotate(180 74 56)">♦</text>
+  </g>
+</svg>

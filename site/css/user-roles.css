@@ -1,0 +1,137 @@
+/* User Role System Styles */
+
+/* Role badges */
+.role-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-right: 6px;
+    color: white;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+
+.role-badge.role-r {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border: 1px solid #45a049;
+}
+
+.role-badge.role-a {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    border: 1px solid #d32f2f;
+}
+
+/* Future role styles ready to use */
+.role-badge.role-m {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    border: 1px solid #F57C00;
+}
+
+.role-badge.role-s {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    border: 1px solid #7B1FA2;
+}
+
+/* Role-enabled sections (hidden by default) */
+.fundraiser-section {
+    display: none;
+    background: #f8f9fa;
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.fundraiser-section.role-enabled {
+    display: block;
+}
+
+.project-creation-tools {
+    display: none;
+    background: #e8f5e8;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.project-creation-tools.role-enabled {
+    display: block;
+}
+
+.admin-panel {
+    display: none;
+    background: #fff3cd;
+    border: 2px solid #f44336;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.admin-panel.role-enabled {
+    display: block;
+}
+
+.verification-tools, .project-approval-tools {
+    display: none;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.verification-tools.role-enabled,
+.project-approval-tools.role-enabled {
+    display: block;
+}
+
+/* User role indicators container */
+#user-role-indicators {
+    margin: 10px 0;
+}
+
+/* Responsive role badges */
+@media (max-width: 600px) {
+    .role-badge {
+        font-size: 11px;
+        padding: 3px 6px;
+        margin-right: 4px;
+    }
+}
+
+/* Role-specific button styles */
+.recipient-button {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.recipient-button:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.admin-button {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-button:hover {
+    background: linear-gradient(135deg, #d32f2f, #c62828);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}

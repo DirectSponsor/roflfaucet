@@ -1,0 +1,342 @@
+<?php
+/**
+ * Unified Project Payment API for ROFLFaucet
+ * Handles both Project 000 (general fund) and Project 001+ (specific projects)
+ * Integrates with existing donation system and financial totals
+ */
+
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
+// Configuration
+define('COINOS_API_KEY', getenv('COINOS_API_KEY') ?: 'your-api-key-here');
+define('PROJECTS_DIR', __DIR__ . '/../projects/');
+
+/**
+ * Load project configuration
+ */
+function loadProject($projectId) {
+    // Look for any file starting with the project number
+    $projectPattern = PROJECTS_DIR . sprintf('%03d-*.json', intval($projectId));
+    $matchingFiles = glob($projectPattern);
+    
+    $projectFile = null;
+    if (!empty($matchingFiles)) {
+        $projectFile = $matchingFiles[0]; // Use the first matching file
+    } else {
+        // Fallback to generic naming for backwards compatibility
+        $projectFile = PROJECTS_DIR . sprintf('%03d-project.json', intval($projectId));
+    }
+    
+    // For Project 000, create default config if not exists
+    if ($projectId === '000' && !file_exists($projectFile)) {
+        $defaultProject = [
+            'project_id' => '000',
+            'title' => 'ROFLFaucet Monthly Distributions',
+            'description' => 'Monthly distribution of unallocated site income among recipients',
+            'target_amount' => null,
+            'recipient_wallet' => [
+                'api_key' => 'MAIN_COINOS_KEY' // Uses main COINOS_API_KEY env var
+            ],
+            'is_general_fund' => true,
+            'status' => 'active'
+        ];
+        
+        if (!is_dir(PROJECTS_DIR)) {
+            mkdir(PROJECTS_DIR, 0755, true);
+        }
+        
+        file_put_contents($projectFile, json_encode($defaultProject, JSON_PRETTY_PRINT));
+        return $defaultProject;
+    }
+    
+    if (file_exists($projectFile)) {
+        return json_decode(file_get_contents($projectFile), true);
+    }
+    
+    return null;
+}
+
+/**
+ * Get financial totals from existing API
+ */
+function getFinancialTotals() {
+    $url = 'https://roflfaucet.com/api/financial-totals.php';
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 10,
+            'method' => 'GET'
+        ]
+    ]);
+    
+    $response = @file_get_contents($url, false, $context);
+    if ($response === false) {
+        return null;
+    }
+    
+    return json_decode($response, true);
+}
+
+/**
+ * Get project data with current stats
+ */
+function getProjectData($projectId) {
+    $project = loadProject($projectId);
+    if (!$project) {
+        return ['error' => 'Project not found'];
+    }
+    
+    if ($projectId === '000') {
+        // For Project 000, get data from financial totals API
+        $financialData = getFinancialTotals();
+        if ($financialData) {
+            $project['current_amount'] = $financialData['charity_fund']['current_total_sats'];
+            $project['total_received'] = $financialData['monthly_summary']['donations_this_month'];
+            // Calculate carried over amount (available - this month's donations)
+            $project['carried_over'] = $financialData['charity_fund']['current_total_sats'] - $financialData['monthly_summary']['donations_this_month'];
+            $project['donors_count'] = $financialData['monthly_summary']['active_donors_this_month'];
+            $project['monthly_focus'] = true; // Indicates these are monthly stats
+        } else {
+            // Fallback values
+            $project['current_amount'] = 0;
+            $project['total_received'] = 0;
+            $project['carried_over'] = 0;
+            $project['donors_count'] = 0;
+        }
+    } else {
+        // For other projects, use project-specific data
+        $project['current_amount'] = $project['current_amount'] ?? 0;
+        $project['total_received'] = $project['total_received'] ?? 0;
+        $project['total_distributed'] = $project['total_distributed'] ?? 0;
+        $project['donors_count'] = $project['donors_count'] ?? 0;
+    }
+    
+    return $project;
+}
+
+/**
+ * Create Lightning invoice via existing donate.php API
+ */
+function createProjectInvoice($projectId, $amount, $donorName, $donorMessage = '') {
+    $project = loadProject($projectId);
+    if (!$project) {
+        return ['error' => 'Project not found'];
+    }
+    
+    // For Project 000, use existing donate.php API
+    if ($projectId === '000') {
+        $donateApiUrl = 'https://roflfaucet.com/payments/api/donate.php';
+        
+        $postData = [
+            'amount_sats' => intval($amount),
+            'donor_name' => $donorName,
+            'donor_message' => $donorMessage . ' (Project 000: Monthly Distributions)'
+        ];
+        
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json',
+                'content' => json_encode($postData),
+                'timeout' => 30
+            ]
+        ]);
+        
+        $response = @file_get_contents($donateApiUrl, false, $context);
+        if ($response === false) {
+            return ['error' => 'Failed to create invoice'];
+        }
+        
+        $result = json_decode($response, true);
+        if ($result && $result['success']) {
+            return $result['data'];
+        } else {
+            return ['error' => $result['error'] ?? 'Invoice creation failed'];
+        }
+    }
+    
+    // For other projects (001+), use Coinos API directly with proper format
+    if (isset($project['recipient_wallet']['api_key'])) {
+        $apiKey = $project['recipient_wallet']['api_key'];
+        
+        // Create invoice via Coinos API - use proper webhook format like working donate.php
+        $invoiceData = [
+            'invoice' => [
+                'amount' => intval($amount),
+                'type' => 'lightning',
+                'memo' => sprintf(
+                    'Donation to %s from %s%s',
+                    $project['title'],
+                    $donorName,
+                    $donorMessage ? ' - ' . $donorMessage : ''
+                ),
+                'webhook' => 'https://roflfaucet.com/payments/api/webhook.php',
+                'secret' => 'roflfaucet_webhook_secret_2024'
+            ]
+        ];
+        
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $apiKey
+                ],
+                'content' => json_encode($invoiceData),
+                'timeout' => 30
+            ]
+        ]);
+        
+        $response = @file_get_contents('https://coinos.io/api/invoice', false, $context);
+        
+        if ($response === false) {
+            // Get more details about the failure
+            $error = error_get_last();
+            return ['error' => 'Failed to create Coinos invoice: ' . ($error['message'] ?? 'Unknown network error')];
+        }
+        
+        $result = json_decode($response, true);
+        
+        if ($result && isset($result['id'])) {
+            // Format response to match Project 000 format exactly
+            return [
+                'donation_id' => $result['id'],
+                'invoice' => $result['text'] ?? '',
+                'amount_sats' => intval($amount),
+                'qr_code' => 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($result['text'] ?? ''),
+                'memo' => $invoiceData['invoice']['memo'],
+                'expires_at' => isset($result['expiry']) ? (time() + $result['expiry']) : null,
+                'project_id' => $projectId,
+                'project_title' => $project['title']
+            ];
+        } else {
+            // Include the actual response for debugging
+            return [
+                'error' => 'Invalid response from Coinos API',
+                'coinos_response' => $response,
+                'parsed_result' => $result
+            ];
+        }
+    }
+    
+    return ['error' => 'No API key configured for this project'];
+}
+
+/**
+ * Get recent donations for a project
+ */
+function getProjectDonations($projectId, $limit = 10) {
+    if ($projectId === '000') {
+        // For Project 000, get from main donations file
+        $donationsFile = __DIR__ . '/../payments/data/donations/donations.json';
+        if (file_exists($donationsFile)) {
+            $donations = json_decode(file_get_contents($donationsFile), true) ?: [];
+            
+            // Get current month donations only
+            $currentMonth = date('Y-m');
+            $monthlyDonations = array_filter($donations, function($donation) use ($currentMonth) {
+                $donationMonth = date('Y-m', strtotime($donation['confirmed_at'] ?? $donation['created_at']));
+                return $donationMonth === $currentMonth;
+            });
+            
+            // Sort by date (newest first) and limit
+            usort($monthlyDonations, function($a, $b) {
+                return strtotime($b['confirmed_at'] ?? $b['created_at']) - strtotime($a['confirmed_at'] ?? $a['created_at']);
+            });
+            
+            return array_slice($monthlyDonations, 0, $limit);
+        }
+    }
+    
+    return [];
+}
+
+// Main API handling
+try {
+    $method = $_SERVER['REQUEST_METHOD'];
+    
+    if ($method === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$input || !isset($input['action'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing action parameter']);
+            exit;
+        }
+        
+        $action = $input['action'];
+        
+        switch ($action) {
+            case 'get_project':
+                if (!isset($input['project_id'])) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Missing project_id']);
+                    exit;
+                }
+                
+                $projectData = getProjectData($input['project_id']);
+                if (isset($projectData['error'])) {
+                    http_response_code(404);
+                    echo json_encode(['success' => false, 'error' => $projectData['error']]);
+                } else {
+                    echo json_encode(['success' => true, 'data' => $projectData]);
+                }
+                break;
+                
+            case 'create_invoice':
+                $projectId = $input['project_id'] ?? '';
+                $amount = intval($input['amount'] ?? 0);
+                $donorName = trim($input['donor_name'] ?? '');
+                
+                if (empty($projectId) || $amount < 1 || empty($donorName)) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Missing or invalid parameters']);
+                    exit;
+                }
+                
+                $result = createProjectInvoice($projectId, $amount, $donorName);
+                if (isset($result['error'])) {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'error' => $result['error']]);
+                } else {
+                    echo json_encode(['success' => true, 'data' => $result]);
+                }
+                break;
+                
+            case 'get_donations':
+                $projectId = $input['project_id'] ?? '';
+                $limit = intval($input['limit'] ?? 10);
+                
+                if (empty($projectId)) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Missing project_id']);
+                    exit;
+                }
+                
+                $donations = getProjectDonations($projectId, $limit);
+                echo json_encode(['success' => true, 'data' => $donations]);
+                break;
+                
+            default:
+                http_response_code(400);
+                echo json_encode(['error' => 'Unknown action']);
+                break;
+        }
+        
+    } else {
+        http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed']);
+    }
+    
+} catch (Exception $e) {
+    error_log("Project Payment API error: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['error' => 'Internal server error']);
+}
