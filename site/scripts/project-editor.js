@@ -11,9 +11,10 @@ class ProjectEditor {
     }
     
     async init() {
-        // Get project ID from URL
+        // Get project ID and action from URL
         const params = new URLSearchParams(window.location.search);
-        this.projectId = params.get('project') || '001';
+        const action = params.get('action');
+        this.projectId = params.get('project') || null;
         
         // Check authentication using inline function
         this.currentUser = this.getValidUsername();
@@ -22,8 +23,53 @@ class ProjectEditor {
             return;
         }
         
-        // Load project data
-        await this.loadProjectData();
+        // Check if creating new project
+        if (action === 'create') {
+            console.log('🆕 Create mode detected');
+            // Wait for role system to load
+            await this.waitForRoleSystem();
+            
+            // Check recipient permission
+            if (!window.isRecipient || !window.isRecipient()) {
+                console.log('❌ Not a recipient, access denied');
+                document.getElementById('accessDenied').style.display = 'block';
+                document.getElementById('accessDenied').innerHTML = `
+                    <h1>⚠️ Recipient Role Required</h1>
+                    <p>You need the Recipient role to create fundraising projects.</p>
+                    <p>Please contact an administrator to request the Recipient role.</p>
+                    <br>
+                    <a href="profile.html" class="btn btn-secondary">← Back to Profile</a>
+                `;
+                return;
+            }
+            
+            console.log('✅ Recipient role verified');
+            // Show empty form for new project
+            this.projectData = {};
+            this.setupFormForCreate();
+            this.setupFormHandlers();
+            document.getElementById('editForm').style.display = 'block';
+        } else {
+            // Edit existing project
+            this.projectId = this.projectId || '001';
+            await this.loadProjectData();
+        }
+    }
+    
+    async waitForRoleSystem() {
+        return new Promise((resolve) => {
+            if (window.userRoles) {
+                resolve();
+            } else {
+                setTimeout(resolve, 1000);
+            }
+        });
+    }
+    
+    setupFormForCreate() {
+        document.getElementById('projectSubtitle').textContent = 'Create a new fundraising project';
+        // Leave all fields empty - they're already empty by default
+        console.log('🆕 Create mode: Form ready for new project');
     }
     
     // Inline auth function (from site-utils.js)
