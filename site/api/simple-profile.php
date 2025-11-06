@@ -237,14 +237,59 @@ function saveProfileData($profileFile, $data) {
 }
 
 // Main API Logic
+$action = $_GET['action'] ?? '';
+
+// Handle search action separately (it has its own auth check)
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
+    // SEARCH USERS - Find users by partial username (admin only)
+    $requesterId = getUserId();
+    if (!$requesterId) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Authentication required']);
+        exit;
+    }
+    
+    // Determine requester's profile file
+    if (!str_contains($requesterId, '-')) {
+        $foundFile = findProfileByUsername($requesterId);
+        if ($foundFile) {
+            $requesterFile = $foundFile;
+        } else {
+            $requesterFile = USERDATA_DIR . "/profiles/{$requesterId}.txt";
+        }
+    } else {
+        $requesterFile = USERDATA_DIR . "/profiles/{$requesterId}.txt";
+    }
+    
+    $requesterData = loadProfileData($requesterFile, $requesterId);
+    
+    if (!in_array('admin', $requesterData['roles'] ?? [])) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Admin access required']);
+        exit;
+    }
+    
+    $query = $_GET['query'] ?? '';
+    $limit = intval($_GET['limit'] ?? 10);
+    
+    $results = searchProfiles($query, $limit);
+    
+    echo json_encode([
+        'success' => true,
+        'query' => $query,
+        'results' => $results,
+        'count' => count($results)
+    ]);
+    exit;
+}
+
+// For all other actions, require authentication
 $userId = getUserId();
 if (!$userId) {
     http_response_code(401);
     echo json_encode(['error' => 'Authentication required']);
     exit;
 }
-
-$action = $_GET['action'] ?? '';
 
 // Determine profile file path
 // If userId doesn't contain a dash, try to find by username
@@ -446,38 +491,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'profile') {
         'user_id' => $userId,
         'user_roles' => $userRoles,
         'role_checks' => $hasRoles
-    ]);
-    
-} elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
-    // SEARCH USERS - Find users by partial username (admin only)
-    // For search, userId comes from query param but we don't need auth
-    // Check if requester is admin
-    $requesterId = getUserId();
-    if (!$requesterId) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Authentication required']);
-        exit;
-    }
-    
-    $requesterFile = USERDATA_DIR . "/profiles/{$requesterId}.txt";
-    $requesterData = loadProfileData($requesterFile, $requesterId);
-    
-    if (!in_array('admin', $requesterData['roles'] ?? [])) {
-        http_response_code(403);
-        echo json_encode(['error' => 'Admin access required']);
-        exit;
-    }
-    
-    $query = $_GET['query'] ?? '';
-    $limit = intval($_GET['limit'] ?? 10);
-    
-    $results = searchProfiles($query, $limit);
-    
-    echo json_encode([
-        'success' => true,
-        'query' => $query,
-        'results' => $results,
-        'count' => count($results)
     ]);
     
 } else {
