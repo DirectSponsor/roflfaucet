@@ -42,9 +42,9 @@ error() {
 pre_deploy_checks() {
     log "Running pre-deployment checks..."
     
-    # Check if we're in the right directory
+    # Check if we're in the site directory (after cd in main())
     if [[ ! -f "index.html" ]] || [[ ! -d "api" ]]; then
-        error "Not in ROFLFaucet site directory. Please run from /home/andy/work/projects/roflfaucet (parent directory)"
+        error "Not in ROFLFaucet site directory. Script should cd to site/ first."
     fi
     
     # Check server connectivity

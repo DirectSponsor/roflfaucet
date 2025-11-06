@@ -654,3 +654,35 @@ class CharityTotalsDisplay {
 document.addEventListener('DOMContentLoaded', () => {
     new CharityTotalsDisplay();
 });
+
+// ========================================
+// 🏷️ User Role System - Dynamic Loading
+// ========================================
+
+/**
+ * Dynamically load role system CSS and JavaScript
+ * Loads on all pages automatically via site-utils.js
+ */
+(function() {
+    'use strict';
+    
+    console.log('🏷️ Role System: Initializing...');
+    
+    // Load role CSS
+    const roleCSS = document.createElement('link');
+    roleCSS.rel = 'stylesheet';
+    roleCSS.href = 'css/user-roles.css';
+    document.head.appendChild(roleCSS);
+    
+    // Load role JavaScript
+    const roleJS = document.createElement('script');
+    roleJS.src = 'scripts/user-roles.js';
+    roleJS.onload = function() {
+        console.log('✅ Role System: Loaded successfully');
+    };
+    roleJS.onerror = function() {
+        console.warn('⚠️ Role System: Failed to load user-roles.js');
+    };
+    document.head.appendChild(roleJS);
+    
+})();
