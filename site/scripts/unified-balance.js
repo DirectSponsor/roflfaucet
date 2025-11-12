@@ -94,7 +94,8 @@ class UnifiedBalanceSystem {
             const combinedUserId = this.getCombinedUserIdFromToken();
             if (combinedUserId === 'guest') return false;
             
-            const response = await fetch(`api/coins-balance.php?action=timestamp&user_id=${combinedUserId}`);//
+            // Use hub API for timestamp check
+            const response = await fetch(`https://auth.directsponsor.org/api/sync.php?action=timestamp&user_id=${combinedUserId}&data_type=balance`);
             if (!response.ok) {
                 console.warn('⚠️ Sync check failed, assuming sync needed');
                 return true; // Fail safe - sync if check fails
@@ -102,13 +103,13 @@ class UnifiedBalanceSystem {
             
             const data = await response.json();
             
-            if (this.lastServerTimestamp && data.timestamp > this.lastServerTimestamp) {
-                console.log('🔄 Balance file modified elsewhere - sync needed');
-                this.lastServerTimestamp = data.timestamp;
+            if (this.lastServerTimestamp && data.last_updated > this.lastServerTimestamp) {
+                console.log('🔄 Balance modified elsewhere - sync needed');
+                this.lastServerTimestamp = data.last_updated;
                 return true;
             }
             
-            this.lastServerTimestamp = data.timestamp;
+            this.lastServerTimestamp = data.last_updated;
             return false;
         } catch (error) {
             console.warn('⚠️ Sync check failed, assuming sync needed:', error);
@@ -209,7 +210,7 @@ class UnifiedBalanceSystem {
     
     getValidUsername() {
         try {
-            const sessionData = localStorage.getItem('roflfaucet_session');
+            const sessionData = localStorage.getItem('directsponsor_session');
             if (sessionData) {
                 const data = JSON.parse(sessionData);
                 if (data.expires && Date.now() > data.expires) {
@@ -226,7 +227,7 @@ class UnifiedBalanceSystem {
     getUserIdFromToken() {
         // Use simple localStorage user_id with expiration check
         try {
-            const sessionData = localStorage.getItem('roflfaucet_session');
+            const sessionData = localStorage.getItem('directsponsor_session');
             if (sessionData) {
                 const data = JSON.parse(sessionData);
                 if (data.expires && Date.now() > data.expires) {
@@ -243,7 +244,7 @@ class UnifiedBalanceSystem {
     getCombinedUserIdFromToken() {
         // Get combined userID for file access (userID-username)
         try {
-            const sessionData = localStorage.getItem('roflfaucet_session');
+            const sessionData = localStorage.getItem('directsponsor_session');
             if (sessionData) {
                 const data = JSON.parse(sessionData);
                 if (data.expires && Date.now() > data.expires) {
@@ -306,7 +307,8 @@ class UnifiedBalanceSystem {
                 return this.getGuestBalance();
             }
             
-            const response = await fetch(`api/coins-balance.php?action=balance&user_id=${combinedUserId}&_t=` + Date.now(), {
+            // Use hub API to fetch balance
+            const response = await fetch(`https://auth.directsponsor.org/api/sync.php?action=get&user_id=${combinedUserId}&data_type=balance&_t=` + Date.now(), {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -317,8 +319,8 @@ class UnifiedBalanceSystem {
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
-                    this.balance = parseFloat(data.balance) || 0;
-                    console.log('✅ Simple balance loaded:', this.balance);
+                    this.balance = parseFloat(data.data.coins) || 0;
+                    console.log('✅ Balance loaded from hub:', this.balance);
                     return this.balance;
                 } else {
                     throw new Error(data.error || 'API returned error');
@@ -393,6 +395,7 @@ class UnifiedBalanceSystem {
                 return this.addGuestBalance(amount, source, description);
             }
             
+            // Update via local API first (for now - will migrate fully to hub later)
             const response = await fetch('api/coins-balance.php?action=update_balance', {
                 method: 'POST',
                 headers: {
@@ -409,9 +412,13 @@ class UnifiedBalanceSystem {
                 const data = await response.json();
                 if (data.success) {
                     this.balance = parseFloat(data.new_balance) || 0;
+                    
+                    // Push updated balance to hub
+                    this.pushBalanceToHub(combinedUserId, this.balance);
+                    
                     // Reset inactivity timer after successful balance change
                     this.resetInactivityTimer();
-                    console.log('✅ Real balance added via flat-file:', amount, 'New balance:', this.balance);
+                    console.log('✅ Real balance added and pushed to hub:', amount, 'New balance:', this.balance);
                     return { success: true, balance: this.balance };
                 } else {
                     throw new Error(data.error || 'API returned error');
@@ -451,6 +458,7 @@ class UnifiedBalanceSystem {
                 return this.subtractGuestBalance(amount, source, description);
             }
             
+            // Update via local API first (for now - will migrate fully to hub later)
             const response = await fetch('api/coins-balance.php?action=update_balance', {
                 method: 'POST',
                 headers: {
@@ -467,9 +475,13 @@ class UnifiedBalanceSystem {
                 const data = await response.json();
                 if (data.success) {
                     this.balance = parseFloat(data.new_balance) || 0;
+                    
+                    // Push updated balance to hub
+                    this.pushBalanceToHub(combinedUserId, this.balance);
+                    
                     // Reset inactivity timer after successful balance change
                     this.resetInactivityTimer();
-                    console.log('✅ Real balance subtracted via flat-file:', amount, 'New balance:', this.balance);
+                    console.log('✅ Real balance subtracted and pushed to hub:', amount, 'New balance:', this.balance);
                     return { success: true, balance: this.balance };
                 } else {
                     throw new Error(data.error || 'API returned error');
@@ -494,6 +506,37 @@ class UnifiedBalanceSystem {
         
         console.log('💸 Guest balance subtracted:', amount, 'New balance:', this.balance);
         return { success: true, balance: this.balance };
+    }
+    
+    async pushBalanceToHub(userId, balance) {
+        // Push balance update to hub (with timeout to not block too long)
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
+            
+            await fetch('https://auth.directsponsor.org/api/sync.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'push',
+                    user_id: userId,
+                    site_id: 'roflfaucet',
+                    data_type: 'balance',
+                    data: { coins: balance }
+                }),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            console.log('📤 Balance pushed to hub:', balance);
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.warn('⚠️ Hub push timed out (non-critical)');
+            } else {
+                console.warn('⚠️ Failed to push balance to hub:', error);
+            }
+            // Non-critical - don't throw
+        }
     }
     
     async fallbackToGuestMode() {
