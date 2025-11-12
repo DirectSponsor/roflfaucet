@@ -152,6 +152,34 @@ function searchProfiles($query, $limit = 10) {
 }
 
 /**
+ * Fetch profile data from auth server sync API
+ * @param string $userId User ID
+ * @return array|null Profile data from auth server, or null on failure
+ */
+function fetchProfileFromAuthServer($userId) {
+    $authUrl = "https://auth.directsponsor.org/api/sync.php?action=get&user_id=" . urlencode($userId) . "&data_type=profile";
+    
+    // Use curl for better error handling
+    $ch = curl_init($authUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200 && $response) {
+        $data = json_decode($response, true);
+        if ($data && $data['success'] && isset($data['data'])) {
+            return $data['data'];
+        }
+    }
+    
+    return null;
+}
+
+/**
  * Load user profile data with default structure
  * @param string $profileFile Path to profile file
  * @param string $userId User ID for default data
@@ -188,6 +216,42 @@ function loadProfileData($profileFile, $userId) {
                 'last_profile_update' => time()
             ], $data);
         }
+    }
+    
+    // LAZY LOADING: File doesn't exist locally, try fetching from auth server
+    $authProfile = fetchProfileFromAuthServer($userId);
+    if ($authProfile) {
+        // Merge auth server data with default structure
+        $data = array_merge([
+            'user_id' => $userId,
+            'level' => 1,
+            'username' => '',
+            'display_name' => $authProfile['display_name'] ?? '',
+            'avatar' => $authProfile['avatar'] ?? '👤',
+            'email' => '',
+            'bio' => $authProfile['bio'] ?? '',
+            'location' => $authProfile['location'] ?? '',
+            'website' => $authProfile['website'] ?? '',
+            'joined_date' => time(),
+            'settings' => [
+                'notifications' => true,
+                'theme' => 'default'
+            ],
+            'stats' => [
+                'total_claims' => 0,
+                'total_games_played' => 0,
+                'total_won' => 0
+            ],
+            'roles' => ['member'],
+            'fundraiser_permissions' => [],
+            'public_profile' => false,
+            'last_profile_update' => time()
+        ]);
+        
+        // Cache the profile locally for future requests
+        saveProfileData($profileFile, $data);
+        
+        return $data;
     }
     
     // Default structure for new users
@@ -308,17 +372,7 @@ if (strpos($userId, '-') === false) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'profile') {
-    // GET PROFILE - Return user profile data
-    // Check if profile file actually exists
-    if (!file_exists($profileFile)) {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'error' => 'User profile not found'
-        ]);
-        exit;
-    }
-    
+    // GET PROFILE - Return user profile data (with lazy loading from auth server)
     $data = loadProfileData($profileFile, $userId);
     
     echo json_encode([

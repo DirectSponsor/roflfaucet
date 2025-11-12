@@ -40,6 +40,33 @@ function getUserId() {
     return null;
 }
 
+/**
+ * Fetch balance data from auth server sync API
+ * @param string $userId User ID
+ * @return array|null Balance data from auth server, or null on failure
+ */
+function fetchBalanceFromAuthServer($userId) {
+    $authUrl = "https://auth.directsponsor.org/api/sync.php?action=get&user_id=" . urlencode($userId) . "&data_type=balance";
+    
+    $ch = curl_init($authUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200 && $response) {
+        $data = json_decode($response, true);
+        if ($data && $data['success'] && isset($data['data'])) {
+            return $data['data'];
+        }
+    }
+    
+    return null;
+}
+
 // Find balance file for user
 function getBalanceFilePath($userId) {
     if (!$userId || $userId === 'guest') {
@@ -55,24 +82,46 @@ function getBalanceFilePath($userId) {
 }
 
 // Load balance data from file
-function loadBalanceData($balanceFile) {
-    if (!file_exists($balanceFile)) {
-        return null;
+function loadBalanceData($balanceFile, $userId = null) {
+    if (file_exists($balanceFile)) {
+        $content = file_get_contents($balanceFile);
+        $data = json_decode($content, true);
+        
+        if ($data) {
+            // Ensure required fields exist
+            return [
+                'balance' => $data['balance'] ?? 0,
+                'last_updated' => $data['last_updated'] ?? time(),
+                'recent_transactions' => $data['recent_transactions'] ?? []
+            ];
+        }
     }
     
-    $content = file_get_contents($balanceFile);
-    $data = json_decode($content, true);
-    
-    if (!$data) {
-        return null;
+    // LAZY LOADING: File doesn't exist locally, try fetching from auth server
+    if ($userId) {
+        $authBalance = fetchBalanceFromAuthServer($userId);
+        if ($authBalance && isset($authBalance['coins'])) {
+            // Create local balance file with data from auth server
+            $balanceData = [
+                'balance' => floatval($authBalance['coins']),
+                'last_updated' => time(),
+                'recent_transactions' => []
+            ];
+            
+            // Ensure directory exists
+            $dir = dirname($balanceFile);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            
+            // Cache the balance locally for future requests
+            saveBalanceData($balanceFile, $balanceData);
+            
+            return $balanceData;
+        }
     }
     
-    // Ensure required fields exist
-    return [
-        'balance' => $data['balance'] ?? 0,
-        'last_updated' => $data['last_updated'] ?? time(),
-        'recent_transactions' => $data['recent_transactions'] ?? []
-    ];
+    return null;
 }
 
 // Save balance data to file
@@ -113,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'timestamp') {
     
 // Handle GET balance request
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'balance') {
-    $data = loadBalanceData($balanceFile);
+    $data = loadBalanceData($balanceFile, $userId);
     
     if ($data === null) {
         http_response_code(404);
@@ -134,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'timestamp') {
     $amount = floatval($input['amount'] ?? 0);
     $source = $input['source'] ?? 'manual';
     
-    $data = loadBalanceData($balanceFile);
+    $data = loadBalanceData($balanceFile, $userId);
     if ($data === null) {
         http_response_code(404);
         echo json_encode(['error' => 'Balance file not found']);
