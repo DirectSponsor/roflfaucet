@@ -141,7 +141,7 @@ curl -X POST https://auth.directsponsor.org/api/sync.php \
 1. Ask user to open browser console (F12)
 2. Check what data is stored:
    ```javascript
-   localStorage.getItem('roflfaucet_session')
+   localStorage.getItem('directsponsor_session')
    localStorage.getItem('user_id')
    ```
 3. Clear localStorage and re-login:

@@ -11,7 +11,7 @@ This document captures the integration between ROFLFaucet's existing accounts sy
 function getValidUsername() {
     try {
         // Check main session data first
-        const sessionData = localStorage.getItem('roflfaucet_session');
+        const sessionData = localStorage.getItem('directsponsor_session');
         if (sessionData) {
             const data = JSON.parse(sessionData);
             // Check if session has expired
@@ -31,7 +31,7 @@ function getValidUsername() {
 
 ### **Session Data Structure**
 ```javascript
-// localStorage['roflfaucet_session']
+// localStorage['directsponsor_session']
 {
     username: "member_name",
     user_id: 123,
@@ -179,7 +179,7 @@ function handleLogin() {
 ## 🔧 **Technical Implementation Notes**
 
 ### **Key Integration Points:**
-- **Session detection** using existing `roflfaucet_session` localStorage
+- **Session detection** using existing `directsponsor_session` localStorage
 - **Dynamic UI rendering** based on login status
 - **Seamless auth integration** with return redirect
 - **Fallback handling** for expired sessions or errors
