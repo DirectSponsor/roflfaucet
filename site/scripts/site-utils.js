@@ -410,6 +410,10 @@ function processJwtFromUrl() {
             localStorage.setItem('combined_user_id', combinedUserId);
             localStorage.setItem('login_time', Date.now().toString());
             
+            // Clear old balance cache when user changes
+            localStorage.removeItem('guest_transactions');
+            localStorage.removeItem('last_balance_fetch');
+            
             console.log(`✅ Logged in as: ${username}`);
             
             // User files are handled server-side when needed
@@ -779,3 +783,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run sync on page load
     syncSession();
 })();
+// TEMP FIX for cache clearing

@@ -143,8 +143,7 @@ class UserRoleSystem {
         const mapping = {
             'recipient': 'r',
             'admin': 'a', 
-            'moderator': 'm',
-            'fundraiser': 'r' // backward compatibility
+            'moderator': 'm'
         };
         return mapping[profileRole.toLowerCase()] || null;
     }

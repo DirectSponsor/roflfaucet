@@ -17,7 +17,6 @@
     <!-- Site-wide scripts -->
     <script src="scripts/unified-balance.js"></script>
     <script src="scripts/site-utils.js"></script>
-    <script src="scripts/user-roles.js"></script>
     <script src="js/levels-system.js"></script>
 </head>
 <body>
@@ -281,6 +280,23 @@
                                                 </div>
                                             </div>
                                             
+                                            <!-- Account Security Section -->
+                                            <div id="security-section" style="margin: 30px 0; background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 8px;">
+                                                <h3>🔐 Account Security</h3>
+                                                <p style="color: #666; margin-bottom: 15px;">Manage your password and account security:</p>
+                                                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                                    <a href="https://auth.directsponsor.org/change-password.php?token=" id="change-password-link" class="security-button" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">Change Password</a>
+                                                    <a href="https://auth.directsponsor.org/forgot-password.php?redirect_uri=https://roflfaucet.com/profile.html" class="security-button" style="display: inline-block; padding: 10px 20px; background: #6c757d; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">Reset Password</a>
+                                                </div>
+                                                <script>
+                                                    // Add JWT token to change password link
+                                                    const jwt = localStorage.getItem('roflfaucet_session');
+                                                    if (jwt) {
+                                                        document.getElementById('change-password-link').href += jwt + '&redirect_uri=https://roflfaucet.com/profile.html';
+                                                    }
+                                                </script>
+                                            </div>
+                                            
                                             <!-- Activity Section (only for own profile) -->
                                             <div id="activity-section" style="margin: 30px 0; background: rgba(255, 255, 255, 0.8); padding: 20px 0; border-radius: 8px;">
                                                 <h3>Recent Activity</h3>
@@ -342,7 +358,7 @@
     </script>
     <!-- Simple mobile chat navigation -->
     <script src="scripts/mobile-chat-nav.js?v=1.5-all-buttons-left"></script>
-    <script src="chat/chat.js?v=2.6-notifications-coming-soon"></script>
+    <script defer src="chat/chat.js?v=2.7-no-tip-scan"></script>
     
 </body>
 </html>

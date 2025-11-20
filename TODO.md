@@ -1,7 +1,120 @@
 # ROFLFAUCET - Master TODO List
 
-*Last updated: 2025-11-06*  
+*Last updated: 2025-11-09*  
 *Auto-managed by AI assistant based on notes from: `aa-new-issues-requests`*
+
+## 🎉 RECENT COMPLETION: Project Image System Migration (2025-11-09)
+
+**✅ COMPLETED: Protected Image Storage with Apache Alias**
+- Project images moved to `/var/roflfaucet-data/projects/{username}/images/` (protected from deployments)
+- Avatar directory created at `/var/roflfaucet-data/avatars/` (protected from deployments)
+- Apache Alias configured to serve protected images via public URLs
+- Image upload API updated to save to user-specific directories
+- Project API updated to search user directories and return correct Apache Alias paths
+- Fundraiser page image display fixed with responsive sizing (max-height: 500px)
+- PHP 8.1 configuration fixed in Apache (was still referencing dead PHP 7.4)
+- Apache config management improved (proper symlinks from sites-enabled to sites-available)
+- All project creation, editing, and public viewing working correctly
+
+**Architecture:**
+- **Protected data**: `/var/roflfaucet-data/` - never touched by deployments
+- **Apache Aliases**: 
+  - `/project-images/` → `/var/roflfaucet-data/projects/`
+  - `/images/avatars/` → `/var/roflfaucet-data/avatars/`
+- **User directories**: Projects organized by username in `projects/{username}/active/` and `completed/`
+
+---
+
+## 🔥 NEW PRIORITY ISSUES
+
+### ISSUE-018: Slots Balance Validation Bug
+**Priority: HIGH (Game Security)**  
+**Status: IDENTIFIED - NEEDS FIX**  
+**Discovered: 2025-11-12 during lazy loading testing**
+
+**Problem:**
+Slots game allows play without sufficient balance or with balance showing as "1" (possibly cached).
+This has occurred multiple times and needs proper validation to prevent unauthorized gameplay.
+
+**Root Cause:**
+- Balance validation may be bypassing proper checks for logged-in users
+- Could be related to localStorage cache vs. server balance mismatch
+- May occur specifically with new users or after balance sync issues
+- **NOTE**: Guest mode (logged out) works correctly - refuses to spin with zero balance
+
+**Impact:**
+- Users can play games without paying the cost
+- Potential for negative balances or free gameplay
+- Revenue loss and game economy integrity issues
+
+**Implementation Tasks:**
+- [ ] Investigate slots balance validation logic
+- [ ] Add server-side balance verification before game starts
+- [ ] Ensure balance checks happen after lazy loading completes
+- [ ] Add proper error handling for insufficient funds
+- [ ] Test with new users and cached balance scenarios
+- [ ] Add logging for balance validation failures
+
+### ISSUE-016: Time-on-Site Leaderboard System
+**Priority: MEDIUM (Engagement Feature)**  
+**Status: PLANNING**  
+**Source: aa-new-issues-requests (lines 10-16)**
+
+**Goal:**
+Implement time-on-site tracking with monthly leaderboards to increase engagement and provide SEO/advertiser value.
+
+**Requirements:**
+- **Time tracking**: Points per second spent on site (like jigsaw.build)
+- **Monthly reset**: Leaderboards start fresh each month so new users can compete
+- **Unobtrusive UI**: Small counter in user menu with link to leaderboard page
+- **Rewards system**: Badges, coins, or bonus % multipliers for activities
+- **Point sources**: Could aggregate from multiple activities (coins earned, games played, sites visited)
+
+**Technical Considerations:**
+- **Guest tracking**: Use localStorage for visitors
+- **Member tracking**: Need efficient server-side updates without constant polling
+  - Option 1: Update on page unload/tab close events
+  - Option 2: Use existing page stats that track time-per-page
+  - Option 3: 10-second polling interval (evaluate performance impact)
+- **Data efficiency**: Leverage existing analytics rather than new constant connections
+
+**Related Features:**
+- Existing leaderboard documentation (needs to be located)
+- Real-time update system for leaderboards (previously documented)
+- Multi-site point aggregation (ClickForCharity, WRC, ROFLFaucet)
+- Point breakdown by source (which game, which site, etc.)
+
+**Implementation Tasks:**
+- [ ] Research existing leaderboard documentation
+- [ ] Design point calculation system (time + activity aggregation)
+- [ ] Choose efficient server update mechanism (evaluate polling vs. event-based)
+- [ ] Create monthly leaderboard with auto-reset
+- [ ] Add unobtrusive counter to user menu
+- [ ] Implement reward system (badges/coins/multipliers)
+- [ ] Build leaderboard display page with real-time updates
+- [ ] Test performance impact of chosen tracking method
+
+### ✅ ISSUE-017: Profile & Sync System Documentation Consolidation
+**Priority: MEDIUM (Documentation)**  
+**Status: RESOLVED (2025-11-14)**  
+**Source: aa-new-issues-requests (lines 19-24)**
+
+**Resolution:**
+Sync system implementation is complete and documented in `/home/andy/work/sync-system/`:
+- `FILE_SYNC_STRATEGY.md` - Complete technical specification
+- `DEPLOYMENT_GUIDE.md` - Step-by-step deployment instructions
+- `README_SYNC.md` - Quick reference guide
+- Live implementation with `inotify + rsync` daemons
+- Active systemd services on all servers
+
+Outdated documentation files removed:
+- ❌ `PROFILE_SYNC_SYSTEM.md` (archived, implementation superseded)
+- ❌ `SMART_SYNC_README.md` (archived, implementation superseded)
+- ❌ `UNIFIED_SYNC_SYSTEM.md` (archived, API design abandoned)
+
+**Source of Truth:** `/home/andy/work/sync-system/` - Hub-and-spoke file sync with inotify + rsync
+
+---
 
 ## 🎉 MAJOR ACHIEVEMENT: DATA MIGRATION COMPLETE (2025-10-12)
 
@@ -13,436 +126,68 @@
 - Deployment script created with backup rotation
 - System architecture now production-ready and maintainable
 
-**Current Priority: User Roles System Implementation**
+**Next Steps:** Continue with issue list below
 
-## 🔥 NEW PRIORITY ISSUES
-
-### ISSUE-012: User Roles System Implementation
-**Priority: CRITICAL (Prerequisite for Project Creation)**  
-**Status: ✅ COMPLETED (2025-11-06)**  
-**Source: Yesterday's planning discussion**
+### ISSUE-019: Nostr Bridge for Community Content
+**Priority: LOW (Strategic Community Feature)**  
+**Status: PLANNING**  
+**Source: aa-new-issues-requests (lines 25-27)**
 
 **Goal:**
-Implement comprehensive user role system to enable Recipients to create and manage their own projects.
+Leverage Nostr's native social features (replies, likes, zaps/tips) instead of building a custom forum. Nostr user "roflfaucet" posts community memes/GIFs/videos to Nostr, and DirectSponsor.net bridges those posts back to display on the site. This gives us social functionality for free while reaching the broader Nostr audience.
 
-**Roles Implemented:**
-- **Admin** - Full access, user management, role assignment via `/admin-roles.html`
-- **Moderator** - Content moderation (role defined, UI ready for future features)
-- **Recipient** - Can create/manage fundraising projects via `/edit-project-v2.html?action=create`
-- **Member** - Standard user access (default role for all users)
+**Why Nostr Bridge (vs custom forum)?**
+- **Less code**: Nostr already has replies, likes, zaps (tips) - no custom implementation needed
+- **Wider reach**: Posts on Nostr reach crypto community naturally (viral memes)
+- **Dual presence**: Content appears on both DirectSponsor.net AND Nostr natively
+- **User economy**: Zaps provide direct creator rewards (not limited to coin rewards)
+- **Network effect**: All relays carry the content - decentralized discovery
+- **SEO/traffic**: Quality UGC spreads organically across Nostr clients
 
-**Implementation Completed:**
-- [✅] **Role management in profiles** - Profile data structure with `roles` field in `/var/roflfaucet-data/userdata/profiles/`
-- [✅] **Role system loaded site-wide** - Dynamic loading via `site-utils.js` on all pages
-- [✅] **Admin interface created** - `/admin-roles.html` for role assignment (admin-only access)
-- [✅] **Permission checks implemented** - `isAdmin()`, `isRecipient()`, `hasRole()`, `hasPermission()` functions
-- [✅] **UI role indicators** - Color-coded badges (red=admin, green=recipient, orange=moderator)
-- [✅] **Recipient project creation** - "+ New Project" button on profile, permission-checked workflow
-- [✅] **API role management** - `api/simple-profile.php?action=manage_roles` endpoint (admin-only)
-
-**Documentation:**
-- `PROFILE_SYNC_SYSTEM.md` - Full architecture design for Phase 1 (local roles) through Phase 4 (multi-site sync)
-- Hub-and-spoke model ready for future cross-site profile sync
-
-**Next Steps (Future Phases):**
-- [ ] Phase 2: Create profile sync API on auth.directsponsor.org
-- [ ] Phase 3: Enable bidirectional sync between ROFLFaucet, ClickForCharity, WRC
-- [ ] Phase 4: Test multi-site role propagation
-
-### ISSUE-013: Chat System Restoration
-**Priority: HIGH (User Experience)**  
-**Status: ✅ COMPLETED (2025-10-13)**  
-**Source: aa-new-issues-requests (line 26)**
-
-**Problem:**
-Chat system had disappeared and stopped working due to hardcoded paths in API after data directory migration.
-
-**Solution Implemented:**
-- [✅] **Fixed hardcoded paths** in `simple-chat.php` API
-- [✅] **Added data directory constants** pointing to `/var/roflfaucet-data/userdata`
-- [✅] **Updated all file references** to use new USERDATA_DIR constant
-- [✅] **Deployed fix** and verified chat API returning messages correctly
-- [✅] **Confirmed chat functionality restored** - API working, messages loading
-
-### ISSUE-014: IDrive Scheduled Backup Setup
-**Priority: MEDIUM (Data Protection)**  
-**Status: NEEDS TROUBLESHOOTING**  
-**Source: aa-new-issues-requests (lines 20-22)**
-
-**Problem:**
-IDrive scheduled backup not retaining settings, manual backup working but automation failing.
+**How It Works:**
+1. Users submit meme/GIF/video via DirectSponsor.net interface
+2. Content posted to Nostr via "roflfaucet" user account (our node)
+3. Bridge displays Nostr posts on DirectSponsor.net gallery
+4. Community replies, zaps, and likes happen natively on Nostr
+5. Featured/trending posts drive traffic back to site
 
 **Requirements:**
-- Investigate why scheduled backup settings don't persist
-- Possibly file permissions issue preventing settings write
-- Reference: https://www.idrive.com/help/linux-help/scheduler
+- **Nostr user**: "roflfaucet" account on our node
+- **DirectSponsor.net interface**: Simple submit page (image/GIF/video upload)
+- **Bridge display**: Show Nostr posts (with replies/zaps/likes) on directsponsor.net
+- **Content themes**: Funny, amazing, charity-related "Like Us" (animals doing human things)
+- **Incentives**: Optional DirectSponsor coins for community participation, but primary reward is Nostr zaps
+- **Moderation**: Filter low-quality content before posting to Nostr
 
-**Tasks:**
-- [ ] Check IDrive settings file permissions
-- [ ] Test scheduled backup configuration persistence
-- [ ] Implement reliable automated backup schedule
-- [ ] Verify backup is running and storing correctly
+**Strategic Benefits:**
+- **Massive reach**: Memes naturally viral on Nostr (organic growth)
+- **Zero maintenance**: Nostr handles all social features
+- **Revenue friendly**: Zaps flow directly to creators (no coin cost to us)
+- **Community building**: Unified identity across DirectSponsor ecosystem + Nostr
+- **Brand awareness**: "roflfaucet" memes become recognizable in crypto community
+- **Low dev cost**: Bridge is simpler than building forum from scratch
 
-### ISSUE-015: Remove Lightning Method Column
-**Priority: LOW (UI Cleanup)**  
-**Status: ✅ COMPLETED (2025-10-13)**  
-**Source: aa-new-issues-requests (line 30)**
+**Implementation Tasks:**
+- [ ] Set up "roflfaucet" Nostr user account on our node
+- [ ] Create Nostr event publisher (post content to relays)
+- [ ] Build content submission interface on DirectSponsor.net
+- [ ] Implement content filtering/moderation before Nostr posting
+- [ ] Create Nostr event fetcher (retrieve posts, replies, zaps, likes)
+- [ ] Design gallery view to display Nostr posts on directsponsor.net
+- [ ] Add sorting by engagement (zaps, replies, likes)
+- [ ] Implement link to full Nostr post (let users interact on any Nostr client)
+- [ ] Optional: Add DirectSponsor coin rewards for featured content
+- [ ] Set up moderation tools (block spammers, remove inappropriate content)
+- [ ] Test with beta posters
+- [ ] Monitor trending content and Nostr reach metrics
 
-**Goal:**
-Remove redundant "Method" column from accounts.html and accounts system since Lightning is the only payment method used.
-
-**Solution Implemented:**
-- [✅] **Removed Method column** from accounts.html table header
-- [✅] **Updated JavaScript** to remove method field from table row generation
-- [✅] **Deployed changes** and verified accounts page loads correctly
-- [✅] **Confirmed table layout** - clean 7-column layout without redundant method column
-- ⚪ **API unchanged** - payment_method still stored in data but not displayed (no impact)
-
-## 🚨 CRITICAL SECURITY ISSUES
-
-### ISSUE-002: Accounts System - Manual Payment Distribution
-**Priority: HIGH (End-of-Month Deadline)**  
-**Status: ✅ COMPLETED & TESTED**
-**Source: aa-new-issues-requests (lines 10-16)**
-
-**Requirement:**
-- Monthly fund distribution to recipients (like Evans - Kenya reforestation)
-- Manual payments via Coinos wallet (external to site)
-- Need confirmation system for recipients
-- Screenshot attachment capability for payment proof
-
-**Components Needed:**
-1. **Payment Confirmation Form** - for recipients to confirm receipt
-2. **Admin Payment Entry** - for you to record manual payments
-3. **Screenshot Upload** - attach payment proof
-4. **Recipient Verification** - simple confirmation workflow
-
-**Completed Tasks:**
-- [✅] Design payment confirmation form UI
-- [✅] Create admin payment entry interface (`site/admin-payment-entry.html`)
-- [✅] Implement screenshot upload functionality
-- [✅] Set up recipient confirmation workflow (`site/confirm-payment.html`)
-- [✅] Complete PHP backend APIs (`site/api/`)
-- [✅] Integrate with transparency page
-- [✅] Organize all files in `site/` directory
-
-**Ready for Deployment:**
-- [ ] Deploy to production using `./deploy-simple.sh`
-- [ ] Test admin payment entry
-- [ ] Test Evans confirmation workflow
+**Notes:**
+- This is essentially a smart curation + amplification play
+- Users can still tip/zap through Nostr (primary reward mechanism)
+- DirectSponsor coins are optional bonus, not required
+- Potential for viral growth - meme appeal = natural Nostr engagement
+- Track Nostr reach as key metric (how many zaps, reposts, etc.)
 
 ---
-
-## 🚨 CRITICAL SECURITY ISSUES
-
-### ISSUE-001: Slots Game Balance Exploit
-**Priority: CRITICAL**  
-**Status: ✅ COMPLETED 2025-10-05**  
-**Source: aa-new-issues-requests (lines 1-11)**
-
-**Problem Identified:**
-- Users could play slots with 0 balance due to race condition during page load
-- Spin button was enabled before balance finished loading asynchronously
-- Game initialized with `this.credits = 0`, then loaded real balance after delay
-- Users could click spin during this window before balance validation had correct data
-
-**Root Cause:**
-- HTML had spin button enabled by default: `<button onclick="spinReels()">SPIN</button>`
-- JavaScript loaded balance asynchronously: `this.credits = await getBalance()`
-- No synchronization between balance loading and button enablement
-
-**Solution Implemented:**
-- [✅] **Fixed race condition** - Spin button now disabled by default in HTML
-- [✅] **Added balance loading sync** - Button only enables after `loadGameState()` completes
-- [✅] **Enhanced button control** - Bet buttons also disabled until balance loads
-- [✅] **Deployed fix to production** - Both `slots.html` and `slots-simplified.js` updated
-- [✅] **Verified fix works** - Users now get "insufficient balance" popup correctly
-
-**Technical Details:**
-- Modified `slots.html` line 203: Added `disabled` attribute to spin button
-- Added `enableSpinButton()` function to enable controls after balance loads
-- Called `enableSpinButton()` in `loadGameState()` after balance is retrieved
-- Fixed both front and back side spin buttons for consistency
-
-**Security Impact:**
-- Eliminated gambling exploit that allowed free play with 0 balance
-- Ensures balance validation always has correct data before game actions
-- Maintains game integrity and fairness for all users
-
----
-
-## 🎨 ENHANCEMENT PROJECTS
-
-### ISSUE-003: Comprehensive Revenue Reporting System
-**Priority: HIGH (Business Intelligence)**  
-**Status: PLANNED**  
-**Source: aa-new-issues-requests (lines 52-58)**
-
-**Goal:**
-Expand beyond donation transparency to full revenue reporting covering all income sources with spreadsheet-like presentation.
-
-**Requirements:**
-- **Full-width reporting page** with spreadsheet layout
-- **Multiple income categories**: Donations, Ad Revenue (own ads + ad networks), Other sources
-- **Category linking**: Each row links to detailed category page
-- **Manual entry system**: All income manually added to maintain Lightning wallet balance sync
-- **Invoice-based system**: Use same donation invoice system but with different labels
-- **Flat-file backend**: Use existing text file system, no database needed
-
-**Implementation Tasks:**
-- [ ] Design full-width spreadsheet layout
-- [ ] Create income category system (donations, ads, other)
-- [ ] Extend donation invoice system for all income types
-- [ ] Build category detail pages
-- [ ] Integrate with existing financial reporting API
-- [ ] Add manual income entry interface
-
-### ISSUE-004: Game Statistics & Balance System
-**Priority: MEDIUM (Game Optimization)**  
-**Status: NEEDS DEFINITION**  
-**Source: aa-new-issues-requests (line 61)**
-
-**Goal:**
-Track and optimize game payout rates to make games interesting but sustainable.
-
-**Requirements:**
-- **Payout tracking**: Monitor payouts per 100/1000 plays for each game
-- **Game balancing**: Adjust games to be engaging without excessive payouts
-- **Performance analytics**: Track which games are too generous or too stingy
-- **Admin interface**: Easy game parameter adjustment based on statistics
-
-**Implementation Tasks:**
-- [ ] Design game statistics tracking system
-- [ ] Implement payout rate monitoring
-- [ ] Create game balance analytics dashboard
-- [ ] Add game parameter adjustment interface
-- [ ] Set target payout rates per game
-
-### ISSUE-005: Mobile UX Improvements
-**Priority: MEDIUM (User Experience)**  
-**Status: NEEDS RESEARCH**  
-**Source: aa-new-issues-requests (lines 65-70)**
-
-**Goal:**
-Improve mobile experience by showing ads and enabling chat access on mobile devices.
-
-**Requirements:**
-- **Mobile ads solution**: Show sidebar content as table below main content instead of hiding
-- **Chat tab system**: Implement swipe/tab system for mobile chat access (previously documented)
-- **Responsive design**: Maintain functionality across all screen sizes
-
-**Implementation Tasks:**
-- [ ] Research mobile sidebar alternatives
-- [ ] Locate previous mobile chat tab documentation
-- [ ] Design mobile ads display system
-- [ ] Implement swipe/tab chat interface
-- [ ] Test mobile UX improvements
-
-### User Profile System Enhancement
-**Priority: LOW (Future Enhancement)**  
-**Status: PLANNED**
-
-**Goal:**
-Make user profiles publicly accessible presentation pages that can be linked from transparency tables, donor lists, and other areas for better UX while preserving privacy options.
-
-**Benefits:**
-- **Compact Tables**: Show just "Evans" instead of "Evans - Kenya Reforestation Project"
-- **Rich Details**: Full project information via clickable profile links
-- **Privacy Controls**: Users choose what information to share publicly
-- **Better Engagement**: Recipients can showcase projects with photos/progress
-
-**Components Needed:**
-1. **Public Profile Pages** - `/profile/{username}` routes
-2. **Privacy Controls** - Toggle public visibility settings
-3. **Project Showcase** - Rich content for recipients (photos, updates, metrics)
-4. **Profile Linking** - Update transparency tables to link names to profiles
-5. **Contact Options** - Optional contact methods for direct communication
-
-**Implementation Tasks:**
-- [ ] Design public profile page layout
-- [ ] Add privacy toggle to profile settings
-- [ ] Create profile content management interface
-- [ ] Update transparency page to link recipient names
-- [ ] Add profile photo/project image upload
-- [ ] Implement `/profile/{username}` routing
-
----
-
-## ✅ COMPLETED CRITICAL DATA RECOVERY
-
-### ISSUE-006: Coins Balance System Data Loss Bug Fixed
-**Priority: CRITICAL (Data Loss)**  
-**Status: ✅ COMPLETED 2025-10-05**  
-**Source: aa-new-issues-requests + investigation**
-
-**Problem Identified:**
-- Users andytest1 and andytest2 had coins balances reset to 0 due to dangerous `ensureBalanceFileExists()` functions
-- Functions in `session-bridge.php` and `ensure-user-files.php` would "helpfully" create new coins balance files with 0 coins during authentication
-- Silent data destruction occurred when files appeared missing (path issues, permissions, etc.)
-
-**Root Cause:**
-- Authentication system would call file creation functions during login
-- Instead of failing safely, system would overwrite existing coins balance data with fresh 0-balance files
-- No warning or error - silent data loss
-
-**Solution Implemented:**
-- [✅] **Deployed new `coins-balance.php` API** - Clean, safe coins balance system with "fail fast" philosophy
-- [✅] **Updated `unified-balance.js`** - Uses new API with confusion-avoiding naming
-- [✅] **Disabled dangerous coins balance creation** - Modified `session-bridge.php` to log warnings instead of creating files
-- [✅] **Created production backup** - `userdata-backup-20251005-172414.tar.gz` before deployment
-- [✅] **Verified data recovery** - Both users have correct coins balances (andytest1: 200 coins, andytest2: 1000 coins)
-- [✅] **Implemented path fixes** - Corrected API directory structure issues
-
-**Prevention Measures:**
-- System now fails visibly if coins balance files are missing (except for legitimate new account creation)
-- No more silent coins balance resets to 0
-- Clear error messages direct users to contact support
-- Proper logging of coins balance file issues for investigation
-
-## 🚨 REMAINING URGENT DATA PROTECTION TASKS
-
-### ISSUE-007: Deploy Script Backup Enhancement
-**Priority: HIGH (Data Protection)**  
-**Status: NEEDS IMPLEMENTATION**  
-**Source: aa-new-issues-requests (lines 49-50)**
-
-**Requirements:**
-- **Pre-deployment backups**: Create tar archive before each deployment
-- **Multiple backup retention**: Keep 3-4 most recent deployment backups
-- **Quick recovery**: Enable fast rollback for immediate issues
-- **Avoid permissions issues**: Use tar instead of zip
-
-**Implementation Tasks:**
-- [ ] Modify deploy script to create tar backups
-- [ ] Add timestamp-based backup naming
-- [ ] Implement backup rotation (keep latest 4)
-- [ ] Test backup and restore process
-- [ ] Document backup locations and restore procedures
-
-### ISSUE-008: Manus Bot Session Issue
-**Priority: MEDIUM (Bot Maintenance)**  
-**Status: NEEDS TROUBLESHOOTING**  
-**Source: aa-new-issues-requests (lines 73-86)**
-
-**Problem:**
-- Manus.im bot authentication succeeds but session doesn't persist
-- Login shows success but roflfaucet site still shows "login" instead of username
-- Browser console investigation needed
-- Issue specific to automated browser, not manual login
-
-**Troubleshooting Plan:**
-- [ ] Get browser console output during login process
-- [ ] Check cookie domain and secure flag settings
-- [ ] Verify session management for automated browsers
-- [ ] Test session persistence across redirects
-- [ ] Document findings and implement fix
-
-## 📋 PENDING TASKS
-
-### Documentation Updates
-- [ ] Update SECURITY_UPGRADE_TODO.md with exploit details
-- [ ] Create incident response documentation
-- [ ] Update game validation procedures
-
-### Development Tasks  
-- [ ] Fix slots balance validation
-- [ ] Implement proper session management
-- [ ] Add server-side game state validation
-- [ ] Make sidebar reporting widget clickable link to transparency page
-
-### Testing Tasks
-- [ ] Create test cases for balance validation
-- [ ] Test localStorage clearing solution
-- [ ] Verify fix across all games
-
----
-
-### ISSUE-009: Payment Screenshot Addition to Accounts
-**Priority: LOW (Administrative)**  
-**Status: NEEDS IMPLEMENTATION**  
-**Source: aa-new-issues-requests (lines 10-11)**
-
-**Goal:**
-Add missing payment screenshot for September payment in accounts system transparency page.
-
-**Requirements:**
-- Image file location: `/home/andy/Desktop/coinos.png`
-- Upload to payment record without changing existing system architecture
-- Add link to image in transparency.html presentation
-
-**Implementation Tasks:**
-- [ ] Copy payment screenshot to appropriate web directory
-- [ ] Update payment record to include image reference
-- [ ] Add image display link in transparency.html
-- [ ] Test image display and linking functionality
-
-### ISSUE-010: Browser Automation Testing Tool Research
-**Priority: MEDIUM (Development Tools)**  
-**Status: RESEARCH NEEDED**  
-**Source: aa-new-issues-requests (lines 14-22)**
-
-**Goal:**
-Investigate browser-use/web-ui tool for automated testing and checking of roflfaucet sites.
-
-**Tool Details:**
-- **Repository**: https://github.com/browser-use/web-ui
-- **Features**: Gradio-based WebUI, expanded LLM support (Google, OpenAI, Azure, Anthropic, DeepSeek, Ollama)
-- **Benefits**: Custom browser support, persistent sessions, high-definition recording
-- **Use Case**: External API-based testing (suitable for low-power local machines)
-
-**Research Tasks:**
-- [ ] Install and test browser-use/web-ui locally
-- [ ] Evaluate automated testing capabilities for roflfaucet
-- [ ] Test integration with various LLM APIs
-- [ ] Assess suitability for continuous site monitoring
-- [ ] Document findings and implementation recommendations
-
-### ISSUE-011: LightningLova Funding System with User Roles
-**Priority: HIGH (Community Support)**  
-**Status: NEEDS USER ROLE SYSTEM FIRST**  
-**Source: aa-new-issues-requests (lines 26-27)**
-
-**Goal:**
-Create funding request system for LightningLova member to request modem funding and monthly package payments for Bitcoin$Ghana project.
-
-**Requirements:**
-- **User roles system**: Implement before funding pages (prerequisite)
-- **Modem funding page**: One-time request for modem to enable landline
-- **Monthly payment page**: $10/month for basic package
-- **Recipient verification**: Ensure only authorized members can request funding
-
-**Implementation Tasks:**
-- [ ] Design and implement user roles system
-- [ ] Create LightningLova member role
-- [ ] Build modem funding request page
-- [ ] Build monthly payment request page  
-- [ ] Integrate with existing payment/transparency system
-- [ ] Add admin approval workflow for funding requests
-- [ ] Test complete funding request and approval process
-
----
-
-## 📝 NOTES PROCESSING STATUS
-
-**Last processed note:** Line 30 (Remove Lightning method column)  
-**Next unprocessed:** None (all current notes processed)  
-**Processing date:** 2025-10-13
-
-**Recently Added to TODO:**
-- ISSUE-012: User Roles System Implementation (CRITICAL)
-- ISSUE-013: Chat System Restoration (HIGH)
-- ISSUE-014: IDrive Scheduled Backup Setup (MEDIUM)
-- ISSUE-015: Remove Lightning Method Column (LOW)
-
-**Major Update:** Data migration completed (2025-10-12) - All systems operational
-
----
-
-## 🎯 WORKFLOW
-
-1. **Add notes** to `aa-new-issues-requests`
-2. **AI processes** notes into structured todos
-3. **Documentation updated** automatically
-4. **Progress tracked** in this file
 
 *This file is automatically maintained. Manual edits may be overwritten.*

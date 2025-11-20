@@ -223,14 +223,20 @@
     </div>
     
     <!-- Scripts -->
-    <script src="scripts/faucet-bridge.js"></script>
+    <script src="scripts/faucet-bridge.js?v=1.1-flush-fix"></script>
     
     <!-- Chat widget script -->
-    <script src="chat/chat.js?v=2.6-notifications-coming-soon"></script>
+    <script defer src="chat/chat.js?v=2.7-no-tip-scan"></script>
     
     <!-- Simple mobile chat navigation -->
     <script src="scripts/mobile-chat-nav.js?v=1.5-all-buttons-left"></script>
     
+    <script>
+        // Update balance display on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBalanceDisplays();
+        });
+    </script>
 </body>
 </html>
 <!-- Test comment -->

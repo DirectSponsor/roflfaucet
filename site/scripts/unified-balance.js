@@ -1,211 +1,303 @@
-// Unified Balance System
-// Works the same for both guest users (localStorage) and members (API)
+// ROFLFaucet Unified Balance System with Hub Batching
+// Seamlessly handles both guest users (tokens in localStorage) and members (coins on server)
+// NEW: Batches member balance updates to Hub API for conflict-free sync
 
 class UnifiedBalanceSystem {
     constructor() {
-        // Use simple username detection with localStorage (with expiration check)
+        // Check login status with localStorage expiration
         this.isLoggedIn = !!this.getValidUsername();
         this.userId = this.isLoggedIn ? this.getUserIdFromToken() : 'guest';
-        this.accessToken = null; // No longer needed
         this.balance = 0;
+        this.siteId = 'rf'; // ROFLFaucet identifier
+        this.consecutiveFailures = 0; // Track Hub connection issues
+        this.isSyncing = false; // Balance sync lock
         
-        // Smart sync system properties
-        this.lastServerTimestamp = null;
-        this.lastSyncTime = null;
-        this.syncInProgress = false;
-        this.inactivityTimer = null;
-        this.isPageVisible = true;
-        
-        console.log(`💰 Unified Balance System initialized for ${this.isLoggedIn ? 'member' : 'guest'} user`);
+        console.log(`💰 ROFLFaucet Balance System initialized for ${this.isLoggedIn ? 'member' : 'guest'} user`);
         
         // Update currency display immediately
         this.updateCurrencyDisplay();
         
-        // Setup smart sync system
-        this.setupSmartSync();
+        // Setup flush triggers for members
+        if (this.isLoggedIn) {
+            this.setupFlushTriggers();
+        }
     }
     
+    // ========== NEW: BATCHING SYSTEM ==========
     
-    updateCurrencyDisplay() {
-        const currency = this.isLoggedIn ? 'coins' : 'tokens';
-        console.log(`💱 Unified: Updating currency display to: ${currency}`);
+    setupFlushTriggers() {
+        // Flush every 120 seconds
+        this.flushInterval = setInterval(() => {
+            this.flushPendingOps('timer');
+        }, 120000);
         
-        // Update all currency display elements
-        const currencyElements = document.querySelectorAll('.currency, .currency-full, [data-currency]');
-        
-        console.log(`🔄 Unified: Found ${currencyElements.length} currency elements to update`);
-        currencyElements.forEach(element => {
-            const oldValue = element.textContent;
-            element.textContent = currency;
-            console.log(`  → Unified: Updated element: ${oldValue} → ${currency}`);
+        // Flush on tab hide, refresh on tab show
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.flushPendingOps('tab-hide');
+            } else {
+                // Tab became visible - lock balance ops and refresh
+                this.isSyncing = true;
+                this.showSyncNotification();
+                console.log('🔒 Balance sync lock enabled (10s)');
+                
+                setTimeout(() => {
+                    this.getBalance().then(() => {
+                        this.updateBalanceDisplaysSync();
+                        this.isSyncing = false;
+                        this.hideSyncNotification();
+                        console.log('✅ Tab visible - balance refreshed, lock released');
+                    });
+                }, 100);
+                
+                // Release lock after 10s even if fetch fails
+                setTimeout(() => {
+                    this.isSyncing = false;
+                    this.hideSyncNotification();
+                }, 10000);
+            }
         });
+        
+        // Flush before page unload
+        window.addEventListener('beforeunload', () => {
+            this.flushPendingOps('beforeunload');
+        });
+        
+        console.log('⏱️ Flush triggers setup: 120s timer, tab-hide, beforeunload');
     }
     
-    setupSmartSync() {
-        if (!this.isLoggedIn) {
-            console.log('📱 Smart sync: Guest mode - no sync needed');
+    getPendingOps() {
+        const key = `pending_balance_ops:${this.getCombinedUserIdFromToken()}`;
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : { ops: [], last_flush: 0 };
+    }
+    
+    savePendingOps(pending) {
+        const key = `pending_balance_ops:${this.getCombinedUserIdFromToken()}`;
+        localStorage.setItem(key, JSON.stringify(pending));
+    }
+    
+    generateOpId() {
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        return `${this.siteId}-${timestamp}-${random}`;
+    }
+    
+    enqueueDelta(amount, source, description) {
+        const op = {
+            op_id: this.generateOpId(),
+            amount: amount,
+            source: source || 'unknown',
+            description: description || '',
+            timestamp: Math.floor(Date.now() / 1000),
+            retries: 0
+        };
+        
+        const pending = this.getPendingOps();
+        pending.ops.push(op);
+        this.savePendingOps(pending);
+        
+        // Optimistically update local balance display
+        this.balance += amount;
+        this.updateBalanceDisplaysSync();
+        
+        console.log('📝 Queued balance op:', op);
+        return op;
+    }
+    
+    async flushPendingOps(trigger = 'manual') {
+        if (!this.isLoggedIn) return;
+        
+        const pending = this.getPendingOps();
+        if (pending.ops.length === 0) {
+            console.log('✅ No pending ops to flush');
             return;
         }
         
-        console.log('🔄 Smart sync: Setting up event listeners');
+        const combinedUserId = this.getCombinedUserIdFromToken();
+        if (combinedUserId === 'guest') return;
         
-        // Page visibility change sync
-        document.addEventListener('visibilitychange', () => {
-            this.isPageVisible = !document.hidden;
-            if (!this.isPageVisible) {
-                console.log('👁️ Smart sync: Page hidden - triggering sync');
-                this.syncIfNeeded('visibility_change');
-            }
-        });
-        
-        // Page unload sync
-        window.addEventListener('beforeunload', () => {
-            console.log('🚪 Smart sync: Page unloading - triggering sync');
-            this.syncIfNeeded('page_unload');
-        });
-        
-        // Setup inactivity fallback timer
-        this.resetInactivityTimer();
-        
-        // Track user activity to reset inactivity timer
-        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
-            document.addEventListener(event, () => this.resetInactivityTimer(), { passive: true });
-        });
-    }
-    
-    resetInactivityTimer() {
-        if (this.inactivityTimer) {
-            clearTimeout(this.inactivityTimer);
-        }
-        
-        // Set 5-minute inactivity fallback
-        this.inactivityTimer = setTimeout(() => {
-            if (this.isLoggedIn && this.isPageVisible) {
-                console.log('⏰ Smart sync: Inactivity fallback - triggering sync');
-                this.syncIfNeeded('inactivity_fallback');
-            }
-        }, 5 * 60 * 1000); // 5 minutes
-    }
-    
-    async checkIfSyncNeeded() {
-        if (!this.isLoggedIn) return false;
+        console.log(`📤 Flushing ${pending.ops.length} ops to Hub (${trigger})`);
         
         try {
-            const combinedUserId = this.getCombinedUserIdFromToken();
-            if (combinedUserId === 'guest') return false;
+            const response = await fetch('https://auth.directsponsor.org/api/balance-update.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: combinedUserId,
+                    ops: pending.ops,
+                    client_time: Math.floor(Date.now() / 1000)
+                })
+            });
             
-            // Use hub API for timestamp check
-            const response = await fetch(`https://auth.directsponsor.org/api/sync.php?action=timestamp&user_id=${combinedUserId}&data_type=balance`);
             if (!response.ok) {
-                console.warn('⚠️ Sync check failed, assuming sync needed');
-                return true; // Fail safe - sync if check fails
+                throw new Error(`HTTP ${response.status}`);
             }
             
-            const data = await response.json();
+            const result = await response.json();
             
-            if (this.lastServerTimestamp && data.last_updated > this.lastServerTimestamp) {
-                console.log('🔄 Balance modified elsewhere - sync needed');
-                this.lastServerTimestamp = data.last_updated;
-                return true;
-            }
-            
-            this.lastServerTimestamp = data.last_updated;
-            return false;
-        } catch (error) {
-            console.warn('⚠️ Sync check failed, assuming sync needed:', error);
-            return true; // Fail safe - sync if check fails
-        }
-    }
-    
-    async syncIfNeeded(trigger = 'manual') {
-        if (!this.isLoggedIn) {
-            return false;
-        }
-        
-        console.log(`🔄 Smart sync: Checking sync (trigger: ${trigger})`);
-        
-        // For current single-site usage, only sync on important triggers
-        // This keeps the infrastructure ready for future multi-site sync
-        const criticalTriggers = ['before_game', 'after_game', 'visibility_change'];
-        const shouldCheck = criticalTriggers.includes(trigger);
-        
-        if (shouldCheck) {
-            // Show brief indicator for critical syncs
-            this.showSyncIndicator();
-            
-            try {
-                const needsSync = await this.checkIfSyncNeeded();
-                if (needsSync) {
-                    console.log(`✅ Smart sync: Sync needed, fetching fresh balance`);
-                    await this.getRealBalance();
-                    this.lastSyncTime = Date.now();
-                    return true;
-                } else {
-                    console.log(`⏭️ Smart sync: No sync needed`);
-                    return false;
+            if (result.success) {
+                // Remove applied ops from queue
+                const appliedIds = result.applied_op_ids || [];
+                pending.ops = pending.ops.filter(op => !appliedIds.includes(op.op_id));
+                pending.last_flush = Date.now();
+                this.savePendingOps(pending);
+                
+                // Update local balance to match server (don't re-fetch, use Hub's value)
+                this.balance = result.balance;
+                // Update displays directly with new balance (skip getBalance API call)
+                this.updateBalanceDisplaysSync();
+                
+                console.log('✅ Flush successful, new balance:', result.balance);
+                if (result.skipped_op_ids && result.skipped_op_ids.length > 0) {
+                    console.log('⏭️ Skipped duplicate ops:', result.skipped_op_ids);
                 }
-            } finally {
-                this.hideSyncIndicator();
+                
+                // Reset failure counter and hide warning
+                this.consecutiveFailures = 0;
+                this.hideHubWarning();
+            } else {
+                throw new Error(result.error || 'Flush failed');
             }
-        } else {
-            // For non-critical triggers, skip sync check (optimization)
-            console.log(`⏭️ Smart sync: Skipping check for trigger: ${trigger}`);
-            return false;
+        } catch (error) {
+            console.error('❌ Flush error:', error);
+            
+            // Increment retry count for failed ops
+            pending.ops.forEach(op => op.retries++);
+            
+            // Remove ops with too many retries (>10)
+            pending.ops = pending.ops.filter(op => op.retries <= 10);
+            this.savePendingOps(pending);
+            
+            // Track failures and show warning
+            this.consecutiveFailures++;
+            if (this.consecutiveFailures >= 3) {
+                this.showHubWarning(this.consecutiveFailures >= 10);
+            }
+            
+            console.warn('⚠️ Hub unreachable, will retry later');
         }
     }
     
-    showSyncIndicator() {
-        // Only show for logged-in users (multi-tab sync scenarios)
-        if (!this.isLoggedIn) return;
+    // ========== HUB WARNING BANNER ==========
+    
+    showHubWarning(isBlocking = false) {
+        // Remove existing banner
+        this.hideHubWarning();
         
-        // Remove any existing indicator
-        this.hideSyncIndicator();
+        const banner = document.createElement('div');
+        banner.id = 'hub-warning-banner';
+        banner.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: ${isBlocking ? '#dc3545' : '#ff9800'};
+            color: white;
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        `;
         
-        const indicator = document.createElement('div');
-        indicator.id = 'sync-indicator';
-        indicator.innerHTML = `
-            <div style="
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(0,0,0,0.8);
-                color: white;
-                padding: 20px 30px;
-                border-radius: 10px;
-                z-index: 10000;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                font-family: Arial, sans-serif;
-                font-size: 16px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            ">
-                <div class="spinner" style="
-                    border: 3px solid #333;
-                    border-top: 3px solid #fff;
-                    border-radius: 50%;
-                    width: 20px;
-                    height: 20px;
-                    animation: spin 1s linear infinite;
-                "></div>
-                Syncing balance...
+        if (isBlocking) {
+            banner.innerHTML = `
+                ❌ Unable to sync balance after multiple attempts. 
+                Please stop earning activities and contact support.
+                <button onclick="window.unifiedBalance.flushPendingOps('manual')" 
+                        style="margin-left: 10px; padding: 5px 10px; background: white; color: #dc3545; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">
+                    Retry Now
+                </button>
+            `;
+        } else {
+            banner.innerHTML = `
+                ⚠️ Connection issue - your earnings are being saved and will sync when reconnected.
+                <button onclick="window.unifiedBalance.hideHubWarning()" 
+                        style="margin-left: 10px; padding: 5px 10px; background: white; color: #ff9800; border: none; border-radius: 3px; cursor: pointer;">
+                    Dismiss
+                </button>
+            `;
+        }
+        
+        document.body.insertBefore(banner, document.body.firstChild);
+        console.log(`${isBlocking ? '🚨' : '⚠️'} Hub warning banner shown (failures: ${this.consecutiveFailures})`);
+    }
+    
+    hideHubWarning() {
+        const banner = document.getElementById('hub-warning-banner');
+        if (banner) {
+            banner.remove();
+            console.log('✅ Hub warning banner hidden');
+        }
+    }
+    
+    showSyncNotification() {
+        this.hideSyncNotification();
+        
+        const notification = document.createElement('div');
+        notification.id = 'sync-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        notification.innerHTML = `
+            <style>
+                @keyframes slideIn {
+                    from { transform: translateX(400px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            </style>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="border: 2px solid white; border-top-color: transparent; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite;"></div>
+                <span>Syncing balance...</span>
+                <a href="#" onclick="alert('Your balance is being synchronized between sites. This takes ~5-10 seconds. Games and tasks will wait until sync completes to ensure accuracy.'); return false;"
+                   style="color: white; text-decoration: underline; cursor: help;" title="Why is this syncing?">ℹ️</a>
             </div>
             <style>
                 @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
+                    to { transform: rotate(360deg); }
                 }
             </style>
         `;
-        document.body.appendChild(indicator);
+        
+        document.body.appendChild(notification);
     }
     
-    hideSyncIndicator() {
-        const indicator = document.getElementById('sync-indicator');
-        if (indicator) {
-            indicator.remove();
+    hideSyncNotification() {
+        const notification = document.getElementById('sync-notification');
+        if (notification) {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
         }
+    }
+    
+    // ========== ORIGINAL METHODS (modified to use batching) ==========
+    
+    updateCurrencyDisplay() {
+        const currency = this.isLoggedIn ? 'coins' : 'tokens';
+        console.log(`💱 Updating currency display to: ${currency}`);
+        
+        // Update all currency display elements
+        const currencyElements = document.querySelectorAll('.currency, [data-currency]');
+        currencyElements.forEach(element => {
+            element.textContent = currency;
+        });
     }
     
     getValidUsername() {
@@ -225,13 +317,12 @@ class UnifiedBalanceSystem {
     }
     
     getUserIdFromToken() {
-        // Use simple localStorage user_id with expiration check
         try {
             const sessionData = localStorage.getItem('directsponsor_session');
             if (sessionData) {
                 const data = JSON.parse(sessionData);
                 if (data.expires && Date.now() > data.expires) {
-                    return 'guest'; // Expired
+                    return 'guest';
                 }
                 return data.user_id || 'guest';
             }
@@ -242,13 +333,13 @@ class UnifiedBalanceSystem {
     }
     
     getCombinedUserIdFromToken() {
-        // Get combined userID for file access (userID-username)
+        // Get combined userID for API access (userID-username format)
         try {
             const sessionData = localStorage.getItem('directsponsor_session');
             if (sessionData) {
                 const data = JSON.parse(sessionData);
                 if (data.expires && Date.now() > data.expires) {
-                    return 'guest'; // Expired
+                    return 'guest';
                 }
                 
                 // If combined_user_id exists, use it
@@ -256,7 +347,7 @@ class UnifiedBalanceSystem {
                     return data.combined_user_id;
                 }
                 
-                // Otherwise construct it from user_id and username
+                // Otherwise construct from user_id and username
                 if (data.user_id && data.username) {
                     return `${data.user_id}-${data.username}`;
                 }
@@ -280,14 +371,6 @@ class UnifiedBalanceSystem {
             return 'guest';
         } catch (error) {
             console.error('Error getting combined user ID:', error);
-            
-            // Final fallback
-            const userId = localStorage.getItem('user_id');
-            const username = localStorage.getItem('username');
-            if (userId && username) {
-                return `${userId}-${username}`;
-            }
-            
             return 'guest';
         }
     }
@@ -307,41 +390,39 @@ class UnifiedBalanceSystem {
                 return this.getGuestBalance();
             }
             
-            // Use hub API to fetch balance
-            const response = await fetch(`https://auth.directsponsor.org/api/sync.php?action=get&user_id=${combinedUserId}&data_type=balance&_t=` + Date.now(), {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                cache: 'no-cache'
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success) {
-                    this.balance = parseFloat(data.data.coins) || 0;
-                    console.log('✅ Balance loaded from hub:', this.balance);
-                    return this.balance;
-                } else {
-                    throw new Error(data.error || 'API returned error');
-                }
-            } else {
-                throw new Error('API request failed');
-            }
+            // Fetch from ROFLFaucet balance API
+            return await this.getBalanceFromAPI(combinedUserId);
         } catch (error) {
             console.error('💥 Balance fetch error:', error);
             throw error;
         }
     }
     
-    getLocalBalance() {
-        const transactions = this.getLocalTransactions();
-        this.balance = transactions.reduce((total, tx) => {
-            return total + (tx.type === 'spend' ? -tx.amount : tx.amount);
-        }, 0);
-        
-        console.log(`💰 ${this.isLoggedIn ? 'Member' : 'Guest'} balance calculated:`, this.balance);
-        return this.balance;
+    async getBalanceFromAPI(combinedUserId) {
+        try {
+            // Read local balance file (synced from Hub via Syncthing)
+            const response = await fetch(`/api/get_balance.php?user_id=${combinedUserId}`, {
+                method: 'GET',
+                cache: 'no-cache'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    this.balance = parseFloat(data.balance) || 0;
+                    console.log('✅ Balance loaded:', this.balance);
+                    return this.balance;
+                }
+            }
+            
+            // If endpoint doesn't exist yet, default to 0
+            this.balance = 0;
+            return this.balance;
+        } catch (error) {
+            console.warn('⚠️ Balance API not available, defaulting to 0');
+            this.balance = 0;
+            return this.balance;
+        }
     }
     
     getGuestBalance() {
@@ -386,49 +467,22 @@ class UnifiedBalanceSystem {
     }
     
     async addRealBalance(amount, source, description) {
-        // Check if we need to sync before making changes
-        await this.syncIfNeeded('before_balance_change');
-        
         try {
             const combinedUserId = this.getCombinedUserIdFromToken();
             if (combinedUserId === 'guest') {
                 return this.addGuestBalance(amount, source, description);
             }
             
-            // Update via local API first (for now - will migrate fully to hub later)
-            const response = await fetch('api/coins-balance.php?action=update_balance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    user_id: combinedUserId,
-                    amount: amount,
-                    source: `${source}: ${description}`
-                })
-            });
+            // Wait if balance is syncing
+            await this.waitForSync();
             
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success) {
-                    this.balance = parseFloat(data.new_balance) || 0;
-                    
-                    // Push updated balance to hub
-                    this.pushBalanceToHub(combinedUserId, this.balance);
-                    
-                    // Reset inactivity timer after successful balance change
-                    this.resetInactivityTimer();
-                    console.log('✅ Real balance added and pushed to hub:', amount, 'New balance:', this.balance);
-                    return { success: true, balance: this.balance };
-                } else {
-                    throw new Error(data.error || 'API returned error');
-                }
-            } else {
-                throw new Error('API request failed');
-            }
+            // NEW: Queue the operation for batching
+            this.enqueueDelta(amount, source, description);
+            
+            return { success: true, balance: this.balance };
         } catch (error) {
             console.error('💥 Add balance error:', error);
-            throw error; // Don't fall back for logged-in users
+            throw error;
         }
     }
     
@@ -449,49 +503,22 @@ class UnifiedBalanceSystem {
     }
     
     async subtractRealBalance(amount, source, description) {
-        // Check if we need to sync before making changes
-        await this.syncIfNeeded('before_balance_change');
-        
         try {
             const combinedUserId = this.getCombinedUserIdFromToken();
             if (combinedUserId === 'guest') {
                 return this.subtractGuestBalance(amount, source, description);
             }
             
-            // Update via local API first (for now - will migrate fully to hub later)
-            const response = await fetch('api/coins-balance.php?action=update_balance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    user_id: combinedUserId,
-                    amount: -amount, // Negative amount for subtraction
-                    source: `${source}: ${description}`
-                })
-            });
+            // Wait if balance is syncing
+            await this.waitForSync();
             
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success) {
-                    this.balance = parseFloat(data.new_balance) || 0;
-                    
-                    // Push updated balance to hub
-                    this.pushBalanceToHub(combinedUserId, this.balance);
-                    
-                    // Reset inactivity timer after successful balance change
-                    this.resetInactivityTimer();
-                    console.log('✅ Real balance subtracted and pushed to hub:', amount, 'New balance:', this.balance);
-                    return { success: true, balance: this.balance };
-                } else {
-                    throw new Error(data.error || 'API returned error');
-                }
-            } else {
-                throw new Error('API request failed');
-            }
+            // NEW: Queue negative delta for batching
+            this.enqueueDelta(-amount, source, description);
+            
+            return { success: true, balance: this.balance };
         } catch (error) {
             console.error('💥 Subtract balance error:', error);
-            throw error; // Don't fall back for logged-in users
+            throw error;
         }
     }
     
@@ -508,120 +535,114 @@ class UnifiedBalanceSystem {
         return { success: true, balance: this.balance };
     }
     
-    async pushBalanceToHub(userId, balance) {
-        // Push balance update to hub (with timeout to not block too long)
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
-            
-            await fetch('https://auth.directsponsor.org/api/sync.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'push',
-                    user_id: userId,
-                    site_id: 'roflfaucet',
-                    data_type: 'balance',
-                    data: { coins: balance }
-                }),
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            console.log('📤 Balance pushed to hub:', balance);
-        } catch (error) {
-            if (error.name === 'AbortError') {
-                console.warn('⚠️ Hub push timed out (non-critical)');
-            } else {
-                console.warn('⚠️ Failed to push balance to hub:', error);
-            }
-            // Non-critical - don't throw
-        }
-    }
-    
-    async fallbackToGuestMode() {
-        console.log('🔄 Falling back to guest mode...');
-        this.isLoggedIn = false;
-        this.userId = 'guest';
-        this.accessToken = null;
-        return this.getGuestBalance();
-    }
-    
     refreshLoginStatus() {
         const wasLoggedIn = this.isLoggedIn;
         this.isLoggedIn = !!this.getValidUsername();
         this.userId = this.isLoggedIn ? this.getUserIdFromToken() : 'guest';
-        this.accessToken = null; // No longer needed
         
         if (wasLoggedIn !== this.isLoggedIn) {
-            console.log(`💰 Login status changed: ${wasLoggedIn ? 'member' : 'guest'} → ${this.isLoggedIn ? 'member' : 'guest'}`);
-            // Note: This is mainly used for logout, as login triggers a page refresh
+            console.log(`💰 Login status changed: ${wasLoggedIn ? 'member' : 'guest'} → ${this.isLoggedIn ? 'member' : 'guest'}`);;
             this.updateCurrencyDisplay();
             setTimeout(updateBalanceDisplays, 100);
             
-            // Update login-dependent content visibility
-            if (typeof updateLoginDependentContent === 'function') {
-                updateLoginDependentContent();
+            // Setup flush triggers if newly logged in
+            if (this.isLoggedIn && !wasLoggedIn) {
+                this.setupFlushTriggers();
+            }
+            
+            // Update login UI
+            if (typeof updateLoginUI === 'function') {
+                updateLoginUI();
             }
         }
     }
     
     getTerminology() {
         return {
-            currency: this.isLoggedIn ? 'Coins' : 'Tokens',
-            fullName: this.isLoggedIn ? 'Useless Coins' : 'Pointless Tokens',
-            action: this.isLoggedIn ? 'Claim Coins' : 'Claim Tokens'
+            currency: this.isLoggedIn ? 'coins' : 'tokens',
+            fullName: this.isLoggedIn ? 'Charity Coins' : 'Guest Tokens',
+            action: this.isLoggedIn ? 'Earn Coins' : 'Earn Tokens'
         };
+    }
+    
+    // Task completion tracking (for PTC ads)
+    markTaskCompleted(taskId) {
+        const completedTasks = this.getCompletedTasks();
+        completedTasks[taskId] = new Date().toISOString();
+        localStorage.setItem('completed_tasks', JSON.stringify(completedTasks));
+        console.log('✅ Task marked complete:', taskId);
+    }
+    
+    isTaskCompleted(taskId) {
+        const completedTasks = this.getCompletedTasks();
+        return !!completedTasks[taskId];
+    }
+    
+    getCompletedTasks() {
+        const stored = localStorage.getItem('completed_tasks');
+        return stored ? JSON.parse(stored) : {};
     }
     
     // Clear all guest data (for testing)
     clearGuestData() {
         localStorage.removeItem('guest_transactions');
+        localStorage.removeItem('completed_tasks');
         console.log('🗑️ Guest data cleared');
+    }
+    
+    // Wait for sync to complete before processing balance operations
+    async waitForSync() {
+        if (!this.isSyncing) return;
+        
+        console.log('⏳ Waiting for balance sync to complete...');
+        return new Promise(resolve => {
+            const checkSync = setInterval(() => {
+                if (!this.isSyncing) {
+                    clearInterval(checkSync);
+                    console.log('✅ Sync complete, processing operation');
+                    resolve();
+                }
+            }, 100);
+        });
+    }
+    
+    // Update balance displays synchronously using current this.balance
+    updateBalanceDisplaysSync() {
+        const terminology = this.getTerminology();
+        const balance = this.balance;
+        
+        const balanceElements = document.querySelectorAll('.balance, #user-balance, #balance-display');
+        balanceElements.forEach(element => {
+            const formattedBalance = Math.floor(balance);
+            element.textContent = formattedBalance;
+            element.title = `${formattedBalance} ${terminology.fullName}`;
+        });
+        
+        updateCurrencyDisplays();
     }
 }
 
 // Global instance
 window.unifiedBalance = new UnifiedBalanceSystem();
 
-// Global convenience functions
+// Also expose as window.UnifiedBalance for compatibility with app.js
+window.UnifiedBalance = window.unifiedBalance;
+
 // Global function to update all balance displays
 window.updateBalanceDisplays = async () => {
     const balance = await window.unifiedBalance.getBalance();
     const terminology = window.unifiedBalance.getTerminology();
     
     // Find all elements with 'balance' class and update them
-    const balanceElements = document.querySelectorAll('.balance');
+    const balanceElements = document.querySelectorAll('.balance, #user-balance, #balance-display');
     balanceElements.forEach(element => {
-        // Format the balance number as whole number
         const formattedBalance = Math.floor(balance);
         element.textContent = formattedBalance;
-        
-        // Update title attribute for hover tooltip
         element.title = `${formattedBalance} ${terminology.fullName}`;
-    });
-    
-    // Also update any elements with specific IDs for backward compatibility
-    const legacyElements = [
-        'balance',
-        'current-balance',
-        'current-balance-back',
-        'user-balance',
-        'balance-display'
-    ];
-    
-    legacyElements.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = Math.floor(balance);
-            element.title = `${Math.floor(balance)} ${terminology.fullName}`;
-        }
     });
     
     // Update currency terminology
     updateCurrencyDisplays();
-    
-    // console.log('💰 Balance displays updated:', Math.floor(balance), terminology.currency);
 };
 
 // Global function to update currency terminology displays
@@ -629,27 +650,11 @@ window.updateCurrencyDisplays = () => {
     const terminology = window.unifiedBalance.getTerminology();
     
     // Find all elements with 'currency' class and update them
-    const currencyElements = document.querySelectorAll('.currency');
+    const currencyElements = document.querySelectorAll('.currency, #user-balance-label');
     currencyElements.forEach(element => {
         element.textContent = terminology.currency;
         element.title = terminology.fullName;
     });
-    
-    // Find all elements with 'currency-upper' class and update them (for UPPERCASE display)
-    const currencyUpperElements = document.querySelectorAll('.currency-upper');
-    currencyUpperElements.forEach(element => {
-        element.textContent = terminology.currency.toUpperCase();
-        element.title = terminology.fullName;
-    });
-    
-    // Find all elements with 'currency-full' class and update them (for full name)
-    const currencyFullElements = document.querySelectorAll('.currency-full');
-    currencyFullElements.forEach(element => {
-        element.textContent = terminology.fullName;
-        element.title = terminology.fullName;
-    });
-    
-    // console.log('🏷️ Currency displays updated:', terminology.currency);
 };
 
 // Global convenience functions
@@ -658,13 +663,11 @@ window.addBalance = (amount, source, description) => window.unifiedBalance.addBa
 window.subtractBalance = (amount, source, description) => window.unifiedBalance.subtractBalance(amount, source, description);
 window.getTerminology = () => window.unifiedBalance.getTerminology();
 
+// NEW: Manual flush function for testing
+window.flushBalance = () => window.unifiedBalance.flushPendingOps('manual');
+
 // Auto-update balance displays when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Initial update
     setTimeout(updateBalanceDisplays, 100);
-    
-    // Note: No more 10-second polling! Smart sync system handles updates
-    console.log('🔧 Smart sync system active - no polling needed');
+    console.log('💰 Balance system initialized');
 });
-
-console.log('🔧 Unified Balance System ready!');

@@ -75,57 +75,66 @@ function loadUserBalance($userId) {
 }
 
 /**
- * Update user balance (integrate with existing balance system)
+ * Update user balance via Hub API (centralized balance system)
+ * This ensures all balance changes go through the Hub for consistency
  */
 function updateUserBalance($userId, $newBalance, $change, $description) {
+    // Get combined user ID (userID-username format) for Hub API
+    $combinedUserId = null;
     $balanceDir = USERDATA_DIR . '/balances';
-    
-    // Try to find existing file (new or old format)
     $files = glob($balanceDir . '/' . $userId . '-*.txt');
+    
     if (!empty($files)) {
-        $balanceFile = $files[0]; // Use existing new format file
+        $filename = basename($files[0], '.txt');
+        $combinedUserId = $filename;
     } else {
-        // Check for old format file
-        $oldFile = $balanceDir . '/' . $userId . '.txt';
-        if (file_exists($oldFile)) {
-            $balanceFile = $oldFile; // Use existing old format file
-        } else {
-            // Create new file - need username for new format
-            $username = getUsernameFromId($userId) ?: 'user' . $userId;
-            $balanceFile = $balanceDir . '/' . $userId . '-' . $username . '.txt';
+        // Fallback: construct from user ID
+        $username = getUsernameFromId($userId) ?: 'user' . $userId;
+        $combinedUserId = $userId . '-' . $username;
+    }
+    
+    // Generate unique operation ID for idempotency
+    $opId = 'chat-' . time() . '-' . mt_rand(1000, 9999);
+    
+    // Prepare operation for Hub API
+    $op = [
+        'op_id' => $opId,
+        'amount' => (float)$change,
+        'source' => 'chat',
+        'description' => $description,
+        'timestamp' => time(),
+        'retries' => 0
+    ];
+    
+    // Send to Hub API
+    $hubUrl = 'https://auth.directsponsor.org/api/balance-update.php';
+    $payload = json_encode([
+        'user_id' => $combinedUserId,
+        'ops' => [$op],
+        'client_time' => time()
+    ]);
+    
+    $ch = curl_init($hubUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200 && $response) {
+        $result = json_decode($response, true);
+        if ($result['success'] ?? false) {
+            return true;
         }
     }
     
-    // Load existing data or create new
-    $data = [];
-    if (file_exists($balanceFile)) {
-        $data = json_decode(file_get_contents($balanceFile), true) ?: [];
-    }
-    
-    $oldBalance = floatval($data['balance'] ?? 0);
-    $data['balance'] = $newBalance;
-    $data['last_updated'] = time();
-    
-    // Add transaction record
-    if (!isset($data['transactions'])) {
-        $data['transactions'] = [];
-    }
-    
-    $data['transactions'][] = [
-        'timestamp' => time(),
-        'type' => $change > 0 ? 'credit' : 'debit',
-        'old_balance' => $oldBalance,
-        'new_balance' => $newBalance,
-        'change' => $change,
-        'description' => $description
-    ];
-    
-    // Limit transaction history to last 50
-    if (count($data['transactions']) > 50) {
-        $data['transactions'] = array_slice($data['transactions'], -50);
-    }
-    
-    return file_put_contents($balanceFile, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX) !== false;
+    // Log error for debugging
+    error_log("Chat: Hub API balance update failed for $combinedUserId: HTTP $httpCode, Response: $response");
+    return false;
 }
 
 /**

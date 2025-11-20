@@ -224,22 +224,15 @@ class ProjectEditor {
             this.showStatus('💾 Saving changes...', 'info');
             console.log('DEBUG: Starting save process');
             
-            // Handle image upload first if there's a new image
-            let imageUrl = this.projectData.main_image; // Keep existing image by default
+            // For new projects, we need to save the project first to get an ID,
+            // then upload the image. Store the file for later.
             const fileInput = document.getElementById('projectImage');
+            const hasNewImage = fileInput.files.length > 0;
+            const imageFile = hasNewImage ? fileInput.files[0] : null;
             
-            if (fileInput.files.length > 0) {
-                console.log('DEBUG: Uploading new image...');
-                imageUrl = await this.uploadImage(fileInput.files[0]);
-                if (!imageUrl) {
-                    this.showStatus('❌ Image upload failed. Please try again.', 'error');
-                    return;
-                }
-            }
-            
-            // Get form data
+            // Get form data (without image for now)
             const formData = {
-                action: 'update_project',
+                action: this.projectId ? 'update_project' : 'create_project',
                 project_id: this.projectId,
                 username: this.currentUser,
                 title: document.getElementById('projectTitle').value,
@@ -249,11 +242,12 @@ class ProjectEditor {
                 recipient_name: document.getElementById('recipientName').value,
                 location: document.getElementById('location').value,
                 website_url: document.getElementById('websiteUrl').value,
-                main_image: imageUrl
+                main_image: this.projectData.main_image || '' // Keep existing or empty for now
             };
             
             console.log('DEBUG: Form data:', formData);
             
+            // Save the project first
             const response = await fetch('/api/project-management-api-v2.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -264,13 +258,44 @@ class ProjectEditor {
             const result = await response.json();
             console.log('DEBUG: API response:', result);
             
-            if (result.success) {
-                // Create a link to the actual project page
-                const projectLink = result.project_url || `${this.projectData.filename}` || `project-${this.projectId}.html`;
-                this.showStatus(`✅ Changes saved successfully! <a href="${projectLink}" style="color: #007bff; text-decoration: underline;">👁️ View Updated Project</a>`, 'success');
-            } else {
+            if (!result.success) {
                 this.showStatus('❌ ' + (result.error || 'Failed to save changes'), 'error');
+                return;
             }
+            
+            // If this was a new project, get the generated ID
+            if (!this.projectId && result.project_id) {
+                this.projectId = result.project_id;
+                console.log('DEBUG: New project created with ID:', this.projectId);
+            }
+            
+            // Now upload the image if there is one
+            if (hasNewImage && imageFile) {
+                console.log('DEBUG: Uploading image for project ID:', this.projectId);
+                const imageUrl = await this.uploadImage(imageFile);
+                if (imageUrl) {
+                    // Update the project with the image URL
+                    const updateImageData = {
+                        action: 'update_project',
+                        project_id: this.projectId,
+                        username: this.currentUser,
+                        main_image: imageUrl
+                    };
+                    await fetch('/api/project-management-api-v2.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updateImageData)
+                    });
+                }
+            }
+            
+            // Show success message - redirect to profile to see project
+            this.showStatus(`✅ Project saved successfully! <a href="profile.html" style="color: #007bff; text-decoration: underline;">👁️ Back to Profile</a>`, 'success');
+            
+            // Auto-redirect to profile after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'profile.html';
+            }, 2000);
         } catch (error) {
             console.error('Save failed:', error);
             this.showStatus('❌ Network error - please try again.', 'error');

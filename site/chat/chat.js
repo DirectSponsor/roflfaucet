@@ -1371,20 +1371,8 @@ class ChatWidget {
                         this.lastTimestamp = lastMessage.timestamp;
                     }
                     
-                    // Check if any messages are tip-related and refresh balance if needed
-                    const hasTipMessages = result.messages.some(msg => 
-                        msg.type === 'tip' || 
-                        (msg.message && msg.message.includes('tipped '))
-                    );
-                    
-                    if (hasTipMessages && window.unifiedBalance) {
-                        console.log('💰 Tip detected in messages, refreshing balance...');
-                        setTimeout(() => {
-                            if (window.unifiedBalance.syncIfNeeded) {
-                                window.unifiedBalance.syncIfNeeded('chat_tip_detected');
-                            }
-                        }, 500); // Small delay to ensure server processing is complete
-                    }
+                    // Note: Balance refresh for tips is handled by notifications system
+                    // No need to scan messages for tips here
                 } else if (result.current_timestamp && result.current_timestamp > this.lastTimestamp) {
                     // Only update timestamp if no messages but server timestamp is newer
                     // This handles the case where we're caught up

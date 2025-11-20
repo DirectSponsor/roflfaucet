@@ -102,9 +102,8 @@ class RollGame {
         
         try {
             console.log(`🔄 Roll Game: Smart balance refresh triggered: ${trigger}`);
-            // Check if sync is needed (multi-tab scenario)
-            const needsSync = await this.balanceSystem.syncIfNeeded(trigger);
-            if (needsSync || trigger === 'before_game' || trigger === 'after_game') {
+            // Refresh balance for important triggers
+            if (trigger === 'before_game' || trigger === 'after_game') {
                 await this.refreshBalance();
             }
         } catch (error) {

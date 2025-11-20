@@ -305,8 +305,10 @@
                             <!-- Search User -->
                             <div class="role-search">
                                 <h3>🔍 Search User</h3>
-                                <input type="text" id="user-search" placeholder="Enter username or user ID (e.g., andytest1 or 1-andytest1)" oninput="searchSuggestions()">
-                                <button onclick="searchUser()" class="faucet-countdown-btn" style="margin-top: 10px; width: auto; padding: 12px 24px;">Search</button>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="text" id="user-search" placeholder="Enter username or user ID (e.g., andytest1 or 1-andytest1)" oninput="searchSuggestions()" style="flex: 1;">
+                                    <button onclick="searchUser()" class="faucet-countdown-btn" style="width: auto; padding: 12px 24px;">Search</button>
+                                </div>
                                 
                                 <!-- Search Suggestions -->
                                 <div id="search-suggestions" style="display: none; background: white; border: 2px solid #4A90E2; border-radius: 6px; margin-top: 10px; max-height: 300px; overflow-y: auto;"></div>
@@ -436,24 +438,23 @@
                     </div>
                     <div class="role-actions">
                         <strong>Manage Roles:</strong><br>
-                        <button class="role-btn add" onclick="addRole('${userId}', 'recipient')" ${roles.includes('recipient') ? 'disabled' : ''}>
-                            + Add Recipient
-                        </button>
-                        <button class="role-btn remove" onclick="removeRole('${userId}', 'recipient')" ${!roles.includes('recipient') ? 'disabled' : ''}>
-                            − Remove Recipient
-                        </button>
-                        <button class="role-btn add" onclick="addRole('${userId}', 'admin')" ${roles.includes('admin') ? 'disabled' : ''}>
-                            + Add Admin
-                        </button>
-                        <button class="role-btn remove" onclick="removeRole('${userId}', 'admin')" ${!roles.includes('admin') ? 'disabled' : ''}>
-                            − Remove Admin
-                        </button>
-                        <button class="role-btn add" onclick="addRole('${userId}', 'moderator')" ${roles.includes('moderator') ? 'disabled' : ''}>
-                            + Add Moderator
-                        </button>
-                        <button class="role-btn remove" onclick="removeRole('${userId}', 'moderator')" ${!roles.includes('moderator') ? 'disabled' : ''}>
-                            − Remove Moderator
-                        </button>
+                        <div style="margin: 10px 0;">
+                            <label style="display: block; margin: 8px 0; cursor: pointer;">
+                                <input type="checkbox" id="role-recipient-${userId}" ${roles.includes('recipient') ? 'checked' : ''} onchange="toggleRole('${userId}', 'recipient', this.checked)" style="margin-right: 8px;">
+                                <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Recipient</span>
+                                - Can create and manage fundraising projects
+                            </label>
+                            <label style="display: block; margin: 8px 0; cursor: pointer;">
+                                <input type="checkbox" id="role-admin-${userId}" ${roles.includes('admin') ? 'checked' : ''} onchange="toggleRole('${userId}', 'admin', this.checked)" style="margin-right: 8px;">
+                                <span style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Admin</span>
+                                - Full site administration
+                            </label>
+                            <label style="display: block; margin: 8px 0; cursor: pointer;">
+                                <input type="checkbox" id="role-moderator-${userId}" ${roles.includes('moderator') ? 'checked' : ''} onchange="toggleRole('${userId}', 'moderator', this.checked)" style="margin-right: 8px;">
+                                <span style="background: #fd7e14; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Moderator</span>
+                                - Content moderation (future)
+                            </label>
+                        </div>
                     </div>
                 </div>
             `;
@@ -461,12 +462,9 @@
             document.getElementById('user-results').innerHTML = card;
         }
         
-        async function addRole(targetUserId, role) {
-            await manageRole(targetUserId, role, 'add');
-        }
-        
-        async function removeRole(targetUserId, role) {
-            await manageRole(targetUserId, role, 'remove');
+        async function toggleRole(targetUserId, role, isChecked) {
+            const operation = isChecked ? 'add' : 'remove';
+            await manageRole(targetUserId, role, operation);
         }
         
         async function manageRole(targetUserId, role, operation) {

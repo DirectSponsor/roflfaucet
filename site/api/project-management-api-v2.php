@@ -50,6 +50,16 @@ try {
     case 'create_draft_project':
         echo json_encode(createDraftProject($input));
         break;
+    
+    case 'list_user_projects':
+        echo json_encode(listUserProjects($input));
+        break;
+    
+    case 'get_project_public':
+        // Public endpoint - no auth required
+        $projectId = $input['project_id'] ?? '';
+        echo json_encode(getProjectData($projectId));
+        break;
             
         default:
             echo json_encode(['success' => false, 'error' => 'Unknown action']);
@@ -99,9 +109,9 @@ function getProjectData($projectId) {
     
     error_log('DEBUG target_amount_raw: ' . $targetAmountRaw);
     
-    // Use user-specific image path
-    $imageUrl = "/projects/{$username}/images/{$projectId}.jpg";
-    $imagePath = "/var/roflfaucet-data{$imageUrl}";
+    // Use Apache Alias path for images (served from protected directory)
+    $imageUrl = "/project-images/{$username}/images/{$projectId}.jpg";
+    $imagePath = "/var/roflfaucet-data/projects/{$username}/images/{$projectId}.jpg";
     
     if (!file_exists($imagePath) && $username) {
         // Copy placeholder to user directory
@@ -129,8 +139,8 @@ function getProjectData($projectId) {
         'location' => extractByComments($html, 'location', ''),
         'website_url' => extractByComments($html, 'website-url', ''),
         'target_amount' => (int)str_replace(',', '', $targetAmountRaw),
-        'current_amount' => 5000,  // Mock for now
-        'supporters_count' => 3,   // Mock for now
+        'current_amount' => (int)str_replace(',', '', extractByComments($html, 'current-amount', '0')),
+        'supporters_count' => 0,
         'category' => 'General',
         'status' => 'active',
         'main_image' => $imageUrl, // Use actual image or placeholder
@@ -243,36 +253,32 @@ function updateProject($data) {
 }
 
 function updateProjectHtmlFile($projectId, $projectData) {
-    // Check for simple numeric format first, then legacy formats
-    $simpleFile = "/var/roflfaucet-data/projects/{$projectId}.html";
-    $simplePendingFile = "/var/roflfaucet-data/projects/pending/{$projectId}.html";
-    $legacyFile = "/var/roflfaucet-data/projects/project-{$projectId}.html";
-    $newFormatFiles = glob("/var/roflfaucet-data/projects/{$projectId}-*.html");
-    $pendingFiles = glob("/var/roflfaucet-data/projects/pending/{$projectId}-*.html");
+    // Search all user directories for this project ID
+    $userDirs = glob('/var/roflfaucet-data/projects/*', GLOB_ONLYDIR);
     
     $fileToUpdate = null;
-    // Check simple numeric format first (active directory)
-    if (file_exists($simpleFile)) {
-        $fileToUpdate = $simpleFile;
-    }
-    // Check simple numeric format in pending directory
-    elseif (file_exists($simplePendingFile)) {
-        $fileToUpdate = $simplePendingFile;
-    }
-    // Check legacy format
-    elseif (file_exists($legacyFile)) {
-        $fileToUpdate = $legacyFile;
-    }
-    // Check new format in active directory
-    elseif (!empty($newFormatFiles)) {
-        $fileToUpdate = $newFormatFiles[0];
-    }
-    // Check pending directory
-    elseif (!empty($pendingFiles)) {
-        $fileToUpdate = $pendingFiles[0];
+    $username = null;
+    
+    foreach ($userDirs as $userDir) {
+        // Check active directory first
+        $activeFile = "{$userDir}/active/{$projectId}.html";
+        if (file_exists($activeFile)) {
+            $fileToUpdate = $activeFile;
+            $username = basename($userDir);
+            break;
+        }
+        
+        // Check completed directory
+        $completedFile = "{$userDir}/completed/{$projectId}.html";
+        if (file_exists($completedFile)) {
+            $fileToUpdate = $completedFile;
+            $username = basename($userDir);
+            break;
+        }
     }
     
     if (!$fileToUpdate) {
+        error_log("Project file not found for ID: {$projectId}");
         return false;
     }
     
@@ -290,9 +296,9 @@ function updateProjectHtmlFile($projectId, $projectData) {
     $html = updateByComments($html, 'website-url', $projectData['website_url']);
     $html = updateByComments($html, 'target-amount', number_format($projectData['target_amount']));
     
-    // Always store the standard image URL in HTML
-    $standardImageUrl = '/images/projects/project-' . $projectId . '.jpg';
-    $imageHtml = '<div class="project-main-image" style="margin-bottom: 20px; text-align: center;"><img src="' . $standardImageUrl . '" alt="Project Image" style="max-width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px;"></div>';
+    // Use Apache Alias path for image URL
+    $imageUrl = "/project-images/{$username}/images/{$projectId}.jpg";
+    $imageHtml = '<div class="project-main-image" style="margin-bottom: 20px; text-align: center;"><img src="' . $imageUrl . '" alt="Project Image" style="max-width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px;"></div>';
     $html = updateByComments($html, 'main-image', $imageHtml);
     
     // Write the updated HTML back to the file
@@ -594,5 +600,49 @@ function createProjectHtmlFile($projectId, $projectData, $username, $urlSlug) {
     $result = file_put_contents($outputFile, $html);
     
     return $result !== false;
+}
+
+function listUserProjects($data) {
+    $username = $data['username'] ?? '';
+    
+    if (empty($username)) {
+        return ['success' => false, 'error' => 'Username required'];
+    }
+    
+    // Clean username
+    $cleanUsername = (strpos($username, '-') !== false) ? explode('-', $username)[1] : $username;
+    
+    $userDir = "/var/roflfaucet-data/projects/{$cleanUsername}";
+    $projects = [];
+    
+    // Check if user directory exists
+    if (!is_dir($userDir)) {
+        return ['success' => true, 'projects' => []];
+    }
+    
+    // Get projects from active directory
+    $activeDir = "{$userDir}/active";
+    if (is_dir($activeDir)) {
+        $files = glob("{$activeDir}/*.html");
+        foreach ($files as $file) {
+            $projectId = basename($file, '.html');
+            $html = file_get_contents($file);
+            
+            $projects[] = [
+                'id' => $projectId,
+                'title' => extractByComments($html, 'title', 'Untitled'),
+                'tagline' => extractByComments($html, 'description', ''),
+                'goal_amount' => (int)str_replace(',', '', extractByComments($html, 'target-amount', '0')),
+                'current_amount' => (int)str_replace(',', '', extractByComments($html, 'current-amount', '0')),
+                'category' => extractByComments($html, 'category', 'General'),
+                'status' => 'active',
+                'created_date' => filemtime($file),
+                'is_pending' => false,
+                'verification' => ['verified' => true]
+            ];
+        }
+    }
+    
+    return ['success' => true, 'projects' => $projects];
 }
 ?>

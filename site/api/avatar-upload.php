@@ -30,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // SECURE Configuration
 define('MAX_FILE_SIZE', 512 * 1024); // 512KB max
 define('ALLOWED_TYPES', ['image/jpeg', 'image/png']); // Only safest formats
-define('AVATAR_DIR', __DIR__ . '/../images/avatars/'); // Public directory
-define('AVATAR_URL_BASE', 'images/avatars/'); // Public URL path
+define('AVATAR_DIR', '/var/roflfaucet-data/avatars/'); // Protected from deployment overwrites
+define('AVATAR_URL_BASE', 'images/avatars/'); // Public URL path (via Apache Alias)
 
 /**
  * Get user ID from request

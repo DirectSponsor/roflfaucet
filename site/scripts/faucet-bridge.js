@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set up claim button
         const finalClaimBtn = document.getElementById('final-claim-btn');
         if (finalClaimBtn) {
-            finalClaimBtn.addEventListener('click', function() {
+            finalClaimBtn.addEventListener('click', async function() {
                 console.log('🚀 Faucet Bridge: Final claim button clicked!');
                 
                 // Check cooldown before processing claim
@@ -36,8 +36,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Process the claim
                 console.log('💰 Faucet Bridge: Processing faucet claim...');
-                window.unifiedBalance.addBalance(20, 'faucet', 'Faucet claim reward');
+                await window.unifiedBalance.addBalance(20, 'faucet', 'Faucet claim reward');
                 updateLastClaimTime();
+                
+                // Flush pending operations before redirecting (for logged-in users)
+                if (window.unifiedBalance.isLoggedIn) {
+                    console.log('⏳ Flushing balance before redirect...');
+                    await window.unifiedBalance.flushPendingOps('faucet-claim');
+                }
                 
                 // Redirect to result page
                 window.location.href = 'faucet-result.html';

@@ -186,8 +186,11 @@ class ProfileManager {
         // Load recent activity
         await this.loadRecentActivity();
         
-        // Load fundraisers if user has fundraiser role
+        // Load fundraisers if user has recipient role
         await this.loadUserFundraisers();
+        
+        // Show/hide role-specific sections based on user roles
+        this.updateRoleBasedSections();
     }
     
     async updateBalance() {
@@ -509,16 +512,35 @@ class ProfileManager {
         }
     }
     
+    updateRoleBasedSections() {
+        const userRoles = this.profileData?.roles || ['member'];
+        console.log('🎨 Updating role-based sections for roles:', userRoles);
+        
+        // Show admin panel only if user has admin role
+        const adminPanel = document.querySelector('.admin-panel');
+        if (adminPanel) {
+            if (userRoles.includes('admin')) {
+                console.log('✅ Showing admin panel');
+                adminPanel.style.display = 'block';
+            } else {
+                console.log('❌ Hiding admin panel (not admin)');
+                adminPanel.style.display = 'none';
+            }
+        }
+        
+        // Fundraiser section visibility is handled by loadUserFundraisers()
+    }
+    
     async loadUserFundraisers() {
         try {
             console.log('💝 Loading user fundraisers...');
             
-            // Check if user has fundraiser capability (recipient, fundraiser, or admin)
+            // Check if user has recipient capability (recipient or admin)
             const userRoles = this.profileData?.roles || ['member'];
-            const canCreateFundraisers = userRoles.includes('recipient') || userRoles.includes('fundraiser') || userRoles.includes('admin');
+            const canCreateFundraisers = userRoles.includes('recipient') || userRoles.includes('admin');
             
             if (!canCreateFundraisers) {
-                console.log('User does not have fundraiser role, hiding fundraiser section');
+                console.log('User does not have recipient role, hiding projects section');
                 const fundraisersSection = document.getElementById('fundraisers-section');
                 if (fundraisersSection) {
                     fundraisersSection.style.display = 'none';
@@ -532,24 +554,26 @@ class ProfileManager {
                 fundraisersSection.style.display = 'block';
             }
             
-            // Load user's fundraisers (including pending ones)
-            const response = await fetch('api/fundraiser-api.php?action=list&include_pending=1');
+            // Load user's projects from new API
+            const currentUserId = localStorage.getItem('combined_user_id');
+            const currentUsername = currentUserId ? (currentUserId.includes('-') ? currentUserId.split('-')[1] : currentUserId) : null;
+            console.log('🔍 Current username:', currentUsername);
+            
+            const response = await fetch('api/project-management-api-v2.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'list_user_projects',
+                    username: currentUsername
+                })
+            });
             const data = await response.json();
             
             if (data.success) {
-                const currentUserId = localStorage.getItem('combined_user_id');
-                // Always use just the username part (evans) for consistency
-                const currentUsername = currentUserId ? (currentUserId.includes('-') ? currentUserId.split('-')[1] : currentUserId) : null;
-                console.log('🔍 Current username for filtering:', currentUsername);
-                
-                const userFundraisers = data.fundraisers.filter(f => 
-                    f.owner_user_id === currentUsername
-                );
-                
-                console.log('✅ User fundraisers after filtering:', userFundraisers.map(f => ({id: f.id, title: f.title, is_pending: f.is_pending})));
-                this.displayUserFundraisers(userFundraisers);
+                console.log('✅ User projects loaded:', data.projects);
+                this.displayUserFundraisers(data.projects || []);
             } else {
-                throw new Error(data.error || 'Failed to load fundraisers');
+                throw new Error(data.error || 'Failed to load projects');
             }
             
         } catch (error) {

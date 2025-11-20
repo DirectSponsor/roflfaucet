@@ -225,8 +225,8 @@ function loadProfileData($profileFile, $userId) {
         $data = array_merge([
             'user_id' => $userId,
             'level' => 1,
-            'username' => '',
-            'display_name' => $authProfile['display_name'] ?? '',
+            'username' => $authProfile['username'] ?? '',
+            'display_name' => $authProfile['display_name'] ?? $authProfile['username'] ?? '',
             'avatar' => $authProfile['avatar'] ?? '👤',
             'email' => '',
             'bio' => $authProfile['bio'] ?? '',

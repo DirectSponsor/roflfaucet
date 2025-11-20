@@ -15,10 +15,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['image'])) {
 }
 
 $projectId = $_POST['project_id'] ?? '';
+$username = $_POST['username'] ?? '';
+
 if (empty($projectId)) {
     echo json_encode(['success' => false, 'error' => 'Project ID required']);
     exit;
 }
+
+if (empty($username)) {
+    echo json_encode(['success' => false, 'error' => 'Username required']);
+    exit;
+}
+
+// Clean username (remove user_id prefix if present)
+$cleanUsername = (strpos($username, '-') !== false) ? explode('-', $username)[1] : $username;
 
 $uploadedFile = $_FILES['image'];
 
@@ -34,19 +44,28 @@ if ($uploadedFile['size'] > 2 * 1024 * 1024) {
     exit;
 }
 
-// Validate file type - JPG only for simplicity
-$allowedTypes = ['image/jpeg', 'image/jpg'];
+// Validate file type - Accept JPG, PNG, and WebP
+$allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 $mimeType = finfo_file($finfo, $uploadedFile['tmp_name']);
 finfo_close($finfo);
 
 if (!in_array($mimeType, $allowedTypes)) {
-    echo json_encode(['success' => false, 'error' => 'Please upload a JPG image file. Other formats will be converted automatically.']);
+    echo json_encode(['success' => false, 'error' => 'Please upload a JPG, PNG, or WebP image file.']);
     exit;
 }
 
-// Create upload directory if it doesn't exist
-$uploadDir = '/var/www/html/images/projects/';
+// Get file extension from mime type
+$extensions = [
+    'image/jpeg' => 'jpg',
+    'image/jpg' => 'jpg',
+    'image/png' => 'png',
+    'image/webp' => 'webp'
+];
+$extension = $extensions[$mimeType] ?? 'jpg';
+
+// Create upload directory in user's protected data directory
+$uploadDir = "/var/roflfaucet-data/projects/{$cleanUsername}/images/";
 if (!file_exists($uploadDir)) {
     if (!mkdir($uploadDir, 0755, true)) {
         echo json_encode(['success' => false, 'error' => 'Failed to create upload directory']);
@@ -54,8 +73,8 @@ if (!file_exists($uploadDir)) {
     }
 }
 
-// Always use .jpg extension for simplicity
-$filename = 'project-' . $projectId . '.jpg';
+// Use simple project ID as filename
+$filename = $projectId . '.' . $extension;
 $targetPath = $uploadDir . $filename;
 
 error_log('DEBUG upload: projectId=' . $projectId);
@@ -66,8 +85,8 @@ error_log('DEBUG upload: targetPath=' . $targetPath);
 
 // Move uploaded file
 if (move_uploaded_file($uploadedFile['tmp_name'], $targetPath)) {
-    // Return the web-accessible URL
-    $imageUrl = '/images/projects/' . $filename;
+    // Return the web-accessible URL via Apache Alias
+    $imageUrl = "/project-images/{$cleanUsername}/images/{$filename}";
     
     echo json_encode([
         'success' => true,

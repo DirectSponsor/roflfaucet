@@ -31,8 +31,10 @@
 
         .fundraiser-hero {
             width: 100%;
-            height: 300px;
-            object-fit: cover;
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            object-fit: contain;
             border-radius: 8px;
             margin-bottom: 20px;
         }
@@ -528,19 +530,55 @@
             }
 
             try {
-                const response = await fetch(`api/fundraiser-api.php?action=get&id=${encodeURIComponent(fundraiserId)}`);
-                const data = await response.json();
+                // Try new project API first
+                const newApiResponse = await fetch('api/project-management-api-v2.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get_project_public',
+                        project_id: fundraiserId
+                    })
+                });
+                const newData = await newApiResponse.json();
                 
-                if (data.success) {
-                    currentFundraiser = data.fundraiser;
+                if (newData.success) {
+                    // Convert new format to old format for display
+                    currentFundraiser = convertProjectToFundraiser(newData.data);
                     displayFundraiser(currentFundraiser);
                 } else {
-                    showError(data.error || 'Failed to load fundraiser');
+                    showError(newData.error || 'Project not found');
                 }
             } catch (error) {
                 console.error('Error loading fundraiser:', error);
                 showError('Failed to load fundraiser');
             }
+        }
+        
+        // Convert new project format to old fundraiser format
+        function convertProjectToFundraiser(project) {
+            return {
+                id: project.id,
+                title: project.title,
+                tagline: project.description,
+                description: project.description,
+                story: project.full_description,
+                goal_amount: project.target_amount,
+                current_amount: project.current_amount || 0,
+                currency: 'sats',
+                type: 'one-time',
+                status: project.status || 'active',
+                hero_image: project.main_image,
+                owner_user_id: project.recipient_name,
+                contact_info: {
+                    location: project.location,
+                    website: project.website_url
+                },
+                verification: { verified_by: 'admin' },
+                contributions: [],
+                updates: [],
+                created_date: Date.now() / 1000,
+                last_updated: Date.now() / 1000
+            };
         }
 
         // Display fundraiser data
@@ -556,7 +594,7 @@
             // Hero image
             if (fundraiser.hero_image) {
                 const heroImg = document.getElementById('hero-image');
-                heroImg.src = 'images/fundraisers/' + fundraiser.hero_image;
+                heroImg.src = fundraiser.hero_image;
                 heroImg.style.display = 'block';
             }
 
