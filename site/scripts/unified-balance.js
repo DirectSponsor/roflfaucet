@@ -179,17 +179,22 @@ class UnifiedBalanceSystem {
             const lastActiveSite = localStorage.getItem('last_active_site');
             const currentSite = this.siteId;
             
-            // Update current site
-            localStorage.setItem('last_active_site', currentSite);
-            
-            // Check if switching from different site
+            // Check if switching from different site BEFORE updating
             if (lastActiveSite && lastActiveSite !== currentSite) {
                 // Cross-site switch - need full sync with lock
-                console.log(`🔄 Detected site switch: ${lastActiveSite} → ${currentSite}`);
+                console.log(`🔄 Detected site switch on focus: ${lastActiveSite} → ${currentSite}`);
+                
+                // Update current site FIRST (so other tabs see the switch)
+                localStorage.setItem('last_active_site', currentSite);
+                
                 await this.syncFromOtherSite();
             } else {
                 // Same site - just refresh balance without lock
                 console.log(`🔄 Refreshing balance on focus (same site)`);
+                
+                // Still update last active site timestamp
+                localStorage.setItem('last_active_site', currentSite);
+                
                 await this.getBalance();
                 this.updateBalanceDisplaysSync();
             }
