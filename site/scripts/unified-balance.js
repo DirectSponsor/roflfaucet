@@ -144,7 +144,17 @@ class UnifiedBalanceSystem {
             this.flushNetChange('timer');
         }, 120000);
         
-        // 2. Blur - flush when window loses focus
+        // 2. Visibility change - flush when tab becomes hidden AND update last active site
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Mark that we're leaving this site (more reliable than blur)
+                localStorage.setItem('last_active_site', this.siteId);
+                console.log(`👋 Leaving site, marked last_active_site = ${this.siteId}`);
+                this.flushNetChange('visibility-hidden');
+            }
+        });
+        
+        // Also keep blur as backup
         window.addEventListener('blur', () => {
             this.flushNetChange('blur');
         });
