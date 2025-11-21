@@ -34,6 +34,9 @@ class UnifiedBalanceSystem {
             }
             this.setupFlushTriggers();
             this.setupCrossSiteSync();
+            
+            // Check if we just switched from another site
+            this.checkCrossSiteSwitchOnLoad();
         }
     }
     
@@ -155,6 +158,21 @@ class UnifiedBalanceSystem {
     }
     
     // ========== CROSS-SITE SYNC LOGIC ==========
+    
+    checkCrossSiteSwitchOnLoad() {
+        const lastActiveSite = localStorage.getItem('last_active_site');
+        const currentSite = this.siteId;
+        
+        // Check if we just navigated from a different site
+        if (lastActiveSite && lastActiveSite !== currentSite) {
+            console.log(`🔄 Detected site switch on load: ${lastActiveSite} → ${currentSite}`);
+            // Trigger sync immediately
+            this.syncFromOtherSite();
+        }
+        
+        // Update current site
+        localStorage.setItem('last_active_site', currentSite);
+    }
     
     setupCrossSiteSync() {
         window.addEventListener('focus', async () => {
