@@ -2,9 +2,9 @@
 
 **Use this prompt in a new window to avoid context problems**
 
-## Current Status
+## Current Status (Updated 2025-11-20)
 
-The cross-site sync system is **IMPLEMENTED AND DEPLOYED**. This document tracks where we are and what might still need work.
+The cross-site sync system is **IMPLEMENTED AND DEPLOYED**. Balance detection on window focus/tab switches is **WORKING**. Minor issue: Balance not updating immediately after faucet claim (requires window switch to update). This document tracks where we are and what might still need work.
 
 ## Architecture Overview
 
@@ -55,10 +55,21 @@ Key files:
    - ClickForCharity: `unified-balance.js` reads from local cache, syncs via file system
    - Both support guest (localStorage) and member (server file) modes
    - Auto-detects login status and routes appropriately
+   - **Window focus/visibility detection WORKING**: Balance refreshes when switching tabs/windows
+   - Uses Page Visibility API + window focus events for detection
+   - Tested: Balance stays consistent without refresh, updates when returning to tab
 
 ### ⏳ What Might Need Work
 
-1. **JavaScript-to-Server Integration**
+1. **Balance Update After Faucet Claim (CURRENT ISSUE)**
+   - Balance updates correctly when switching windows/tabs (confirmed working)
+   - Balance does NOT update immediately after faucet claim on same page
+   - Expected: 12698 → 12718 immediately after claim
+   - Actual: Shows 12698 until user switches away and back (then shows 12718)
+   - **TODO**: Check if faucet claim code is calling balance refresh function
+   - Look in: `site/faucet-claim.html`, `site/scripts/faucet-bridge.js`
+
+2. **JavaScript-to-Server Integration**
    - JavaScript balance functions need to write files (not API calls)
    - Check if `addBalance()`, `subtractBalance()`, `getBalance()` actually write to `/var/{site}-data/userdata/balances/`
    - File write should trigger inotify → rsync → hub distribution
@@ -73,6 +84,7 @@ Key files:
    - Can earn coins on ROFLFaucet and see them on ClickForCharity?
    - Latency should be ~5-10 seconds (debounce + rsync)
    - **TEST**: Earn coins on one site, switch to other, verify balance updates
+   - **TESTED 2025-11-20**: Cross-tab detection working, balance consistent without refresh
 
 4. **Profile Sync (Lower Priority)**
    - Currently only balances are syncing
@@ -212,6 +224,13 @@ Check these locations for recent changes relative to sync-system/ docs:
 - `/home/andy/work/projects/clickforcharity/site/api/` (balance-related PHP)
 
 Any recent changes to these might not be reflected in the sync-system/ docs yet.
+
+## Notes (2025-11-20)
+
+- Git backup files appearing in uncommitted changes - keep backups/ directory but don't commit backup files
+- Recent commit cleaned up old sync documentation (removed PROFILE_SYNC_SYSTEM.md, SMART_SYNC_README.md, UNIFIED_SYNC_SYSTEM.md)
+- Added new files: SYNC_WORK_PROMPT.md, includes/scripts.html, site/api/get_balance.php
+- Next focus: Fix balance update after faucet claim (check faucet-claim.html and faucet-bridge.js)
 
 ---
 

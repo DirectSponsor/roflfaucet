@@ -17,8 +17,8 @@ class DynamicWinSystem {
         
         // Wait for other systems to load
         const initSystems = () => {
-            if (typeof UnifiedBalanceSystem !== 'undefined') {
-                this.unifiedBalance = new UnifiedBalanceSystem();
+            if (window.unifiedBalance) {
+                this.unifiedBalance = window.unifiedBalance;
                 this.setupBetTracking();
                 console.log('✅ Dynamic Win System initialized');
             } else {

@@ -44,10 +44,14 @@ if (!file_exists($balanceFile)) {
     echo json_encode([
         'success' => true,
         'balance' => 0,
-        'user_id' => $userId
+        'user_id' => $userId,
+        'file_timestamp' => null
     ]);
     exit;
 }
+
+// Get file modification timestamp
+$fileTimestamp = filemtime($balanceFile);
 
 // Read balance file
 $data = json_decode(file_get_contents($balanceFile), true);
@@ -62,6 +66,7 @@ echo json_encode([
     'success' => true,
     'balance' => $data['balance'] ?? 0,
     'last_updated' => $data['last_updated'] ?? null,
+    'file_timestamp' => $fileTimestamp,
     'user_id' => $userId
 ]);
 ?>

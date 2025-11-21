@@ -38,8 +38,8 @@ class LevelsSystem {
         
         // Wait for UnifiedBalanceSystem and login state
         const initBalance = () => {
-            if (typeof UnifiedBalanceSystem !== 'undefined') {
-                this.unifiedBalance = new UnifiedBalanceSystem();
+            if (window.unifiedBalance) {
+                this.unifiedBalance = window.unifiedBalance;
                 // Refresh login status to ensure it's current
                 this.unifiedBalance.refreshLoginStatus();
                 this.isLoggedIn = this.unifiedBalance.isLoggedIn;

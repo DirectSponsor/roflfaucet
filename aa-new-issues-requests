@@ -5,4 +5,1298 @@
 
 ---
 
+In roflfaucet, I play some games and have a balance of 12830 but when i go back to the faucet page, its 12590 and then when I go back to slots its also 12590 -- then a few more seconds, it is 12839 again. I think this may be to do with using local storage for balance in some cases but using server balance in other cases. These pages may be using different methods to get the balance. 
 
+in another account I have 1080 coins, I do a faucet claim, success, add 20 but balance remains 1080 even through a forced refresh, but after a minute or two (mabye the batching time) I refresh and it gors to 1100. So again it seems like there is the local storage and the server balance being used or not used as the case may be. 
+
+My balance seems to do random-seeming jumps too. I think it's got more than one way of adding and subtracting and we need to have only one. Like, local storage is all the browser takes any notice of, except for when it first starts or resumes on focus of the tab/window... I dont mean exactly this, but some way to make sure we dont have the balance changing like it does now. 
+
+==========================================================
+
+The notice "⚠️ Connection issue - your earnings are being saved and will sync when reconnected. Dismiss" somes up evne when I am onl yon the one site, not switching. 
+
+--------------------------------------------
+
+Further to the above, I think if each site is only writing to hub, and is keeping its own balance noted in the local storage, we can ignore the balance on the site's server completely, except when checking due to a tab switching or other moving from oen site to another. if I switch to faucet from slots or from dice to faucet, we can just use local storage to track balance because that doesnt change so long as i am not on another site concurrently, so clicking a link or evne using 2 tabs in the same site (we can tell when thye do that cant we?) will not affect the balance, only if they go from one site to another. So my changing baance can be eliminated, its jsut a case of how?
+
+What I mean is, if i go from slots to faucet, there is no need to check the balance file on claiming faucet because its all in local storage anyway... we only need to check the balance file if the user has gone fro the site for a while and come back. Or if they are freshly arrived,
+
+=============================================================
+
+after some activity on roflfaucet I move to clickforchariry, but it has an old balance, porbably form 2 mins ago showign and it doesnt update, despite soem refreshses. So I go back to roflfaucet, and it shows the sysncing notice again but then changes to 
+❌ Unable to sync balance after multiple attempts. Please stop earning activities and contact support. Retry Now
+
+So something is not right. work to do but I think one thing is our sending immediatley when the window loses focus is probably not happening. Theoretically, if we send immediately and check after a short delay we should get balance updating quite fast. 
+
+They do sync eventually, its jsu ta matter of making it more transparent to the user
+
+when this notice appeared below is the console output. its saying too many requests, so something is worng because its onl yme right now, 
+
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Loading the script '<URL>' violates the following Content Security Policy directive: "script-src-elem 'none'". The policy is report-only, so the violation has been logged but no further action has been taken.
+Executing inline event handler violates the following Content Security Policy directive 'script-src 'none''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The policy is report-only, so the violation has been logged but no further action has been taken.
+Executing inline event handler violates the following Content Security Policy directive 'script-src 'none''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The policy is report-only, so the violation has been logged but no further action has been taken.
+Executing inline event handler violates the following Content Security Policy directive 'script-src 'none''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The policy is report-only, so the violation has been logged but no further action has been taken.
+Executing inline event handler violates the following Content Security Policy directive 'script-src 'none''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The policy is report-only, so the violation has been logged but no further action has been taken.
+Executing inline event handler violates the following Content Security Policy directive 'script-src 'none''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The policy is report-only, so the violation has been logged but no further action has been taken.
+Executing inline event handler violates the following Content Security Policy directive 'script-src 'none''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The policy is report-only, so the violation has been logged but no further action has been taken.
+Executing inline event handler violates the following Content Security Policy directive 'script-src 'none''. Either the 'unsafe-inline' keyword, a hash ('sha256-...'), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The policy is report-only, so the violation has been logged but no further action has been taken.
+favicon.ico:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13270, Bet: 10, Spins: 79
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=2, symbol=banana, symbolIndex=1
+ Reel 2: position=2, symbol=banana, symbolIndex=1
+ Reel 3: position=14, symbol=banana, symbolIndex=7
+ Reel 1 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Reel 2 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Reel 3 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: banana === banana === banana
+ 🎲 All equal? true
+ 🎉 WIN! three_banana - Payout: 10x bet = 100 credits
+ 💰 Balance: 13270, Bet: 10, Spins: 79
+ 🎰 Spin complete! Result: three_banana, Payout: 100
+ 📝 Queued balance op: Object
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13370
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13360, Bet: 10, Spins: 80
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=4, symbol=cherries, symbolIndex=2
+ Reel 2: position=11, symbol=blank, symbolIndex=5
+ Reel 3: position=8, symbol=bar, symbolIndex=4
+ Reel 1 stopped on position 4 (cherries)
+   In-between: false
+   Background position: 0 -130px
+ Reel 2 stopped on position 11 (blank)
+   In-between: true
+   Background position: 0 -585px
+ Reel 3 stopped on position 8 (bar)
+   In-between: false
+   Background position: 0 -390px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: cherries === blank === bar
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13360, Bet: 10, Spins: 80
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13360
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13350, Bet: 10, Spins: 81
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=8, symbol=bar, symbolIndex=4
+ Reel 2: position=4, symbol=cherries, symbolIndex=2
+ Reel 3: position=14, symbol=banana, symbolIndex=7
+ Reel 1 stopped on position 8 (bar)
+   In-between: false
+   Background position: 0 -390px
+ Reel 2 stopped on position 4 (cherries)
+   In-between: false
+   Background position: 0 -130px
+ Reel 3 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: bar === cherries === banana
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13350, Bet: 10, Spins: 81
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13350
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13340, Bet: 10, Spins: 82
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=16, symbol=cherries, symbolIndex=8
+ Reel 2: position=12, symbol=watermelon, symbolIndex=6
+ Reel 3: position=10, symbol=bigwin, symbolIndex=5
+ Reel 1 stopped on position 16 (cherries)
+   In-between: false
+   Background position: 0 -910px
+ Reel 2 stopped on position 12 (watermelon)
+   In-between: false
+   Background position: 0 -650px
+ Reel 3 stopped on position 10 (bigwin)
+   In-between: false
+   Background position: 0 -520px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: cherries === watermelon === bigwin
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13340, Bet: 10, Spins: 82
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13340
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13330, Bet: 10, Spins: 83
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=7, symbol=blank, symbolIndex=3
+ Reel 2: position=4, symbol=cherries, symbolIndex=2
+ Reel 3: position=14, symbol=banana, symbolIndex=7
+ Reel 1 stopped on position 7 (blank)
+   In-between: true
+   Background position: 0 -325px
+ Reel 2 stopped on position 4 (cherries)
+   In-between: false
+   Background position: 0 -130px
+ Reel 3 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? true
+ 🎰 currentBet: 10
+ 🎰 credits: 13330
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: blank === cherries === banana
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13330, Bet: 10, Spins: 83
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13330
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13320, Bet: 10, Spins: 84
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=8, symbol=bar, symbolIndex=4
+ Reel 2: position=2, symbol=banana, symbolIndex=1
+ Reel 3: position=9, symbol=blank, symbolIndex=4
+ Reel 1 stopped on position 8 (bar)
+   In-between: false
+   Background position: 0 -390px
+ 📊 Charity Totals: Updated elements with current: 33521 sats
+ Reel 2 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Reel 3 stopped on position 9 (blank)
+   In-between: true
+   Background position: 0 -455px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: bar === banana === blank
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13320, Bet: 10, Spins: 84
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13320
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13310, Bet: 10, Spins: 85
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=0, symbol=watermelon, symbolIndex=0
+ Reel 2: position=10, symbol=bigwin, symbolIndex=5
+ Reel 3: position=14, symbol=banana, symbolIndex=7
+ Reel 1 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Reel 2 stopped on position 10 (bigwin)
+   In-between: false
+   Background position: 0 -520px
+ Reel 3 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? true
+ 🎰 currentBet: 10
+ 🎰 credits: 13310
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === bigwin === banana
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13310, Bet: 10, Spins: 85
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13310
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13300, Bet: 10, Spins: 86
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=0, symbol=watermelon, symbolIndex=0
+ Reel 2: position=8, symbol=bar, symbolIndex=4
+ Reel 3: position=0, symbol=watermelon, symbolIndex=0
+ Reel 1 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Reel 2 stopped on position 8 (bar)
+   In-between: false
+   Background position: 0 -390px
+ Reel 3 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? true
+ 🎰 currentBet: 10
+ 🎰 credits: 13300
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === bar === watermelon
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13300, Bet: 10, Spins: 86
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13300
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13290, Bet: 10, Spins: 87
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=2, symbol=banana, symbolIndex=1
+ Reel 2: position=0, symbol=watermelon, symbolIndex=0
+ Reel 3: position=4, symbol=cherries, symbolIndex=2
+ Reel 1 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Reel 2 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Reel 3 stopped on position 4 (cherries)
+   In-between: false
+   Background position: 0 -130px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: banana === watermelon === cherries
+ 🎲 All equal? false
+ 🎉 WIN! any_fruit - Payout: 4x bet = 40 credits
+ 💰 Balance: 13290, Bet: 10, Spins: 87
+ 🎰 Spin complete! Result: any_fruit, Payout: 40
+ 📝 Queued balance op: Object
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13330
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13320, Bet: 10, Spins: 88
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=10, symbol=bigwin, symbolIndex=5
+ Reel 2: position=5, symbol=blank, symbolIndex=2
+ Reel 3: position=4, symbol=cherries, symbolIndex=2
+ Reel 1 stopped on position 10 (bigwin)
+   In-between: false
+   Background position: 0 -520px
+ Reel 2 stopped on position 5 (blank)
+   In-between: true
+   Background position: 0 -195px
+ Reel 3 stopped on position 4 (cherries)
+   In-between: false
+   Background position: 0 -130px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: bigwin === blank === cherries
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13320, Bet: 10, Spins: 88
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13320
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13310, Bet: 10, Spins: 89
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=12, symbol=watermelon, symbolIndex=6
+ Reel 2: position=4, symbol=cherries, symbolIndex=2
+ Reel 3: position=8, symbol=bar, symbolIndex=4
+ Reel 1 stopped on position 12 (watermelon)
+   In-between: false
+   Background position: 0 -650px
+ Reel 2 stopped on position 4 (cherries)
+   In-between: false
+   Background position: 0 -130px
+ Reel 3 stopped on position 8 (bar)
+   In-between: false
+   Background position: 0 -390px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === cherries === bar
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13310, Bet: 10, Spins: 89
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13310
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13300, Bet: 10, Spins: 90
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=2, symbol=banana, symbolIndex=1
+ Reel 2: position=2, symbol=banana, symbolIndex=1
+ Reel 3: position=0, symbol=watermelon, symbolIndex=0
+ Reel 1 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ 📊 Charity Totals: Updated elements with current: 33521 sats
+ Reel 2 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Reel 3 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: banana === banana === watermelon
+ 🎲 All equal? false
+ 🎉 WIN! any_fruit - Payout: 4x bet = 40 credits
+ 💰 Balance: 13300, Bet: 10, Spins: 90
+ 🎰 Spin complete! Result: any_fruit, Payout: 40
+ 📝 Queued balance op: Object
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13340
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13330, Bet: 10, Spins: 91
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=0, symbol=watermelon, symbolIndex=0
+ Reel 2: position=1, symbol=blank, symbolIndex=0
+ Reel 3: position=14, symbol=banana, symbolIndex=7
+ Reel 1 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Reel 2 stopped on position 1 (blank)
+   In-between: true
+   Background position: 0 65px
+ Reel 3 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? true
+ 🎰 currentBet: 10
+ 🎰 credits: 13330
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === blank === banana
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13330, Bet: 10, Spins: 91
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13330
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13320, Bet: 10, Spins: 92
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=14, symbol=banana, symbolIndex=7
+ Reel 2: position=14, symbol=banana, symbolIndex=7
+ Reel 3: position=6, symbol=seven, symbolIndex=3
+ Reel 1 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Reel 2 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Reel 3 stopped on position 6 (seven)
+   In-between: false
+   Background position: 0 -260px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: banana === banana === seven
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13320, Bet: 10, Spins: 92
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13320
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13310, Bet: 10, Spins: 93
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=0, symbol=watermelon, symbolIndex=0
+ Reel 2: position=2, symbol=banana, symbolIndex=1
+ Reel 3: position=2, symbol=banana, symbolIndex=1
+ Reel 1 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Reel 2 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Reel 3 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === banana === banana
+ 🎲 All equal? false
+ 🎉 WIN! any_fruit - Payout: 4x bet = 40 credits
+ 💰 Balance: 13310, Bet: 10, Spins: 93
+ 🎰 Spin complete! Result: any_fruit, Payout: 40
+ 📝 Queued balance op: Object
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13350
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13340, Bet: 10, Spins: 94
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=10, symbol=bigwin, symbolIndex=5
+ Reel 2: position=14, symbol=banana, symbolIndex=7
+ Reel 3: position=16, symbol=cherries, symbolIndex=8
+ Reel 1 stopped on position 10 (bigwin)
+   In-between: false
+   Background position: 0 -520px
+ Reel 2 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Reel 3 stopped on position 16 (cherries)
+   In-between: false
+   Background position: 0 -910px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: bigwin === banana === cherries
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13340, Bet: 10, Spins: 94
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13340
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13330, Bet: 10, Spins: 95
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=5, symbol=blank, symbolIndex=2
+ Reel 2: position=14, symbol=banana, symbolIndex=7
+ Reel 3: position=9, symbol=blank, symbolIndex=4
+ Reel 1 stopped on position 5 (blank)
+   In-between: true
+   Background position: 0 -195px
+ Reel 2 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Reel 3 stopped on position 9 (blank)
+   In-between: true
+   Background position: 0 -455px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: blank === banana === blank
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13330, Bet: 10, Spins: 95
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13330
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13320, Bet: 10, Spins: 96
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=12, symbol=watermelon, symbolIndex=6
+ Reel 2: position=14, symbol=banana, symbolIndex=7
+ Reel 3: position=12, symbol=watermelon, symbolIndex=6
+ Reel 1 stopped on position 12 (watermelon)
+   In-between: false
+   Background position: 0 -650px
+ 📤 Flushing 127 ops to Hub (timer)
+ 📤 Flushing 127 ops to Hub (timer)
+ 📤 Flushing 127 ops to Hub (timer)
+ Reel 2 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ 📊 Charity Totals: Updated elements with current: 33521 sats
+ ✅ Flush successful, new balance: 13320
+ ⏭️ Skipped duplicate ops: Array(96)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+ ❌ Flush error: 
+flushPendingOps @ unified-balance.js:165
+ ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+ ❌ Flush error: 
+flushPendingOps @ unified-balance.js:165
+ ⚠️ Hub warning banner shown (failures: 9)
+ ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+ Reel 3 stopped on position 12 (watermelon)
+   In-between: false
+   Background position: 0 -650px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === banana === watermelon
+ 🎲 All equal? false
+ 🎉 WIN! any_fruit - Payout: 4x bet = 40 credits
+ 💰 Balance: 13320, Bet: 10, Spins: 96
+ 🎰 Spin complete! Result: any_fruit, Payout: 40
+ 📝 Queued balance op: Object
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13360
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13350, Bet: 10, Spins: 97
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=14, symbol=banana, symbolIndex=7
+ Reel 2: position=12, symbol=watermelon, symbolIndex=6
+ Reel 3: position=5, symbol=blank, symbolIndex=2
+ Reel 1 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Reel 2 stopped on position 12 (watermelon)
+   In-between: false
+   Background position: 0 -650px
+ Reel 3 stopped on position 5 (blank)
+   In-between: true
+   Background position: 0 -195px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: banana === watermelon === blank
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13350, Bet: 10, Spins: 97
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13350
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13340, Bet: 10, Spins: 98
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=12, symbol=watermelon, symbolIndex=6
+ Reel 2: position=10, symbol=bigwin, symbolIndex=5
+ Reel 3: position=0, symbol=watermelon, symbolIndex=0
+ Reel 1 stopped on position 12 (watermelon)
+   In-between: false
+   Background position: 0 -650px
+ Reel 2 stopped on position 10 (bigwin)
+   In-between: false
+   Background position: 0 -520px
+ Reel 3 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === bigwin === watermelon
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13340, Bet: 10, Spins: 98
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13340
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13330, Bet: 10, Spins: 99
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=2, symbol=banana, symbolIndex=1
+ Reel 2: position=14, symbol=banana, symbolIndex=7
+ Reel 3: position=18, symbol=seven, symbolIndex=9
+ Reel 1 stopped on position 2 (banana)
+   In-between: false
+   Background position: 0 0px
+ Reel 2 stopped on position 14 (banana)
+   In-between: false
+   Background position: 0 -780px
+ Reel 3 stopped on position 18 (seven)
+   In-between: false
+   Background position: 0 -1040px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: banana === banana === seven
+ 🎲 All equal? false
+ 💸 No win this time
+ 💰 Balance: 13330, Bet: 10, Spins: 99
+ 🎰 Spin complete! Result: no_win, Payout: 0
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13330
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13320, Bet: 10, Spins: 100
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=10, symbol=bigwin, symbolIndex=5
+ Reel 2: position=10, symbol=bigwin, symbolIndex=5
+ Reel 3: position=6, symbol=seven, symbolIndex=3
+ Reel 1 stopped on position 10 (bigwin)
+   In-between: false
+   Background position: 0 -520px
+ Reel 2 stopped on position 10 (bigwin)
+   In-between: false
+   Background position: 0 -520px
+ Reel 3 stopped on position 6 (seven)
+   In-between: false
+   Background position: 0 -260px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: bigwin === bigwin === seven
+ 🎲 All equal? false
+ 🎉 WIN! bar_bigwin_combo - Payout: 15x bet = 150 credits
+ 💰 Balance: 13320, Bet: 10, Spins: 100
+ 🎰 Spin complete! Result: bar_bigwin_combo, Payout: 150
+ 📝 Queued balance op: Object
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13470
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13460, Bet: 10, Spins: 101
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=12, symbol=watermelon, symbolIndex=6
+ Reel 2: position=0, symbol=watermelon, symbolIndex=0
+ Reel 3: position=4, symbol=cherries, symbolIndex=2
+ Reel 1 stopped on position 12 (watermelon)
+   In-between: false
+   Background position: 0 -650px
+ 📊 Charity Totals: Updated elements with current: 33521 sats
+ Reel 2 stopped on position 0 (watermelon)
+   In-between: false
+   Background position: 0 130px
+ Reel 3 stopped on position 4 (cherries)
+   In-between: false
+   Background position: 0 -130px
+ Stopped on: [object Object], [object Object], [object Object]
+ 🎲 Win check outcomes: Array(3)
+ 🎲 Win check symbols: Array(3)
+ 🎲 Symbol comparison: watermelon === watermelon === cherries
+ 🎲 All equal? false
+ 🎉 WIN! any_fruit - Payout: 4x bet = 40 credits
+ 💰 Balance: 13460, Bet: 10, Spins: 101
+ 🎰 Spin complete! Result: any_fruit, Payout: 40
+ 📝 Queued balance op: Object
+ ✅ Hub warning banner hidden
+ 📤 Flushing 135 ops to Hub (tab-hide)
+ 📤 Flushing 135 ops to Hub (tab-hide)
+ 📤 Flushing 135 ops to Hub (tab-hide)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+ ❌ Flush error: 
+flushPendingOps @ unified-balance.js:165
+ ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:226 🚨 Hub warning banner shown (failures: 10)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+unified-balance.js:120 📤 Flushing 135 ops to Hub (timer)
+unified-balance.js:120 📤 Flushing 135 ops to Hub (timer)
+unified-balance.js:120 📤 Flushing 135 ops to Hub (timer)
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+unified-balance.js:153 ✅ Flush successful, new balance: 13500
+unified-balance.js:155 ⏭️ Skipped duplicate ops: Array(127)
+unified-balance.js:233 ✅ Hub warning banner hidden
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:226 🚨 Hub warning banner shown (failures: 11)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+unified-balance.js:42 🔒 Balance sync lock enabled (10s)
+unified-balance.js:42 🔒 Balance sync lock enabled (10s)
+unified-balance.js:42 🔒 Balance sync lock enabled (10s)
+unified-balance.js:413 ✅ Balance loaded: 13500
+unified-balance.js:49 ✅ Tab visible - balance refreshed, lock released
+unified-balance.js:413 ✅ Balance loaded: 13500
+unified-balance.js:49 ✅ Tab visible - balance refreshed, lock released
+unified-balance.js:413 ✅ Balance loaded: 13500
+unified-balance.js:49 ✅ Tab visible - balance refreshed, lock released
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+quillbot-content.js:2 Uncaught Error: Implement `updateCopyPasteInfo()`
+    at t.value (quillbot-content.js:2:1385196)
+    at l._setCopyPasteInfo (quillbot-content.js:2:1340087)
+quillbot-content.js:2 Uncaught Error: Implement `updateCopyPasteInfo()`
+    at t.value (quillbot-content.js:2:1385196)
+    at l._setCopyPasteInfo (quillbot-content.js:2:1340087)
+quillbot-content.js:2 Uncaught Error: Implement `updateCopyPasteInfo()`
+    at t.value (quillbot-content.js:2:1385196)
+    at l._setCopyPasteInfo (quillbot-content.js:2:1340087)
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+unified-balance.js:120 📤 Flushing 121 ops to Hub (timer)
+unified-balance.js:120 📤 Flushing 121 ops to Hub (timer)
+unified-balance.js:120 📤 Flushing 121 ops to Hub (timer)
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+unified-balance.js:153 ✅ Flush successful, new balance: 13500
+unified-balance.js:155 ⏭️ Skipped duplicate ops: Array(121)
+unified-balance.js:233 ✅ Hub warning banner hidden
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:226 🚨 Hub warning banner shown (failures: 12)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:233 ✅ Hub warning banner hidden
+unified-balance.js:226 ⚠️ Hub warning banner shown (failures: 3)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+unified-balance.js:233 ✅ Hub warning banner hidden
+unified-balance.js:120 📤 Flushing 121 ops to Hub (tab-hide)
+unified-balance.js:120 📤 Flushing 121 ops to Hub (tab-hide)
+unified-balance.js:120 📤 Flushing 121 ops to Hub (tab-hide)
+unified-balance.js:153 ✅ Flush successful, new balance: 13500
+unified-balance.js:155 ⏭️ Skipped duplicate ops: Array(121)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:226 ⚠️ Hub warning banner shown (failures: 4)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:233 ✅ Hub warning banner hidden
+unified-balance.js:226 🚨 Hub warning banner shown (failures: 13)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+unified-balance.js:120 📤 Flushing 81 ops to Hub (timer)
+unified-balance.js:120 📤 Flushing 81 ops to Hub (timer)
+unified-balance.js:120 📤 Flushing 81 ops to Hub (timer)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:233 ✅ Hub warning banner hidden
+unified-balance.js:226 ⚠️ Hub warning banner shown (failures: 5)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:233 ✅ Hub warning banner hidden
+unified-balance.js:226 🚨 Hub warning banner shown (failures: 14)
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+unified-balance.js:42 🔒 Balance sync lock enabled (10s)
+unified-balance.js:42 🔒 Balance sync lock enabled (10s)
+unified-balance.js:42 🔒 Balance sync lock enabled (10s)
+unified-balance.js:413 ✅ Balance loaded: 13500
+unified-balance.js:49 ✅ Tab visible - balance refreshed, lock released
+unified-balance.js:413 ✅ Balance loaded: 13500
+unified-balance.js:49 ✅ Tab visible - balance refreshed, lock released
+unified-balance.js:413 ✅ Balance loaded: 13500
+unified-balance.js:49 ✅ Tab visible - balance refreshed, lock released
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+slots-simplified.js:986 🎰 Global spinReels() function called!
+slots-simplified.js:987 🎰 Current slotMachine instance: CasinoSlotMachine
+slots-simplified.js:988 🎰 Is slotMachine truthy? true
+slots-simplified.js:991 🎰 Calling slotMachine.spinReels()...
+slots-simplified.js:992 🎰 isSpinning? false
+slots-simplified.js:993 🎰 currentBet: 10
+slots-simplified.js:994 🎰 credits: 13500
+unified-balance.js:104 📝 Queued balance op: Object
+slots-simplified.js:596 🎰 Spinning with bet: 10 credits...
+slots-simplified.js:946 💰 Balance: 13490, Bet: 10, Spins: 102
+slots-simplified.js:616 Virtual reel list sizes: Array(3)
+slots-simplified.js:617 Current positions before: Array(3)
+slots-simplified.js:640 Reel 1: position=2, symbol=banana, symbolIndex=1
+slots-simplified.js:640 Reel 2: position=11, symbol=blank, symbolIndex=5
+slots-simplified.js:640 Reel 3: position=2, symbol=banana, symbolIndex=1
+slots-simplified.js:693 Reel 1 stopped on position 2 (banana)
+slots-simplified.js:694   In-between: false
+slots-simplified.js:695   Background position: 0 0px
+slots-simplified.js:693 Reel 2 stopped on position 11 (blank)
+slots-simplified.js:694   In-between: true
+slots-simplified.js:695   Background position: 0 -585px
+slots-simplified.js:693 Reel 3 stopped on position 2 (banana)
+slots-simplified.js:694   In-between: false
+slots-simplified.js:695   Background position: 0 0px
+slots-simplified.js:653 Stopped on: [object Object], [object Object], [object Object]
+slots-simplified.js:758 🎲 Win check outcomes: Array(3)
+slots-simplified.js:759 🎲 Win check symbols: Array(3)
+slots-simplified.js:760 🎲 Symbol comparison: banana === blank === banana
+slots-simplified.js:761 🎲 All equal? false
+slots-simplified.js:815 💸 No win this time
+slots-simplified.js:946 💰 Balance: 13490, Bet: 10, Spins: 102
+slots-simplified.js:834 🎰 Spin complete! Result: no_win, Payout: 0
+unified-balance.js:120 📤 Flushing 73 ops to Hub (manual)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+unified-balance.js:165 ❌ Flush error: Error: HTTP 429
+    at UnifiedBalanceSystem.flushPendingOps (unified-balance.js:136:23)
+flushPendingOps @ unified-balance.js:165
+unified-balance.js:180 ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+unified-balance.js:120 📤 Flushing 59 ops to Hub (manual)
+auth.directsponsor.org/api/balance-update.php:1  Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+ ❌ Flush error: 
+flushPendingOps @ unified-balance.js:165
+ ✅ Hub warning banner hidden
+ ⚠️ Hub warning banner shown (failures: 3)
+ ⚠️ Hub unreachable, will retry later
+flushPendingOps @ unified-balance.js:180
+ ✅ Hub warning banner hidden
+ 🎰 Global spinReels() function called!
+ 🎰 Current slotMachine instance: CasinoSlotMachine
+ 🎰 Is slotMachine truthy? true
+ 🎰 Calling slotMachine.spinReels()...
+ 🎰 isSpinning? false
+ 🎰 currentBet: 10
+ 🎰 credits: 13490
+ 📝 Queued balance op: Object
+ 🎰 Spinning with bet: 10 credits...
+ 💰 Balance: 13480, Bet: 10, Spins: 103
+ Virtual reel list sizes: Array(3)
+ Current positions before: Array(3)
+ Reel 1: position=12, symbol=watermelon, symbolIndex=6
+ Reel 2: position=9, symbol=blank, symbolIndex=4
+slots-simplified.js:640 Reel 3: position=14, symbol=banana, symbolIndex=7
+slots-simplified.js:693 Reel 1 stopped on position 12 (watermelon)
+slots-simplified.js:694   In-between: false
+slots-simplified.js:695   Background position: 0 -650px
+site-utils.js:633 📊 Charity Totals: Updated elements with current: 33521 sats
+slots-simplified.js:693 Reel 2 stopped on position 9 (blank)
+slots-simplified.js:694   In-between: true
+slots-simplified.js:695   Background position: 0 -455px
+slots-simplified.js:693 Reel 3 stopped on position 14 (banana)
+slots-simplified.js:694   In-between: false
+slots-simplified.js:695   Background position: 0 -780px
+slots-simplified.js:653 Stopped on: [object Object], [object Object], [object Object]
+slots-simplified.js:758 🎲 Win check outcomes: Array(3)
+slots-simplified.js:759 🎲 Win check symbols: Array(3)
+slots-simplified.js:760 🎲 Symbol comparison: watermelon === blank === banana
+slots-simplified.js:761 🎲 All equal? false
+slots-simplified.js:815 💸 No win this time
+slots-simplified.js:946 💰 Balance: 13480, Bet: 10, Spins: 103
+slots-simplified.js:834 🎰 Spin complete! Result: no_win, Payout: 0
+slots-simplified.js:986 🎰 Global spinReels() function called!
+slots-simplified.js:987 🎰 Current slotMachine instance: CasinoSlotMachine
+slots-simplified.js:988 🎰 Is slotMachine truthy? true
+slots-simplified.js:991 🎰 Calling slotMachine.spinReels()...
+slots-simplified.js:992 🎰 isSpinning? false
+slots-simplified.js:993 🎰 currentBet: 10
+slots-simplified.js:994 🎰 credits: 13480
+unified-balance.js:104 📝 Queued balance op: Object
+slots-simplified.js:596 🎰 Spinning with bet: 10 credits...
+slots-simplified.js:946 💰 Balance: 13470, Bet: 10, Spins: 104
+slots-simplified.js:616 Virtual reel list sizes: Array(3)
+slots-simplified.js:617 Current positions before: Array(3)
+slots-simplified.js:640 Reel 1: position=4, symbol=cherries, symbolIndex=2
+slots-simplified.js:640 Reel 2: position=12, symbol=watermelon, symbolIndex=6
+slots-simplified.js:640 Reel 3: position=16, symbol=cherries, symbolIndex=8
+slots-simplified.js:693 Reel 1 stopped on position 4 (cherries)
+slots-simplified.js:694   In-between: false
+slots-simplified.js:695   Background position: 0 -130px
+slots-simplified.js:693 Reel 2 stopped on position 12 (watermelon)
+slots-simplified.js:694   In-between: false
+slots-simplified.js:695   Background position: 0 -650px
+slots-simplified.js:986 🎰 Global spinReels() function called!
+slots-simplified.js:987 🎰 Current slotMachine instance: CasinoSlotMachine
+slots-simplified.js:988 🎰 Is slotMachine truthy? true
+slots-simplified.js:991 🎰 Calling slotMachine.spinReels()...
+slots-simplified.js:992 🎰 isSpinning? true
+slots-simplified.js:993 🎰 currentBet: 10
+slots-simplified.js:994 🎰 credits: 13470
+slots-simplified.js:693 Reel 3 stopped on position 16 (cherries)
+slots-simplified.js:694   In-between: false
+slots-simplified.js:695   Background position: 0 -910px
+slots-simplified.js:653 Stopped on: [object Object], [object Object], [object Object]
+slots-simplified.js:758 🎲 Win check outcomes: Array(3)
+slots-simplified.js:759 🎲 Win check symbols: Array(3)
+slots-simplified.js:760 🎲 Symbol comparison: cherries === watermelon === cherries
+slots-simplified.js:761 🎲 All equal? false
+slots-simplified.js:446 🎉 WIN! any_fruit - Payout: 4x bet = 40 credits
+slots-simplified.js:946 💰 Balance: 13470, Bet: 10, Spins: 104
+slots-simplified.js:834 🎰 Spin complete! Result: any_fruit, Payout: 40
+unified-balance.js:104 📝 Queued balance op: Object
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1285px
+slots-simplified.js:354   Container width: 602.5px
+slots-simplified.js:355   Available width: 530.5px
+slots-simplified.js:356   Calculated reel width: 176px
+slots-simplified.js:357   Final reel width: 130px
+slots-simplified.js:358   Reel height: 390px
+slots-simplified.js:359   Position height: 65px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 130px
+slots-simplified.js:231   Rendered reel height: 390px
+slots-simplified.js:232   Symbol height: 130px
+slots-simplified.js:233   Total sprite height: 1300px
+slots-simplified.js:234   Position height: 65px
+slots-simplified.js:235   Reels container width: 454px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1278px
+slots-simplified.js:354   Container width: 599px
+slots-simplified.js:355   Available width: 527px
+slots-simplified.js:356   Calculated reel width: 175px
+slots-simplified.js:357   Final reel width: 130px
+slots-simplified.js:358   Reel height: 390px
+slots-simplified.js:359   Position height: 65px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 130px
+slots-simplified.js:231   Rendered reel height: 390px
+slots-simplified.js:232   Symbol height: 130px
+slots-simplified.js:233   Total sprite height: 1300px
+slots-simplified.js:234   Position height: 65px
+slots-simplified.js:235   Reels container width: 454px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1236px
+slots-simplified.js:354   Container width: 578px
+slots-simplified.js:355   Available width: 506px
+slots-simplified.js:356   Calculated reel width: 168px
+slots-simplified.js:357   Final reel width: 130px
+slots-simplified.js:358   Reel height: 390px
+slots-simplified.js:359   Position height: 65px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 130px
+slots-simplified.js:231   Rendered reel height: 390px
+slots-simplified.js:232   Symbol height: 130px
+slots-simplified.js:233   Total sprite height: 1300px
+slots-simplified.js:234   Position height: 65px
+slots-simplified.js:235   Reels container width: 454px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1221px
+slots-simplified.js:354   Container width: 570.5px
+slots-simplified.js:355   Available width: 498.5px
+slots-simplified.js:356   Calculated reel width: 166px
+slots-simplified.js:357   Final reel width: 130px
+slots-simplified.js:358   Reel height: 390px
+slots-simplified.js:359   Position height: 65px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 130px
+slots-simplified.js:231   Rendered reel height: 390px
+slots-simplified.js:232   Symbol height: 130px
+slots-simplified.js:233   Total sprite height: 1300px
+slots-simplified.js:234   Position height: 65px
+slots-simplified.js:235   Reels container width: 454px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1203px
+slots-simplified.js:354   Container width: 561.5px
+slots-simplified.js:355   Available width: 489.5px
+slots-simplified.js:356   Calculated reel width: 163px
+slots-simplified.js:357   Final reel width: 130px
+slots-simplified.js:358   Reel height: 390px
+slots-simplified.js:359   Position height: 65px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 130px
+slots-simplified.js:231   Rendered reel height: 390px
+slots-simplified.js:232   Symbol height: 130px
+slots-simplified.js:233   Total sprite height: 1300px
+slots-simplified.js:234   Position height: 65px
+slots-simplified.js:235   Reels container width: 454px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1186px
+slots-simplified.js:354   Container width: 553px
+slots-simplified.js:355   Available width: 481px
+slots-simplified.js:356   Calculated reel width: 160px
+slots-simplified.js:357   Final reel width: 120px
+slots-simplified.js:358   Reel height: 360px
+slots-simplified.js:359   Position height: 60px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 120px
+slots-simplified.js:231   Rendered reel height: 360px
+slots-simplified.js:232   Symbol height: 120px
+slots-simplified.js:233   Total sprite height: 1200px
+slots-simplified.js:234   Position height: 60px
+slots-simplified.js:235   Reels container width: 424px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1173px
+slots-simplified.js:354   Container width: 546.5px
+slots-simplified.js:355   Available width: 474.5px
+slots-simplified.js:356   Calculated reel width: 158px
+slots-simplified.js:357   Final reel width: 120px
+slots-simplified.js:358   Reel height: 360px
+slots-simplified.js:359   Position height: 60px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 120px
+slots-simplified.js:231   Rendered reel height: 360px
+slots-simplified.js:232   Symbol height: 120px
+slots-simplified.js:233   Total sprite height: 1200px
+slots-simplified.js:234   Position height: 60px
+slots-simplified.js:235   Reels container width: 424px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1158px
+slots-simplified.js:354   Container width: 539px
+slots-simplified.js:355   Available width: 467px
+slots-simplified.js:356   Calculated reel width: 155px
+slots-simplified.js:357   Final reel width: 120px
+slots-simplified.js:358   Reel height: 360px
+slots-simplified.js:359   Position height: 60px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 120px
+slots-simplified.js:231   Rendered reel height: 360px
+slots-simplified.js:232   Symbol height: 120px
+slots-simplified.js:233   Total sprite height: 1200px
+slots-simplified.js:234   Position height: 60px
+slots-simplified.js:235   Reels container width: 424px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1147px
+slots-simplified.js:354   Container width: 533.5px
+slots-simplified.js:355   Available width: 461.5px
+slots-simplified.js:356   Calculated reel width: 153px
+slots-simplified.js:357   Final reel width: 120px
+slots-simplified.js:358   Reel height: 360px
+slots-simplified.js:359   Position height: 60px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 120px
+slots-simplified.js:231   Rendered reel height: 360px
+slots-simplified.js:232   Symbol height: 120px
+slots-simplified.js:233   Total sprite height: 1200px
+slots-simplified.js:234   Position height: 60px
+slots-simplified.js:235   Reels container width: 424px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1127px
+slots-simplified.js:354   Container width: 523.5px
+slots-simplified.js:355   Available width: 451.5px
+slots-simplified.js:356   Calculated reel width: 150px
+slots-simplified.js:357   Final reel width: 120px
+slots-simplified.js:358   Reel height: 360px
+slots-simplified.js:359   Position height: 60px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 120px
+slots-simplified.js:231   Rendered reel height: 360px
+slots-simplified.js:232   Symbol height: 120px
+slots-simplified.js:233   Total sprite height: 1200px
+slots-simplified.js:234   Position height: 60px
+slots-simplified.js:235   Reels container width: 424px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1102px
+slots-simplified.js:354   Container width: 511px
+slots-simplified.js:355   Available width: 439px
+slots-simplified.js:356   Calculated reel width: 146px
+slots-simplified.js:357   Final reel width: 120px
+slots-simplified.js:358   Reel height: 360px
+slots-simplified.js:359   Position height: 60px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 120px
+slots-simplified.js:231   Rendered reel height: 360px
+slots-simplified.js:232   Symbol height: 120px
+slots-simplified.js:233   Total sprite height: 1200px
+slots-simplified.js:234   Position height: 60px
+slots-simplified.js:235   Reels container width: 424px
+slots-simplified.js:352 🎰 Responsive dimensions calculated:
+slots-simplified.js:353   Viewport width: 1096px
+slots-simplified.js:354   Container width: 508px
+slots-simplified.js:355   Available width: 436px
+slots-simplified.js:356   Calculated reel width: 145px
+slots-simplified.js:357   Final reel width: 120px
+slots-simplified.js:358   Reel height: 360px
+slots-simplified.js:359   Position height: 60px
+slots-simplified.js:229 🎰 Sprite dimensions updated:
+slots-simplified.js:230   Rendered reel width: 120px
+slots-simplified.js:231   Rendered reel height: 360px
+slots-simplified.js:232   Symbol height: 120px
+slots-simplified.js:233   Total sprite height: 1200px
+slots-simplified.js:234   Position height: 60px
+slots-simplified.js:235   Reels container width: 424px
+
+
+I also noticed that when I switch tabs to clickforcharity most of the time the sync notice only stays for about a second and then is gone, and it appears immediately so there is not enough time for the other tab to have send its data to the hub.
+
+to try, note the balance in clickforcharity, then go to rofl and do some games for at least 6 mins, then go back to cfc and see what the balance is, its not easy to know exactly what is happening but that will give an idea, its likely jsut giving the last 2 min push but not updating the immediate one becauase its checking too soon. 

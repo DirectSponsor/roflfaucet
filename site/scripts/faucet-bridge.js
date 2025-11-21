@@ -1,8 +1,14 @@
 // Faucet Bridge Script - Minimal Version
 // Handles the faucet claim process
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🌉 Faucet Bridge: Starting initialization...');
+// Singleton protection
+if (window.faucetBridgeInitialized) {
+    console.warn('⚠️ Faucet Bridge already initialized! Script loaded multiple times.');
+} else {
+    window.faucetBridgeInitialized = true;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🌉 Faucet Bridge: Starting initialization...');
     
     // Wait for unified balance system to be ready
     function waitForUnifiedBalance() {
@@ -39,10 +45,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 await window.unifiedBalance.addBalance(20, 'faucet', 'Faucet claim reward');
                 updateLastClaimTime();
                 
-                // Flush pending operations before redirecting (for logged-in users)
+                // Flush net change before redirecting (for logged-in users)
                 if (window.unifiedBalance.isLoggedIn) {
                     console.log('⏳ Flushing balance before redirect...');
-                    await window.unifiedBalance.flushPendingOps('faucet-claim');
+                    // Start flush (don't wait for completion)
+                    window.unifiedBalance.flushNetChange('faucet-claim');
+                    // Clear netChange immediately so next page starts fresh
+                    window.unifiedBalance.resetNetChange();
+                    // Small delay to let flush request send
+                    await new Promise(resolve => setTimeout(resolve, 100));
                 }
                 
                 // Redirect to result page
@@ -51,8 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    waitForUnifiedBalance();
-});
+        waitForUnifiedBalance();
+    });
+}
 
 function updateLastClaimTime() {
     const now = Date.now();
