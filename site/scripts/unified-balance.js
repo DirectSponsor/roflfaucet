@@ -144,12 +144,10 @@ class UnifiedBalanceSystem {
             this.flushNetChange('timer');
         }, 120000);
         
-        // 2. Visibility change - flush when tab becomes hidden AND update last active site
+        // 2. Visibility change - flush when tab becomes hidden
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                // Mark that we're leaving this site (more reliable than blur)
-                localStorage.setItem('last_active_site', this.siteId);
-                console.log(`👋 Leaving site, marked last_active_site = ${this.siteId}`);
+                // Just flush - don't update last_active_site (focus handler does that)
                 this.flushNetChange('visibility-hidden');
             }
         });
