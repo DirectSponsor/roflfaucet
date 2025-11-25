@@ -76,6 +76,9 @@
                         <div class="dropdown-content">
                             <a href="profile.html">👤 Profile</a>
                             <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox <span id="notification-badge" class="notification-badge" style="background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7em; margin-left: 5px; display: none;">3</span></a>
+                            <button id="sync-balance-btn" onclick="window.unifiedBalance?.syncBalance()" style="width:100%;text-align:left;border:none;background:none;padding:8px 15px;cursor:pointer;font-size:14px;color:#333;">
+                                🔄 Sync Balance <span style="font-size:11px;opacity:0.7;cursor:help;" onclick="event.stopPropagation();window.location.href='/balance-sync-help.html';">(?)</span>
+                            </button>
                             <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
                         </div>
                     </div>
@@ -288,11 +291,42 @@
                                                     <a href="https://auth.directsponsor.org/change-password.php?token=" id="change-password-link" class="security-button" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">Change Password</a>
                                                     <a href="https://auth.directsponsor.org/forgot-password.php?redirect_uri=https://roflfaucet.com/profile.html" class="security-button" style="display: inline-block; padding: 10px 20px; background: #6c757d; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">Reset Password</a>
                                                 </div>
+                                                
+                                                <!-- Data Deletion Section -->
+                                                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #ddd;">
+                                                    <h4 style="color: #dc3545; margin-bottom: 10px;">🗑️ Data Deletion</h4>
+                                                    <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                                                        <strong>Permanently delete all your account data</strong> including balance, profile, chat history, and avatars. 
+                                                        This action cannot be undone and will remove your data from all sites.
+                                                    </p>
+                                                    <button id="delete-account-btn" onclick="confirmAccountDeletion()" style="display: inline-block; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">
+                                                        Delete My Account Data
+                                                    </button>
+                                                    <p style="color: #888; font-size: 12px; margin-top: 10px;">
+                                                        ⚠️ Files are recoverable for 30 days, after which they are permanently deleted.
+                                                    </p>
+                                                </div>
                                                 <script>
                                                     // Add JWT token to change password link
                                                     const jwt = localStorage.getItem('roflfaucet_session');
                                                     if (jwt) {
                                                         document.getElementById('change-password-link').href += jwt + '&redirect_uri=https://roflfaucet.com/profile.html';
+                                                    }
+                                                    
+                                                    // Account deletion confirmation
+                                                    function confirmAccountDeletion() {
+                                                        const userId = localStorage.getItem('roflfaucet_user_id');
+                                                        if (!userId) {
+                                                            alert('Unable to identify your account. Please log out and log back in.');
+                                                            return;
+                                                        }
+                                                        
+                                                        if (confirm('Are you sure you want to delete all your account data? This includes:\n\n• Balance and earnings\n• Profile information\n• Chat history\n• Avatar images\n\nThis action cannot be undone and will affect all sites.')) {
+                                                            // Redirect to auth server for deletion
+                                                            const returnUrl = encodeURIComponent(window.location.href);
+                                                            const deleteUrl = `https://auth.directsponsor.org/delete-account.html?user_id=${userId}&return_url=${returnUrl}`;
+                                                            window.location.href = deleteUrl;
+                                                        }
                                                     }
                                                 </script>
                                             </div>

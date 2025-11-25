@@ -27,33 +27,34 @@
 
 ## 🔥 NEW PRIORITY ISSUES
 
-### ISSUE-018: Slots Balance Validation Bug
-**Priority: HIGH (Game Security)**  
-**Status: IDENTIFIED - NEEDS FIX**  
-**Discovered: 2025-11-12 during lazy loading testing**
+### ✅ ISSUE-018: Balance Manipulation Detection System
+**Priority: MEDIUM (Fraud Detection)**  
+**Status: STRATEGY DEFINED - SEE DOCUMENTATION**  
+**Updated: 2025-11-24**
 
-**Problem:**
-Slots game allows play without sufficient balance or with balance showing as "1" (possibly cached).
-This has occurred multiple times and needs proper validation to prevent unauthorized gameplay.
+**Strategic Decision:**
+Rather than "fixing" the balance caching issue, implement manipulation detection to catch dishonest actors.
 
-**Root Cause:**
-- Balance validation may be bypassing proper checks for logged-in users
-- Could be related to localStorage cache vs. server balance mismatch
-- May occur specifically with new users or after balance sync issues
-- **NOTE**: Guest mode (logged out) works correctly - refuses to spin with zero balance
+**Rationale:**
+- Low real-world risk (coins, not real money)
+- LocalStorage manipulation always possible for technical users
+- Better to detect and remove bad actors than prevent all users
+- Turn security "bug" into fraud detection feature
 
-**Impact:**
-- Users can play games without paying the cost
-- Potential for negative balances or free gameplay
-- Revenue loss and game economy integrity issues
+**Implementation:**
+- Documented in `MANIPULATION_DETECTION_STRATEGY.md`
+- Phase 1: Add client-server discrepancy logging
+- Phase 2: Build analytics dashboard for pattern detection  
+- Phase 3: Automated flagging and tiered response system
+- Phase 4: Honeypot strategy to catch manipulators before payout
 
-**Implementation Tasks:**
-- [ ] Investigate slots balance validation logic
-- [ ] Add server-side balance verification before game starts
-- [ ] Ensure balance checks happen after lazy loading completes
-- [ ] Add proper error handling for insufficient funds
-- [ ] Test with new users and cached balance scenarios
-- [ ] Add logging for balance validation failures
+**Benefits:**
+- Catches truly dishonest users rather than inconveniencing everyone
+- Builds evidence for decisive action
+- Minimal performance impact on honest users
+- Strong deterrent when manipulators get caught
+
+**Next Action:** Implement Phase 1 discrepancy logging (low effort, high value)
 
 ### ISSUE-016: Time-on-Site Leaderboard System
 **Priority: MEDIUM (Engagement Feature)**  

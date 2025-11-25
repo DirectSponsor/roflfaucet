@@ -76,6 +76,9 @@
                         <div class="dropdown-content">
                             <a href="profile.html">👤 Profile</a>
                             <a href="chat.html#inbox" id="inbox-menu-item">📨 Inbox <span id="notification-badge" class="notification-badge" style="background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7em; margin-left: 5px; display: none;">3</span></a>
+                            <button id="sync-balance-btn" onclick="window.unifiedBalance?.syncBalance()" style="width:100%;text-align:left;border:none;background:none;padding:8px 15px;cursor:pointer;font-size:14px;color:#333;">
+                                🔄 Sync Balance <span style="font-size:11px;opacity:0.7;cursor:help;" onclick="event.stopPropagation();window.location.href='/balance-sync-help.html';">(?)</span>
+                            </button>
                             <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
                         </div>
                     </div>

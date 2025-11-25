@@ -11,9 +11,9 @@ class UnifiedBalanceSystem {
         // Balance state
         this.fileBalance = 0; // Balance from file
         this.netChange = 0; // Running total of changes since last flush
-        this.isBalanceLocked = false; // Lock during cross-site sync
         this.consecutiveFailures = 0;
         this.isFlushing = false; // Guard flag to prevent double flush
+        this.isSyncing = false; // Guard flag for manual sync
         
         console.log(`💰 ROFLFaucet Balance System initialized for ${this.isLoggedIn ? 'member' : 'guest'} user`);
         
@@ -34,9 +34,6 @@ class UnifiedBalanceSystem {
             }
             this.setupFlushTriggers();
             this.setupCrossSiteSync();
-            
-            // Check if we just switched from another site
-            this.checkCrossSiteSwitchOnLoad();
         }
     }
     
@@ -110,14 +107,11 @@ class UnifiedBalanceSystem {
             
             if (result.success) {
                 // Update file balance and reset net change
+                const previousNetChange = this.netChange;
                 this.fileBalance = result.balance;
                 this.resetNetChange();
                 
                 console.log('✅ Flush successful, new balance:', result.balance);
-                
-                // Track last write for cross-site detection
-                localStorage.setItem('last_write_site', this.siteId);
-                localStorage.setItem('last_write_time', Date.now().toString());
                 
                 this.consecutiveFailures = 0;
                 this.hideHubWarning();
@@ -147,7 +141,6 @@ class UnifiedBalanceSystem {
         // 2. Visibility change - flush when tab becomes hidden
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                // Just flush - don't update last_active_site (focus handler does that)
                 this.flushNetChange('visibility-hidden');
             }
         });
@@ -165,120 +158,80 @@ class UnifiedBalanceSystem {
         console.log('⏱️ Flush triggers setup: timer (120s), blur, beforeunload');
     }
     
-    // ========== CROSS-SITE SYNC LOGIC ==========
+    // ========== MANUAL SYNC ==========
     
-    checkCrossSiteSwitchOnLoad() {
-        const lastActiveSite = localStorage.getItem('last_active_site');
-        const currentSite = this.siteId;
-        
-        // Check if we just navigated from a different site
-        if (lastActiveSite && lastActiveSite !== currentSite) {
-            console.log(`🔄 Detected site switch on load: ${lastActiveSite} → ${currentSite}`);
-            // Trigger sync immediately
-            this.syncFromOtherSite();
+    async syncBalance() {
+        if (!this.isLoggedIn) {
+            this.showSyncMessage('⚠️ Please log in to sync balance', 3000);
+            return;
         }
         
-        // Update current site
-        localStorage.setItem('last_active_site', currentSite);
+        if (this.isSyncing) return;
+        
+        this.isSyncing = true;
+        
+        try {
+            this.updateSyncButton('syncing');
+            await this.flushNetChange('manual-sync');
+            this.showSyncMessage('⏳ Syncing balance... (10 seconds)');
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            await this.getBalance();
+            this.updateBalanceDisplaysSync();
+            this.showSyncMessage('✅ Balance synced!', 2000);
+            this.updateSyncButton('success');
+            setTimeout(() => this.updateSyncButton('normal'), 2000);
+            console.log('✅ Manual balance sync completed');
+        } catch (error) {
+            console.error('❌ Sync error:', error);
+            this.showSyncMessage('❌ Sync failed. Please try again.', 3000);
+            this.updateSyncButton('normal');
+        } finally {
+            this.isSyncing = false;
+        }
+    }
+    
+    updateSyncButton(state) {
+        const btn = document.getElementById('sync-balance-btn');
+        if (!btn) return;
+        switch(state) {
+            case 'syncing':
+                btn.innerHTML = '⏳ Syncing...';
+                btn.disabled = true;
+                break;
+            case 'success':
+                btn.innerHTML = '✅ Synced!';
+                btn.disabled = true;
+                break;
+            default:
+                btn.innerHTML = '🔄 Sync <span class="sync-help">(?)</span>';
+                btn.disabled = false;
+        }
+    }
+    
+    showSyncMessage(message, duration = null) {
+        const existing = document.getElementById('sync-message');
+        if (existing) existing.remove();
+        const div = document.createElement('div');
+        div.id = 'sync-message';
+        div.textContent = message;
+        div.style.cssText = 'position:fixed;top:70px;right:20px;background:#4CAF50;color:white;padding:12px 20px;border-radius:4px;box-shadow:0 2px 5px rgba(0,0,0,0.3);z-index:10001;font-size:14px;';
+        document.body.appendChild(div);
+        if (duration) setTimeout(() => { if (div.parentNode) div.remove(); }, duration);
     }
     
     setupCrossSiteSync() {
+        // Simple: just refresh balance on focus
         window.addEventListener('focus', async () => {
-            const lastActiveSite = localStorage.getItem('last_active_site');
-            const currentSite = this.siteId;
-            
-            // Check if switching from different site BEFORE updating
-            if (lastActiveSite && lastActiveSite !== currentSite) {
-                // Cross-site switch - need full sync with lock
-                console.log(`🔄 Detected site switch on focus: ${lastActiveSite} → ${currentSite}`);
-                
-                // Update current site FIRST (so other tabs see the switch)
-                localStorage.setItem('last_active_site', currentSite);
-                
-                await this.syncFromOtherSite();
-            } else {
-                // Same site - just refresh balance without lock
-                console.log(`🔄 Refreshing balance on focus (same site)`);
-                
-                // Still update last active site timestamp
-                localStorage.setItem('last_active_site', currentSite);
-                
-                await this.getBalance();
-                this.updateBalanceDisplaysSync();
-            }
+            await this.getBalance();
+            this.updateBalanceDisplaysSync();
         });
-        
-        // Listen for localStorage changes from other tabs
+        // Keep storage listener for multi-tab
         window.addEventListener('storage', (e) => {
-            if (e.key === this.getNetChangeKey() || e.key === 'last_write_time') {
-                console.log('🔄 Balance updated in another tab, refreshing...');
+            if (e.key === this.getNetChangeKey()) {
                 this.loadNetChange();
                 this.updateBalanceDisplaysSync();
             }
         });
-        
-        // Set initial site
-        localStorage.setItem('last_active_site', this.siteId);
-    }
-    
-    async syncFromOtherSite() {
-        // Lock balance operations
-        this.isBalanceLocked = true;
-        this.showSyncNotification();
-        
-        console.log('🔒 Balance operations locked for cross-site sync');
-        
-        // Wait 10 seconds for Syncthing
-        await new Promise(resolve => setTimeout(resolve, 10000));
-        
-        // Read balance from file
-        await this.getBalance();
-        
-        // Check if sync succeeded by looking at file timestamp
-        const combinedUserId = this.getCombinedUserIdFromToken();
-        try {
-            const response = await fetch(`/api/get_balance.php?user_id=${combinedUserId}`);
-            const data = await response.json();
-            
-            const fileTimestamp = data.file_timestamp;
-            const lastWriteTime = parseInt(localStorage.getItem('last_write_time') || '0');
-            const ageSeconds = Date.now()/1000 - fileTimestamp;
-            
-            if (ageSeconds < 15) {
-                // Sync succeeded - file is recent
-                console.log('✅ Cross-site sync successful');
-                this.isBalanceLocked = false;
-                this.hideSyncNotification();
-                this.updateBalanceDisplaysSync();
-            } else {
-                // Sync failed - file is stale
-                console.error('❌ Cross-site sync failed - file too old:', ageSeconds, 'seconds');
-                this.handleSyncFailure();
-            }
-        } catch (error) {
-            console.error('❌ Failed to check sync status:', error);
-            this.handleSyncFailure();
-        }
-    }
-    
-    handleSyncFailure() {
-        this.showHubWarning(true);
-        
-        // Store failure info
-        localStorage.setItem('sync_failed_' + this.getCombinedUserIdFromToken(), JSON.stringify({
-            failed_site: this.siteId,
-            last_good_site: localStorage.getItem('last_write_site'),
-            timestamp: Date.now()
-        }));
-        
-        // Keep operations locked
-        // Auto-retry every 30 seconds
-        setTimeout(() => {
-            if (this.isBalanceLocked) {
-                console.log('🔄 Retrying sync...');
-                this.syncFromOtherSite();
-            }
-        }, 30000);
     }
     
     // ========== WARNING BANNERS ==========
@@ -327,44 +280,6 @@ class UnifiedBalanceSystem {
     hideHubWarning() {
         const banner = document.getElementById('hub-warning-banner');
         if (banner) banner.remove();
-    }
-    
-    showSyncNotification() {
-        this.hideSyncNotification();
-        
-        const notification = document.createElement('div');
-        notification.id = 'sync-notification';
-        notification.style.cssText = `
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 9999;
-            font-size: 14px;
-        `;
-        
-        notification.innerHTML = `
-            <style>
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-            </style>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="border: 2px solid white; border-top-color: transparent; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite;"></div>
-                <span>🔄 Syncing your balance across sites...</span>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
-    }
-    
-    hideSyncNotification() {
-        const notification = document.getElementById('sync-notification');
-        if (notification) notification.remove();
     }
     
     // ========== BALANCE OPERATIONS ==========
@@ -419,11 +334,6 @@ class UnifiedBalanceSystem {
     }
     
     async addBalance(amount, source, description) {
-        if (this.isBalanceLocked) {
-            console.warn('⚠️ Balance locked - cannot add balance');
-            return { success: false, error: 'Balance locked during sync' };
-        }
-        
         if (this.isLoggedIn) {
             this.addToNetChange(amount, source, description);
             return { success: true, balance: this.fileBalance + this.netChange };
@@ -433,11 +343,6 @@ class UnifiedBalanceSystem {
     }
     
     async subtractBalance(amount, source, description) {
-        if (this.isBalanceLocked) {
-            console.warn('⚠️ Balance locked - cannot subtract balance');
-            return { success: false, error: 'Balance locked during sync' };
-        }
-        
         if (this.isLoggedIn) {
             this.addToNetChange(-amount, source, description);
             return { success: true, balance: this.fileBalance + this.netChange };
@@ -566,7 +471,7 @@ class UnifiedBalanceSystem {
     
     updateCurrencyDisplay() {
         const currency = this.isLoggedIn ? 'coins' : 'tokens';
-        const currencyElements = document.querySelectorAll('.currency, [data-currency]');
+        const currencyElements = document.querySelectorAll('.currency, [data-currency], .currency-full');
         currencyElements.forEach(element => {
             element.textContent = currency;
         });
@@ -583,7 +488,7 @@ class UnifiedBalanceSystem {
             element.title = `${formattedBalance} ${terminology.fullName}`;
         });
         
-        updateCurrencyDisplays();
+        this.updateCurrencyDisplay();
     }
     
     getTerminology() {
