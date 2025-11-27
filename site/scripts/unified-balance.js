@@ -525,6 +525,39 @@ class UnifiedBalanceSystem {
         localStorage.removeItem('guest_transactions');
         console.log('🗑️ Guest data cleared');
     }
+    
+    // ========== MANIPULATION DETECTION ==========
+    
+    checkManipulation(gameCost) {
+        if (!this.isLoggedIn) return; // Skip for guests
+        
+        const clientBalance = this.fileBalance + this.netChange;
+        
+        // Call server to check for suspicious activity
+        fetch('/scripts/analytics.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=check_manipulation&user_id=${this.userId}&client_balance=${clientBalance}&game_cost=${gameCost}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.server_balance) {
+                // Check for significant discrepancy
+                if (Math.abs(clientBalance - data.server_balance) > 10) {
+                    console.warn(`🚨 Balance discrepancy detected: Client=${clientBalance}, Server=${data.server_balance}`);
+                    
+                    // Update local balance to match server
+                    const discrepancy = data.server_balance - this.fileBalance;
+                    this.netChange = discrepancy;
+                    this.saveNetChange();
+                    this.updateCurrencyDisplay();
+                }
+            }
+        })
+        .catch(error => {
+            console.log('🔍 Manipulation check failed:', error);
+        });
+    }
 }
 
 // Global instance (singleton pattern)
@@ -549,7 +582,7 @@ window.updateBalanceDisplays = async () => {
         element.title = `${formattedBalance} ${terminology.fullName}`;
     });
     
-    updateCurrencyDisplays();
+    window.updateCurrencyDisplays();
 };
 
 window.updateCurrencyDisplays = () => {
@@ -559,6 +592,13 @@ window.updateCurrencyDisplays = () => {
         element.textContent = terminology.currency;
         element.title = terminology.fullName;
     });
+};
+
+// Global manipulation check function for games
+window.checkManipulation = (gameCost) => {
+    if (window.unifiedBalance && window.unifiedBalance.isLoggedIn) {
+        window.unifiedBalance.checkManipulation(gameCost);
+    }
 };
 
 window.getBalance = () => window.unifiedBalance.getBalance();

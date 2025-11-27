@@ -198,6 +198,161 @@ class SimpleGameAnalytics {
         
         return array_values($users);
     }
+    
+    /**
+     * Log balance manipulation detection
+     * Called when suspicious activity is detected
+     */
+    public static function logManipulation($userId, $type, $data) {
+        $today = date('Y-m-d');
+        $manipulationFile = self::$statsDir . "manipulation_$today.log";
+        
+        $entry = [
+            'timestamp' => time(),
+            'user_id' => $userId,
+            'type' => $type, // 'balance_mismatch', 'insufficient_balance', 'impossible_earnings'
+            'data' => $data,
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
+        ];
+        
+        file_put_contents($manipulationFile, json_encode($entry) . "\n", FILE_APPEND | LOCK_EX);
+    }
+    
+    /**
+     * Check for suspicious activity patterns - SIMPLIFIED
+     */
+    public static function checkSuspiciousActivity($userId, $clientBalance, $gameCost) {
+        $serverBalance = self::getUserBalance($userId);
+        $userLevel = self::getUserLevel($userId);
+        
+        // MAIN DETECTION: Low level users with rapid balance growth
+        if ($userLevel <= 3) { // Levels 1-3 are new users
+            $today = date('Y-m-d');
+            $userFile = self::$statsDir . "user_{$userId}_$today.log";
+            
+            if (file_exists($userFile)) {
+                $lines = file($userFile, FILE_IGNORE_NEW_LINES);
+                $totalEarnings = 0;
+                $timeSpan = 0;
+                $firstTime = null;
+                $lastTime = null;
+                
+                foreach ($lines as $line) {
+                    $entry = json_decode($line, true);
+                    if ($entry && $entry['net'] > 0) {
+                        $totalEarnings += $entry['net'];
+                        
+                        if ($firstTime === null) $firstTime = $entry['timestamp'];
+                        $lastTime = $entry['timestamp'];
+                    }
+                }
+                
+                // Calculate time span in hours
+                if ($firstTime && $lastTime) {
+                    $timeSpan = ($lastTime - $firstTime) / 3600; // Convert to hours
+                    if ($timeSpan < 1) $timeSpan = 1; // Minimum 1 hour to avoid division by zero
+                }
+                
+                // DETECTION TRIGGERS:
+                
+                // 1. Too much earnings in short time (for new users)
+                $hourlyEarnings = $totalEarnings / $timeSpan;
+                if ($hourlyEarnings > 200) { // More than 200 coins per hour for new users
+                    self::logManipulation($userId, 'rapid_earnings', [
+                        'user_level' => $userLevel,
+                        'total_earnings' => $totalEarnings,
+                        'time_hours' => round($timeSpan, 1),
+                        'hourly_rate' => round($hourlyEarnings, 1),
+                        'games_played' => count($lines)
+                    ]);
+                }
+                
+                // 2. High total earnings for level (suspicious for new users)
+                $maxEarningsForLevel = [
+                    1 => 500,   // Level 1: 500 coins max per day seems reasonable
+                    2 => 800,   // Level 2: 800 coins max per day
+                    3 => 1200   // Level 3: 1200 coins max per day
+                ];
+                
+                if ($totalEarnings > ($maxEarningsForLevel[$userLevel] ?? 1200)) {
+                    self::logManipulation($userId, 'excessive_earnings', [
+                        'user_level' => $userLevel,
+                        'daily_earnings' => $totalEarnings,
+                        'max_reasonable' => $maxEarningsForLevel[$userLevel] ?? 1200,
+                        'games_played' => count($lines)
+                    ]);
+                }
+            }
+        }
+        
+        // Optional: Still log balance mismatches but lower priority
+        if (abs($clientBalance - $serverBalance) > 50) { // Higher threshold
+            self::logManipulation($userId, 'balance_mismatch', [
+                'client_balance' => $clientBalance,
+                'server_balance' => $serverBalance,
+                'difference' => abs($clientBalance - $serverBalance)
+            ]);
+        }
+        
+        return $serverBalance;
+    }
+    
+    /**
+     * Get user balance from balance system
+     */
+    private static function getUserBalance($userId) {
+        // Use existing balance API
+        $balanceFile = "/var/roflfaucet-data/users/{$userId}/balance.json";
+        if (file_exists($balanceFile)) {
+            $data = json_decode(file_get_contents($balanceFile), true);
+            return (float)($data['balance'] ?? 0);
+        }
+        return 0;
+    }
+    
+    /**
+     * Get user level from profile
+     */
+    private static function getUserLevel($userId) {
+        $profileFile = "/var/roflfaucet-data/users/{$userId}/profile.json";
+        if (file_exists($profileFile)) {
+            $data = json_decode(file_get_contents($profileFile), true);
+            return (int)($data['level'] ?? 1);
+        }
+        return 1;
+    }
+    
+    /**
+     * Get manipulation stats for admin dashboard
+     */
+    public static function getManipulationStats($days = 7) {
+        $stats = [];
+        $total = 0;
+        
+        for ($i = 0; $i < $days; $i++) {
+            $date = date('Y-m-d', strtotime("-$i days"));
+            $file = self::$statsDir . "manipulation_$date.log";
+            
+            if (file_exists($file)) {
+                $lines = file($file, FILE_IGNORE_NEW_LINES);
+                $dayStats = ['total' => count($lines), 'types' => []];
+                
+                foreach ($lines as $line) {
+                    $entry = json_decode($line, true);
+                    if ($entry) {
+                        $type = $entry['type'] ?? 'unknown';
+                        $dayStats['types'][$type] = ($dayStats['types'][$type] ?? 0) + 1;
+                    }
+                }
+                
+                $stats[$date] = $dayStats;
+                $total += count($lines);
+            }
+        }
+        
+        return ['total' => $total, 'days' => $stats];
+    }
 }
 
 /**
@@ -254,7 +409,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo json_encode(['error' => 'Unknown action']);
     }
-    
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
     header('Content-Type: application/json');
     
@@ -269,6 +423,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $days = (int)($_GET['days'] ?? 7);
         $leaderboard = SimpleGameAnalytics::getUserLeaderboard($game, $days);
         echo json_encode(['success' => true, 'data' => $leaderboard]);
+    } elseif ($action === 'check_manipulation') {
+    $userId = $_POST['user_id'] ?? 'guest';
+    $clientBalance = floatval($_POST['client_balance'] ?? 0);
+    $gameCost = floatval($_POST['game_cost'] ?? 0);
+    
+    if ($userId !== 'guest') {
+        $serverBalance = SimpleGameAnalytics::checkSuspiciousActivity($userId, $clientBalance, $gameCost);
+        echo json_encode(['success' => true, 'server_balance' => $serverBalance]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Guest user']);
+    }
+} elseif ($action === 'manipulation') {
+        $days = (int)($_GET['days'] ?? 7);
+        $stats = SimpleGameAnalytics::getManipulationStats($days);
+        echo json_encode(['success' => true, 'data' => $stats]);
     } else {
         echo json_encode(['error' => 'Unknown action']);
     }
