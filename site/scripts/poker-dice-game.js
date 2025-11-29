@@ -1383,13 +1383,10 @@ class PokerDiceGame {
     
     // Utility methods (simplified versions of originals)
     changeBet(delta) {
-        console.log(`🎲 changeBet called: delta=${delta}, currentBet=${this.currentBet}`);
-        
         // Check if levels system is available
         if (!window.levelsSystem) {
             console.warn('🎲 Level system not available - using default max bet');
             const newBet = Math.max(1, Math.min(100, this.currentBet + delta));
-            console.log(`🎲 Setting bet to: ${newBet} (fallback mode)`);
             this.setBet(newBet);
             return;
         }
@@ -1397,35 +1394,23 @@ class PokerDiceGame {
         const maxBet = window.levelsSystem.getMaxBet();
         const newBet = Math.max(1, this.currentBet + delta);
         
-        console.log(`🎲 Bet calculation: currentBet=${this.currentBet}, delta=${delta}, newBet=${newBet}, maxBet=${maxBet}`);
-        
         if (newBet <= maxBet) {
-            console.log(`🎲 Bet allowed: setting to ${newBet}`);
             this.setBet(newBet);
         } else if (delta > 0) {
             // Trying to increase bet beyond level limit
             window.levelsSystem.showInsufficientLevelModal(newBet, maxBet);
             console.log(`🎲 Bet blocked: ${newBet} exceeds max bet ${maxBet} for current level`);
-        } else {
-            // If delta < 0 (decreasing), always allow it
-            console.log(`🎲 Decrease bet allowed: setting to ${newBet}`);
-            this.setBet(newBet);
         }
+        // If delta < 0 (decreasing), always allow it
     }
     
     setBet(amount) {
         const bet = Math.max(1, parseInt(amount) || 1);
-        console.log(`🎲 setBet called: amount=${amount}, final bet=${bet}`);
         
         // Store internally and update display
         this.currentBet = bet;
         const betDisplay = document.getElementById('currentBet');
-        if (betDisplay) {
-            betDisplay.textContent = bet;
-            console.log(`🎲 Bet display updated to: ${bet}`);
-        } else {
-            console.error('🎲 Could not find bet display element!');
-        }
+        if (betDisplay) betDisplay.textContent = bet;
         
         this.saveLastBet(); // Save the new bet amount
         this.updateMainButton();
