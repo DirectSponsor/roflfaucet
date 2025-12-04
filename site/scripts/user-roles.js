@@ -20,7 +20,7 @@ class UserRoleSystem {
                 name: 'Admin',
                 description: 'Full site administration capabilities',
                 permissions: ['verify_recipients', 'approve_projects', 'manage_users', 'access_admin_panel'],
-                uiElements: ['admin-panel', 'verification-tools', 'project-approval-tools']
+                uiElements: ['admin-panel', 'verification-tools', 'project-approval-tools', 'admin-only']
             },
             // Future roles can be added here:
             // 'm': {
