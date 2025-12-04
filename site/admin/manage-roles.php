@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 session_start();
 
 function getProfilePath($userId) {
-    return '/var/www/staging/userdata/profiles/' . $userId . '.txt';
+    return '/var/roflfaucet-data/userdata/profiles/' . $userId . '.txt';
 }
 
 function loadProfile($userId) {
