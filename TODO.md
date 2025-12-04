@@ -1,3 +1,8 @@
+note from andy, rather than mess up the file, cna you pu tit somewhere appropriate?
+We have lots of sync conflict files but syncthing should not be having conflicts because we were making sure we dont update the user files on more than one site at a time. 
+
+
+
 # ROFLFAUCET - Master TODO List
 
 *Last updated: 2025-11-09*  
