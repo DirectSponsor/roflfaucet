@@ -1,8 +1,3 @@
-note from andy, rather than mess up the file, cna you pu tit somewhere appropriate?
-We have lots of sync conflict files but syncthing should not be having conflicts because we were making sure we dont update the user files on more than one site at a time. 
-
-
-
 # ROFLFAUCET - Master TODO List
 
 *Last updated: 2025-11-09*  
@@ -31,6 +26,101 @@ We have lots of sync conflict files but syncthing should not be having conflicts
 ---
 
 ## 🔥 NEW PRIORITY ISSUES
+
+### ISSUE-020: Syncthing Conflict Files Investigation & Sync Cleanup
+**Priority: CRITICAL (System Architecture)**  
+**Status: DOCUMENTED - MIGRATION PLAN CREATED**  
+**Updated: 2025-12-07**
+
+**✅ INVESTIGATION COMPLETE - CURRENT STATE DOCUMENTED**
+
+**ACTUAL WORKING SYNC ARCHITECTURE (2025-12-07):**
+
+**Method: Syncthing file-based sync (flat files, no database, no constant API auth) ✅**
+
+**ROFLFaucet (89.116.44.206):**
+- ✅ **ACTIVE SYNC**: Manual syncthing process (www-data user, started via nohup)
+  - Process: `/usr/bin/syncthing serve --no-browser --no-restart --logflags=0 --home=/var/roflfaucet-data/.config/syncthing`
+  - Port 22000: Connected to hub (86.38.200.119:22000)
+- ❌ REDUNDANT: `roflfaucet-sync.service` (inotify + API daemon) - RUNNING but FAILING
+- ❌ DEAD: `syncthing-roflfaucet.service`, `syncthing@root.service` (masked), `syncthing@www-data.service` (failed)
+
+**Hub - es3-auth (86.38.200.119):**
+- ✅ **ACTIVE SYNC**: Manual syncthing process (apache user, started via sudo nohup)
+  - Process: `sudo -u apache nohup syncthing serve --no-browser --home=/var/directsponsor-data/.config/syncthing`
+  - Port 22000: Connected to both ROFLFaucet and ClickForCharity
+- ❌ DEAD: `syncthing-hub.service` (failed - port conflict), `syncthing@root.service` (stopped)
+
+**ClickForCharity (89.116.173.103):**
+- ✅ **ACTIVE SYNC**: Manual syncthing process (www-data user, started via sudo nohup)
+  - Process: `sudo -u www-data nohup syncthing serve --no-browser --home=/var/clickforcharity-data/.config/syncthing`
+  - Port 22000: Connected to hub (86.38.200.119:22000)
+- ❌ DEAD: `syncthing-clickforcharity.service` (stopped), `syncthing@root.service` (stopped)
+
+**Conflict Files:**
+- 40 legacy conflict files on each server from Nov 16 transition (syncthing shutdown/restart)
+- Additional conflicts on Nov 25 at 02:00:01 (likely cron job during sync)
+- No new conflicts since migration to manual processes
+
+**MIGRATION PLAN - Consolidate to Single Sync Method:**
+
+**Goal: One syncthing systemd service per server, remove all redundant processes**
+
+**Phase 1: Prepare systemd services**
+- [ ] Create/verify proper systemd service files on all 3 servers
+- [ ] Ensure services use same config paths as manual processes:
+  - ROFLFaucet: `/var/roflfaucet-data/.config/syncthing` (www-data user)
+  - Hub: `/var/directsponsor-data/.config/syncthing` (apache user)
+  - ClickForCharity: `/var/clickforcharity-data/.config/syncthing` (www-data user)
+- [ ] Configure services to auto-restart and enable on boot
+
+**Phase 2: Stop manual processes**
+- [ ] Find PIDs of manual syncthing processes on all servers
+- [ ] Stop manual syncthing processes gracefully (let sync complete first)
+- [ ] Verify no nohup processes remain
+
+**Phase 3: Start systemd services**
+- [ ] Start systemd syncthing services on all 3 servers
+- [ ] Verify connectivity (all 3 should connect via port 22000)
+- [ ] Test sync by making changes on each site
+- [ ] Monitor for 24 hours to ensure stability
+
+**Phase 4: Remove redundant services**
+- [ ] Stop and disable `roflfaucet-sync.service` (API daemon)
+- [ ] Remove `/root/sync-daemon.sh` on ROFLFaucet
+- [ ] Unmask and permanently disable old `syncthing@root` services
+- [ ] Remove failed systemd service configs for old services
+
+**Phase 5: Clean up conflict files**
+- [ ] Archive conflict files to backup location (zip with timestamp)
+- [ ] Delete conflict files from all 3 servers (40 files each)
+- [ ] Verify original files are intact and current
+
+**Phase 6: Documentation**
+- [ ] Document final syncthing configuration
+- [ ] Create systemd service restart/troubleshooting guide
+- [ ] Update deployment scripts to be aware of systemd services
+
+### ISSUE-021: Admin Panel on Profile Page
+**Priority: HIGH (Admin Feature)**  
+**Status: NEW**  
+**Updated: 2025-12-07**
+
+**Problem:**
+Profile page has an admin panel section with non-functional links. This was likely planned for future implementation.
+
+**Requirements:**
+- Make admin panel links functional
+- Move user roles management link from user menu (admin) into this panel
+- Consolidate admin functions in one location
+
+**Action items:**
+- [ ] Review profile page admin panel section
+- [ ] Identify all intended admin panel links
+- [ ] Implement missing functionality for each link
+- [ ] Move user roles management from user menu to admin panel
+- [ ] Test admin panel access and permissions
+- [ ] Update navigation structure
 
 ### ✅ ISSUE-018: Balance Manipulation Detection System
 **Priority: MEDIUM (Fraud Detection)**  
