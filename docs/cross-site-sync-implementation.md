@@ -18,9 +18,17 @@ Instead of relying on browser state (referrer, session storage, etc.), we use th
 1. Page loads → immediately fetch balance data (includes `last_updated` timestamp)
 2. Calculate file age: `pageLoadTime - last_updated`
 3. If file age < 15 seconds → user likely just came from another site
-4. Wait 10 seconds for Syncthing to propagate changes
-5. Reload balance with synced data
-6. Enable games/transactions
+4. Set `syncInProgress = true` flag
+5. Wait 10 seconds for Syncthing to propagate changes
+6. Reload balance with synced data
+7. Set `syncInProgress = false` - actions can proceed
+
+**Action Queuing:**
+- If user clicks a button during sync, the action waits instead of being blocked
+- `addToNetChange()` checks `syncInProgress` flag
+- If sync in progress, action waits in a loop (checks every 100ms)
+- When sync completes, action proceeds automatically
+- User gets their coins - nothing is lost!
 
 ### Why This Approach
 
@@ -42,26 +50,32 @@ Instead of relying on browser state (referrer, session storage, etc.), we use th
 
 ### Key Changes to `unified-balance.js`
 
-1. **Added `gamesEnabled` flag**
-   - Starts as `false` for logged-in users
-   - Set to `true` after sync check completes
-   - Guest users always `true`
+1. **Added `syncInProgress` flag**
+   - Starts as `false`
+   - Set to `true` during cross-site sync delay
+   - Set to `false` after sync completes
+   - Used to queue actions instead of blocking them
 
 2. **Added `checkAndWaitForSync()` method**
    - Runs on page load for logged-in users
+   - Skips on page refresh (F5) - only runs on normal navigation
    - Fetches balance data with `last_updated` timestamp
    - Calculates file age
-   - If fresh (<15s): Shows sync message, waits 10s, reloads balance
-   - If old (>15s): No delay, enables games immediately
+   - If fresh (<15s): Sets `syncInProgress = true`, waits 10s, reloads balance, sets `syncInProgress = false`
+   - If old (>15s): No delay, no flag set
 
-3. **Added `canMakeTransaction()` method**
-   - Checks `gamesEnabled` flag before allowing balance changes
-   - Shows warning message if games not enabled yet
-   - Prevents race conditions during sync period
+3. **Added `waitForSyncIfNeeded()` method**
+   - Checks `syncInProgress` flag
+   - If sync in progress, waits in a loop (checks every 100ms)
+   - Shows "⏳ Waiting for sync to complete..." message
+   - Returns when sync completes
+   - Actions proceed automatically after wait
 
 4. **Modified `addToNetChange()` method**
-   - Calls `canMakeTransaction()` before processing
-   - Blocks transactions during sync period
+   - Now `async` function
+   - Calls `await waitForSyncIfNeeded()` before processing
+   - **Queues** transactions during sync period instead of blocking them
+   - User actions are delayed, not lost
 
 ### Configuration
 
@@ -96,16 +110,22 @@ const SYNC_WAIT_TIME = 10000;      // 10 seconds
 4. ClickForCharity page loads
 5. Detects fresh file (<15s old)
 6. Shows: "⏳ Syncing balance from other site... (10 seconds)"
-7. Waits 10 seconds
-8. Reloads balance (now synced)
-9. Shows: "✅ Balance synced!" (2 seconds)
-10. Enables games
+7. Sets `syncInProgress = true`
+8. Waits 10 seconds
+9. Reloads balance (now synced)
+10. Sets `syncInProgress = false`
+11. Shows: "✅ Balance synced!" (2 seconds)
+12. Any queued actions proceed automatically
 
 ### During Sync Period
 - User can browse the site
 - Balance display shows current value
-- Attempting to play a game shows: "⏳ Please wait - syncing balance..."
-- Transactions are blocked until sync completes
+- User clicks faucet/game button during sync:
+  - Action is **queued**, not blocked
+  - Shows: "⏳ Waiting for sync to complete..."
+  - After 10 seconds, action proceeds automatically
+  - User gets their coins - nothing is lost!
+- **Actions are delayed, not blocked** - user experience is seamless
 
 ## Server Requirements
 
@@ -195,11 +215,11 @@ Or:
 
 For each site, ensure:
 
-- [ ] `unified-balance.js` includes `gamesEnabled` flag
-- [ ] `checkAndWaitForSync()` method is implemented
-- [ ] `canMakeTransaction()` method is implemented
+- [ ] `unified-balance.js` includes `syncInProgress` flag
+- [ ] `checkAndWaitForSync()` method is implemented with page refresh detection
+- [ ] `waitForSyncIfNeeded()` method is implemented
 - [ ] Constructor calls `checkAndWaitForSync()` for logged-in users
-- [ ] `addToNetChange()` checks `canMakeTransaction()` before processing
+- [ ] `addToNetChange()` is `async` and calls `await waitForSyncIfNeeded()`
 - [ ] Balance API returns `last_updated` timestamp
 - [ ] Site is syncing via Syncthing with other DirectSponsor sites
 
@@ -228,7 +248,8 @@ The key additions to `unified-balance.js` are:
 
 1. **In constructor:**
 ```javascript
-this.gamesEnabled = false; // Start disabled until sync check complete
+this.syncInProgress = false; // True during cross-site sync delay
+this.pendingActions = []; // Queue for actions during sync
 
 // Later in constructor for logged-in users:
 this.checkAndWaitForSync();
@@ -236,14 +257,39 @@ this.checkAndWaitForSync();
 
 2. **New methods:**
 ```javascript
-async checkAndWaitForSync() { /* ... see implementation ... */ }
-canMakeTransaction() { /* ... see implementation ... */ }
+async checkAndWaitForSync() {
+    // Skip on page refresh
+    if (performance.navigation.type === 1) {
+        console.log('📊 Page refresh detected - skipping sync delay');
+        return;
+    }
+    
+    // Check file age, if fresh (<15s):
+    this.syncInProgress = true;
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    await this.getBalance();
+    this.syncInProgress = false;
+}
+
+async waitForSyncIfNeeded() {
+    if (!this.syncInProgress) return;
+    
+    console.log('⏳ Action queued - waiting for sync to complete...');
+    while (this.syncInProgress) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+}
 ```
 
-3. **In addToNetChange:**
+3. **Modified addToNetChange:**
 ```javascript
-if (!this.canMakeTransaction()) {
-    return;
+async addToNetChange(amount, source, description) {
+    // Wait for sync if in progress, then proceed
+    await this.waitForSyncIfNeeded();
+    
+    this.netChange += amount;
+    this.saveNetChange();
+    // ...
 }
 ```
 
