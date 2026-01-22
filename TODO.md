@@ -27,12 +27,34 @@
 
 ## 🔥 NEW PRIORITY ISSUES
 
-### ISSUE-020: Syncthing Conflict Files Investigation & Sync Cleanup
-**Priority: CRITICAL (System Architecture)**  
-**Status: DOCUMENTED - MIGRATION PLAN CREATED**  
-**Updated: 2025-12-07**
+### ISSUE-022: Update OpenGraph Descriptions for Charity Focus
+**Priority: LOW (Content Polish)**  
+**Status: NEW**  
+**Updated: 2026-01-22**
 
-**✅ INVESTIGATION COMPLETE - CURRENT STATE DOCUMENTED**
+**Problem:**
+OpenGraph descriptions across game pages should emphasize the charity aspect to better communicate ROFLFaucet's mission.
+
+**Current:** "Play casino slots and win UselessCoins on ROFLFaucet"  
+**Desired:** "Play casino slots and win UselessCoins for charity on ROFLFaucet"
+
+**Pages to update:**
+- [ ] slots.html
+- [ ] roll.html
+- [ ] wheel.html
+- [ ] poker-dice.html
+- [ ] games.html (overview)
+- [ ] index.html (if applicable)
+
+**Implementation:**
+Update `og:description` and `twitter:description` meta tags to include "for charity" messaging.
+
+### ✅ ISSUE-020: Syncthing Conflict Files Investigation & Sync Cleanup
+**Priority: CRITICAL (System Architecture)**  
+**Status: COMPLETED**  
+**Updated: 2026-01-22**
+
+**✅ MIGRATION COMPLETE - ALL SERVERS NOW RUNNING SYSTEMD SERVICES**
 
 **ACTUAL WORKING SYNC ARCHITECTURE (2025-12-07):**
 
@@ -97,9 +119,69 @@
 - [ ] Verify original files are intact and current
 
 **Phase 6: Documentation**
-- [ ] Document final syncthing configuration
-- [ ] Create systemd service restart/troubleshooting guide
+- [x] Document final syncthing configuration
+- [x] Create systemd service restart/troubleshooting guide
 - [ ] Update deployment scripts to be aware of systemd services
+
+---
+
+**✅ MIGRATION COMPLETED: 2026-01-22**
+
+**Final Architecture:**
+- **ROFLFaucet**: `syncthing-roflfaucet.service` running (www-data user)
+- **Hub (es3-auth)**: `syncthing-hub.service` running (apache user)
+- **ClickForCharity**: `syncthing-clickforcharity.service` running (www-data user)
+
+**Results:**
+- ✅ All manual nohup processes stopped
+- ✅ All systemd services running with auto-restart enabled
+- ✅ Conflict files archived to `/root/sync-conflicts-backup-20260122-*.tar.gz` on each server
+- ✅ All 95 conflict files deleted (40 ROFLFaucet, 40 Hub, 15 ClickForCharity)
+- ✅ Sync tested and verified working across all 3 servers
+- ✅ Services configured to start on boot
+
+**Service Management:**
+```bash
+# Check status
+ssh roflfaucet "systemctl status syncthing-roflfaucet.service"
+ssh es3-auth "systemctl status syncthing-hub.service"
+ssh clickforcharity "systemctl status syncthing-clickforcharity.service"
+
+# Restart if needed
+sudo systemctl restart syncthing-roflfaucet.service
+sudo systemctl restart syncthing-hub.service
+sudo systemctl restart syncthing-clickforcharity.service
+
+# View logs
+sudo journalctl -u syncthing-roflfaucet.service -f
+```
+
+**Remaining Tasks:**
+- Monitor for 24 hours to ensure stability
+- Consider stopping redundant `roflfaucet-sync.service` (inotify + API daemon) if still running
+
+**✅ CROSS-SITE SYNC PROTECTION IMPLEMENTED: 2026-01-22**
+
+Added automatic cross-site navigation detection to prevent race conditions:
+
+**Implementation:**
+- File-timestamp based detection (checks `last_updated` in balance file)
+- If file modified in last 15 seconds → wait 10 seconds for Syncthing sync
+- Blocks transactions during sync period (`gamesEnabled` flag)
+- Shows user-friendly sync messages
+
+**Benefits:**
+- ✅ Prevents balance conflicts during cross-site navigation
+- ✅ Server-authoritative (doesn't rely on browser state)
+- ✅ Automatic detection (no manual tracking needed)
+- ✅ No false positives (won't delay same-site navigation)
+- ✅ Minimal server impact (only 1-2 requests on page load)
+
+**Documentation:**
+- Implementation: `/docs/cross-site-sync-implementation.md`
+- Strategy: `/home/andy/work/projects/sync-system/BALANCE_BATCHING_STRATEGY.md`
+
+**Expected Result:** Zero conflicts from cross-site navigation
 
 ### ISSUE-021: Admin Panel on Profile Page
 **Priority: HIGH (Admin Feature)**  

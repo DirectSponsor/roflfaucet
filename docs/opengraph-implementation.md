@@ -200,6 +200,55 @@ $og_url = $og_url ?? 'https://yourdomain.com/';
 - Violates static-first philosophy
 - Minimal benefit for small sites
 
+## Deployment Instructions
+
+### For ROFLFaucet (or similar projects with deploy scripts)
+
+The standard deploy script only syncs the `site/` directory, so the rotation script must be uploaded manually:
+
+```bash
+# 1. Upload the rotation script
+scp rotate-og-image.sh roflfaucet:/var/www/html/
+
+# 2. Make it executable
+ssh roflfaucet "chmod +x /var/www/html/rotate-og-image.sh"
+
+# 3. Set up cron job for hourly rotation
+ssh roflfaucet "(crontab -l 2>/dev/null | grep -v 'rotate-og-image.sh'; echo '0 * * * * /var/www/html/rotate-og-image.sh >> /var/www/html/og-rotation.log 2>&1') | crontab -"
+
+# 4. Verify cron job
+ssh roflfaucet "crontab -l | grep rotate-og-image"
+```
+
+### Cron Schedule Options
+
+**Hourly (Production):**
+```bash
+0 * * * * /var/www/html/rotate-og-image.sh >> /var/www/html/og-rotation.log 2>&1
+```
+
+**Every 5 minutes (Testing):**
+```bash
+*/5 * * * * /var/www/html/rotate-og-image.sh >> /var/www/html/og-rotation.log 2>&1
+```
+
+**Daily at midnight:**
+```bash
+0 0 * * * /var/www/html/rotate-og-image.sh >> /var/www/html/og-rotation.log 2>&1
+```
+
+### Monitoring
+
+Check rotation logs:
+```bash
+ssh roflfaucet "tail -20 /var/www/html/og-rotation.log"
+```
+
+Verify current active image:
+```bash
+ssh roflfaucet "ls -la /var/www/html/images/og-image.jpg /var/www/html/images/og-images/"
+```
+
 ## Resources
 
 ### Documentation
@@ -219,13 +268,17 @@ $og_url = $og_url ?? 'https://yourdomain.com/';
 - [ ] Upload image to `/images/` directory
 - [ ] Add OG meta tags to each page
 - [ ] Customize title, description, URL per page
+- [ ] Upload rotation script to server (manual step)
+- [ ] Set up cron job for automatic rotation
 - [ ] Test with Facebook debugger
 - [ ] Test with Twitter validator
 - [ ] Verify image displays correctly
 - [ ] Check mobile preview
+- [ ] Monitor rotation logs
 - [ ] Document any page-specific images
 
 ---
 
 **Last Updated:** 2026-01-22  
-**Applies To:** Static HTML sites, frugal web design philosophy
+**Applies To:** Static HTML sites, frugal web design philosophy  
+**Deployment Status:** ✅ Implemented on ROFLFaucet (hourly rotation active)
