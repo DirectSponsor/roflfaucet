@@ -241,6 +241,13 @@ class UnifiedBalanceSystem {
     async checkAndWaitForSync() {
         const pageLoadTime = Date.now();
         
+        // Skip sync delay on page refresh (F5) - only check on normal navigation
+        if (performance.navigation.type === 1) {
+            console.log('📊 Page refresh detected - skipping sync delay');
+            this.gamesEnabled = true;
+            return;
+        }
+        
         try {
             // Get initial balance data (includes last_updated timestamp)
             const combinedUserId = this.getCombinedUserIdFromToken();
