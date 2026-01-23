@@ -58,7 +58,8 @@
 ```
 site/api/mark_recent_change.php          (new)
 site/api/recent_changes.txt              (new)
-site/api/check_cross_site_changes.php    (new)
+site/api/check_user_recent.php           (new - optimized endpoint)
+site/api/check_cross_site_changes.php    (modified - uses optimized endpoint)
 site/api/.htaccess                       (new)
 site/scripts/unified-balance.js          (modified)
 ```
@@ -67,7 +68,8 @@ site/scripts/unified-balance.js          (modified)
 ```
 api/mark_recent_change.php               (new)
 api/recent_changes.txt                   (new)
-api/check_cross_site_changes.php         (new)
+api/check_user_recent.php                (new - optimized endpoint)
+api/check_cross_site_changes.php         (modified - uses optimized endpoint)
 api/.htaccess                            (new)
 js/unified-balance.js                    (modified)
 ```
@@ -119,10 +121,11 @@ d569dcd - Switch to server-side cross-site change detection - no CORS issues
 
 ## Performance Notes
 
-- **Overhead:** Minimal - only 3 small text file fetches when focusing tab
+- **Overhead:** Minimal - lightweight endpoint queries (1-2 bytes response)
 - **Frequency:** Only checks when user focuses tab (not on every action)
 - **File Size:** `recent_changes.txt` stays tiny (auto-expires entries after 30s)
 - **Server Load:** Negligible - simple file reads, no database queries
+- **Optimization (2026-01-23):** Changed from downloading full `recent_changes.txt` to querying `check_user_recent.php?user_id=X` which returns just `n` or age in seconds
 
 ## Architecture
 
@@ -141,9 +144,11 @@ Tab focus event triggers checkForCrossSiteChanges()
   ↓
 Calls local check_cross_site_changes.php
   ↓
-Server fetches recent_changes.txt from ROFLFaucet
+Server queries ROFLFaucet: check_user_recent.php?user_id=X
   ↓
-Finds user ID → Shows banner
+Response: 'n' (not found) or '15' (seconds ago)
+  ↓
+If found → Shows banner
   ↓
 User clicks "Sync Now" → Waits 10s → Reloads balance
 ```
@@ -155,6 +160,7 @@ User clicks "Sync Now" → Waits 10s → Reloads balance
 3. **Test incrementally** - Many iterations to get right approach
 4. **Document root matters** - ClickForCharity uses non-standard path
 5. **Permissions critical** - Files must be writable by www-data
+6. **Minimize data transfer** - Query endpoints (1-2 bytes) beat downloading full files, even tiny ones
 
 ---
 
