@@ -1,169 +1,143 @@
-# Cross-Site Sync Detection - Implementation Status
+# Cross-Site Balance Sync - Status
 
-**Date:** 2026-01-22  
-**Status:** ✅ Working - Balance updates persist correctly
+**Date:** 2026-01-23  
+**Status:** ⚠️ Simplified - Removed automatic detection, manual sync only
 
-## What Was Implemented
+## Current Approach (Simplified)
 
-### Server-Side Cross-Site Detection
-- **Files Created:**
-  - `/api/mark_recent_change.php` - Marks user balance changes in a tracking file
-  - `/api/recent_changes.txt` - Public text file listing user IDs with recent changes (last 30s)
-  - `/api/check_cross_site_changes.php` - Server-side API that checks other sites for recent changes
-  - `/api/.htaccess` - CORS headers to allow cross-site requests
+### What Works Now
+- ✅ Balance updates persist correctly on each site
+- ✅ Syncthing syncs balance files between servers every 5-10 seconds
+- ✅ Manual sync button available for users who switch sites
+- ✅ Flush-on-blur ensures changes are saved when leaving a tab
 
 ### How It Works
-1. When user updates balance on Site A, `mark_recent_change.php` adds their user ID to `recent_changes.txt`
-2. When user focuses tab on Site B, JavaScript calls local `check_cross_site_changes.php`
-3. Server-side PHP fetches `recent_changes.txt` from other sites (no CORS issues)
-4. If user ID found, shows banner: "⚠️ Balance updated on [Site] Xs ago [Sync Now] [Dismiss]"
-5. User clicks "Sync Now" → waits 10 seconds → reloads balance → shows success
+1. User plays on Site A → balance changes accumulate in `netChange`
+2. User switches tabs → blur event triggers flush to balance file
+3. Syncthing syncs the file to other servers (5-10 seconds)
+4. User switches to Site B → balance loads from synced file
+5. If user wants immediate sync, they click the manual sync button
 
-### Sites Deployed
-- ✅ ROFLFaucet
-- ✅ ClickForCharity
-- ⏳ Auth server (skipped - SSL/CORS issues, not critical)
+### Known Limitation
+**Edge case:** If a user actively uses both sites simultaneously (within the same 5-10 second Syncthing window), one transaction may be lost because:
+- Site A writes balance file with transaction 1
+- Site B writes balance file with transaction 2
+- Syncthing syncs → one file overwrites the other
+- One transaction is lost
 
-## Issues Fixed Today
+**Frequency:** Rare - requires user to be actively clicking/playing on both sites at the exact same time.
 
-### Issue 1: CORS Errors
-**Problem:** Browser blocked cross-site requests to `recent_changes.txt`  
-**Solution:** Moved detection to server-side PHP + added `.htaccess` CORS headers
+**Mitigation:** Manual sync button available. Users can sync if they notice a discrepancy.
 
-### Issue 2: Balance Not Persisting
-**Problem:** Balance updates showed briefly then reverted to old value  
-**Root Cause:** Stale netChange detection was clearing localStorage too aggressively  
-**Solution:** Removed the 5-minute staleness check - it was interfering with normal operations
+## Files Removed (2026-01-23)
 
-### Issue 3: Wrong Document Root (ClickForCharity)
-**Problem:** Files deployed to `/var/www/html/` but site uses `/var/www/clickforcharity.net/public_html/`  
-**Solution:** Moved files to correct location with proper permissions
-
-## Current State
-
-### Working Features
-- ✅ Balance updates persist correctly across page loads and games
-- ✅ Cross-site detection API endpoints deployed and functional
-- ✅ Server-side checking avoids all CORS issues
-- ✅ Lightweight tracking (just user IDs in text file, auto-expires after 30s)
-
-### Pending Testing
-- ⏳ Cross-site sync banner display (need to test switching between sites quickly)
-- ⏳ Verify sync banner shows correct site name and timing
-- ⏳ Test "Sync Now" button functionality
-
-## Files Modified
+The following cross-site detection files were removed as they added complexity without solving the root problem:
 
 ### ROFLFaucet
 ```
-site/api/mark_recent_change.php          (new)
-site/api/recent_changes.txt              (new)
-site/api/check_user_recent.php           (new - optimized endpoint)
-site/api/check_cross_site_changes.php    (modified - uses optimized endpoint)
-site/api/.htaccess                       (new)
-site/scripts/unified-balance.js          (modified)
+site/api/mark_recent_change.php          (removed)
+site/api/recent_changes.txt              (removed)
+site/api/check_user_recent.php           (removed)
+site/api/check_cross_site_changes.php    (removed)
 ```
 
 ### ClickForCharity
 ```
-api/mark_recent_change.php               (new)
-api/recent_changes.txt                   (new)
-api/check_user_recent.php                (new - optimized endpoint)
-api/check_cross_site_changes.php         (modified - uses optimized endpoint)
-api/.htaccess                            (new)
-js/unified-balance.js                    (modified)
+api/mark_recent_change.php               (removed)
+api/recent_changes.txt                   (removed)
+api/check_user_recent.php                (removed)
+api/check_cross_site_changes.php         (removed)
 ```
 
-## Git Commits (Most Recent First)
+### JavaScript Changes
+Removed from `unified-balance.js` on both sites:
+- `checkForCrossSiteChanges()` function
+- `showCrossSiteSyncBanner()` function
+- `cleanupOldChangeTracking()` function
+- `markRecentChange()` function
+- Cross-site check on focus event (kept basic balance refresh)
+- localStorage tracking for shown banners
+
+## Future Solution: Transaction-Log Approach
+
+**Problem:** Current balance files store absolute values. When Syncthing syncs, one file overwrites the other, losing transactions that happened on the overwritten server.
+
+**Solution:** Store a transaction log instead of absolute balance. When files sync, merge the transactions from both servers.
+
+### Proposed Architecture
+
+#### Balance File Format (New)
+```json
+{
+  "user_id": "2-andytest2",
+  "balance": 13190,
+  "last_updated": 1769147125,
+  "pending_transactions": [
+    {
+      "id": "roflfaucet_1769147100_abc123",
+      "timestamp": 1769147100,
+      "server": "roflfaucet",
+      "amount": 20,
+      "source": "faucet_claim",
+      "confirmed": false
+    },
+    {
+      "id": "clickforcharity_1769147110_def456",
+      "timestamp": 1769147110,
+      "server": "clickforcharity",
+      "amount": 10,
+      "source": "ptc_task",
+      "confirmed": false
+    }
+  ]
+}
 ```
-f0e8d29 - Remove stale netChange detection - was clearing balances too aggressively
-8428f99 - Add stale netChange detection - clears localStorage older than 5 minutes (REVERTED)
-d569dcd - Switch to server-side cross-site change detection - no CORS issues
-316922d - Add CORS headers for cross-site recent changes tracking
-6103c67 - Add cross-site recent changes tracking - lightweight sync detection via public txt files
-19fe131 - Revert all sync protection changes - back to simple system
-```
 
-## Next Steps
+#### Server-Side Merge Script
+Create `/api/merge_balance_transactions.php` that runs via inotify when Syncthing modifies a balance file:
 
-1. **Test cross-site switching:**
-   - Play on ROFLFaucet (claim faucet or game)
-   - Wait 2 seconds for flush
-   - Switch to ClickForCharity tab
-   - Verify banner appears with correct info
+1. Detect when balance file is modified by Syncthing (not by local write)
+2. Read incoming `pending_transactions` array
+3. Merge with any local pending transactions (by unique ID)
+4. Recalculate balance from all transactions
+5. Mark old transactions as confirmed
+6. Write merged result back to file
 
-2. **Test sync button:**
-   - Click "Sync Now" on banner
-   - Verify 10-second wait message
-   - Verify balance updates correctly
-   - Verify success message appears
+#### Benefits
+- **No polling:** Event-driven via inotify (Linux file watcher)
+- **No conflicts:** Transaction log is append-only, merges automatically
+- **Eventually consistent:** All servers converge to same balance within seconds
+- **No client changes:** JavaScript stays simple, just reads balance
+- **Scales well:** Only processes files that actually changed
+- **No lost transactions:** Even if user uses both sites simultaneously
 
-3. **Monitor for conflicts:**
-   ```bash
-   ssh es3-auth "find /var/directsponsor-data/userdata/balances -name '*.sync-conflict*' -mmin -10"
-   ```
+#### Implementation Steps (Future)
+1. Update balance file format to include `pending_transactions` array
+2. Modify `write_balance.php` to append transactions instead of overwriting balance
+3. Create `merge_balance_transactions.php` merge script
+4. Set up inotify watcher or cron job (every 5 seconds) to trigger merge
+5. Test with simultaneous transactions on both sites
+6. Deploy to all servers
 
-4. **Update main documentation:**
-   - Update `/docs/cross-site-sync-implementation.md` with final server-side approach
-   - Document the removal of stale detection and why
+#### Syncthing Compatibility
+- ✅ No changes needed to Syncthing configuration
+- ✅ Still syncs files every 5-10 seconds
+- ✅ Still uses last-modified conflict resolution
+- ✅ Merge script handles the "overwrite" gracefully by merging transaction logs
 
-## Known Issues
-
-### Syncthing Not Running on ROFLFaucet
-- Syncthing service is inactive on ROFLFaucet server
-- Files are still syncing via auth server as hub
-- Not critical but should be investigated
-
-### Old Sync Conflicts
-- User `2-andytest2` has 14+ old sync conflicts
-- These are archived but should be cleaned up
-- Conflict resolver not running on auth server
-
-## Performance Notes
-
-- **Overhead:** Minimal - lightweight endpoint queries (1-2 bytes response)
-- **Frequency:** Only checks when user focuses tab (not on every action)
-- **File Size:** `recent_changes.txt` stays tiny (auto-expires entries after 15s)
-- **Server Load:** Negligible - simple file reads, no database queries
-- **Optimization (2026-01-23):** Changed from downloading full `recent_changes.txt` to querying `check_user_recent.php?user_id=X` which returns just `n` or age in seconds
-- **Timing Fix (2026-01-23):** Reduced expiry from 30s to 15s (Syncthing syncs in 5-10s), added localStorage tracking to prevent showing same change multiple times
-- **Cleanup Fix (2026-01-23):** Added automatic cleanup of expired entries in check_user_recent.php so old entries don't persist indefinitely
-
-## Architecture
-
-```
-User plays on ROFLFaucet
-  ↓
-Balance flush writes to file
-  ↓
-Calls mark_recent_change.php
-  ↓
-Adds user ID to recent_changes.txt (timestamp:userId)
-  ↓
-User switches to ClickForCharity
-  ↓
-Tab focus event triggers checkForCrossSiteChanges()
-  ↓
-Calls local check_cross_site_changes.php
-  ↓
-Server queries ROFLFaucet: check_user_recent.php?user_id=X
-  ↓
-Response: 'n' (not found) or '15' (seconds ago)
-  ↓
-If found → Shows banner
-  ↓
-User clicks "Sync Now" → Waits 10s → Reloads balance
-```
+### Why Not Implement Now?
+- Adds complexity while other features are being stabilized
+- Requires testing to ensure merge logic is correct
+- Edge case (simultaneous use) is rare for current user base
+- Manual sync button provides adequate workaround
 
 ## Lessons Learned
 
-1. **Server-side is simpler** - Avoids all CORS complexity
-2. **Don't over-optimize** - Stale detection seemed smart but broke normal flow
-3. **Test incrementally** - Many iterations to get right approach
-4. **Document root matters** - ClickForCharity uses non-standard path
-5. **Permissions critical** - Files must be writable by www-data
-6. **Minimize data transfer** - Query endpoints (1-2 bytes) beat downloading full files, even tiny ones
+1. **Simplicity wins** - Complex detection systems added overhead without solving root problem
+2. **Solve at the right level** - Client-side detection can't fix server-side merge conflicts
+3. **Accept trade-offs** - Rare edge cases don't always need immediate solutions
+4. **Document for later** - Capture the solution design when you have clarity, implement when ready
 
 ---
 
-**For tomorrow:** Start fresh conversation, test cross-site banner, verify everything works end-to-end.
+**Next:** Focus on stabilizing core balance system, then revisit transaction-log approach when ready to handle simultaneous-use edge case.
