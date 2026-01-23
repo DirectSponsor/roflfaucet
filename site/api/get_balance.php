@@ -3,7 +3,7 @@
  * ROFLFaucet Get Balance API
  * 
  * Read-only endpoint to fetch user balance
- * Reads from local balance files synced from Hub via Syncthing
+ * Queries centralized auth server for current balance
  */
 
 header('Content-Type: application/json');
@@ -37,36 +37,28 @@ if (!preg_match('/^[0-9]+-[a-zA-Z0-9_-]+$/', $userId)) {
     exit;
 }
 
-$balanceFile = '/var/roflfaucet-data/userdata/balances/' . $userId . '.txt';
+// Query centralized auth server
+$authServerUrl = 'https://auth.directsponsor.net/api/get_balance.php?user_id=' . urlencode($userId);
 
-if (!file_exists($balanceFile)) {
-    // User doesn't exist yet - return 0 balance
+$ch = curl_init($authServerUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
+curl_close($ch);
+
+if ($response === false || $httpCode !== 200) {
+    http_response_code(500);
     echo json_encode([
-        'success' => true,
-        'balance' => 0,
-        'user_id' => $userId,
-        'file_timestamp' => null
+        'success' => false,
+        'error' => 'Failed to fetch balance from auth server',
+        'details' => $curlError
     ]);
     exit;
 }
 
-// Get file modification timestamp
-$fileTimestamp = filemtime($balanceFile);
-
-// Read balance file
-$data = json_decode(file_get_contents($balanceFile), true);
-
-if (!$data) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Could not read balance data']);
-    exit;
-}
-
-echo json_encode([
-    'success' => true,
-    'balance' => $data['balance'] ?? 0,
-    'last_updated' => $data['last_updated'] ?? null,
-    'file_timestamp' => $fileTimestamp,
-    'user_id' => $userId
-]);
+// Return auth server response
+echo $response;
 ?>
