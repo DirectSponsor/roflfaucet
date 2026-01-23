@@ -123,9 +123,10 @@ d569dcd - Switch to server-side cross-site change detection - no CORS issues
 
 - **Overhead:** Minimal - lightweight endpoint queries (1-2 bytes response)
 - **Frequency:** Only checks when user focuses tab (not on every action)
-- **File Size:** `recent_changes.txt` stays tiny (auto-expires entries after 30s)
+- **File Size:** `recent_changes.txt` stays tiny (auto-expires entries after 15s)
 - **Server Load:** Negligible - simple file reads, no database queries
 - **Optimization (2026-01-23):** Changed from downloading full `recent_changes.txt` to querying `check_user_recent.php?user_id=X` which returns just `n` or age in seconds
+- **Timing Fix (2026-01-23):** Reduced expiry from 30s to 15s (Syncthing syncs in 5-10s), added localStorage tracking to prevent showing same change multiple times
 
 ## Architecture
 
