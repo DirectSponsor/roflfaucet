@@ -1,0 +1,25 @@
+# Sensitive credentials
+config.local.php
+
+# Backups
+*.backup
+*.backup-*
+*.backup[0-9]*
+*.bak
+*.tar.gz
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
