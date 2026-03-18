@@ -49,139 +49,22 @@ OpenGraph descriptions across game pages should emphasize the charity aspect to 
 **Implementation:**
 Update `og:description` and `twitter:description` meta tags to include "for charity" messaging.
 
-### ✅ ISSUE-020: Syncthing Conflict Files Investigation & Sync Cleanup
-**Priority: CRITICAL (System Architecture)**  
-**Status: COMPLETED**  
-**Updated: 2026-01-22**
+### ✅ ISSUE-020: Syncthing Migration to systemd
+**Status: COMPLETED 2026-01-22**
 
-**✅ MIGRATION COMPLETE - ALL SERVERS NOW RUNNING SYSTEMD SERVICES**
+All 3 servers now run systemd syncthing services (auto-restart, boot-enabled):
+- `syncthing-roflfaucet.service` (www-data, `/var/roflfaucet-data/.config/syncthing`)
+- `syncthing-hub.service` (apache, `/var/directsponsor-data/.config/syncthing`)
+- `syncthing-clickforcharity.service` (www-data, `/var/clickforcharity-data/.config/syncthing`)
 
-**ACTUAL WORKING SYNC ARCHITECTURE (2025-12-07):**
+95 conflict files cleaned up. Cross-site sync protection implemented (15s timestamp check).
 
-**Method: Syncthing file-based sync (flat files, no database, no constant API auth) ✅**
-
-**ROFLFaucet (89.116.44.206):**
-- ✅ **ACTIVE SYNC**: Manual syncthing process (www-data user, started via nohup)
-  - Process: `/usr/bin/syncthing serve --no-browser --no-restart --logflags=0 --home=/var/roflfaucet-data/.config/syncthing`
-  - Port 22000: Connected to hub (86.38.200.119:22000)
-- ❌ REDUNDANT: `roflfaucet-sync.service` (inotify + API daemon) - RUNNING but FAILING
-- ❌ DEAD: `syncthing-roflfaucet.service`, `syncthing@root.service` (masked), `syncthing@www-data.service` (failed)
-
-**Hub - es3-auth (86.38.200.119):**
-- ✅ **ACTIVE SYNC**: Manual syncthing process (apache user, started via sudo nohup)
-  - Process: `sudo -u apache nohup syncthing serve --no-browser --home=/var/directsponsor-data/.config/syncthing`
-  - Port 22000: Connected to both ROFLFaucet and ClickForCharity
-- ❌ DEAD: `syncthing-hub.service` (failed - port conflict), `syncthing@root.service` (stopped)
-
-**ClickForCharity (89.116.173.103):**
-- ✅ **ACTIVE SYNC**: Manual syncthing process (www-data user, started via sudo nohup)
-  - Process: `sudo -u www-data nohup syncthing serve --no-browser --home=/var/clickforcharity-data/.config/syncthing`
-  - Port 22000: Connected to hub (86.38.200.119:22000)
-- ❌ DEAD: `syncthing-clickforcharity.service` (stopped), `syncthing@root.service` (stopped)
-
-**Conflict Files:**
-- 40 legacy conflict files on each server from Nov 16 transition (syncthing shutdown/restart)
-- Additional conflicts on Nov 25 at 02:00:01 (likely cron job during sync)
-- No new conflicts since migration to manual processes
-
-**MIGRATION PLAN - Consolidate to Single Sync Method:**
-
-**Goal: One syncthing systemd service per server, remove all redundant processes**
-
-**Phase 1: Prepare systemd services**
-- [ ] Create/verify proper systemd service files on all 3 servers
-- [ ] Ensure services use same config paths as manual processes:
-  - ROFLFaucet: `/var/roflfaucet-data/.config/syncthing` (www-data user)
-  - Hub: `/var/directsponsor-data/.config/syncthing` (apache user)
-  - ClickForCharity: `/var/clickforcharity-data/.config/syncthing` (www-data user)
-- [ ] Configure services to auto-restart and enable on boot
-
-**Phase 2: Stop manual processes**
-- [ ] Find PIDs of manual syncthing processes on all servers
-- [ ] Stop manual syncthing processes gracefully (let sync complete first)
-- [ ] Verify no nohup processes remain
-
-**Phase 3: Start systemd services**
-- [ ] Start systemd syncthing services on all 3 servers
-- [ ] Verify connectivity (all 3 should connect via port 22000)
-- [ ] Test sync by making changes on each site
-- [ ] Monitor for 24 hours to ensure stability
-
-**Phase 4: Remove redundant services**
-- [ ] Stop and disable `roflfaucet-sync.service` (API daemon)
-- [ ] Remove `/root/sync-daemon.sh` on ROFLFaucet
-- [ ] Unmask and permanently disable old `syncthing@root` services
-- [ ] Remove failed systemd service configs for old services
-
-**Phase 5: Clean up conflict files**
-- [ ] Archive conflict files to backup location (zip with timestamp)
-- [ ] Delete conflict files from all 3 servers (40 files each)
-- [ ] Verify original files are intact and current
-
-**Phase 6: Documentation**
-- [x] Document final syncthing configuration
-- [x] Create systemd service restart/troubleshooting guide
-- [ ] Update deployment scripts to be aware of systemd services
-
----
-
-**✅ MIGRATION COMPLETED: 2026-01-22**
-
-**Final Architecture:**
-- **ROFLFaucet**: `syncthing-roflfaucet.service` running (www-data user)
-- **Hub (es3-auth)**: `syncthing-hub.service` running (apache user)
-- **ClickForCharity**: `syncthing-clickforcharity.service` running (www-data user)
-
-**Results:**
-- ✅ All manual nohup processes stopped
-- ✅ All systemd services running with auto-restart enabled
-- ✅ Conflict files archived to `/root/sync-conflicts-backup-20260122-*.tar.gz` on each server
-- ✅ All 95 conflict files deleted (40 ROFLFaucet, 40 Hub, 15 ClickForCharity)
-- ✅ Sync tested and verified working across all 3 servers
-- ✅ Services configured to start on boot
-
-**Service Management:**
 ```bash
-# Check status
-ssh roflfaucet "systemctl status syncthing-roflfaucet.service"
-ssh es3-auth "systemctl status syncthing-hub.service"
-ssh clickforcharity "systemctl status syncthing-clickforcharity.service"
-
-# Restart if needed
-sudo systemctl restart syncthing-roflfaucet.service
-sudo systemctl restart syncthing-hub.service
-sudo systemctl restart syncthing-clickforcharity.service
-
-# View logs
-sudo journalctl -u syncthing-roflfaucet.service -f
+systemctl status syncthing-roflfaucet.service   # check
+systemctl restart syncthing-roflfaucet.service  # restart
 ```
 
-**Remaining Tasks:**
-- Monitor for 24 hours to ensure stability
-- Consider stopping redundant `roflfaucet-sync.service` (inotify + API daemon) if still running
-
-**✅ CROSS-SITE SYNC PROTECTION IMPLEMENTED: 2026-01-22**
-
-Added automatic cross-site navigation detection to prevent race conditions:
-
-**Implementation:**
-- File-timestamp based detection (checks `last_updated` in balance file)
-- If file modified in last 15 seconds → wait 10 seconds for Syncthing sync
-- Blocks transactions during sync period (`gamesEnabled` flag)
-- Shows user-friendly sync messages
-
-**Benefits:**
-- ✅ Prevents balance conflicts during cross-site navigation
-- ✅ Server-authoritative (doesn't rely on browser state)
-- ✅ Automatic detection (no manual tracking needed)
-- ✅ No false positives (won't delay same-site navigation)
-- ✅ Minimal server impact (only 1-2 requests on page load)
-
-**Documentation:**
-- Implementation: `/docs/cross-site-sync-implementation.md`
-- Strategy: `/home/andy/work/projects/sync-system/BALANCE_BATCHING_STRATEGY.md`
-
-**Expected Result:** Zero conflicts from cross-site navigation
+- [ ] Confirm `roflfaucet-sync.service` (old inotify daemon) is stopped/disabled on ES7
 
 ### ISSUE-021: Admin Panel on Profile Page
 **Priority: HIGH (Admin Feature)**  

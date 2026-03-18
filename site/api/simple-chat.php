@@ -53,25 +53,52 @@ function getUserAuth() {
 }
 
 /**
- * Load user balance data
+ * Load user balance data from centralized auth server
  */
 function loadUserBalance($userId) {
-    $balanceDir = USERDATA_DIR . '/balances';
-    
-    // Try new format first: {userID}-{username}.txt
-    $files = glob($balanceDir . '/' . $userId . '-*.txt');
-    if (!empty($files)) {
-        $balanceFile = $files[0];
-    } else {
-        // Fallback to old format: {userID}.txt
-        $balanceFile = $balanceDir . '/' . $userId . '.txt';
-        if (!file_exists($balanceFile)) {
-            return false;
+    // Build combined user ID if only numeric ID provided
+    $combinedUserId = $userId;
+    if (is_numeric($userId)) {
+        $found = findCombinedUserIdFromLocal($userId);
+        if ($found) {
+            $combinedUserId = $found;
         }
     }
     
-    $data = json_decode(file_get_contents($balanceFile), true);
-    return $data ? floatval($data['balance']) : false;
+    // Query centralized auth server
+    $authUrl = 'https://auth.directsponsor.org/api/get_balance.php?user_id=' . urlencode($combinedUserId);
+    
+    $ch = curl_init($authUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200 && $response) {
+        $data = json_decode($response, true);
+        if (isset($data['balance'])) {
+            return floatval($data['balance']);
+        }
+    }
+    
+    // No fallback - auth server is single source of truth for balances
+    error_log("Chat: Failed to get balance for $combinedUserId: HTTP $httpCode");
+    return false;
+}
+
+/**
+ * Helper: find combined user ID from local profile files
+ */
+function findCombinedUserIdFromLocal($userId) {
+    $profilesDir = USERDATA_DIR . '/profiles';
+    $files = glob($profilesDir . '/' . $userId . '-*.txt');
+    foreach ($files as $file) {
+        if (strpos($file, 'sync-conflict') === false && strpos($file, '.backup') === false) {
+            return basename($file, '.txt');
+        }
+    }
+    return false;
 }
 
 /**
@@ -80,38 +107,20 @@ function loadUserBalance($userId) {
  */
 function updateUserBalance($userId, $newBalance, $change, $description) {
     // Get combined user ID (userID-username format) for Hub API
-    $combinedUserId = null;
-    $balanceDir = USERDATA_DIR . '/balances';
-    $files = glob($balanceDir . '/' . $userId . '-*.txt');
-    
-    if (!empty($files)) {
-        $filename = basename($files[0], '.txt');
-        $combinedUserId = $filename;
-    } else {
+    $combinedUserId = findCombinedUserIdFromLocal($userId);
+    if (!$combinedUserId) {
         // Fallback: construct from user ID
         $username = getUsernameFromId($userId) ?: 'user' . $userId;
         $combinedUserId = $userId . '-' . $username;
     }
     
-    // Generate unique operation ID for idempotency
-    $opId = 'chat-' . time() . '-' . mt_rand(1000, 9999);
-    
-    // Prepare operation for Hub API
-    $op = [
-        'op_id' => $opId,
-        'amount' => (float)$change,
-        'source' => 'chat',
-        'description' => $description,
-        'timestamp' => time(),
-        'retries' => 0
-    ];
-    
-    // Send to Hub API
-    $hubUrl = 'https://auth.directsponsor.org/api/balance-update.php';
+    // Send to Hub API (same format as write_balance.php)
+    $hubUrl = 'https://auth.directsponsor.org/api/update_balance.php';
     $payload = json_encode([
         'user_id' => $combinedUserId,
-        'ops' => [$op],
-        'client_time' => time()
+        'amount' => (float)$change,
+        'source' => 'chat',
+        'server_id' => 'roflfaucet'
     ]);
     
     $ch = curl_init($hubUrl);
@@ -143,15 +152,20 @@ function updateUserBalance($userId, $newBalance, $change, $description) {
  * Returns the full combined ID (userID-username) format
  */
 function findCombinedUserIdByIdOrUsername($searchTerm) {
-    $balanceDir = USERDATA_DIR . '/balances';
-    if (!is_dir($balanceDir)) {
+    $profilesDir = USERDATA_DIR . '/profiles';
+    if (!is_dir($profilesDir)) {
         return false;
     }
     
     $searchLower = strtolower(trim($searchTerm));
-    $files = glob($balanceDir . '/*-*.txt');
+    $files = glob($profilesDir . '/*-*.txt');
     
     foreach ($files as $file) {
+        // Skip Syncthing conflict and backup files
+        if (strpos($file, 'sync-conflict') !== false || strpos($file, '.backup') !== false) {
+            continue;
+        }
+        
         $filename = basename($file, '.txt');
         $parts = explode('-', $filename, 2); // Split on first dash only
         
@@ -186,19 +200,22 @@ function findUserIdByUsername($targetUsername) {
 }
 
 /**
- * Get username from user ID using filename lookup
+ * Get username from user ID using profile filename lookup
  */
 function getUsernameFromId($userId) {
-    $balanceDir = USERDATA_DIR . '/balances';
-    if (!is_dir($balanceDir)) {
+    $profilesDir = USERDATA_DIR . '/profiles';
+    if (!is_dir($profilesDir)) {
         return false;
     }
     
     // Look for file matching pattern: {userID}-{username}.txt
-    $files = glob($balanceDir . '/' . $userId . '-*.txt');
+    $files = glob($profilesDir . '/' . $userId . '-*.txt');
     
-    if (!empty($files)) {
-        $filename = basename($files[0], '.txt');
+    foreach ($files as $file) {
+        if (strpos($file, 'sync-conflict') !== false || strpos($file, '.backup') !== false) {
+            continue;
+        }
+        $filename = basename($file, '.txt');
         $parts = explode('-', $filename, 2);
         
         if (count($parts) === 2) {
