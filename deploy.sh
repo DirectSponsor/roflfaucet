@@ -171,6 +171,7 @@ preview_deletions() {
         --exclude='data/' \
         --exclude='stats.html' \
         --exclude='*.backup-*' \
+        --exclude='scripts/userdata/stats/' \
         "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/" 2>/dev/null | grep '^\*deleting' || true)
     
     if [[ -n "$deletions" ]]; then
@@ -205,6 +206,7 @@ deploy_files() {
         --exclude='data/' \
         --exclude='stats.html' \
         --exclude='*.backup-*' \
+        --exclude='scripts/userdata/stats/' \
         --progress \
         "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/"
     
