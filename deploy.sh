@@ -168,6 +168,9 @@ preview_deletions() {
         --exclude='deploy.sh' \
         --exclude='.DS_Store' \
         --exclude='Thumbs.db' \
+        --exclude='data/' \
+        --exclude='stats.html' \
+        --exclude='*.backup-*' \
         "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/" 2>/dev/null | grep '^\*deleting' || true)
     
     if [[ -n "$deletions" ]]; then
@@ -190,6 +193,7 @@ deploy_files() {
     
     # Rsync with careful exclusions - --delete is safe now that LOCAL_PATH points to site/ directory
     # Deletes server files that don't exist in local site/ directory (prevents old file buildup)
+    # IMPORTANT: data/ is excluded because it lives parallel to site/ and contains user data
     rsync -avz --delete \
         --exclude='.git/' \
         --exclude='node_modules/' \
@@ -198,6 +202,9 @@ deploy_files() {
         --exclude='deploy.sh' \
         --exclude='.DS_Store' \
         --exclude='Thumbs.db' \
+        --exclude='data/' \
+        --exclude='stats.html' \
+        --exclude='*.backup-*' \
         --progress \
         "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/"
     
