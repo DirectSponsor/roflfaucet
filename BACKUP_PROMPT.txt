@@ -1,0 +1,41 @@
+BACKUP SYSTEM CONVERSATION PROMPT
+
+We have three servers (RoflFaucet, DirectSponsor, ClickForCharity) with live user data and donations. Before migrating fundraiser functionality to DirectSponsor, we need a robust backup strategy.
+
+Current situation:
+- We have 2 backup servers available but only using 1
+- Real donation history exists (cannot be lost)
+- Multiple unique data types across servers: HTML files, JSON configs, user-uploaded images, potentially databases
+- Sensitive data: Coinos API keys, JWT secrets, user passwords
+
+Questions to resolve:
+
+1. DATA INVENTORY
+   - What exactly needs to be backed up on each server? (list all data locations)
+   - Are there any databases (MySQL, PostgreSQL, etc.) or just the HTML/JSON file structure?
+   - Where are secrets stored? (Apache env vars, .env files, config files outside webroot?)
+   - What about user-uploaded images and project files?
+
+2. BACKUP INFRASTRUCTURE
+   - Why is only 1 of 2 backup servers being used? Can we activate both?
+   - What's the current backup tool/method? (rsync, tar, custom script, commercial backup software?)
+   - How often should backups run? (daily, hourly, on-change?)
+   - How many backup versions should we keep?
+
+3. BACKUP SCOPE & TESTING
+   - Should backups include live databases or shut them down first?
+   - Are backups encrypted? Should they be?
+   - How do we verify backups are valid? (test restore process regularly?)
+   - What's the recovery time objective (RTO) if a server fails? (hours, minutes?)
+
+4. SECRETS HANDLING
+   - How do we back up sensitive data (Coinos API keys, JWT secrets) safely?
+   - Should they be encrypted in backups? Stored separately?
+   - Access control: who can restore from backups?
+
+5. PRE-MIGRATION CHECKLIST
+   - Before Phase 1 of the fundraiser migration, what backup state do we need?
+   - Should we do a full manual backup before touching any servers?
+   - How do we know the backup is complete and valid before proceeding?
+
+Goal: A simple, reliable backup strategy that covers all unique user data, uses both backup servers effectively, and can be restored quickly if needed.
