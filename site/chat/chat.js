@@ -1266,8 +1266,9 @@ class ChatWidget {
             const result = await response.json();
 
             if (result.success) {
-                // Message sent successfully - polling will pick it up within 3 seconds
+                // Message sent successfully - poll immediately so it appears at once
                 this.showStatus('Message sent', 'success');
+                await this.pollMessages();
                 
                 // Notify Anzar bot about the message (for rainpool accumulation)
                 if (window.anzarBot && this.username) {
