@@ -69,6 +69,11 @@ auto_commit_changes() {
     else
         log "No pending changes to commit"
     fi
+    
+    # Push all commits to GitHub
+    log "Pushing commits to GitHub..."
+    git push
+    success "GitHub up to date"
 }
 
 # Pre-deployment checks

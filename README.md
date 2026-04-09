@@ -1,7 +1,9 @@
 # ROFLFaucet
-
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/DirectSponsor/roflfaucet)
 
+**Live site: [roflfaucet.com](https://roflfaucet.com/)**
+
+A faucet and gaming site
 A faucet and gaming site where players earn UselessCoins for charity by playing browser-based games. Coins can be directed to charitable causes via the DirectSponsor ecosystem.
 
 ## Features
