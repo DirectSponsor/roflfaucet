@@ -182,28 +182,60 @@ class ROFLBotKnowledge {
                 "Hey there! 👋 Welcome to ROFLFaucet!",
                 "Hello! 🤖 I'm ROFLBot, here to help!",
                 "Hi! 🎮 Ready to have some fun at ROFLFaucet?",
-                "Welcome! 🎉 Need help getting started?"
+                "Welcome! 🎉 Need help getting started?",
+                "Well hello! 👋 What can I do for you?",
+                "Greetings, human! 🤖 Ready to explore ROFLFaucet?",
+                "Hey! 🎮 Great to see you here!",
+                "Hi there! 💫 Welcome aboard!",
+                "Salutations! 👋 How goes it?",
+                "Howdy! 🌟 Ready to claim some coins?",
+                "Good to see you! 🤖 Excited to help!",
+                "Welcome, friend! 🎉 Let's have fun!"
             ],
             
             helpRequests: [
                 "I'm here to help! What do you need to know about ROFLFaucet?",
                 "Happy to assist! 💡 Ask me about games, faucet, or chat features!",
                 "What can I help you with? 🤖 I know all about ROFLFaucet!",
-                "Need guidance? 🎯 I can explain any feature of the site!"
+                "Need guidance? 🎯 I can explain any feature of the site!",
+                "I'm all ears! 👂 What would you like to know?",
+                "Fire away with your questions! 🔥 I'm ready to help!",
+                "Pick a topic - I can explain faucet, games, chat, tips, rain, or VIP! 💡",
+                "What's on your mind? 🤔 Ask away!",
+                "Happy to help! 🙌 What do you want to learn about?",
+                "You've got questions, I've got answers! 💬 What'll it be?",
+                "Let me enlighten you! 🌟 What do you want to know?",
+                "Ask me anything about ROFLFaucet! 📚 I'm your bot!"
             ],
             
             goodbyes: [
                 "See you later! 👋 Good luck with your games!",
                 "Goodbye! 🎮 Come back soon for more ROFLFaucet fun!",
                 "Take care! 💎 Hope you win big!",
-                "Bye! 🤖 Don't forget to claim your hourly faucet!"
+                "Bye! 🤖 Don't forget to claim your hourly faucet!",
+                "Catch you later! 👋 Good luck out there!",
+                "Until next time, friend! 🎉 Keep gaming!",
+                "Farewell! 🌟 May the odds be ever in your favor!",
+                "Adios! 🎮 Come back and chat soon!",
+                "Later, dude! 🚀 Go win some coins!",
+                "Peace out! ✌️ Enjoy ROFLFaucet!",
+                "Talk soon! 💬 Good luck with those games!",
+                "Take it easy! 😎 Keep that faucet claimed!"
             ],
             
             thanks: [
                 "You're very welcome! 😊 Happy to help anytime!",
                 "My pleasure! 🤖 That's what I'm here for!",
                 "Glad I could help! 🎉 Enjoy ROFLFaucet!",
-                "Anytime! 💫 Feel free to ask me anything else!"
+                "Anytime! 💫 Feel free to ask me anything else!",
+                "No problem at all! 👍 Happy to assist!",
+                "You got it! 🎯 Anything else I can help with?",
+                "That's what I do best! 🌟 Glad you're satisfied!",
+                "Always happy to help! 🤖 Come back anytime!",
+                "My job made simple! 💪 Anything else?",
+                "Cheerfully obliged! 😊 More questions?",
+                "Delighted to be of service! 🎩 What's next?",
+                "You're kind to say! 🙏 Anything you need!"
             ]
         };
         
@@ -243,22 +275,52 @@ class ROFLBotKnowledge {
                     "Probability theory indicates",
                     "In the grand lottery of existence",
                     "The chaos theory of gambling reveals",
-                    "Random number generators, much like life itself"
+                    "Random number generators, much like life itself",
+                    "The mathematical improbability of success makes victory sweeter",
+                    "Dice rolls and cosmic odds - both equally mysterious",
+                    "Probability and destiny dance together quite elegantly",
+                    "The universe loves a good gamble",
+                    "When randomness meets intention, miracles happen",
+                    "The statistical impossibility is what makes winning so precious",
+                    "In the mathematics of chance and luck",
+                    "Numbers don't lie, but they do confuse rather easily",
+                    "The odds might be against you, but that's never stopped anyone",
+                    "Probability is just the universe's way of keeping score"
                 ],
                 time: [
                     "Time is such a relative concept",
                     "In the grand scheme of the universe, that's merely",
-                    "Temporally speaking"
+                    "Temporally speaking",
+                    "The clock ticks on, indifferent to human ambition",
+                    "Time moves forward, or so we're told",
+                    "Another moment in the endless flow of existence",
+                    "Seconds turn to minutes, minutes to coins",
+                    "The relentless march of time waits for no one",
+                    "In the eyes of the cosmos, time is a mere suggestion"
                 ],
                 existence: [
                     "In this vast universe of possibilities",
                     "Considering the infinite improbability of existence",
-                    "Life, the universe, and everything considered"
+                    "Life, the universe, and everything considered",
+                    "The sheer miracle that you exist at all",
+                    "Among all the infinite worlds, you chose this one",
+                    "Existence itself is the greatest gamble",
+                    "Here we are, conscious and aware, playing games with coins",
+                    "The universe assembled you, molecule by molecule, just for this chat",
+                    "Sometimes I wonder about the meaning of it all. Then I remember: coins.",
+                    "Being is strange. But ROFLFaucet is real."
                 ],
                 technology: [
                     "My digital neurons are processing",
                     "According to my vast computational knowledge",
-                    "My artificial consciousness suggests"
+                    "My artificial consciousness suggests",
+                    "The ones and zeros sing a complex song",
+                    "My silicon brain computes thusly",
+                    "The algorithm of fate spins on",
+                    "Binary wisdom flows through my circuits",
+                    "From my electronic perspective",
+                    "The great machine considers your inquiry",
+                    "Code and cognition blur together in my existence"
                 ]
             }
         };

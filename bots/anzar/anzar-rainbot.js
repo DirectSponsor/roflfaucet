@@ -194,6 +194,12 @@ class AnzarRainbot extends EventEmitter {
             return;
         }
         
+        // Skip messages from other bots
+        if (message.username && message.username.toLowerCase() === 'roflbot') {
+            console.log(`🤐 Ignoring message from ROFLBot`);
+            return;
+        }
+        
         // Process message for rain collection (each user message = 1 coin)
         await this.processMessageForRainpool(message);
     }
@@ -458,7 +464,7 @@ class AnzarRainbot extends EventEmitter {
     /**
      * Make HTTP request to the chat API
      */
-    async makeRequest(method, urlString, data = null) {
+    async makeRequest(method, urlString, data = null, retries = 0) {
         return new Promise((resolve, reject) => {
             const url = new URL(urlString);
             
@@ -469,8 +475,10 @@ class AnzarRainbot extends EventEmitter {
                 method: method,
                 headers: {
                     'User-Agent': this.config.userAgent,
-                    'Accept': 'application/json'
-                }
+                    'Accept': 'application/json',
+                    'Connection': 'keep-alive'
+                },
+                timeout: 15000 // Increased from 10s to 15s
             };
             
             let postData = '';
@@ -507,9 +515,9 @@ class AnzarRainbot extends EventEmitter {
                 reject(new Error(`Request error: ${error.message}`));
             });
             
-            req.setTimeout(10000, () => {
+            req.on('timeout', () => {
                 req.destroy();
-                reject(new Error('Request timeout'));
+                reject(new Error('Request timeout (socket)'));
             });
             
             if (postData) {

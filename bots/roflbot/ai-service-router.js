@@ -16,8 +16,8 @@ class AIServiceRouter {
                 name: 'Google Gemini',
                 endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
                 apiKey: process.env.GEMINI_API_KEY,
-                dailyLimit: 1500,
-                minuteLimit: 15,
+                dailyLimit: 40,  // Free tier actual limit is 50, use conservative 40
+                minuteLimit: 2,  // Very restricted free tier
                 cost: 0, // Free
                 priority: 1, // Higher priority = preferred
                 strengths: ['general', 'fast'],
@@ -25,7 +25,7 @@ class AIServiceRouter {
                 minuteUsage: 0,
                 lastReset: new Date().toDateString(),
                 lastMinuteReset: Date.now(),
-                enabled: true
+                enabled: false  // DISABLED: Free tier (50/day) is too limited. Revisit when we have a paid plan.
             },
             huggingface: {
                 name: 'Hugging Face',

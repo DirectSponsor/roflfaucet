@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROFLFaucet Changelog</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            margin-top: 0;
+            color: #667eea;
+            text-align: center;
+        }
+        .changelog-intro {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .date {
+            color: #888;
+            font-size: 13px;
+        }
+        .feature {
+            color: #27ae60;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 ROFLFaucet Changelog</h1>
+        <p class="changelog-intro">Significant updates and improvements to ROFLFaucet</p>
+        
+        <!-- EMBED:changelog -->
+        <ul>
+            <li><strong>2026-04-11</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Bot Migration</span> Both Anzar Rainbot and ROFLBot migrated from Node.js to Python for improved stability and zero external dependencies. Bots now running on Orange Pi 5 via PM2 with 40% lower memory usage. Deployed and tested successfully.</li>
+            <li><strong>2026-04-09</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Chat System</span> Migrated chat system from WebSocket to HTTP polling API for improved reliability and scalability. Both bots updated to use new polling-based architecture.</li>
+        </ul>
+        <!-- /EMBED:changelog -->
+    </div>
+</body>
+</html>

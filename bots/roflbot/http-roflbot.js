@@ -40,7 +40,7 @@ class HTTPROFLBot extends EventEmitter {
         this.reconnectAttempts = 0;
         this.recentResponses = [];
         this.responsesCooldown = 60000; // 1 minute
-        this.maxResponsesPerMinute = 3;
+        this.maxResponsesPerMinute = 1; // Reduced from 3 to 1 response per minute
         
         // Visitor greeting system
         this.greetedUsers = new Map(); // username -> timestamp of last greeting
@@ -206,6 +206,12 @@ class HTTPROFLBot extends EventEmitter {
             return;
         }
         
+        // Skip messages from other bots (Anzar, etc)
+        if (message.username && message.username.toLowerCase() === 'anzar') {
+            console.log(`🤐 Ignoring message from Anzar`);
+            return;
+        }
+        
         // Skip messages that start with typical bot patterns
         if (message.message && (
             message.message.includes('ROFLBot [general]') ||
@@ -308,7 +314,7 @@ class HTTPROFLBot extends EventEmitter {
         }
         
         // Very small chance to join general conversation for users not recently greeted
-        return Math.random() < 0.05; // Reduced from 20% to 5%
+        return Math.random() < 0.02; // Reduced from 5% to 2%
     }
     
     /**
@@ -332,8 +338,8 @@ class HTTPROFLBot extends EventEmitter {
         
         // If user has less than 2 messages in recent history, consider them a new visitor
         if (userRecentMessages.length <= 1) {
-            // 60% chance to greet new visitors
-            return Math.random() < 0.6;
+            // 20% chance to greet new visitors (reduced from 60%)
+            return Math.random() < 0.2;
         }
         
         return false;
@@ -448,46 +454,19 @@ class HTTPROFLBot extends EventEmitter {
     
     /**
      * Generate AI response using the service router
+     * DISABLED: AI integration is still experimental and unreliable.
+     * Currently returns philosophical fallback responses only.
+     * See GEMINI-STATUS.md for details on future AI work.
      */
     async generateResponse(message, context) {
-        try {
-            // Create enhanced query with conversation context
-            const recentMessages = this.conversationHistory.slice(-5);
-            const conversationContext = recentMessages
-                .map(m => `${m.username}: ${m.message}`)
-                .join('\n');
-            
-            const enhancedQuery = conversationContext 
-                ? `Recent conversation:\n${conversationContext}\n\nCurrent message: ${message.message}`
-                : message.message;
-            
-            const result = await this.aiRouter.selectService(enhancedQuery, context);
-            
-            // Clean up the response
-            let response = result.response.trim();
-            
-            // Remove common AI prefixes
-            response = response.replace(/^(ROFLBot:|Bot:|Assistant:)\s*/i, '');
-            
-            // Add Douglas Adams philosophical touches
-            response = this.knowledge.addAdamsianQuirk(response, context);
-            
-            // Ensure response isn't too long
-            if (response.length > 400) {
-                response = response.substring(0, 397) + '...';
-            }
-            
-            console.log(`🤖 Generated response (${result.service}${result.fromCache ? ', cached' : ''}): ${response}`);
-            
-            return response;
-            
-        } catch (error) {
-            console.warn('⚠️  Failed to generate AI response:', error.message);
-            
-            // Fallback to philosophical response
-            return this.knowledge.getPhilosophicalResponse('existence') || 
-                   "My digital neurons are processing... try asking me something else! 🤖";
-        }
+        // AI service integration is disabled until properly redesigned.
+        // For now, respond with philosophical/witty fallback phrases.
+        console.log(`🤖 AI disabled - using fallback response for context: ${context}`);
+        
+        // Return philosophical response from knowledge base
+        return this.knowledge.getPhilosophicalResponse(context) || 
+               this.knowledge.getPhilosophicalResponse('existence') || 
+               "In this vast cosmos, I find your question intriguing. 🤖";
     }
     
     /**
@@ -629,8 +608,10 @@ class HTTPROFLBot extends EventEmitter {
                 method: method,
                 headers: {
                     'User-Agent': this.config.userAgent,
-                    'Accept': 'application/json'
-                }
+                    'Accept': 'application/json',
+                    'Connection': 'keep-alive'
+                },
+                timeout: 15000 // Increased from 10s to 15s
             };
             
             let postData = '';
@@ -667,9 +648,9 @@ class HTTPROFLBot extends EventEmitter {
                 reject(new Error(`Request error: ${error.message}`));
             });
             
-            req.setTimeout(10000, () => {
+            req.on('timeout', () => {
                 req.destroy();
-                reject(new Error('Request timeout'));
+                reject(new Error('Request timeout (socket)'));
             });
             
             if (postData) {

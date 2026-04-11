@@ -2,6 +2,48 @@
 
 **Central hub for all ROFLFaucet bot systems and automated features**
 
+## ⚡ Recent Change: Chat Migration to HTTP Polling
+**Status:** ✅ Complete
+
+The ROFLFaucet chat backend no longer uses the old WebSocket endpoint. Both active bots were updated to use the PHP polling API instead:
+
+- Old chat transport: `wss://roflfaucet.com:8082/chat`
+- New chat API: `https://roflfaucet.com/api/simple-chat.php`
+- Polling interval: 3 seconds
+
+### What was fixed
+- Replaced WebSocket dependency with HTTP polling
+- Added client-side filtering so bots only process new messages
+- Improved request stability on the Orange Pi with a longer HTTP timeout
+- Added keep-alive HTTP connections
+- Restarted both bots under PM2 on the Orange Pi
+
+### Current live processes
+- `anzar`
+- `roflbot-http`
+
+### Low-activity chat behavior
+One issue after the migration was that the bots could feel too chatty when the room was quiet. The current behavior now reduces that in a few ways:
+
+#### Anzar
+- Hourly announcements are probabilistic instead of constant
+- Low-funds warnings only happen if chat has been active recently
+- Rain warnings are suppressed if the room is quiet
+
+#### ROFLBot
+- General conversation participation is intentionally low
+- Per-user cooldowns reduce repeated replies to the same person
+- Global response-per-minute limits prevent bursts
+- An emergency brake prevents runaway reply loops
+
+### If you want them quieter later
+- Lower Anzar `announceChance`
+- Lower ROFLBot `maxResponsesPerMinute`
+- Increase ROFLBot `userInteractionCooldown`
+- Lower ROFLBot random general chat response chance in `http-roflbot.js`
+
+See `MIGRATION.md` for the detailed technical notes and troubleshooting steps.
+
 ## 🏗️ **Bot System Architecture**
 
 ### Current Active Bots
@@ -50,6 +92,13 @@ cd /home/andy/roflbot
 - **User Assistance** - Helps with common questions
 - **Game Tips** - Provides strategy advice
 - **Community Interaction** - Engages users in conversation
+
+### AI Status
+- ROFLBot's AI response generation is currently **DISABLED**
+- The bot will respond with philosophical/witty fallback phrases from the Hitchhiker's Guide
+- Early experimental Gemini integration was attempted but proved unreliable
+- Any future AI relay feature (ChatGPT, Gemini, etc.) should be a deliberate new design, not extending this experiment
+- See `GEMINI-STATUS.md` and `AI-INTEGRATION-NOTES.md` for details
 
 ---
 
