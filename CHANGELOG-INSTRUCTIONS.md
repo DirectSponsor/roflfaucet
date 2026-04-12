@@ -52,6 +52,10 @@ Prepend a new entry **at the top** of the `<!-- EMBED:changelog -->` block:
 4. Use today's date in `YYYY-MM-DD` format
 5. Keep the entry to a single line
 6. Write for non-technical readers (what changed, not how)
+7. **Deploy** — run the deploy script so the live site is updated:
+   ```bash
+   bash /home/andy/work/projects/roflfaucet/deploy.sh
+   ```
 
 ### Example Entry
 
@@ -85,6 +89,33 @@ Or just use plain text if you prefer.
 4. **One line only** — keep it concise
 5. **Non-technical language** — write for users, not developers
 6. **Future tense optional** — "will support" or "now supports" both work
+7. **Pagination** — if the list exceeds 50 entries, paginate (show 50 per page, most recent first). Not needed yet but worth implementing before the page gets unwieldy.
+
+---
+
+## Aggregation (Meta-Changelog)
+
+The `<!-- EMBED:changelog -->` / `<!-- /EMBED:changelog -->` comment tags exist so a future script can aggregate changelogs from all sites into one combined feed.
+
+**How it works:**
+- Each site has `changelog.html` with an `<!-- EMBED:changelog -->` block
+- Each `<li>` entry identifies its source via `<strong>SiteName</strong>` (e.g. `ROFLFaucet`, `DirectSponsor`)
+- A meta-changelog script can:
+  1. Fetch the `changelog.html` from each site
+  2. Extract the content between `<!-- EMBED:changelog -->` and `<!-- /EMBED:changelog -->`
+  3. Merge all `<li>` entries and sort by date (the `YYYY-MM-DD` in the first `<strong>` tag)
+  4. Render them on a central "All Updates" page
+
+**Sites using this system:**
+- `https://roflfaucet.com/changelog.html` — ROFLFaucet
+- `https://directsponsor.net/changelog.html` — DirectSponsor
+- `https://clickforcharity.net/changelog.html` — ClickForCharity
+
+**To add more sites:** just ensure their `changelog.html` uses the same `<!-- EMBED:changelog -->` block and `<strong>YYYY-MM-DD</strong> · <strong>SiteName</strong>` entry format.
+
+**Meta-changelog design notes (for when this gets built):**
+- Navigation: show link buttons at the top of the page (one per site) rather than linking the site name inline on every entry — fewer links, less visual noise
+- Pagination: show 50 entries per page to avoid loading a huge list on a single page
 
 ---
 

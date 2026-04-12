@@ -65,6 +65,7 @@ class AnzarRainbot:
         self.last_rain_time = 0
         self.last_rain_hour = -1
         self.last_low_funds_warning = 0
+        self.last_announce_time = 0
         
         # Message deduplication
         self.processed_messages = set()
@@ -345,8 +346,20 @@ class AnzarRainbot:
         """Maybe send an announcement about the rainbot."""
         import random
         
+        # Only announce if there has been recent activity
+        recent_count = self.get_recent_message_count()
+        if recent_count < 3:
+            return
+        
+        # Minimum 30 minutes between announcements
+        now = time.time()
+        if now - self.last_announce_time < 30 * 60:
+            return
+        
         if random.random() > self.rain_config['announce_chance']:
             return
+        
+        self.last_announce_time = now
         
         announcements = [
             f"☔ Rain clouds gathering... tip me to boost the rainpool! Current balance: {self.bot_user['balance']} coins",
@@ -476,5 +489,3 @@ if __name__ == '__main__':
         }
         bot = AnzarRainbot(options)
         bot.start()
-    bot = AnzarRainbot(options)
-    bot.start()

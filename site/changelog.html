@@ -69,6 +69,8 @@
         
         <!-- EMBED:changelog -->
         <ul>
+            <li><strong>2026-04-12</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Bug Fix</span> Anzar Rainbot was announcing every ~4 minutes even in an empty chat; now only speaks up when there are at least 3 recent messages and at most once per 30 minutes.</li>
+            <li><strong>2026-04-12</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Deployment</span> Bot deploy scripts rewritten to match the Python setup — previously broken and referencing old Node.js files.</li>
             <li><strong>2026-04-11</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Bot Migration</span> Both Anzar Rainbot and ROFLBot migrated from Node.js to Python for improved stability and zero external dependencies. Bots now running on Orange Pi 5 via PM2 with 40% lower memory usage. Deployed and tested successfully.</li>
             <li><strong>2026-04-09</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Chat System</span> Migrated chat system from WebSocket to HTTP polling API for improved reliability and scalability. Both bots updated to use new polling-based architecture.</li>
         </ul>

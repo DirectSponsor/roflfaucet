@@ -87,6 +87,11 @@ After completing significant work, prepend a new entry to the changelog:
 - Most recent at top
 - Never remove old entries
 
+**Then deploy** so the live site is updated:
+```bash
+bash /home/andy/work/projects/roflfaucet/deploy.sh
+```
+
 ## Quick Reference
 
 ### Common Commands
