@@ -101,6 +101,15 @@ class ROFLBotKnowledge:
     def get_rain_reaction(self):
         """Get random rain reaction."""
         return random.choice(self.rain_reactions)
+    
+    def get_lonely_greeting(self, username):
+        """Greet a user who appears to be chatting alone."""
+        responses = [
+            f"Hi {username}! Looks like it's just us. 🤖 You can chat with me anytime by saying @roflbot!",
+            f"Hey {username}! 👋 Quiet in here today. If you want to chat, just say @roflbot and I'll respond!",
+            f"Hi {username}! I'm ROFLBot — mention me with @roflbot if you want to have a conversation! 🤖",
+        ]
+        return random.choice(responses)
 
 
 class HTTPROFLBot:
@@ -141,6 +150,13 @@ class HTTPROFLBot:
         self.user_cooldowns = {}  # username -> timestamp
         self.greeting_cooldown = 30 * 60  # 30 minutes in seconds
         self.user_interaction_cooldown = 30 * 60  # 30 minutes in seconds
+        
+        # Lonely user tracking
+        self.unanswered_messages = {}  # username -> [timestamps]
+        self.lonely_user_window = 5 * 60  # 5 minutes of inactivity from others
+        
+        # Respond reason (set in should_respond, read in handle_message)
+        self._respond_reason = None
         
         # Message deduplication
         self.processed_messages = set()
@@ -282,6 +298,10 @@ class HTTPROFLBot:
             'timestamp': now
         })
         
+        # Track as unanswered for lonely user detection
+        _u = message.get('username')
+        self.unanswered_messages.setdefault(_u, []).append(now)
+        
         logger.info(f"💬 {message.get('username')}: {message.get('message')}")
         
         # Parse special message types (tips, rain)
@@ -309,8 +329,11 @@ class HTTPROFLBot:
                 return
             
             # Generate response
-            is_greeting = self.is_new_visitor_greeting(username, now)
-            if is_greeting:
+            reason = self._respond_reason
+            self._respond_reason = None
+            if reason == 'lonely':
+                response = self.knowledge.get_lonely_greeting(username)
+            elif self.is_new_visitor_greeting(username, now):
                 response = self.knowledge.get_greeting()
             else:
                 response = self.knowledge.get_philosophical_response(self.determine_context(text))
@@ -321,27 +344,34 @@ class HTTPROFLBot:
                 time.sleep(delay)
                 self.send_chat_message(response)
                 self.track_response()
+                self.unanswered_messages[username] = []
     
     def should_respond(self, text, username, now):
         """Determine if bot should respond to a message."""
-        # Always respond if mentioned
-        if 'roflbot' in text or '@roflbot' in text or 'bot' in text:
+        # Always respond if directly mentioned by name
+        if 'roflbot' in text or '@roflbot' in text:
             last_response = self.user_cooldowns.get(username)
             if last_response and (now - last_response < 5):  # 5 second cooldown
                 logger.info(f"⏳ Mention cooldown active for {username}")
                 return False
             self.user_cooldowns[username] = now
-            return True
-        
-        # Always respond to help requests
-        if any(word in text for word in ['help', 'how', 'what', '?']):
-            self.user_cooldowns[username] = now
+            self._respond_reason = 'mention'
             return True
         
         # Check if we should greet new visitor
         if self.should_greet_new_visitor(username, now):
             self.greeted_users[username] = now
             self.user_cooldowns[username] = now
+            self._respond_reason = 'greeting'
+            return True
+        
+        # Respond to user chatting alone — greet and explain @roflbot (once per 30 mins)
+        last_interaction = self.user_cooldowns.get(username)
+        cooldown_clear = not last_interaction or (now - last_interaction >= self.user_interaction_cooldown)
+        if cooldown_clear and self.is_lonely_user(username, now):
+            logger.info(f"💬 Responding to lonely user: {username}")
+            self.user_cooldowns[username] = now
+            self._respond_reason = 'lonely'
             return True
         
         # Check rate limiting
@@ -355,6 +385,21 @@ class HTTPROFLBot:
         
         # Very small chance to join general conversation
         return random.random() < 0.02  # 2% chance
+    
+    def is_lonely_user(self, username, now):
+        """Check if user sent their first message and no other humans are active."""
+        msgs = self.unanswered_messages.get(username, [])
+        recent = [t for t in msgs if now - t <= self.lonely_user_window]
+        self.unanswered_messages[username] = recent
+        if len(recent) != 1:
+            return False
+        # Only trigger if no other humans have spoken recently
+        window_start = now - self.lonely_user_window
+        other_active = any(
+            m['username'] != username and m['timestamp'] > window_start
+            for m in self.conversation_history
+        )
+        return not other_active
     
     def should_greet_new_visitor(self, username, now):
         """Check if we should greet this user."""
@@ -482,6 +527,12 @@ class HTTPROFLBot:
         
         # Clean up user cooldowns
         self.user_cooldowns = {k: v for k, v in self.user_cooldowns.items() if now - v <= max_age}
+        
+        # Clean up unanswered message tracking
+        self.unanswered_messages = {
+            k: [t for t in v if now - t <= self.lonely_user_window]
+            for k, v in self.unanswered_messages.items()
+        }
         
         # Clean up message cache
         self.message_cache = {k: v for k, v in self.message_cache.items() if now - v <= 3600}

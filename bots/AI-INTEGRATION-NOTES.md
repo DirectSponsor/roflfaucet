@@ -1,11 +1,54 @@
 # ROFLBot AI Integration - Project Notes
 
-**Status:** ⛔ **DISABLED** - Not ready for production use  
-**Last Updated:** April 9, 2026
+**Status:** 🟡 **PLANNED** - OpenRouter + Hermes approach agreed, not yet implemented  
+**Last Updated:** May 6, 2026
 
 ---
 
-## What Was Attempted
+## Agreed Approach (May 2026)
+
+### Chosen: OpenRouter free tier with NousResearch Hermes 3
+
+**Why OpenRouter:**
+- Free API key, no credit card required
+- Hosts `nousresearch/hermes-3-llama-3.1-405b:free` and similar models
+- Simple HTTP POST — no special library, works with Python's existing `urllib`
+- Rate limits are generous enough for low-traffic faucet chat
+- Add Hugging Face as fallback if limits are hit
+
+**Why Hermes 3:**
+- NousResearch open-source model, strong conversational quality
+- Large context window (128K tokens) — handles long chat histories well
+- Available on OpenRouter free tier
+
+**On "memory" / context:**
+- The LLM itself has no persistent memory — it's stateless per API call
+- "Memory" = conversation history you pass in with each request (a JSON file on the Pi)
+- The Pi's SSD stores this history file — it's tiny (a few KB per conversation)
+- The model weights run on OpenRouter's servers, nothing heavy on the Pi
+- Within a session, the large context window means it "remembers" the full conversation
+
+**Knowledge base / site info:**
+- Store a `knowledge.md` file on the Pi with descriptions of ROFLFaucet, ClickForCharity, and DirectSponsor.net — FAQs, how coins work, games, rules, commands etc.
+- Use a **dual-prompt strategy** to avoid wasting tokens on simple chat messages:
+  - **Short prompt** (always): ROFLBot personality, keep it brief
+  - **Full prompt** (only when needed): short prompt + full knowledge.md contents
+- Inject the knowledge base only when the message looks like a site question (keywords: "how", "what", "explain", "faucet", "claim", "rules", "directsponsor", "clickforcharity" etc.)
+- General chat (`@roflbot hi`, rain reactions) uses the short prompt — very cheap
+- The 128K context window means the entire knowledge base fits easily when needed
+
+**Next steps when ready to implement:**
+1. Sign up for free OpenRouter API key at openrouter.ai
+2. Write `knowledge.md` — descriptions of all three sites, FAQs, commands, rules
+3. Add a `query_ai(prompt, history)` function to `roflbot_http.py` using `urllib`
+4. Add keyword detection to choose short vs full prompt
+5. Pass last N messages as conversation history with each call
+6. Save/load conversation history to a small JSON file on the Pi
+7. Use Hitchhiker phrases as fallback if API call fails
+
+---
+
+## What Was Attempted (historical)
 
 Someone (earlier development) started building an AI relay system for ROFLBot using:
 - **AI Service Router** - Intelligent fallback between multiple AI services
