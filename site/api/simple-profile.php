@@ -50,6 +50,8 @@ define('USERDATA_DIR', ROFLFAUCET_DATA_DIR . '/userdata');
  * @date 2025-08-31
  */
 
+session_start();
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
@@ -306,12 +308,12 @@ $action = $_GET['action'] ?? '';
 // Handle search action separately (it has its own auth check)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
     // SEARCH USERS - Find users by partial username (admin only)
-    $requesterId = getUserId();
-    if (!$requesterId) {
+    if (empty($_SESSION['authenticated']) || empty($_SESSION['user_id'])) {
         http_response_code(401);
         echo json_encode(['error' => 'Authentication required']);
         exit;
     }
+    $requesterId = $_SESSION['user_id'];
     
     // Determine requester's profile file (PHP 7.4 compatible)
     if (strpos($requesterId, '-') === false) {
@@ -347,12 +349,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
     exit;
 }
 
-// For all other actions, require authentication
-$userId = getUserId();
-if (!$userId) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Authentication required']);
-    exit;
+// For POST (write) actions, require verified session (set by session-bridge.php on page load)
+// For GET (read) actions, accept user_id from request params
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (empty($_SESSION['authenticated']) || empty($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Authentication required — please refresh the page']);
+        exit;
+    }
+    $userId = $_SESSION['user_id'];
+} else {
+    $userId = getUserId();
+    if (!$userId) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Authentication required']);
+        exit;
+    }
 }
 
 // Determine profile file path

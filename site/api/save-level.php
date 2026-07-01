@@ -15,32 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-/**
- * Get user ID from request
- */
-function getUserId() {
-    // Try different auth methods in order of preference
-    if (!empty($_GET['user_id'])) {
-        return $_GET['user_id'];
-    }
-    if (!empty($_POST['user_id'])) {
-        return $_POST['user_id'];
-    }
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (!empty($input['user_id'])) {
-        return $input['user_id'];
-    }
-    return null;
+// Auth — require verified session (set by session-bridge.php on page load)
+session_start();
+if (empty($_SESSION['authenticated']) || empty($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Authentication required — please refresh the page']);
+    exit;
 }
+$userId = $_SESSION['user_id'];
 
 try {
-    // Get user ID
-    $userId = getUserId();
-    if (!$userId) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Authentication required']);
-        exit;
-    }
     
     // Get input data
     $input = json_decode(file_get_contents('php://input'), true);

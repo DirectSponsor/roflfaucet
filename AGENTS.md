@@ -130,6 +130,29 @@ ssh orangepi5 "pm2 restart anzar"
 - `site/api/simple-chat.php` - Chat API endpoint
 - `AGENTS.md` - This file (agent guide)
 
+## Known Gotchas
+
+- **Profile `username` field blank on creation**: profile files are named correctly (`{id}-{username}.txt`) but the JSON content may have `"username": ""`. This happens because multiple JS files call `simple-profile.php?action=profile&user_id=...` without passing `username`, so `getUsername()` returns `""` and the new-profile path writes a blank field. This was fixed on directsponsor.net (2026-06-07) by passing `username` in the profile fetch in `site-utils.js` and adding a backfill in `loadProfileData()`. The same pattern exists in roflfaucet's `site-utils.js`, `levels-system.js`, `chat/chat.js`, and `profile.js`. Not currently causing visible issues (functions use `user_id` not `username`), but admin search and any username-based lookup will fail silently for affected users. Fix if admin search is ever added.
+
+## Security: JWT / Session Auth Pattern (2026-07)
+
+Write APIs must NOT accept `user_id` from POST/GET params — that allows any client to impersonate any user.
+
+**Pattern used (session-bridge architecture)**:
+1. `session-bridge.php` validates JWT once on page load → sets `$_SESSION['authenticated']` + `$_SESSION['user_id']`
+2. Write APIs call `session_start()` and check `$_SESSION` only — no per-request crypto
+3. JWT secret read from `/etc/jwt-secret` (root:www-data 640) — value must match auth server
+
+**Files fixed**:
+- `site/session-bridge.php` — reads secret from `/etc/jwt-secret` (was hardcoded wrong value)
+- `site/api/write_balance.php` — session check + `$_SESSION['user_id']`
+- `site/api/save-level.php` — session check + `$_SESSION['user_id']`
+- `site/api/simple-profile.php` — POST write actions + admin search use session; GET reads still accept param
+
+**Known exception**: `site/api/simple-chat.php` — bots (Anzar, ROFLBot) write to this API without sessions; treat as a separate concern.
+
+**Server**: `/etc/jwt-secret` on es7-roflfaucet = `simple_secret_2025` (matches auth server `config.local.php`)
+
 ## Recent Changes (Bot Migration - April 2026)
 
 **Both bots migrated from Node.js to Python** to eliminate dependency issues and prepare for ChatGPT integration.

@@ -19,16 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Get request data
-$input = json_decode(file_get_contents('php://input'), true);
-
-if (!isset($input['user_id']) || !isset($input['net_change'])) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing user_id or net_change']);
+// Auth — require verified session (set by session-bridge.php on page load)
+session_start();
+if (empty($_SESSION['authenticated']) || empty($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Authentication required — please refresh the page']);
     exit();
 }
 
-$userId = $input['user_id'];
+// Get request data
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!isset($input['net_change'])) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Missing net_change']);
+    exit();
+}
+
+$userId = $_SESSION['user_id'];  // from verified session — ignore any user_id in POST body
 $amount = floatval($input['net_change']);
 $source = isset($input['source']) ? $input['source'] : 'unknown';
 $serverId = isset($input['server_id']) ? $input['server_id'] : 'roflfaucet';
