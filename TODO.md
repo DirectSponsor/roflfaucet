@@ -25,7 +25,56 @@
 
 ---
 
+## ✅ RECENT COMPLETION: JWT Write-API Security Fix (2026-07-01)
+
+Write APIs were accepting `user_id` from POST/GET params with no auth check — any client could impersonate any user.
+
+**Fixed files:**
+- `site/session-bridge.php` — JWT secret now read from `/etc/jwt-secret` (was hardcoded wrong value)
+- `site/api/write_balance.php` — session check + `$_SESSION['user_id']`; ignores POST body `user_id`
+- `site/api/save-level.php` — session check + `$_SESSION['user_id']`
+- `site/api/simple-profile.php` — POST write actions + admin search use session; GET reads unaffected
+
+**Pattern:** session-bridge.php validates JWT once on page load → sets `$_SESSION`; write APIs check session only (no per-request crypto — important at scale).
+
+**Known exception:** `simple-chat.php` — bots write to it without sessions; separate concern.
+
+---
+
 ## 🔥 NEW PRIORITY ISSUES
+
+### 🚨 ISSUE-023: Balance Not Syncing When Switching Pages (Slots → Faucet)
+**Priority: HIGH (User-Visible Bug)**  
+**Status: NEW — 2026-07-01**
+
+**Problem:**
+After playing slots and accumulating a balance (e.g. 16997), switching to the faucet page still shows the old balance. Happened twice in the same session — reproducible.
+
+**Suspected cause:**
+There was supposed to be a page visibility / focus event (`onfocus`, `visibilitychange`, or `beforeunload`) that flushes/refreshes the balance when navigating away or returning to a page. This may have broken during the JWT security refactor or was never fully wired up.
+
+**Root cause (diagnosed 2026-07-01):**
+
+The JWT security fix broke balance writes. `write_balance.php` now requires `$_SESSION['authenticated']`, but **`session-bridge.php` is never called from any page** — no PHP session is ever established on roflfaucet. The flush calls to `write_balance.php` silently return 401 and the `netChange` is never persisted to the server. The faucet page then reads the stale file balance.
+
+Before the fix, `write_balance.php` accepted `user_id` from the POST body (insecure but functional). After the fix it requires a session that doesn't exist.
+
+**Flush triggers are working** (`visibilitychange`, `blur`, `beforeunload` all correctly call `flushNetChange()`) — the problem is the server rejecting the flush with 401, not the triggers.
+
+**The fix:**
+1. Create `/api/session-init.php` — a lightweight endpoint that calls `(new SessionBridge())->authenticateUser()` (reads JWT from cookie `jwt_token` or `Authorization` header → sets `$_SESSION`)
+2. In `unified-balance.js` constructor, call `session-init.php` early (before first flush can fire)
+3. Gate flushes on session being established
+
+**Alternative (simpler):** Have `write_balance.php` accept a JWT token directly and verify it inline for roflfaucet until a proper session-init flow is built.
+
+**Action items:**
+- [ ] Create `site/api/session-init.php` endpoint
+- [ ] Call it from `unified-balance.js` constructor (once per page load, non-blocking)
+- [ ] Ensure flush is deferred until session-init completes (or allow retry on 401)
+- [ ] Test: play slots → navigate to faucet → balance matches
+
+---
 
 ### ISSUE-022: Update OpenGraph Descriptions for Charity Focus
 **Priority: LOW (Content Polish)**  

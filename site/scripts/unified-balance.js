@@ -14,6 +14,7 @@ class UnifiedBalanceSystem {
         this.consecutiveFailures = 0;
         this.isFlushing = false; // Guard flag to prevent double flush
         this.isSyncing = false; // Guard flag for manual sync
+        this.sessionReady = false; // PHP session established via session-init.php
         
         console.log(`💰 ROFLFaucet Balance System initialized for ${this.isLoggedIn ? 'member' : 'guest'} user`);
         
@@ -34,6 +35,33 @@ class UnifiedBalanceSystem {
             }
             this.setupFlushTriggers();
             this.setupCrossSiteSync();
+            this.initSession(); // Establish PHP session for write APIs (fire-and-forget)
+        }
+    }
+
+    // ========== SESSION INIT ==========
+
+    async initSession() {
+        const combinedUserId = this.getCombinedUserIdFromToken();
+        if (combinedUserId === 'guest') return;
+
+        try {
+            const response = await fetch('/api/session-init.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: combinedUserId,
+                    username: this.getValidUsername() || ''
+                })
+            });
+            if (response.ok) {
+                this.sessionReady = true;
+                console.log('✅ PHP session established for write APIs');
+            } else {
+                console.warn('⚠️ session-init.php returned', response.status);
+            }
+        } catch (e) {
+            console.warn('⚠️ Session init failed:', e);
         }
     }
     
@@ -79,6 +107,15 @@ class UnifiedBalanceSystem {
             return;
         }
         
+        // Ensure PHP session is ready (needed by write_balance.php)
+        if (!this.sessionReady) {
+            await this.initSession();
+            if (!this.sessionReady) {
+                console.warn('⚠️ Flush skipped — PHP session not ready, will retry on next trigger');
+                return;
+            }
+        }
+
         // Prevent double flush
         if (this.isFlushing) {
             console.log(`⏭️ Flush already in progress, skipping ${trigger}`);
