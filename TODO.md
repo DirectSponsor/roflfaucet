@@ -68,13 +68,8 @@ The session-based auth was the right idea but roflfaucet's static-HTML architect
 
 **Action items:**
 - [x] Reverted `site/api/write_balance.php` to pre-JWT version — balance sync working again (2026-07-03)
-- [ ] **Add shared server secret to secure write_balance** (see reference impl in `send-notification.php`):
-  - Auth server: add secret check to `auth/website/api/update_balance.php` (reads `/etc/ds-balance-secret`)
-  - Roflfaucet: `write_balance.php` reads same secret from local file, passes it in curl body
-  - Create secret file on both servers: `echo 'someSecret' > /etc/ds-balance-secret`
-  - Do same for clickforcharity `write_balance.php`
-  - **Zero performance impact** — secret is just an extra field in the one flush curl call that already exists
-  - Reference: `/home/andy/work/projects/auth-server/auth/website/api/send-notification.php` lines 26-51
+- [x] **Shared server secret added (2026-07-03)** — auth server `update_balance.php` now requires `/etc/ds-balance-secret`; roflfaucet + clickforcharity `write_balance.php` read and send it. External calls return 403. Secret stored in `/etc/ds-balance-secret` on es3-auth and es7-roflfaucet.
+- [x] `sessionReady` gate removed from `flushNetChange()` — write_balance.php no longer needs sessions; `initSession()` still fires for save-level/profile APIs
 
 ---
 

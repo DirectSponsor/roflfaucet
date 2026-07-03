@@ -107,15 +107,6 @@ class UnifiedBalanceSystem {
             return;
         }
         
-        // Ensure PHP session is ready (needed by write_balance.php)
-        if (!this.sessionReady) {
-            await this.initSession();
-            if (!this.sessionReady) {
-                console.warn('⚠️ Flush skipped — PHP session not ready, will retry on next trigger');
-                return;
-            }
-        }
-
         // Prevent double flush
         if (this.isFlushing) {
             console.log(`⏭️ Flush already in progress, skipping ${trigger}`);

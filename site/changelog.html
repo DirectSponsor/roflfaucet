@@ -69,6 +69,7 @@
         
         <!-- EMBED:changelog -->
         <ul>
+            <li><strong>2026-07-03</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Security</span> Balance write API now secured with a shared server secret — external attempts to update balances directly on the auth server are rejected with 403.</li>
             <li><strong>2026-07-01</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Security</span> Fixed JWT auth vulnerability in write APIs — balance, level-save, and profile write endpoints now require a verified PHP session rather than accepting user_id from request parameters.</li>
             <li><strong>2026-04-12</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Bug Fix</span> Anzar Rainbot was announcing every ~4 minutes even in an empty chat; now only speaks up when there are at least 3 recent messages and at most once per 30 minutes.</li>
             <li><strong>2026-04-12</strong> · <strong>ROFLFaucet</strong> — <span class="feature">Deployment</span> Bot deploy scripts rewritten to match the Python setup — previously broken and referencing old Node.js files.</li>
