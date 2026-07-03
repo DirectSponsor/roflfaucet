@@ -45,34 +45,33 @@ Write APIs were accepting `user_id` from POST/GET params with no auth check — 
 
 ### 🚨 ISSUE-023: Balance Not Syncing When Switching Pages (Slots → Faucet)
 **Priority: HIGH (User-Visible Bug)**  
-**Status: NEW — 2026-07-01**
+**Status: PARTIALLY FIXED — needs revert + proper approach — 2026-07-01**
 
 **Problem:**
-After playing slots and accumulating a balance (e.g. 16997), switching to the faucet page still shows the old balance. Happened twice in the same session — reproducible.
+After playing slots, balance shown on faucet page is still behind. Two test results:
+- Before session-init fix: completely stale (old balance)
+- After session-init fix (2026-07-01): closer but still ~90 coins off (e.g. slots=16970, faucet=16880)
 
-**Suspected cause:**
-There was supposed to be a page visibility / focus event (`onfocus`, `visibilitychange`, or `beforeunload`) that flushes/refreshes the balance when navigating away or returning to a page. This may have broken during the JWT security refactor or was never fully wired up.
+**Architecture note:**
+Balance goes directly to auth server (`auth.directsponsor.org/api/update_balance.php`) — Syncthing was abandoned as too complex. `write_balance.php` is a proxy that forwards to the auth server.
 
-**Root cause (diagnosed 2026-07-01):**
+**Root cause of JWT regression:**
+The JWT security fix added `$_SESSION` checks to `write_balance.php`. But roflfaucet pages are static HTML — PHP sessions are never established on page load. So every flush to `write_balance.php` was silently 401-ing.
 
-The JWT security fix broke balance writes. `write_balance.php` now requires `$_SESSION['authenticated']`, but **`session-bridge.php` is never called from any page** — no PHP session is ever established on roflfaucet. The flush calls to `write_balance.php` silently return 401 and the `netChange` is never persisted to the server. The faucet page then reads the stale file balance.
+Attempted fix (session-init.php) got us closer but the race condition (faucet page reads balance before slots flushes) suggests a deeper issue — possibly the flush isn't completing before navigation, or the auth server isn't reflecting the update fast enough.
 
-Before the fix, `write_balance.php` accepted `user_id` from the POST body (insecure but functional). After the fix it requires a session that doesn't exist.
+**Plan: revert write_balance.php JWT changes**
+The session-based auth was the right idea but roflfaucet's static-HTML architecture doesn't support it cleanly. The real security lives server-side (roflfaucet server → auth server). Reverting `write_balance.php` to the pre-fix version (accept `user_id` from POST body, proxy to auth server) restores working behaviour.
 
-**Flush triggers are working** (`visibilitychange`, `blur`, `beforeunload` all correctly call `flushNetChange()`) — the problem is the server rejecting the flush with 401, not the triggers.
-
-**The fix:**
-1. Create `/api/session-init.php` — a lightweight endpoint that calls `(new SessionBridge())->authenticateUser()` (reads JWT from cookie `jwt_token` or `Authorization` header → sets `$_SESSION`)
-2. In `unified-balance.js` constructor, call `session-init.php` early (before first flush can fire)
-3. Gate flushes on session being established
-
-**Alternative (simpler):** Have `write_balance.php` accept a JWT token directly and verify it inline for roflfaucet until a proper session-init flow is built.
+- `save-level.php` and `simple-profile.php` session checks can stay — they don't affect the balance issue
+- `session-init.php` can stay (harmless, may be useful later)
 
 **Action items:**
-- [ ] Create `site/api/session-init.php` endpoint
-- [ ] Call it from `unified-balance.js` constructor (once per page load, non-blocking)
-- [ ] Ensure flush is deferred until session-init completes (or allow retry on 401)
-- [ ] Test: play slots → navigate to faucet → balance matches
+- [ ] Revert `site/api/write_balance.php` to pre-JWT version (accept user_id from POST, forward to auth server)
+- [ ] Test: play slots → navigate to faucet → balance matches exactly
+- [ ] Investigate remaining gap (is it a flush-timing issue or auth server caching?)
+- [ ] Consider adding a small delay on faucet page load before reading balance (let flush arrive first)
+- [ ] Longer term: add shared server secret between roflfaucet and auth server for real write_balance security
 
 ---
 
