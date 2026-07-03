@@ -67,11 +67,14 @@ The session-based auth was the right idea but roflfaucet's static-HTML architect
 - `session-init.php` can stay (harmless, may be useful later)
 
 **Action items:**
-- [ ] Revert `site/api/write_balance.php` to pre-JWT version (accept user_id from POST, forward to auth server)
-- [ ] Test: play slots → navigate to faucet → balance matches exactly
-- [ ] Investigate remaining gap (is it a flush-timing issue or auth server caching?)
-- [ ] Consider adding a small delay on faucet page load before reading balance (let flush arrive first)
-- [ ] Longer term: add shared server secret between roflfaucet and auth server for real write_balance security
+- [x] Reverted `site/api/write_balance.php` to pre-JWT version — balance sync working again (2026-07-03)
+- [ ] **Add shared server secret to secure write_balance** (see reference impl in `send-notification.php`):
+  - Auth server: add secret check to `auth/website/api/update_balance.php` (reads `/etc/ds-balance-secret`)
+  - Roflfaucet: `write_balance.php` reads same secret from local file, passes it in curl body
+  - Create secret file on both servers: `echo 'someSecret' > /etc/ds-balance-secret`
+  - Do same for clickforcharity `write_balance.php`
+  - **Zero performance impact** — secret is just an extra field in the one flush curl call that already exists
+  - Reference: `/home/andy/work/projects/auth-server/auth/website/api/send-notification.php` lines 26-51
 
 ---
 
