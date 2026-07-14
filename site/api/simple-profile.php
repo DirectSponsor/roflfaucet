@@ -350,14 +350,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'search') {
 }
 
 // For POST (write) actions, require verified session (set by session-bridge.php on page load)
+// Exception: update_level accepts user_id from POST body — level data carries no money risk,
+// coin cost is deducted via write_balance.php separately, and static HTML pages can't use sessions.
 // For GET (read) actions, accept user_id from request params
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (empty($_SESSION['authenticated']) || empty($_SESSION['user_id'])) {
+    if ($action === 'update_level') {
+        // No session required — accept user_id from POST body with format validation
+        $userId = getUserId();
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(['error' => 'user_id required']);
+            exit;
+        }
+    } elseif (empty($_SESSION['authenticated']) || empty($_SESSION['user_id'])) {
         http_response_code(401);
         echo json_encode(['error' => 'Authentication required — please refresh the page']);
         exit;
+    } else {
+        $userId = $_SESSION['user_id'];
     }
-    $userId = $_SESSION['user_id'];
 } else {
     $userId = getUserId();
     if (!$userId) {
