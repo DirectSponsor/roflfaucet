@@ -339,18 +339,17 @@ function addChatMessage($username, $message, $type = 'message', $metadata = null
         return false;
     }
     
-    // Read existing lines, append new one, trim to limit — all under the lock
-    $lines = [];
-    if (file_exists(CHAT_MESSAGES_FILE)) {
+    // Append new line, then trim only if over the limit — both under the same lock
+    $result = file_put_contents(CHAT_MESSAGES_FILE, $newLine . "\n", FILE_APPEND);
+    if ($result !== false) {
         $lines = file(CHAT_MESSAGES_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (count($lines) > CHAT_MESSAGE_LIMIT) {
+            $lines = array_slice($lines, -CHAT_MESSAGE_LIMIT);
+            file_put_contents(CHAT_MESSAGES_FILE, implode("\n", $lines) . "\n");
+            $meta = ['last_cleanup' => time(), 'total_messages' => count($lines)];
+            file_put_contents(CHAT_META_FILE, json_encode($meta));
+        }
     }
-    $lines[] = $newLine;
-    if (count($lines) > CHAT_MESSAGE_LIMIT) {
-        $lines = array_slice($lines, -CHAT_MESSAGE_LIMIT);
-        $meta = ['last_cleanup' => time(), 'total_messages' => count($lines)];
-        file_put_contents(CHAT_META_FILE, json_encode($meta));
-    }
-    $result = file_put_contents(CHAT_MESSAGES_FILE, implode("\n", $lines) . "\n");
     
     flock($lock, LOCK_UN);
     fclose($lock);
