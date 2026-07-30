@@ -327,43 +327,40 @@ function processMentionNotifications($fromUsername, $message) {
 function addChatMessage($username, $message, $type = 'message', $metadata = null) {
     $timestamp = time();
     $metadataStr = $metadata ? '|' . json_encode($metadata) : '';
-    $line = "{$timestamp}|{$username}|{$message}|{$type}{$metadataStr}\n";
+    $newLine = rtrim("{$timestamp}|{$username}|{$message}|{$type}{$metadataStr}");
     
-    // Append message
-    $result = file_put_contents(CHAT_MESSAGES_FILE, $line, FILE_APPEND | LOCK_EX);
+    // Use a dedicated lock file so the entire read-append-trim cycle is atomic.
+    // Two simultaneous writes each hold LOCK_EX on the lock file; the second
+    // waits until the first releases, so they never interleave.
+    $lockFile = CHAT_MESSAGES_FILE . '.lock';
+    $lock = fopen($lockFile, 'c');
+    if (!$lock || !flock($lock, LOCK_EX)) {
+        if ($lock) fclose($lock);
+        return false;
+    }
     
-    if ($result !== false) {
-        // Update message count and check cleanup
-        cleanupMessagesIfNeeded();
-        
-        // Process @mentions for notifications (only for regular messages, not commands)
-        if ($type === 'message') {
-            processMentionNotifications($username, $message);
-        }
+    // Read existing lines, append new one, trim to limit — all under the lock
+    $lines = [];
+    if (file_exists(CHAT_MESSAGES_FILE)) {
+        $lines = file(CHAT_MESSAGES_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    }
+    $lines[] = $newLine;
+    if (count($lines) > CHAT_MESSAGE_LIMIT) {
+        $lines = array_slice($lines, -CHAT_MESSAGE_LIMIT);
+        $meta = ['last_cleanup' => time(), 'total_messages' => count($lines)];
+        file_put_contents(CHAT_META_FILE, json_encode($meta));
+    }
+    $result = file_put_contents(CHAT_MESSAGES_FILE, implode("\n", $lines) . "\n");
+    
+    flock($lock, LOCK_UN);
+    fclose($lock);
+    
+    // Process @mentions outside the lock (non-critical, slow network calls)
+    if ($result !== false && $type === 'message') {
+        processMentionNotifications($username, $message);
     }
     
     return $result !== false;
-}
-
-/**
- * Clean up old messages (keep last CHAT_MESSAGE_LIMIT)
- */
-function cleanupMessagesIfNeeded() {
-    if (!file_exists(CHAT_MESSAGES_FILE)) {
-        return;
-    }
-    
-    $lines = file(CHAT_MESSAGES_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    
-    if (count($lines) > CHAT_MESSAGE_LIMIT) {
-        // Keep only the last CHAT_MESSAGE_LIMIT messages
-        $keepLines = array_slice($lines, -CHAT_MESSAGE_LIMIT);
-        file_put_contents(CHAT_MESSAGES_FILE, implode("\n", $keepLines) . "\n", LOCK_EX);
-        
-        // Update meta
-        $meta = ['last_cleanup' => time(), 'total_messages' => count($keepLines)];
-        file_put_contents(CHAT_META_FILE, json_encode($meta), LOCK_EX);
-    }
 }
 
 /**
