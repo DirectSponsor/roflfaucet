@@ -343,7 +343,7 @@ function addChatMessage($username, $message, $type = 'message', $metadata = null
     $result = file_put_contents(CHAT_MESSAGES_FILE, $newLine . "\n", FILE_APPEND);
     if ($result !== false) {
         $lines = file(CHAT_MESSAGES_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if (count($lines) > CHAT_MESSAGE_LIMIT) {
+        if (count($lines) > CHAT_MESSAGE_LIMIT + 50) {
             $lines = array_slice($lines, -CHAT_MESSAGE_LIMIT);
             file_put_contents(CHAT_MESSAGES_FILE, implode("\n", $lines) . "\n");
             $meta = ['last_cleanup' => time(), 'total_messages' => count($lines)];
