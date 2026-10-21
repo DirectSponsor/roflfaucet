@@ -91,7 +91,7 @@ pre_deploy_checks() {
     fi
     
     # Check critical files exist
-    local critical_files=("api/coins-balance.php" "api/project-donations-api.php" "main.css")
+    local critical_files=("api/coins-balance.php" "main.css")
     for file in "${critical_files[@]}"; do
         if [[ ! -f "$file" ]]; then
             error "Critical file missing: $file"
@@ -233,9 +233,6 @@ fix_permissions() {
         find '$REMOTE_PATH' -type f -exec chmod 644 {} \;
         
         # Make specific files executable if needed
-        if [ -f '$REMOTE_PATH/api/webhook.php' ]; then
-            chmod 644 '$REMOTE_PATH/api/webhook.php'
-        fi
         
         echo 'Permissions fixed'
     "
@@ -292,6 +289,15 @@ main() {
     echo "Remote: $REMOTE_HOST:$REMOTE_PATH"
     echo ""
     
+    # Warn if changelog hasn't been updated since last commit
+    if git diff --quiet HEAD -- changelog.html 2>/dev/null; then
+        echo ""
+        echo "⚠️  changelog.html hasn't changed since the last commit."
+        echo "   If you made significant changes, run first: ./add-changelog.sh \"Category\" \"Description\""
+        echo "   (deploying anyway — this is just a reminder)"
+        echo ""
+    fi
+
     # Ask for confirmation
     read -p "Continue with deployment? (y/N): " -n 1 -r
     echo
@@ -318,7 +324,7 @@ main() {
     log "Remote backup: $REMOTE_HOST:$REMOTE_BACKUP_DIR.tar.gz"
     log ""
     log "Site: https://roflfaucet.com/"
-    log "Test: Make a small donation to verify everything works"
+    log "Test: Load the homepage and play a game to verify everything works"
 }
 
 # Run main function

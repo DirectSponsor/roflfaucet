@@ -110,7 +110,7 @@ systemctl status syncthing-roflfaucet.service   # check
 systemctl restart syncthing-roflfaucet.service  # restart
 ```
 
-- [ ] Confirm `roflfaucet-sync.service` (old inotify daemon) is stopped/disabled on ES7
+- [ ] Confirm `roflfaucet-sync.service` (old inotify daemon) is stopped/disabled on es7
 
 ### ISSUE-021: Admin Panel on Profile Page
 **Priority: HIGH (Admin Feature)**  

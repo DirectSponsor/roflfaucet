@@ -1,3 +1,5 @@
+> **HISTORICAL (2026-10-21):** this system was removed from roflfaucet. See donations-removal.md.
+
 # ROFLFaucet Project Donations - Current System State
 **Last Updated**: 2025-11-06 18:58 UTC
 

@@ -44,7 +44,20 @@ This file documents important system information for AI agents working on ROFLFa
 ### Changelog Tracking
 - **Location**: `/home/andy/work/projects/roflfaucet/site/changelog.html`
 - **Format**: Embeds dynamic entries in `<!-- EMBED:changelog -->` block
-- **Instructions**: See CHANGELOG-INSTRUCTIONS.md or bottom of this file
+- **How to add an entry**: `./add-changelog.sh "Category" "Description"` (run from repo root)
+
+## Open work (2026-10-21)
+
+- **Donation system removal** (Coinos, dead token) — repo-side removal DONE 2026-10-21 (not yet
+  deployed/committed); see `donations-removal.md`. roflfaucet has NO donation, fundraiser,
+  project, accounts or transparency pages/APIs any more. Server backup before removal:
+  `~/backups/roflfaucet-deploys/pre-donations-removal-2026-10-21.tar.gz`.
+  Instead: the ClickForCharity Coinos wallet donates to projects on directsponsor.net, logged in
+  as user `clickforcharity` with notes containing "clickforcharity"; those payments are public in
+  that account's account html file, so no API/webhook is needed here. How to present/link this
+  on roflfaucet is still to be decided (no link on the site for now).
+  The doc also lists open es7 infra items (MySQL package purge, rebuild decision) with
+  pointers to `~/work/security/` and `~/work/backup-system/restore/`.
 
 ## Important Rules
 
@@ -55,42 +68,20 @@ This file documents important system information for AI agents working on ROFLFa
 
 ## Changelog Instructions
 
-**File**: `/home/andy/work/projects/roflfaucet/site/changelog.html`
+After completing significant work, run from the repo root:
 
-After completing significant work, prepend a new entry to the changelog:
-
-```html
-<!-- EMBED:changelog -->
-<ul>
-  <li><strong>YYYY-MM-DD</strong> · ROFLFaucet — Description of what changed and why</li>
-  ... existing entries ...
-</ul>
-<!-- /EMBED:changelog -->
+```bash
+./add-changelog.sh "Category" "One-line description for non-technical readers."
 ```
 
-**What counts as significant**:
-- New features or UI changes
-- Bug fixes with user-visible impact
-- System/config changes
-- Bot migrations or integrations
-- Breaking changes (mark clearly)
-
-**What to skip**:
-- Typo fixes
-- Minor refactors
-- Work-in-progress
-
-**Rules**:
-- One entry per task/session
-- Write for non-technical readers
-- Keep entries to one line
-- Most recent at top
-- Never remove old entries
-
-**Then deploy** so the live site is updated:
+Then deploy:
 ```bash
 bash /home/andy/work/projects/roflfaucet/deploy.sh
 ```
+
+**What counts as significant**: new features, user-visible bug fixes, security changes, config changes, bot migrations. Skip typo fixes, minor refactors, WIP.
+
+Common categories: `Feature`, `Bug Fix`, `Security`, `UI`, `Bot`, `API`, `Deployment`
 
 ## Quick Reference
 
@@ -151,7 +142,7 @@ Write APIs must NOT accept `user_id` from POST/GET params — that allows any cl
 
 **Known exception**: `site/api/simple-chat.php` — bots (Anzar, ROFLBot) write to this API without sessions; treat as a separate concern.
 
-**Server**: `/etc/jwt-secret` on es7-roflfaucet = `simple_secret_2025` (matches auth server `config.local.php`)
+**Server**: `/etc/jwt-secret` on es7-roflfaucet (value never in docs; matches auth server `config.local.php`)
 
 ## Recent Changes (Bot Migration - April 2026)
 

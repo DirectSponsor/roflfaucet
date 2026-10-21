@@ -4,7 +4,7 @@
 # Backs up entire /var directory to both backup servers
 # Destinations: servarica1 (primary), dr4 (secondary/DR)
 #
-# SSH config required on ES7 (/root/.ssh/config):
+# SSH config required on es7 (/root/.ssh/config):
 #   Host backup-server   -> 209.209.10.41 port 5829 warp key
 #   Host backup-server-2 -> 198.23.194.19 port 22   warp key
 

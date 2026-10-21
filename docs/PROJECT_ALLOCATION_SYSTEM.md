@@ -1,3 +1,5 @@
+> **HISTORICAL (2026-10-21):** the on-site donation/project system described here was removed from roflfaucet. See donations-removal.md.
+
 # Project Allocation System Documentation
 
 ## Overview

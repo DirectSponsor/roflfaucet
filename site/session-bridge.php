@@ -3,7 +3,6 @@
 // Updated for separated architecture
 define('ROFLFAUCET_DATA_DIR', '/var/roflfaucet-data');
 define('USERDATA_DIR', ROFLFAUCET_DATA_DIR . '/userdata');
-define('PROJECTS_DIR', ROFLFAUCET_DATA_DIR . '/projects');
 define('PAYMENTS_DIR', ROFLFAUCET_DATA_DIR . '/payments');
 define('ANALYTICS_DIR', ROFLFAUCET_DATA_DIR . '/analytics');
 define('LOGS_DIR', ROFLFAUCET_DATA_DIR . '/logs');
