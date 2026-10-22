@@ -97,7 +97,7 @@ Each project has a minimal config file: `/var/roflfaucet-data/projects/{username
 ### Current Keys
 - **Site Income (clickforcharity)**: Apache env var `COINOS_API_KEY` in `/etc/apache2/sites-available/env-staging.conf`
 - **lightninglova 001**: `/var/roflfaucet-data/projects/lightninglova/001-config.json`
-  - Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE2YTMxN2YzLTJhNjItNGYyOS1iZDhjLTc5ZTRhOTZlMGZjNC1ybyIsImlhdCI6MTc2MDEzMjc0OH0.d0FX4m6uLDwqH_EJPJaKawu4m13WzZhLGiI20nj42f8`
+  - Key: `<redacted — token was committed 2025-11-06, confirmed dead 2026-10-22; never put tokens in docs>`
   - Wallet ID: `a6a317f3-2a62-4f29-bd8c-79e4a96e0fc4-ro`
 - **evans 001**: ⚠️ TODO - Get Coinos API key from Evans and create config
 

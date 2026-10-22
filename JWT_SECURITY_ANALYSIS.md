@@ -16,7 +16,7 @@ A JWT consists of three parts separated by dots:
 
 Example Coinos read-only JWT:
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY29pbm9zXzEyMyIsInBlcm1pc3Npb25zIjoicmVhZC1vbmx5In0.CRYPTOGRAPHIC_SIGNATURE
+<redacted — token was committed 2025-11-06, confirmed dead 2026-10-22; never put tokens in docs>
 ```
 
 ### 2. The Critical Security Component: Cryptographic Signature
