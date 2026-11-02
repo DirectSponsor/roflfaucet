@@ -35,31 +35,6 @@
 }
 
 /* Role-enabled sections (hidden by default) */
-.fundraiser-section {
-    display: none;
-    background: #f8f9fa;
-    border: 2px solid #4CAF50;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-.fundraiser-section.role-enabled {
-    display: block;
-}
-
-.project-creation-tools {
-    display: none;
-    background: #e8f5e8;
-    border-radius: 6px;
-    padding: 15px;
-    margin: 15px 0;
-}
-
-.project-creation-tools.role-enabled {
-    display: block;
-}
-
 .admin-panel {
     display: none;
     background: #fff3cd;
@@ -70,20 +45,6 @@
 }
 
 .admin-panel.role-enabled {
-    display: block;
-}
-
-.verification-tools, .project-approval-tools {
-    display: none;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 15px;
-    margin: 10px 0;
-}
-
-.verification-tools.role-enabled,
-.project-approval-tools.role-enabled {
     display: block;
 }
 
@@ -102,23 +63,6 @@
 }
 
 /* Role-specific button styles */
-.recipient-button {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.recipient-button:hover {
-    background: linear-gradient(135deg, #45a049, #3d8b40);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
 .admin-button {
     background: linear-gradient(135deg, #f44336, #d32f2f);
     border: none;

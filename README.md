@@ -11,7 +11,7 @@ A faucet and gaming site where players earn UselessCoins for charity by playing 
 - **Bitcoin Lightning** payment integration
 - **Role-based admin** system (admin, moderator, recipient, member)
 - **User profiles** with file-based storage
-- **Fundraiser projects** — users can create and support charity projects
+- **Charity projects** — fundraisers live on [directsponsor.net](https://directsponsor.net) (removed from roflfaucet 2026-10-21)
 - **Balance manipulation detection** — analytics-based fraud prevention
 - **Multi-server sync** via Syncthing
 

@@ -299,7 +299,6 @@
                                 <h4>📋 Available Roles</h4>
                                 <ul>
                                     <li><strong>admin</strong> - Full site administration (assign roles, manage users)</li>
-                                    <li><strong>recipient</strong> - Can create and manage fundraising projects</li>
                                     <li><strong>moderator</strong> - Content moderation (future)</li>
                                 </ul>
                                 <p><strong>Note:</strong> All users automatically have the "member" role.</p>
@@ -418,9 +417,6 @@
                 if (role === 'admin') {
                     badge = 'Admin';
                     color = '#dc3545';
-                } else if (role === 'recipient') {
-                    badge = 'Recipient';
-                    color = '#28a745';
                 } else if (role === 'moderator') {
                     badge = 'Moderator';
                     color = '#fd7e14';
@@ -442,11 +438,6 @@
                     <div class="role-actions">
                         <strong>Manage Roles:</strong><br>
                         <div style="margin: 10px 0;">
-                            <label style="display: block; margin: 8px 0; cursor: pointer;">
-                                <input type="checkbox" id="role-recipient-${userId}" ${roles.includes('recipient') ? 'checked' : ''} onchange="toggleRole('${userId}', 'recipient', this.checked)" style="margin-right: 8px;">
-                                <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Recipient</span>
-                                - Can create and manage fundraising projects
-                            </label>
                             <label style="display: block; margin: 8px 0; cursor: pointer;">
                                 <input type="checkbox" id="role-admin-${userId}" ${roles.includes('admin') ? 'checked' : ''} onchange="toggleRole('${userId}', 'admin', this.checked)" style="margin-right: 8px;">
                                 <span style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Admin</span>
@@ -539,7 +530,6 @@
                             const rolesBadges = user.roles.map(role => {
                                 let color = '#6c757d';
                                 if (role === 'admin') color = '#dc3545';
-                                else if (role === 'recipient') color = '#28a745';
                                 else if (role === 'moderator') color = '#fd7e14';
                                 return `<span style="background: ${color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px;">${role}</span>`;
                             }).join('');

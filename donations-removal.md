@@ -89,3 +89,11 @@ below reduces to "delete the `.env` files when removing the feature".
 
 - 2026-10-21: doc created after the es7 secrets inventory. Nothing removed yet.
 - 2026-10-21: backup of es7 /var/www/html + /var/roflfaucet-data (incl. payments/.env) -> ~/backups/roflfaucet-deploys/pre-donations-removal-2026-10-21.tar.gz (contains secrets, mode 600). Repo removal done: donate/fundraiser/project/accounts/transparency pages, Coinos APIs, webhook, charity-pot widget, nav Donate + Transparency links, profile project UI. NOT yet deployed (deploy.sh will ask to confirm deletions). Server-side TODO after deploy: delete /var/roflfaucet-data/payments/.env*, remove monthly distribution cron, archive+remove data/projects dirs, watch Apache 404s. Decisions: kept admin-roles/user-roles (role system) for now; no directsponsor.net link yet; clickforcharity wallet donates on directsponsor.net instead (see AGENTS.md).
+- 2026-10-21: andy ran deploy.sh (repo removal now live). Project/fundraiser/donation functionality now lives on directsponsor.net (this system was its starting point).
+
+## TODO (remaining)
+
+1. Server cleanup on es7: delete /var/roflfaucet-data/payments/.env*, remove monthly distribution cron, archive then remove data/projects and data/donations dirs (backup already taken).
+2. Watch Apache logs ~1 week for 404s on removed paths (webhook.php, site-income.html, transparency.html, fundraiser*.html, api/*).
+3. Retire leftovers: recipient role in user-roles.js/css and admin-roles.html (decision pending); old Coinos mentions in README.md/TODO.md; commit the repo changes.
+4. LATER (design discussion): a ClickForCharity accounts/presentation page on roflfaucet, pulling data from https://directsponsor.net/profile.html?user=clickforcharity (public, works logged out; terse list with amount, date, link to the fundraiser; fundraiser page links to recipient profile). Needs only a read-only fetch/scrape of public pages, no API/webhook. Open questions: scrape vs. a small JSON endpoint on directsponsor.net, cache, CORS, where it links from on roflfaucet.

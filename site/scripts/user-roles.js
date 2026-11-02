@@ -2,7 +2,7 @@
  * ROFLFaucet User Role System
  * 
  * Extensible role management system using username suffixes
- * Current roles: -r (recipient), -a (admin)
+ * Current roles: -a (admin)
  * Future-ready for: -m (moderator), -s (staff), etc.
  */
 
@@ -10,17 +10,11 @@ class UserRoleSystem {
     constructor() {
         // Role definitions - easily extensible
         this.roleDefinitions = {
-            'r': {
-                name: 'Recipient',
-                description: 'Can create and manage fundraising projects',
-                permissions: ['create_projects', 'edit_own_projects', 'receive_donations'],
-                uiElements: ['fundraiser-section', 'project-creation-tools']
-            },
             'a': {
                 name: 'Admin',
                 description: 'Full site administration capabilities',
-                permissions: ['verify_recipients', 'approve_projects', 'manage_users', 'access_admin_panel'],
-                uiElements: ['admin-panel', 'verification-tools', 'project-approval-tools', 'admin-only']
+                permissions: ['manage_users', 'access_admin_panel'],
+                uiElements: ['admin-panel', 'admin-only']
             },
             // Future roles can be added here:
             // 'm': {
@@ -141,7 +135,6 @@ class UserRoleSystem {
     
     mapProfileRoleToKey(profileRole) {
         const mapping = {
-            'recipient': 'r',
             'admin': 'a', 
             'moderator': 'm'
         };
@@ -160,10 +153,6 @@ class UserRoleSystem {
     
     getRoleNames() {
         return this.userRoles.map(role => this.roleDefinitions[role]?.name).filter(Boolean);
-    }
-    
-    isRecipient() {
-        return this.hasRole('r');
     }
     
     isAdmin() {
@@ -245,15 +234,6 @@ class UserRoleSystem {
         }
     }
     
-    // Admin functions
-    createRecipientUsername(baseUsername) {
-        if (!this.hasPermission('verify_recipients')) {
-            throw new Error('Permission denied: Cannot create recipient usernames');
-        }
-        
-        return `${baseUsername}-r`;
-    }
-    
     // Utility functions for future expansion
     addRole(username, roleKey) {
         if (!this.hasPermission('manage_users')) {
@@ -284,7 +264,6 @@ window.userRoles = new UserRoleSystem();
 // Global convenience functions
 window.hasRole = (role) => window.userRoles.hasRole(role);
 window.hasPermission = (permission) => window.userRoles.hasPermission(permission);
-window.isRecipient = () => window.userRoles.isRecipient();
 window.isAdmin = () => window.userRoles.isAdmin();
 window.validateUsername = (username) => window.userRoles.validateUsername(username);
 
