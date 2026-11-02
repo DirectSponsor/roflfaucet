@@ -244,7 +244,7 @@
                                                         Delete My Account Data
                                                     </button>
                                                     <p style="color: #888; font-size: 12px; margin-top: 10px;">
-                                                        ⚠️ Files are recoverable for 30 days, after which they are permanently deleted.
+                                                        ⚠️ Deletion is scheduled 7 days ahead — you can cancel any time before then. After that, files are recoverable for a further 30 days.
                                                     </p>
                                                 </div>
                                                 <script>
@@ -256,17 +256,10 @@
                                                     
                                                     // Account deletion confirmation
                                                     function confirmAccountDeletion() {
-                                                        const userId = localStorage.getItem('roflfaucet_user_id');
-                                                        if (!userId) {
-                                                            alert('Unable to identify your account. Please log out and log back in.');
-                                                            return;
-                                                        }
-                                                        
-                                                        if (confirm('Are you sure you want to delete all your account data? This includes:\n\n• Balance and earnings\n• Profile information\n• Chat history\n• Avatar images\n\nThis action cannot be undone and will affect all sites.')) {
-                                                            // Redirect to auth server for deletion
+                                                        if (confirm('Schedule your account data for deletion? This includes:\n\n• Balance and earnings\n• Profile information\n• Chat history\n• Avatar images\n\nNothing is deleted immediately — you have 7 days to cancel on the next page if you change your mind.')) {
+                                                            // Redirect to auth server — its own login session verifies identity
                                                             const returnUrl = encodeURIComponent(window.location.href);
-                                                            const deleteUrl = `https://auth.directsponsor.org/delete-account.html?user_id=${userId}&return_url=${returnUrl}`;
-                                                            window.location.href = deleteUrl;
+                                                            window.location.href = `https://auth.directsponsor.org/delete-account.php?return_url=${returnUrl}`;
                                                         }
                                                     }
                                                 </script>
