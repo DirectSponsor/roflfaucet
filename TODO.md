@@ -65,6 +65,30 @@ check in the slots JS, or server-side in `write_balance.php`/
 regression: when did spins stop checking? Check git history on the slots
 game files + balance APIs.
 
+### ISSUE-025: localStorage leaks across account switches (+ role schema drift)
+**Priority: MEDIUM (confusing UI, not a security hole — server checks hold)**
+**Status: NEW**
+**Reported: 2026-11-02**
+
+**Problem:**
+After switching to a new "disposable" account in the same browser, the
+user menu showed **Admin** and the role-management UI appeared. Verified:
+the disposable profile has `global_roles:[]` / `site_roles:{}` — it is
+NOT admin; `manage_roles` correctly requires session + 'admin' in the
+requester's profile file.
+
+**Two underlying bugs:**
+1. `user-roles.js` reads `user_roles` from localStorage as a cache before
+   fetching fresh — localStorage is per-browser, so the previous account's
+   roles leak into the new account's UI. Same class of bug as bet amounts
+   persisting (see ISSUE-024 context). Fix: clear or key account-scoped
+   localStorage on login/account switch (`user_roles_{combinedUserId}`).
+2. **Schema drift:** `user-roles.js` + `simple-profile.php` read
+   `profile.roles`, but profiles now store `global_roles`/`site_roles`.
+   Role fetch finds nothing → always defaults to member → the client
+   role layer is dead code except the stale-cache path. Reconcile schema
+   when re-enabling roles.
+
 ### 🚨 ISSUE-023: Balance Not Syncing When Switching Pages (Slots → Faucet)
 **Priority: HIGH (User-Visible Bug)**  
 **Status: PARTIALLY FIXED — needs revert + proper approach — 2026-07-01**
