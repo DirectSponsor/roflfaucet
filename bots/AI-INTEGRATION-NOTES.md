@@ -10,10 +10,12 @@
 ### Chosen: OpenRouter free tier with NousResearch Hermes 3
 
 > **2026-11-02 staleness note:** `nousresearch/hermes-3-llama-3.1:free` is no longer in
-> OpenRouter's free catalog (checked live list — currently ~14 free models, no Nous/Hermes
-> ones). Free catalogs rotate constantly — re-pick the model at implementation time from
-> `https://openrouter.ai/api/v1/models` (filter `:free`), or use the **Nous Portal free tier**
-> instead since an account + working key already exists on the Orange Pi for Hermes Agent.
+> OpenRouter's free catalog — free models rotate constantly. **Fix: use
+> `openrouter/free` ("Free Models Router", $0, 200k ctx) as the model id** — OpenRouter
+> routes it to whatever free models are currently live, so the integration can't break
+> on catalog rotation again. Alternative: Nous Portal free tier (account + working key
+> already on the Orange Pi for Hermes Agent), but it has no router — model id would
+> need re-picking whenever the `:free` catalog rotates.
 
 **Why OpenRouter:**
 - Free API key, no credit card required
