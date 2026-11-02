@@ -3,6 +3,8 @@
 *Last updated: 2025-11-09*  
 *Auto-managed by AI assistant based on notes from: `aa-new-issues-requests`*
 
+> **2026-10-21:** the project/fundraiser/donation system described below was removed from roflfaucet and now lives on directsponsor.net. See donations-removal.md.
+
 ## 🎉 RECENT COMPLETION: Project Image System Migration (2025-11-09)
 
 **✅ COMPLETED: Protected Image Storage with Apache Alias**
@@ -42,6 +44,26 @@ Write APIs were accepting `user_id` from POST/GET params with no auth check — 
 ---
 
 ## 🔥 NEW PRIORITY ISSUES
+
+### 🚨 ISSUE-024: Slots Allow Play at Zero/Negative Balance
+**Priority: HIGH (coin integrity)**
+**Status: NEW**
+**Reported: 2026-11-02**
+
+**Problem:**
+A disposable test account played slots at 0 balance and the balance went
+negative (-10, -20…) instead of the game refusing play. The balance check
+either isn't running or is comparing the wrong value before a spin.
+
+**Context (not the bug):** bet amount persisted at 10/play from the other
+account's localStorage — known localStorage quirk, accepted, not part of
+this issue.
+
+**To investigate:** which layer should refuse the play — client-side
+check in the slots JS, or server-side in `write_balance.php`/
+`update_balance.php` when the debit would exceed balance. Suspect
+regression: when did spins stop checking? Check git history on the slots
+game files + balance APIs.
 
 ### 🚨 ISSUE-023: Balance Not Syncing When Switching Pages (Slots → Faucet)
 **Priority: HIGH (User-Visible Bug)**  
