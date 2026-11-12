@@ -14,7 +14,6 @@ class UnifiedBalanceSystem {
         this.netChange = 0; // Running total of changes since last flush
         this.consecutiveFailures = 0;
         this.isFlushing = false; // Guard flag to prevent double flush
-        this.isSyncing = false; // Guard flag for manual sync
         this.sessionReady = false; // PHP session established via session-init.php
         
         console.log(`💰 ROFLFaucet Balance System initialized for ${this.isLoggedIn ? 'member' : 'guest'} user`);
@@ -240,7 +239,7 @@ class UnifiedBalanceSystem {
             banner.innerHTML = `
                 ❌ Unable to sync balance from other site.
                 Network issue detected. Earning activities disabled until resolved.
-                <button onclick="window.unifiedBalance.syncFromOtherSite()" 
+                <button onclick="window.unifiedBalance.flushNetChange('manual')" 
                         style="margin-left: 10px; padding: 5px 10px; background: white; color: #dc3545; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">
                     Retry Now
                 </button>
