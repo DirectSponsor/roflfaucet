@@ -4,6 +4,19 @@ The roflfaucet chat is a custom-built, flat-file chat system. It runs on roflfau
 
 ---
 
+## Two chats — the separation
+
+There are **two separate chat systems** in the DirectSponsor / roflfaucet world, deliberately kept apart:
+
+- **The roflfaucet public chat (this document)** — flat-file, polling, with the bots (Anzar rainbot, ROFLBot), `/tip`, `/rain`, and the coin/faucet mechanics. It **stays non-Nostr**. It is embedded on directsponsor.net via iframe (see below). Nothing here changes.
+- **The Nostr chat** — a separate layer, used only where a small, scoped group is talking: **sponsor groups**, and (planned) **fundraiser donors** who opt in to the group of a recipient they supported. Plaintext kind-9 events on our own relay (`wss://relay.directsponsor.net`), server-side signing, no browser crypto. See `sponsor-group-chat-plan.md` in the directsponsor.net project for the full plan.
+
+**The dividing line:** the community-wide stream with bots and coin mechanics stays on the roflfaucet system; small, scoped group conversations (sponsor groups, opted-in donors) go on the Nostr layer.
+
+**Not privacy:** the Nostr layer is *not* private — messages are plaintext on our relay and readable by anyone. It is only *scoped* to a group channel; the public chat is not "more public" than it.
+
+---
+
 ## Architecture Overview
 
 - **No WebSocket, no database.** Messages are stored in flat files; the client polls the API every 3 seconds.
@@ -166,5 +179,6 @@ The bots (Anzar Rainbot, ROFLBot) write to the same `simple-chat.php` API direct
 
 ## Related
 
-- [[chat-private-messaging-outline]] — planned Nostr-based private messaging layer to sit alongside this system. Public chat stays unchanged; private 1:1 and small-group comms would move to Nostr (NIP-17 / NIP-44 / NIP-59). That doc covers scope split, key handling, relay strategy, and migration plan.
-- [[nostr-integration]] — the strfry relay (`wss://relay.directsponsor.net`) that the private messaging layer would use.
+- `sponsor-group-chat-plan.md` (directsponsor.net project) — the current plan for the **Nostr group chat** (sponsor groups + opted-in fundraiser donors). This is the other half of the "two chats" split above.
+- [[chat-private-messaging-outline]] — older draft; the "small private groups" part is superseded by `sponsor-group-chat-plan.md`. The 1:1 DM scope is dormant, not cancelled. Covers key handling, relay strategy.
+- [[nostr-integration]] — the strfry relay (`wss://relay.directsponsor.net`) the Nostr chat would use.
