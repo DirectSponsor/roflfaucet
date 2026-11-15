@@ -110,11 +110,18 @@ async function spinWheel() {
         return;
     }
     
+    // Set spinning BEFORE the awaits — otherwise a second click during
+    // the balance request slips past the guard above
+    wheelAnimation.spinning = true;
+    updateSpinButton();
+    const resetSpin = () => { wheelAnimation.spinning = false; updateSpinButton(); };
+    
     const currentBet = wheelAnimation.currentBet;
     
     // Check if player has enough balance
     const currentBalance = await balanceSystem.getBalance();
     if (currentBalance < currentBet) {
+        resetSpin();
         showInsufficientBalanceDialog('wheel');
         return;
     }
@@ -122,6 +129,7 @@ async function spinWheel() {
     // Subtract bet amount
     const betResult = await balanceSystem.subtractBalance(currentBet, 'wheel_bet', `Wheel spin bet: ${currentBet}`);
     if (!betResult.success) {
+        resetSpin();
         alert('Failed to place bet: ' + betResult.error);
         return;
     }
@@ -129,10 +137,6 @@ async function spinWheel() {
     // Update balance display
     const balanceEl = document.getElementById('current-balance');
     if (balanceEl) balanceEl.textContent = betResult.balance;
-    
-    // Set spinning state and disable spin button
-    wheelAnimation.spinning = true;
-    updateSpinButton();
     
     // Update status to show spinning with animated dots
     const statusElement = document.getElementById('status-text');

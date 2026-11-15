@@ -194,6 +194,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'timestamp') {
     $amount = floatval($input['amount'] ?? 0);
     $source = $input['source'] ?? 'manual';
     
+    // Lock the file for the whole read-modify-write so two concurrent
+    // requests can't load the same balance and lose each other's updates
+    $lockFp = file_exists($balanceFile) ? fopen($balanceFile, 'r+') : null;
+    if ($lockFp) flock($lockFp, LOCK_EX);
+    
     $data = loadBalanceData($balanceFile, $userId);
     if ($data === null) {
         http_response_code(404);
@@ -219,8 +224,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'timestamp') {
     // Keep only recent transactions (last 100)
     $data['recent_transactions'] = array_slice($data['recent_transactions'], 0, 100);
     
-    // Save updated data
-    if (saveBalanceData($balanceFile, $data)) {
+    // Save updated data, then release the lock
+    $saved = saveBalanceData($balanceFile, $data);
+    if ($lockFp) { flock($lockFp, LOCK_UN); fclose($lockFp); }
+    
+    if ($saved) {
         echo json_encode([
             'success' => true,
             'new_balance' => $data['balance'],

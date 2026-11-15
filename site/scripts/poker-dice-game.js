@@ -8,6 +8,7 @@ class PokerDiceGame {
         // Game state
         this.gameState = 'waiting'; // waiting, player_first_roll, player_hold, house_turn, complete
         this.isAnimating = false;
+        this.gameStarting = false; // re-entry guard for the async startGame()
         
         // Current hands
         this.playerDice = [null, null, null, null, null];
@@ -297,20 +298,29 @@ class PokerDiceGame {
     }
     
     async startGame() {
+        // Re-entry guard: gameState stays 'waiting' through the awaits
+        // below, so the button alone can't stop a double-click
+        if (this.gameStarting || this.gameState !== 'waiting') return;
+        this.gameStarting = true;
+        
         const betAmount = this.currentBet;
         
-        // Smart balance refresh before game starts
-        await this.smartBalanceRefresh('before_game');
-        
-        // Check balance (await the async call)
-        const currentBalance = await this.balanceSystem.getBalance();
-        if (currentBalance < betAmount) {
-            this.showInsufficientBalanceDialog(betAmount, currentBalance);
-            return;
+        try {
+            // Smart balance refresh before game starts
+            await this.smartBalanceRefresh('before_game');
+            
+            // Check balance (await the async call)
+            const currentBalance = await this.balanceSystem.getBalance();
+            if (currentBalance < betAmount) {
+                this.showInsufficientBalanceDialog(betAmount, currentBalance);
+                return;
+            }
+            
+            // Deduct bet
+            await this.balanceSystem.subtractBalance(betAmount, 'poker_dice_bet');
+        } finally {
+            this.gameStarting = false;
         }
-        
-        // Deduct bet
-        await this.balanceSystem.subtractBalance(betAmount, 'poker_dice_bet');
         
         // Start player's first roll
         this.gameState = 'player_first_roll';

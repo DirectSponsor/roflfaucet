@@ -436,8 +436,9 @@ class CasinoSlotMachine {
         // Animate coin drops
         this.animateCoins(totalPayout);
         
-        // Update credits gradually
-        this.animateCreditsIncrease(totalPayout);
+        // Update credits gradually — return the promise so the spin
+        // cycle can keep controls locked until the credit lands
+        return this.animateCreditsIncrease(totalPayout);
         
         // Update total won
         this.totalWon += totalPayout;
@@ -575,36 +576,65 @@ class CasinoSlotMachine {
 
     async spinReels() {
         if (this.isSpinning) return;
-        
-        // Use unified balance system to subtract bet amount
-        const betResult = await subtractBalance(this.currentBet, 'slots_bet', `Slot machine bet: ${this.currentBet} credits`);
-        if (!betResult.success) {
-            console.log('❌ Insufficient balance for bet!');
-            if (betResult.error === 'Insufficient balance') {
-                showInsufficientBalanceDialog('slots');
-            }
-            return;
-        }
-        
-        // Update local credits to match the new balance
-        this.credits = betResult.balance;
-        
-        this.totalSpins++;
-        this.totalWagered += this.currentBet;
-        
+        // Set the flag BEFORE the first await — otherwise a second click
+        // during the balance request slips past the guard
         this.isSpinning = true;
-        console.log(`🎰 Spinning with bet: ${this.currentBet} credits...`);
+        this.setControlsEnabled(false);
         
-        // Update display immediately
-        this.updateDisplay();
-        
-        // Start all reels spinning with CSS animation
-        this.reels.forEach((reel, index) => {
-            reel.classList.add('spinning');
-        });
+        try {
+            // Use unified balance system to subtract bet amount
+            const betResult = await subtractBalance(this.currentBet, 'slots_bet', `Slot machine bet: ${this.currentBet} credits`);
+            if (!betResult.success) {
+                console.log('❌ Insufficient balance for bet!');
+                if (betResult.error === 'Insufficient balance') {
+                    showInsufficientBalanceDialog('slots');
+                }
+                this.finishSpin();
+                return;
+            }
+            
+            // Update local credits to match the new balance
+            this.credits = betResult.balance;
+            
+            this.totalSpins++;
+            this.totalWagered += this.currentBet;
+            
+            console.log(`🎰 Spinning with bet: ${this.currentBet} credits...`);
+            
+            // Update display immediately
+            this.updateDisplay();
+            
+            // Start all reels spinning with CSS animation
+            this.reels.forEach((reel, index) => {
+                reel.classList.add('spinning');
+            });
 
-        // Stop reels sequentially like real slot machines
-        this.stopReelsSequentially();
+            // Stop reels sequentially like real slot machines
+            this.stopReelsSequentially();
+        } catch (error) {
+            console.error('❌ Spin failed:', error);
+            this.finishSpin();
+        }
+    }
+    
+    // Called when the whole cycle (bet → reels → win credit) is done.
+    // Small delay so the machine doesn't feel twitchy.
+    finishSpin() {
+        setTimeout(() => {
+            this.isSpinning = false;
+            this.setControlsEnabled(true);
+            this.updateDisplay();
+        }, 300);
+    }
+    
+    setControlsEnabled(enabled) {
+        const spinButton = document.getElementById('spin-btn');
+        if (spinButton) spinButton.disabled = !enabled;
+        // Bet buttons too — processWin reads currentBet at payout time,
+        // so changing it mid-spin would corrupt the payout
+        document.querySelectorAll('.bet-btn-inline').forEach(b => {
+            b.disabled = !enabled;
+        });
     }
 
     async stopReelsSequentially() {
@@ -648,12 +678,17 @@ class CasinoSlotMachine {
                 
                 // If this is the last reel, finish up
                 if (i === 2) {
-                    setTimeout(() => {
-                        this.isSpinning = false;
+                    setTimeout(async () => {
                         console.log(`Stopped on: ${selectedSymbols.join(', ')}`);
                         
-                        // Process the spin result
-                        this.processSpinResult(outcomes);
+                        // Process the spin result (waits for any win credit),
+                        // then release controls — never leave the button dead
+                        try {
+                            await this.processSpinResult(outcomes);
+                        } catch (error) {
+                            console.error('❌ Result processing failed:', error);
+                        }
+                        this.finishSpin();
                     }, 600); // Wait for last reel animation
                 }
             }, delays[i]);
@@ -803,7 +838,7 @@ class CasinoSlotMachine {
         
         // If there's a win, animate the payout
         if (totalPayout > 0) {
-            this.animateWinPayout(totalPayout, winResult);
+            return this.animateWinPayout(totalPayout, winResult).then(() => totalPayout);
         } else {
             // No win - update display to show 0
             const lastWinElement = document.getElementById('last-win');
@@ -818,12 +853,13 @@ class CasinoSlotMachine {
         return totalPayout;
     }
     
-    processSpinResult(outcomes) {
+    async processSpinResult(outcomes) {
         // Check for wins
         const winResult = this.checkWinConditions(outcomes);
         
-        // Process any winnings
-        const totalPayout = this.processWin(winResult, this.currentBet);
+        // Process any winnings — awaits the balance credit on a win,
+        // resolves immediately on a loss
+        const totalPayout = await this.processWin(winResult, this.currentBet);
         
         // Track statistics
         this.trackSpinStats(winResult, totalPayout);

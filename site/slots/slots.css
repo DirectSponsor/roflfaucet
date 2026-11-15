@@ -373,8 +373,8 @@ nav {
     transition: background 0.3s ease;
 }
 
-.slot-direct .spin-button:hover {
-    background: #c0392b;
+.slot-direct .spin-button:not(:disabled):hover {
+    background: #ff6b5b;
 }
 
 .slot-direct .spin-button:disabled {
