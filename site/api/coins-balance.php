@@ -81,47 +81,58 @@ function getBalanceFilePath($userId) {
     return $balanceFile;
 }
 
-// Load balance data from file
+// How old a local balance file may be before we re-check the auth server
+define('BALANCE_CACHE_TTL', 60);
+
+// Load balance data: fresh local file wins; stale files are compared
+// against the auth server and the newer value wins (so claims on other
+// sites reach here, but a local claim whose push is still in flight
+// never gets clobbered by an older hub value).
 function loadBalanceData($balanceFile, $userId = null) {
+    $localData = null;
     if (file_exists($balanceFile)) {
-        $content = file_get_contents($balanceFile);
-        $data = json_decode($content, true);
-        
+        $data = json_decode(file_get_contents($balanceFile), true);
         if ($data) {
-            // Ensure required fields exist
-            return [
+            $localData = [
                 'balance' => $data['balance'] ?? 0,
                 'last_updated' => $data['last_updated'] ?? time(),
                 'recent_transactions' => $data['recent_transactions'] ?? []
             ];
+            if (time() - filemtime($balanceFile) < BALANCE_CACHE_TTL) {
+                return $localData;
+            }
         }
     }
-    
-    // LAZY LOADING: File doesn't exist locally, try fetching from auth server
+
+    // Stale or missing: check the auth server
     if ($userId) {
         $authBalance = fetchBalanceFromAuthServer($userId);
         if ($authBalance && isset($authBalance['coins'])) {
-            // Create local balance file with data from auth server
-            $balanceData = [
-                'balance' => floatval($authBalance['coins']),
-                'last_updated' => time(),
-                'recent_transactions' => []
-            ];
-            
-            // Ensure directory exists
-            $dir = dirname($balanceFile);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
+            $authTs = $authBalance['last_updated'] ?? 0;
+            if (!$localData || $authTs > $localData['last_updated']) {
+                // Auth is newer (or we had nothing) — adopt it, keep local tx history
+                $balanceData = [
+                    'balance' => floatval($authBalance['coins']),
+                    'last_updated' => $authTs ?: time(),
+                    'recent_transactions' => $localData['recent_transactions'] ?? []
+                ];
+                $dir = dirname($balanceFile);
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+                saveBalanceData($balanceFile, $balanceData);
+                return $balanceData;
             }
-            
-            // Cache the balance locally for future requests
-            saveBalanceData($balanceFile, $balanceData);
-            
-            return $balanceData;
+            // Local is newer or equal — touch to refresh mtime without firing
+            // the daemon's close_write watch (no push, no churn). If Hub is
+            // behind, the next real local write will push the newer value.
+            @touch($balanceFile);
+            return $localData;
         }
     }
-    
-    return null;
+
+    // Auth unreachable — serve whatever local copy we have
+    return $localData;
 }
 
 // Save balance data to file
