@@ -13,6 +13,14 @@ LOCAL_PATH="$(pwd)"
 BACKUP_DIR="$HOME/backups/roflfaucet-deploys"
 REMOTE_BACKUP_DIR="/home/roflfaucet-backups/deploy-backup-$(date +%Y%m%d-%H%M%S)"
 
+# Non-interactive mode: -y / --auto / DEPLOY_AUTO=1 answers all prompts yes
+# (agent/CI use). Humans still get the prompts.
+AUTO_MODE=false
+for arg in "$@"; do
+    case "$arg" in -y|--auto|auto) AUTO_MODE=true ;; esac
+done
+[[ "${DEPLOY_AUTO:-0}" == "1" ]] && AUTO_MODE=true
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -38,6 +46,20 @@ error() {
     exit 1
 }
 
+# Prompt helper — AUTO_MODE returns true without reading stdin.
+# IMPORTANT: ssh/rsync inside functions can consume piped stdin, which is
+# why piped answers kept getting eaten. All remote commands get </dev/null.
+confirm() {
+    local prompt="$1"
+    if $AUTO_MODE; then
+        echo "$prompt y (auto)"
+        return 0
+    fi
+    read -rp "$prompt" -n 1
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]]
+}
+
 # Auto-commit pending changes to prevent backlog
 auto_commit_changes() {
     log "Checking for pending changes..."
@@ -47,10 +69,14 @@ auto_commit_changes() {
         local change_count=$(git status --porcelain | wc -l)
         log "Found $change_count pending changes"
         
-        # Ask for custom commit message
+        # Ask for custom commit message (auto-generated in AUTO_MODE)
         echo ""
-        read -p "Enter commit message (or press Enter for auto-generated): " -r custom_msg
-        echo ""
+        if $AUTO_MODE; then
+            custom_msg=""
+        else
+            read -p "Enter commit message (or press Enter for auto-generated): " -r custom_msg
+            echo ""
+        fi
         
         # Add all changes including deletions
         git add -A
@@ -86,7 +112,7 @@ pre_deploy_checks() {
     fi
     
     # Check server connectivity
-    if ! ssh "$REMOTE_HOST" "echo 'Connection test'" >/dev/null 2>&1; then
+    if ! ssh "$REMOTE_HOST" </dev/null "echo 'Connection test'" >/dev/null 2>&1; then
         error "Cannot connect to $REMOTE_HOST"
     fi
     
@@ -148,7 +174,7 @@ create_local_backup() {
 create_remote_backup() {
     log "Creating remote backup..."
     
-    ssh "$REMOTE_HOST" "
+    ssh "$REMOTE_HOST" </dev/null "
         if [ -d '$REMOTE_PATH' ]; then
             tar -czf '$REMOTE_BACKUP_DIR.tar.gz' -C '$(dirname "$REMOTE_PATH")' '$(basename "$REMOTE_PATH")' 2>/dev/null || true
             echo 'Remote backup created: $REMOTE_BACKUP_DIR.tar.gz'
@@ -177,15 +203,13 @@ preview_deletions() {
         --exclude='stats.html' \
         --exclude='*.backup-*' \
         --exclude='scripts/userdata/stats/' \
-        "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/" 2>/dev/null | grep '^\*deleting' || true)
+        "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/" </dev/null 2>/dev/null | grep '^\*deleting' || true)
     
     if [[ -n "$deletions" ]]; then
         warning "⚠️  The following files will be DELETED from the server:"
         echo "$deletions" | sed 's/^\*deleting   /  - /'
         echo ""
-        read -rp "Continue with these deletions? (y/N): " -n 1
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        if ! confirm "Continue with these deletions? (y/N): "; then
             error "Deployment cancelled to prevent deletions."
         fi
     else
@@ -213,7 +237,7 @@ deploy_files() {
         --exclude='*.backup-*' \
         --exclude='scripts/userdata/stats/' \
         --progress \
-        "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/"
+        "$LOCAL_PATH/" "$REMOTE_HOST:$REMOTE_PATH/" </dev/null
     
     success "Files deployed successfully"
 }
@@ -222,7 +246,7 @@ deploy_files() {
 fix_permissions() {
     log "Fixing file permissions on remote server..."
     
-    ssh "$REMOTE_HOST" "
+    ssh "$REMOTE_HOST" </dev/null "
         # Set proper ownership
         sudo chown -R www-data:www-data '$REMOTE_PATH'
         
@@ -265,7 +289,7 @@ verify_deployment() {
 cleanup_remote_backups() {
     log "Cleaning up old remote backups..."
     
-    ssh "$REMOTE_HOST" "
+    ssh "$REMOTE_HOST" </dev/null "
         # Keep only last 3 remote deploy backups
         cd /home/roflfaucet-backups
         ls -t deploy-backup-*.tar.gz 2>/dev/null | tail -n +4 | xargs -r rm -f || true
@@ -299,9 +323,7 @@ main() {
     fi
 
     # Ask for confirmation
-    read -p "Continue with deployment? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    if ! confirm "Continue with deployment? (y/N): "; then
         log "Deployment cancelled"
         exit 0
     fi
